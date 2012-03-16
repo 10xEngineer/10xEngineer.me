@@ -3,10 +3,10 @@ head
 	title 10xEngineer.me Course IDE Detail
 	body
 		.container-fluid
+			include _coursenav
 			.row-fluid
 				.span10
 					form(onsubmit='return captureSource(this)', action="/submitCode", method='POST')#editform
-						legend CODING EXERCISE
 						.controls
 							.well
 								input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')
@@ -29,8 +29,8 @@ head
 				.span10
 					include _additionalfooter
 			.row-fluid
-					p 10xEngineer.me uses
-						a(href="http://ideone.com") ideone.com
+					p 10xEngineer.me uses 
+						a(href="http://ideone.com") ideone.com 
 						| &copy; by 
 						a(href="http://sphere-research.com") Sphere Research Labs
 			.row-fluid

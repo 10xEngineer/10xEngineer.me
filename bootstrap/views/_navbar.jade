@@ -1,7 +1,7 @@
 .navbar
 	.navbar-inner
-		.container(style='width: auto;')
-			a.brand(href='#') 
+		.container-fluid(style='width: auto;')
+			a.brand(href='/about') 
 				span(style='color:white;font-weight:bold;') 10
 				span(style='color:orange;') x
 				span(style='color:white;') Engineer
@@ -13,25 +13,25 @@
 					a(href='/')
 						i.icon-home.icon-white 
 						| Home
-				li
-					a(href='/courses')
+				li.dropdown
+					a.dropdown-toggle(href='/courses', data-toggle='dropdown')
 						i.icon-calendar.icon-white 
 						| Courses
-				li.dropdown
-					a.dropdown-toggle(href='/users', data-toggle='dropdown')
-						i.icon-map-marker.icon-white 
-						| Forums
 						b.caret
 					ul.dropdown-menu
 						li
-							a(href='#') Create New User
+							a(href='#') CS101 DEVOPS
 						li
-							a(href='#') List All Users
+							a(href='#') CS102 LOW LATENCY ALGO
 						li.divider
 						li
-							a(href='#') Batch Import
+							a(href='#') Upcoming Courses
+				li.dropdown
+					a.dropdown-toggle(href='/posts')
+						i.icon-map-marker.icon-white 
+						| Announcements
 				li
-					a(href='/about')
+					a(href='/users')
 						i.icon-user.icon-white 
 						| Profile
 				-if(loggedInUser.is_admin)

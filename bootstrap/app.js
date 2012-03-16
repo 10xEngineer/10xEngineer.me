@@ -251,25 +251,25 @@ submitCode = function(code) {
 // Routes
 app.get('/', loadGlobals, function(req, res){
   res.render('main', {
-    title: 'Fun', loggedInUser:req.user
+    title: '10xEngineer.me Home', loggedInUser:req.user
   });
 });
 
 app.get('/courses', loadGlobals, function(req, res){
   res.render('overview', {
-    title: 'Fun', loggedInUser:req.user
+    title: '10xEngineer.me Course List', loggedInUser:req.user
   });
 });
 
 app.get('/course', loadGlobals, function(req, res){
   res.render('course', {
-    title: 'Fun', loggedInUser:req.user
+    title: '10xEngineer.me Course', UnitTitle: 'CS101 - Devops', loggedInUser:req.user
   });
 });
 
 app.get('/program', loadGlobals, function(req, res){
   res.render('ide', {
-    title: 'Fun', code: '', compile_results: '', compile_errors: '', loggedInUser:req.user
+    title: '10xEngineer.me Course', UnitTitle: 'CS101 - Devops', code: '', compile_results: '', compile_errors: '', loggedInUser:req.user
   });
 });
 
@@ -292,7 +292,7 @@ app.post('/submitCode', loadGlobals, function(req, res){
 
 app.get('/about', loadGlobals, function(req, res){
   res.render('default', {
-    title: 'About',
+    title: '10xEngineer.me About',
     loggedInUser:req.user,
     text: 'We\'re really a fun bunch of people!'
   });

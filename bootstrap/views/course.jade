@@ -1,15 +1,13 @@
-html(lang='en')
-head
-	title 10xEngineer.me Course Detail
-	body
-		.container-fluid
-			.row-fluid
-				.span10
-					include _player
-				.span2(style='background-color:black; color:white;')
-					include _sidebar
-			.row-fluid
-				p
-			.row-fluid
-				include _additionalfooter
+.container-fluid
+	include _coursenav
+	.row-fluid
+		.span10
+			include _player
+		.span2(style='background-color:black; color:white;')
+			include _sidebar
+	.row-fluid
+		p
+	.row-fluid
+		.span10
+			include _additionalfooter
 
