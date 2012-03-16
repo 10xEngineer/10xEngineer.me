@@ -1,0 +1,51 @@
+html(lang='en')
+head
+	title 10xEngineer.me Course IDE Detail
+	body
+		.container-fluid
+			.row-fluid
+				.span10
+					form(onsubmit='return captureSource(this)', action="/submitCode", method='POST')#editform
+						legend CODING EXERCISE
+						.controls
+							.well
+								input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')
+								#editor(style='position:relative;width:800px;height:400px;')
+						.form-actions
+							button.btn.btn-primary(type='submit') SUBMIT
+				.span2(style='background-color:black; color:white;')
+					include _sidebar
+			.row-fluid
+				.span10
+					p
+			.row.fluid
+				.span10
+					.well
+						p#compile_results #{compile_results} || Run to see results
+						p(style='color:red')#compile_errors #{compile_errors} || Run to see any potential errors
+			.row.fluid
+				.span10
+			.row-fluid
+				.span10
+					include _additionalfooter
+			.row-fluid
+					p 10xEngineer.me uses
+						a(href="http://ideone.com") ideone.com
+						| &copy; by 
+						a(href="http://sphere-research.com") Sphere Research Labs
+			.row-fluid
+			script(type='text/javascript', src='/javascripts/ace/ace.js')
+			script(type='text/javascript')
+				$(document).ready(function() {
+					var editor = ace.edit("editor");
+				});
+				function captureSource(form) {
+					with( form ) {
+						console.log('form = ', form);
+						var editor = ace.edit("editor");
+						var sc = editor.getSession().getValue();
+						console.log('onsubmit: ', sc);
+						form.sourcecode.value = sc;
+						console.log('editform.sourcecode = ', form.sourcecode.value);
+					}
+				}

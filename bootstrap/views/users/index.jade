@@ -1,0 +1,41 @@
+h1= title
+.actions 
+  ul
+    li
+      a(href='/user/create') Add User
+ul#userMosaic\n
+  - each user in users
+    li\n
+      a(href='/user/#{user._id}/')
+        img(src='http://static1.robohash.com/#{user.name}.png?set=set1&size=240x240')
+        br
+        h4=user.name
+- if (loggedInUser.is_admin) 
+  table.data
+    tr
+      th Username
+      th Name
+      th Email
+      th Member Since
+      th Delete
+    - each user in users
+      - date = new Date(user.created_at)
+      - userDate= date.toDateString()
+      tr
+        td=user.username
+        td=user.name
+        td=user.email
+        td=userDate
+        td 
+          a(href='/user/#{user._id}/remove') Delete\n
+
+//p Or another way
+//ul.users
+//  != partial('user', users);
+//-p Or a third way
+//-ul.users
+//-  != partial('userGlobal', {collection: users, as: global});
+//-p Or a forth way
+//-ul.users
+//-  != partial('userPerson', {collection: users, as: 'person'});
+
