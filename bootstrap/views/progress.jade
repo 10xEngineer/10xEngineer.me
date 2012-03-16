@@ -1,0 +1,8 @@
+.row-fluid
+	.span2
+	- var sections = ['FIRST QUIZ', 'WHAT IS A ...', 'FIRST PROGRAMMING QUIZ', 'WOULD YOU RATHER', 'EAT QUIZ', 'PYTHON EXPRESSIONS', 'SPEED OF LIGHT' ]
+	each section, i in sections
+		.span6
+			p.bold
+				a(href='#') #{section}
+	.span2

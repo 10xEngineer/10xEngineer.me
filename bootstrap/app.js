@@ -273,6 +273,12 @@ app.get('/program', loadGlobals, function(req, res){
   });
 });
 
+app.get('/progress', loadGlobals, function(req, res){
+  res.render('progress', {
+    title: '10xEngineer.me Course', UnitTitle: 'CS101 - Devops', loggedInUser:req.user
+  });
+});
+
 app.post('/submitCode', loadGlobals, function(req, res){
   console.log('in app.js::submitCode');
 
