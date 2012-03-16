@@ -21,7 +21,7 @@ html(lang="en")
 		body
 			.container-fluid
 				section#navbar
-					include _navbar
+					include _header
 				section#content!= body
 				section#sidebar
 				- if (lastFivePosts)
@@ -39,7 +39,11 @@ html(lang="en")
 			script(type='text/javascript')
 				$(document).ready(function() {
 					$('.dropdown-toggle').dropdown();
-
+					if( $('.carousel') ) {
+						$('.carousel').carousel({
+							interval: 2000
+						});
+					}
 					var player = $("#jquery_jplayer_1");
 					if( player ) {
 						player.jPlayer({

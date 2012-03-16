@@ -282,6 +282,7 @@ app.post('/submitCode', loadGlobals, function(req, res){
   console.log('re-rendering ide');
   res.render('ide', {
     title: 'submitCode',
+	UnitTitle: req.param('UnitTitle', '(unknown)'),
     code: source, 
     compile_results: compile_res,
 	compile_errors: compile_err,
@@ -294,7 +295,7 @@ app.get('/about', loadGlobals, function(req, res){
   res.render('default', {
     title: '10xEngineer.me About',
     loggedInUser:req.user,
-    text: 'We\'re really a fun bunch of people!'
+    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
   });
 });
 

@@ -1,0 +1,44 @@
+.navbar
+
+	.navbar-inner
+		.container-fluid(style='width: auto;')
+			a.brand(href='/about', style='font-size:2em;') 
+				span(style='color:white;font-weight:bold;') 10
+				span(style='color:orange;') x
+				span(style='color:white;') Engineer
+				span(style='color:orange;font-weight:bold;') .
+				span(style='color:white;') me
+				// img(src='/img/10xengineer.me.png', alt='10xEngineer.me')
+			ul.nav
+				li.active
+					a(href='/')
+						i.icon-home.icon-white 
+						| Home
+				li.dropdown
+					a.dropdown-toggle(href='/courses', data-toggle='dropdown')
+						i.icon-calendar.icon-white 
+						| Courses
+						b.caret
+					ul.dropdown-menu
+						li
+							a(href='#') CS101 DEVOPS
+						li
+							a(href='#') CS102 LOW LATENCY ALGO
+						li.divider
+						li
+							a(href='#') Upcoming Courses
+				li.dropdown
+					a.dropdown-toggle(href='/posts')
+						i.icon-map-marker.icon-white 
+						| Announcements
+				li
+					a(href='/users')
+						i.icon-user.icon-white 
+						| Profile
+				-if(loggedInUser.is_admin)
+					li
+						a(href='/admin')
+							i.icon-user.icon-white 
+							| Admin
+			form.navbar-search.pull-right(action='')
+				input.search-query.span3(type='text', placeholder='Search Contents')
