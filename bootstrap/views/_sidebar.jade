@@ -1,16 +1,9 @@
 .row-fluid
-	p.bold
-		a(href='/program')
-			| + UNIT 1
-	p.bold
-		| + HOMEWORK 1
-	p.bold
-		| + OFFICE HOURS 1
-	p.bold
-		| + UNIT 2
-	p.bold
-		| + HOMEWORK 2
-	p.bold
-		| + OFFICE HOURS 2
+	.container(data-spy='scroll')
+		- var sections = ['UNIT', 'HOMEWORK', 'OFFICE HOURS']
+		each i in [1,2,3,4,5,6,7]
+			each section in sections
+				p.bold(style='color:white;')
+					a(href='/program') #{section} #{i}
 .row-fluid(style='background-color:white;')
 	a.btn.btn-primary.btn-large NEXT
