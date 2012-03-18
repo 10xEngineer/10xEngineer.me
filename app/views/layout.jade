@@ -1,0 +1,73 @@
+!!! 5
+html(lang="en")
+	head
+		meta(charset="utf-8")
+		title #{title}
+		link(rel="stylesheet", href="/stylesheets/bootstrap.min.css")
+		link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap-responsive.min.css')
+		link(type='text/css', href='/stylesheets/jplayer.blue.monday.css', rel='stylesheet')
+		script(src='/socket.io/socket.io.js')
+		- if (typeof headContent === "string")
+			!= partial(headContent);
+			| <!--[if lt IE 9]
+		script(src="http://html5shiv.googlecode.com/svn/trunk/html5.js")
+			| <![endif]-->
+		script
+			var socket = io.connect();
+			socket.on('newPost', function (data) {
+				postLink = ' <a href="/post/' + data._id + '">' + data.title + '</a>';
+				$('#recentPosts').prepend($('<p>').append(postLink));
+			});
+		body
+			.container-fluid
+				section#navbar
+					include _header
+				section#content!= body
+				section#sidebar
+				- if (lastFivePosts)
+					#recentPosts
+					- each post in lastFivePosts 
+						p 
+						a(href="/post/#{post._id}") #{post.title}
+				footer
+					p 2012 10xEngineer.me. All rights reserved.
+
+			script(type='text/javascript', src='/javascripts/jquery-1.7.1.min.js')
+			script(type='text/javascript', src='/javascripts/bootstrap.min.js')
+			script(type='text/javascript', src='/javascripts/ace/ace.js')
+			script(type='text/javascript', src='/javascripts/jplayer/jquery.jplayer.min.js')
+			script(type='text/javascript')
+				$(document).ready(function() {
+					$('.dropdown-toggle').dropdown();
+					if( $('.carousel') ) {
+						$('.carousel').carousel({
+							interval: 2000
+						});
+					}
+					$(".collapse").collapse();
+					var player = $("#jquery_jplayer_1");
+					if( player ) {
+						player.jPlayer({
+							ready: function () {
+								$(this).jPlayer("setMedia", {
+									m4v: "http://www.jplayer.org/video/m4v/Big_Buck_Bunny_Trailer_480x270_h264aac.m4v",
+									ogv: "http://www.jplayer.org/video/ogv/Big_Buck_Bunny_Trailer_480x270.ogv",
+									poster: "http://www.jplayer.org/video/poster/Big_Buck_Bunny_Trailer_480x270.png"
+								});
+							},
+							swfPath: "/javascripts/jplayer",
+							supplied: "m4v, ogv",
+								size: {
+									width: "100%",
+									height: "400px",
+									cssClass: "jp-video-360p"
+								}
+								,
+							ended: function() {
+								window.open("/program", "_self");
+							},
+						});
+					}
+
+					if( $('editor') ) {var editor = ace.edit("editor"); }
+				});

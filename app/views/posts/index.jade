@@ -1,0 +1,29 @@
+h1= title
+.actions 
+  ul
+    li
+      a(href='/post/create') Add Post
+h3 Here's the Posts
+p
+  h4 Categories
+  ul.categories
+   - each category in categories
+     li 
+       a(href='/posts/?category=#{category.name}') #{category.name}
+   li
+     a(href='/posts/') All Posts
+table.data
+  tr
+    th Title
+    th Category
+    th User
+    th Created
+  - each post in posts
+    - postDate = post._id.getTimestamp().toDateString()
+    tr
+      td
+        a(href='/post/#{post._id}') #{post.title} \n
+      td= post.category
+      td= postUsers[post.user_id]
+      td= postDate
+
