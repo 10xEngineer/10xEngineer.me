@@ -1,34 +1,33 @@
 .container-fluid
-	include _coursenav
 	.row-fluid
 		.span10
-			form(onsubmit='return captureSource(this)', action="/submitCode", method='POST')#editform
+			form(onsubmit='return captureSource(this)', action="/submitCode", method='POST')#editform.well
 				.controls
-					.well
 						input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')
-						#editor(style='position:relative;width:800px;height:400px;')
+						#editor(style='position:relative;width:100%;height:400px;resize:both;overflow:hidden;')
 				.form-actions
-					button.btn.btn-primary(type='submit') SUBMIT
-		.span2(style='background-color:black; color:white;')
+					button.btn.btn-primary(type='submit') RUN
+					button.btn SUBMIT
+					button.btn CLEAR
+		.span2
 			include _sidebar
 	.row-fluid
 		.span10
 			p
-	.row.fluid
-		.span10
-			.well
-				p#compile_results #{compile_results} || Run to see results
-				p(style='color:red')#compile_errors #{compile_errors} || Run to see any potential errors
-	.row.fluid
+	.row-fluid
+		.span10.well
+			p#compile_results #{compile_results} || Run to see results
+			p(style='color:red')#compile_errors #{compile_errors} || Run to see any potential errors
+	.row-fluid
 		.span10
 	.row-fluid
 		.span10
 			include _additionalfooter
 	.row-fluid
-			p 10xEngineer.me uses 
-				a(href="http://ideone.com") ideone.com 
-				| &copy; by 
-				a(href="http://sphere-research.com") Sphere Research Labs
+		p.pull-right 10xEngineer.me uses 
+			a(href="http://ideone.com") ideone.com 
+			| &copy; by 
+			a(href="http://sphere-research.com") Sphere Research Labs
 	.row-fluid
 	script(type='text/javascript', src='/javascripts/ace/ace.js')
 	script(type='text/javascript')

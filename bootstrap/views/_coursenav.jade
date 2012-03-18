@@ -1,6 +1,14 @@
 .row-fluid
 	.span3
-		legend #{UnitTitle}
+		ul.breadcrumb
+			li
+				a(href='/Courses') Courses
+				span.divider /
+			li
+				a(href='/course') #{Course}
+				span.divider /
+			li
+				a.active(href='#') #{Unit}
 	.span7
 		ul.nav.nav-tabs(style='background-color:black;color:yellow;font-weight:bold;')
 			li.active

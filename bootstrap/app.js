@@ -198,7 +198,7 @@ submitCode = function(code) {
 						codeConfig.is_private);
 			// check API is working
 			console.log('trying api');
-			client.testFunction(codeConfig.user, codeConfig.password, function(error, moreHelp, pi, answerToLifeAndEverything, oOok) {
+			client.testFunction({user: codeConfig.user, password: codeConfig.password}, function(error, moreHelp, pi, answerToLifeAndEverything, oOok) {
 				console.log('api test returns: ', error, moreHelp, pi, answerToLifeAndEverything, oOok);
 			});
 			//if( results.error != "OK" ) {
@@ -251,31 +251,54 @@ submitCode = function(code) {
 // Routes
 app.get('/', loadGlobals, function(req, res){
   res.render('main', {
-    title: '10xEngineer.me Home', loggedInUser:req.user
+    title: '10xEngineer.me Home', 
+	loggedInUser:req.user, 
+	coursenav: "N",
+	Course: '',
+	Unit: ''
   });
 });
 
 app.get('/courses', loadGlobals, function(req, res){
   res.render('overview', {
-    title: '10xEngineer.me Course List', loggedInUser:req.user
+    title: '10xEngineer.me Course List', 
+	loggedInUser:req.user, 
+	coursenav: "N",
+	Course: '',
+	Unit: ''
   });
 });
 
 app.get('/course', loadGlobals, function(req, res){
   res.render('course', {
-    title: '10xEngineer.me Course', UnitTitle: 'CS101 - Devops', loggedInUser:req.user
+    title: '10xEngineer.me Course',
+ 	Course: 'CS99',
+	Unit: 'Devops', 
+	coursenav: "Y",
+	loggedInUser:req.user
   });
 });
 
 app.get('/program', loadGlobals, function(req, res){
   res.render('ide', {
-    title: '10xEngineer.me Course', UnitTitle: 'CS101 - Devops', code: '', compile_results: '', compile_errors: '', loggedInUser:req.user
+    title: '10xEngineer.me Course',
+	Course: 'CS99',
+	Unit: 'Devops',
+	coursenav: "Y",
+	loggedInUser:req.user,
+	code: '',
+	compile_results: '',
+	compile_errors: ''
   });
 });
 
 app.get('/progress', loadGlobals, function(req, res){
   res.render('progress', {
-    title: '10xEngineer.me Course', UnitTitle: 'CS101 - Devops', loggedInUser:req.user
+    title: '10xEngineer.me Course', 
+	Course: 'CS99',
+	Unit: 'Devops', 
+	coursenav: "Y",
+	loggedInUser: req.user
   });
 });
 
@@ -288,7 +311,9 @@ app.post('/submitCode', loadGlobals, function(req, res){
   console.log('re-rendering ide');
   res.render('ide', {
     title: 'submitCode',
-	UnitTitle: req.param('UnitTitle', '(unknown)'),
+	Course: req.param('Course', ''),
+	Unit: req.param('Unit', '(unknown)'),
+	coursenav: "Y",
     code: source, 
     compile_results: compile_res,
 	compile_errors: compile_err,
@@ -301,6 +326,7 @@ app.get('/about', loadGlobals, function(req, res){
   res.render('default', {
     title: '10xEngineer.me About',
     loggedInUser:req.user,
+	coursenav: "N",
     text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
   });
 });
