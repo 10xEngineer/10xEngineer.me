@@ -18,5 +18,9 @@
     , "vows": "latest"
     , "eyes": "latest"
     , "request": "latest"
+	, "mime": "latest"
+	, "soap": "latest"
+	, "uglify": "latest"
+	, "supervisor": "latest"
   }
 }

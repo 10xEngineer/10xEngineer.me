@@ -302,6 +302,16 @@ app.get('/progress', loadGlobals, function(req, res){
   });
 });
 
+app.get('/contentmanager', loadGlobals, function(req, res){
+  res.render('content_manager', {
+    title: '10xEngineer.me Course Creator', 
+	Course: '',
+	Unit: '', 
+	coursenav: "N",
+	loggedInUser: req.user
+  });
+});
+
 app.post('/submitCode', loadGlobals, function(req, res){
   console.log('in app.js::submitCode');
 
