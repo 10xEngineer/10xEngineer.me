@@ -1,6 +1,6 @@
 {
-    "name": "Bootstrap"
-  , "version": "0.9.2"
+    "name": "10xEngineer.me"
+  , "version": "0.1"
   , "private": true
   , "dependencies": {
       "express": "latest"
@@ -12,15 +12,14 @@
     , "mongodb": "latest"
     , "mongoskin": "latest"
     , "redis": "latest"
-    , "bcrypt": "0.4.1"
+    , "bcrypt": "latest"
     , "connect-redis": "latest"
     , "socket.io": "latest"
     , "vows": "latest"
     , "eyes": "latest"
     , "request": "latest"
-	, "mime": "latest"
-	, "soap": "latest"
-	, "uglify": "latest"
-	, "supervisor": "latest"
+    , "mime": "latest"
+    , "soap": "latest"
+    , "uglify-js": "latest
   }
 }
