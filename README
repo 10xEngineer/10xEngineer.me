@@ -1,0 +1,16 @@
+To start on boot using upstart:
+
+sudo cp 10xEngineer.me.conf /etc/init/
+
+To start / stop - use
+sudo start 10xEngineer.me
+stop 10xEngineer.me
+
+To setup monit for auto restarting the app on failure
+chmod +x ./runmonit
+sudo cp monitrc /etc/monit/monitrc
+
+To start monitoring
+sudo ./runmonit
+
+
