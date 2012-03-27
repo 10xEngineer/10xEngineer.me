@@ -10,8 +10,8 @@ var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore();
 var redis = require("redis");
 var client = redis.createClient();
-var soap = require('soap');
-var wsdlurl = 'http://ideone.com/api/1/service.wsdl';
+
+var wsdlurl = 'http://ideone.com/api/1/service.json';
 var code = "";
 var ace = null;
 var editor = null;
@@ -58,7 +58,7 @@ app.configure(function(){
     cookie: {maxAge: 31557600000 }
   }));
   app.use(express.methodOverride());
-  app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+//  app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
@@ -185,68 +185,6 @@ loadPost = function (req, res, next) {
   });
 }
 
-// IDEONE documentation http://ideone.com/files/ideone-api.pdf
-submitCode = function(code) {
-	soap.createClient(wsdlurl, function(err, client) {
-		if( client ) {
-			console.log('client not null');
-			console.log('submit: ', codeConfig.user, 
-						codeConfig.password, 
-						code, 
-						codeConfig.source_language, 
-						codeConfig.run, 
-						codeConfig.is_private);
-			// check API is working
-			console.log('trying api');
-			client.testFunction({user: codeConfig.user, password: codeConfig.password}, function(error, moreHelp, pi, answerToLifeAndEverything, oOok) {
-				console.log('api test returns: ', error, moreHelp, pi, answerToLifeAndEverything, oOok);
-			});
-			//if( results.error != "OK" ) {
-			//	console.log("Cannot connect to the ONEIDE API.", error);
-			//	return null, null
-			//} else { console.log('api ok.'); }
-			
-			console.log('trying submission');
-			client.createSubmission(codeConfig.user, 
-									codeConfig.password, 
-									code, 
-									1, //codeConfig.source_language, 
-									'', //input
-									true, //codeConfig.run, 
-									false, // codeConfig.is_private,
-									function(error, link) {
-										console.log('returned from submission', error, link);
-										if( error == "OK" ) { 
-											console.log('compiled ok');
-
-											var status = client.getSubmissionStatus(codeConfig.user, codeConfig.password, link);
-											console.log('waiting for status');
-											// check the submission status every 3 seconds
-											while( status != 0 ) {
-												sleep(3); // sleep 3 seconds
-												console.log('.');
-												status = client.getSubmissionStatus(codeConfig.user, codeConfig.password, link);
-											}
-											console.log('got status - now results');
-											// get the submission results
-											var details = client.getSubmissionDetails(codeConfig.user, codeConfig.password, link, true, true, true, true, true);
-											console.log('got results');
-											if( details.err = 'OK' )
-												return details, null;
-											else // some kind of error
-												return details, details.err
-										} else { // compile error
-											console.log('compile error: ', err);
-											return link, err;
-										}										
-									});
-		} else { // client is null
-			console.log('Error creating SOAP client.')
-			return null, null;
-		}
-	})
-	return null, null;
-}
 
 // Routes
 app.get('/', loadGlobals, function(req, res){
@@ -312,7 +250,7 @@ app.get('/contentmanager', loadGlobals, function(req, res){
   });
 });
 
-app.post('/submitCode', loadGlobals, function(req, res){
+app.post('/submitCode', loadGlobals, function(req, res, next){
   console.log('in app.js::submitCode');
 
   var source = req.param('sourcecode', '');
@@ -331,6 +269,28 @@ app.post('/submitCode', loadGlobals, function(req, res){
   });
 
 });
+
+// IDEONE documentation http://ideone.com/files/ideone-api.pdf
+submitCode = function(code) {
+	var rpc = require('dnode');
+	if( !rpc ) {
+		console.log('ERROR: rpc not defined');
+		return null, null;
+	}
+	dnode.connect(80, wsdlurl),
+		showNotification = function(notif) {
+			alert(notif.message);
+			return notif.error, notif.message;
+		};
+	socket.listenRPC('testFunction', function(params) {
+		if(params.error) {
+			alert('testFunction error: '+params.error);
+			return params.error, params.message;
+		}
+	}).listenRPC('notification', showNotification);
+
+	return null, null;
+}
 
 app.get('/about', loadGlobals, function(req, res){
   res.render('default', {
