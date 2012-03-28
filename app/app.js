@@ -1,11 +1,13 @@
 var express = require('express');
 var mongo = require('mongoskin');
-var qs = require('querystring');
 
+var fs = require('fs');
+var util = require('util');
 var PostHelper = require('./lib/post.js');
 var UserHelper = require('./lib/user.js');
 var AdminHelper = require('./lib/admin.js');
-var connect = require('express/node_modules/connect');
+var CourseHelper = require('./lib/course.js');
+var connect = require('connect');
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore();
 var redis = require("redis");
@@ -25,12 +27,15 @@ if (path.existsSync('./configLocal.js')) {
   );
   siteInfo = config.getSiteConfig();
   codeConfig = config.getCodeConfig();
+  dbConfig = config.getDBConfig();
 }
 else {
   log.error('Please copy configDefault.js to configLocal.js and replace applicable values.');
 }
 
 console.log(siteInfo);
+console.log(codeConfig);
+console.log(dbConfig);
 
 var Session = connect.middleware.session.Session,
     parseCookie = connect.utils.parseCookie
@@ -42,14 +47,13 @@ client.on("error", function (err) {
 var app = module.exports = express.createServer();
 var io = require('socket.io').listen(app); 
 io.set('log level', 0);
-app.use(express.bodyParser());
 
 // = Configuration
 
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.use(express.bodyParser());
+//  app.use(express.bodyParser({uploadDir:'./uploads'}));
   app.use(express.cookieParser());
   app.use(express.session({
     store: sessionStore,
@@ -57,6 +61,12 @@ app.configure(function(){
     key: 'my.sid',
     cookie: {maxAge: 31557600000 }
   }));
+
+  // To include underscore etc inside Jade templates - add them here
+//  app.helpers({
+//	_: require("underscore")
+//  });
+
   app.use(express.methodOverride());
 //  app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
@@ -116,9 +126,10 @@ String.prototype.randomString = function(stringLength) {
 }
 
 // connect to the db and make the collections available globally
-var db = mongo.db('localhost:27017/' + siteInfo.database_collection)
+var db = mongo.db(dbConfig.mongoDB + dbConfig.database_collection)
 postDb = db.collection('post');
 userDb = db.collection('user');
+courseDb = db.collection('course');
 categoryDb = db.collection('category');
 getNextInt = function (type, callback) {
   db.collection('count').findAndModify({_id: type}, [['_id','asc']], {$inc: {count:1}}, {upsert:true,new:true}, function(error, result) { 
@@ -185,6 +196,19 @@ loadPost = function (req, res, next) {
   });
 }
 
+loadCourse = function (req, res, next) {
+  courseDb.findById(req.params.id, function(error, post) {
+    if (error || !post) {
+      log.trace('Could not find course!');
+    }
+    req.course = course;
+    app.helpers({
+      course: course 
+    });
+    next();
+  });
+}
+
 
 // Routes
 app.get('/', loadGlobals, function(req, res){
@@ -197,7 +221,7 @@ app.get('/', loadGlobals, function(req, res){
   });
 });
 
-app.get('/courses', loadGlobals, function(req, res){
+app.get('/coursesold', loadGlobals, function(req, res){
   res.render('overview', {
     title: '10xEngineer.me Course List', 
 	loggedInUser:req.user, 
@@ -246,8 +270,38 @@ app.get('/contentmanager', loadGlobals, function(req, res){
 	Course: '',
 	Unit: '', 
 	coursenav: "N",
+	contentfile: req.param('coursefile', ''),
 	loggedInUser: req.user
   });
+});
+
+app.post('/file-upload', loadGlobals, function(req, res, next) {
+	console.log('Uploading file');
+	req.form.complete( function(err, fields, files) {
+		if (err) {
+			next(err);
+		} else {
+			console.log('Uploaded %s to %s', files.course.filename, files.course.path);
+			console.log('copying file from temp upload dir to course dir');
+			var tmp_path = files.course.path;
+			var target_path = './public/courses/' + files.course.name;
+			fs.rename(tmp_path, target_path, function(err) {
+				if(err) throw err;
+				// delete the temporary file
+				fs.unlink(tmp_path, function() {
+					if(err) throw err;
+					console.log('File uploaded to: '+target_path + ' - ' + files.course.size + ' bytes');
+					res.redirect('/contentmanager', {coursefile: target_path+'/'+files.course.name});
+				});
+			});			
+		}
+	});
+	
+	req.form.on('progress', function(bytesReceived, bytesExpected) {
+		var percent = (bytesReceived / bytesExpected * 100) | 0;
+		process.stdout.write('Uploading: %' + percent + '\r');
+	})
+
 });
 
 app.post('/submitCode', loadGlobals, function(req, res, next){
@@ -272,12 +326,12 @@ app.post('/submitCode', loadGlobals, function(req, res, next){
 
 // IDEONE documentation http://ideone.com/files/ideone-api.pdf
 submitCode = function(code) {
-	var rpc = require('dnode');
+	//var rpc = require('jsonrpc').RPCHandler;
 	if( !rpc ) {
 		console.log('ERROR: rpc not defined');
 		return null, null;
 	}
-	dnode.connect(80, wsdlurl),
+	dnode.connect({}, wsdlurl),
 		showNotification = function(notif) {
 			alert(notif.message);
 			return notif.error, notif.message;
@@ -304,6 +358,7 @@ app.get('/about', loadGlobals, function(req, res){
 PostHelper.add_routes(app);
 UserHelper.add_routes(app);
 AdminHelper.add_routes(app, express);
+CourseHelper.add_routes(app);
 
 app.get('/listen', loadGlobals, function(req, res){
   res.render('listen', {layout:false});

@@ -1,10 +1,10 @@
 {
     "name": "10xEngineer.me"
-  , "version": "0.1"
+  , "version": "0.0.1"
   , "private": true
   , "dependencies": {
       "express": "latest"
-    , "stylus": "latest"
+    , "connect": "latest"
     , "mkdirp": "latest"
     , "mail": "latest"
     , "jade": "latest"
@@ -20,6 +20,8 @@
     , "request": "latest"
     , "mime": "latest"
     , "soap": "latest"
-    , "uglify-js": "latest
+    , "uglify-js": "latest"
+    , "connect-form": "latest"
+    , "util": "latest"
   }
 }

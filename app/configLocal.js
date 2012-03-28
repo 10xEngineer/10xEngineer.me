@@ -2,11 +2,19 @@ exports.getSiteConfig = function () {
   configValues =  {
     url: 'http://localhost:3000',
     site_name: '10xEngineer.me',
-    site_email: 'steve.g.messina@gmail.com',
-    database_collection: 'bootstrap'
+    site_email: 'steve.g.messina@gmail.com'
   }
 
   return configValues;
+}
+
+exports.getDBConfig = function() {
+	configValues = {
+		mongoDB: 'localhost:27017/',
+		database_collection: 'bootstrap'
+	}
+	
+	return configValues;
 }
 
 exports.getMailConfig = function () {

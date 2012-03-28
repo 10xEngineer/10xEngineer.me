@@ -45,6 +45,12 @@ html(lang="en")
 						});
 					}
 					$(".collapse").collapse();
+
+					$(".accordion-heading.click").click(function() {
+						$(this).toggleClass('highlighted');
+						alert('toggle: '+ this.href.text)
+					});
+
 					var player = $("#jquery_jplayer_1");
 					if( player ) {
 						player.jPlayer({

@@ -14,7 +14,7 @@
 						i.icon-home.icon-white 
 						| Home
 				li.dropdown
-					a.dropdown-toggle(href='/courses', data-toggle='dropdown')
+					a.dropdown-toggle(href='/coursesold', data-toggle='dropdown')
 						i.icon-calendar.icon-white 
 						| Courses
 						b.caret
@@ -41,5 +41,5 @@
 							| Admin
 			form.navbar-search.pull-right(action='')
 				input.search-query.span3(type='text', placeholder='Search Contents')
-	- if(coursenav == "Y")
+	- if(typeof(coursenav) != 'undefined' && coursenav == "Y")
 		include _coursenav
