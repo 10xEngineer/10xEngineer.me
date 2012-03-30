@@ -21,7 +21,7 @@ exports.getMailConfig = function () {
   configValues =  {
     host: 'smtp.gmail.com',
     username: 'steve.g.messina@gmail.com',
-    password: 'ep1phany'
+    password: 'password'
   }
 
   return configValues;
@@ -30,8 +30,8 @@ exports.getMailConfig = function () {
 // IDEONE API setup
 exports.getCodeConfig = function() {
 	configValues = {
-		user: 'velniukas',
-		password: 'limehouse',
+		user: 'user',
+		password: 'password',
 		source_language: '1', //c++
 		run: true,
 		is_private: true
