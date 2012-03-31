@@ -6,6 +6,13 @@ html(lang="en")
 		link(rel="stylesheet", href="/stylesheets/bootstrap.min.css")
 		link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap-responsive.min.css')
 		link(type='text/css', href='/stylesheets/jplayer.blue.monday.css', rel='stylesheet')
+		style
+			.slide-out-div {
+				padding: 20px;
+				width: 250px;
+				background: #ccc;
+				border: 1px solid #29216d;
+			}
 		script(src='/socket.io/socket.io.js')
 		- if (typeof headContent === "string")
 			!= partial(headContent);
@@ -24,11 +31,6 @@ html(lang="en")
 					include _header
 				section#content!= body
 				section#sidebar
-				- if (lastFivePosts)
-					#recentPosts
-					- each post in lastFivePosts 
-						p 
-						a(href="/post/#{post._id}") #{post.title}
 				footer
 					p 2012 10xEngineer.me. All rights reserved.
 
@@ -36,6 +38,7 @@ html(lang="en")
 			script(type='text/javascript', src='/javascripts/bootstrap.min.js')
 			script(type='text/javascript', src='/javascripts/ace/ace.js')
 			script(type='text/javascript', src='/javascripts/jplayer/jquery.jplayer.min.js')
+			script(type='text/javascript', src'http://tab-slide-out.googlecode.com/files/jquery.tabSlideOut.v1.3.js')
 			script(type='text/javascript')
 				$(document).ready(function() {
 					$('.dropdown-toggle').dropdown();
@@ -45,6 +48,23 @@ html(lang="en")
 						});
 					}
 					$(".collapse").collapse();
+
+					$(function(){
+						$('.slide-out-div').tabSlideOut({
+							tabHandle: '.handle',					  //class of the element that will become your tab
+							pathToTabImage: 'http://placekitten.com/40/122', //path to the image for the tab //Optionally can be set using css
+							imageHeight: '122px',					  //height of tab image			  //Optionally can be set using css
+							imageWidth: '40px',						  //width of tab image			  //Optionally can be set using css
+							tabLocation: 'right',					  //side of screen where tab lives, top, right, bottom, or left
+							speed: 300,								  //speed of animation
+							action: 'hover',						  //options: 'click' or 'hover', action to trigger animation
+							topPos: '200px',						  //position from the top/ use if tabLocation is left or right
+							leftPos: '20px',						  //position from left/ use if tabLocation is bottom or top
+							fixedPosition: true						  //options: true makes it stick(fixed position) on scroll
+						});
+
+					});
+
 
 					$(".accordion-heading.click").click(function() {
 						$(this).toggleClass('highlighted');
@@ -75,5 +95,64 @@ html(lang="en")
 						});
 					}
 
-					if( $('editor') ) {var editor = ace.edit("editor"); }
+					if( $('editor') ) {
+						var editor = ace.edit("editor"); 
+						//load default theme and language
+						loadTheme("textmate");	  
+						loadMode("javascript");
+
+						//binding the setting panel events
+						$("#mode").change(function(e){
+							loadMode(e.target.value);
+						})
+						$("#theme").change(function(e){
+							loadTheme(e.target.value);
+						})
+						$("#fontsize").change(function(e){
+							document.getElementById('editor').style.fontSize=e.target.value;
+						})
+						$("#highlight_active").change(function(e){
+							editor.setHighlightActiveLine(e.target.checked);
+						})
+						$("#show_hidden").change(function(e){
+							editor.setShowInvisibles(e.target.checked);
+						})
+						$("#soft_wrap").change(function(e){
+							var session = editor.getSession();
+							var renderer = editor.renderer;
+							switch (e.target.value) {
+								case "off":
+									session.setUseWrapMode(false);
+									renderer.setPrintMarginColumn(80);
+									break;
+								case "40":
+									session.setUseWrapMode(true);
+									session.setWrapLimitRange(40, 40);
+									renderer.setPrintMarginColumn(40);
+									break;
+								case "80":
+									session.setUseWrapMode(true);
+									session.setWrapLimitRange(80, 80);
+									renderer.setPrintMarginColumn(80);
+									break;
+								case "free":
+									session.setUseWrapMode(true);
+									session.setWrapLimitRange(null, null);
+									renderer.setPrintMarginColumn(80);
+									break;
+							}
+						})
+						$("#show_gutter").change(function(e){
+							editor.renderer.setShowGutter(e.target.checked); 
+						}) 
+						$("#show_print_margin").change(function(e){
+							editor.renderer.setShowPrintMargin(e.target.checked); 
+						})
+						$("#soft_tab").change(function(e){
+							editor.getSession().setUseSoftTabs(e.target.checked);  
+						})
+						$("#highlight_selected_word").change(function(e){
+							editor.setHighlightSelectedWord(e.target.checked);
+						});
+					}
 				});

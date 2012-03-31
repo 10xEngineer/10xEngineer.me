@@ -1,6 +1,8 @@
 .container-fluid
 	.row-fluid
-		.span10
+		.span3
+			include _ide_options
+		.span7
 			form(onsubmit='return captureSource(this)', action="/submitCode", method='POST')#editform.well
 				.controls
 						input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')

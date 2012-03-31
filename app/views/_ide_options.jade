@@ -1,2 +1,147 @@
-.sidebar
-	
+#editorSetting
+	table
+		tr
+			td
+				label(for="mode") Mode
+			td
+				select#mode(size="1")
+					option(value="javascript", selected="selected") JavaScript
+					option(value="xml") XML
+					option(value="html") HTML
+					option(value="css") CSS
+					option(value="scss") SCSS
+					option(value="python") Python
+					option(value="php") PHP
+					option(value="java") Java
+					option(value="ruby") Ruby
+					option(value="c_cpp") C/C++
+					option(value="coffee") CoffeeScript
+					option(value="json") JSON
+					option(value="perl") Perl
+					option(value="clojure") Clojure
+					option(value="ocaml") OCaml
+					option(value="csharp") C#
+					option(value="svg") SVG
+					option(value="textile") Textile
+					option(value="groovy") Groovy
+					option(value="scala") Scala
+		tr
+			td
+				label(for="theme") Theme
+			td
+				select#theme(size="1") 
+					option(value="clouds") Clouds
+					option(value="clouds_midnight") Clouds Midnight
+					option(value="cobalt") Cobalt
+					option(value="crimson_editor") Crimson Editor
+					option(value="dawn") Dawn
+					option(value="eclipse") Eclipse
+					option(value="idle_fingers") idleFingers
+					option(value="kr_theme") krTheme
+					option(value="merbivore") Merbivore
+					option(value="merbivore_soft") Merbivore Soft
+					option(value="mono_industrial") Mono Industrial
+					option(value="monokai") Monokai
+					option(value="pastel_on_dark") Pastel on dark
+					option(value="solarized_dark") Solarized Dark
+					option(value="solarized_light") Solarized Light
+					option(value="textmate", selected="selected") TextMate
+					option(value="twilight") Twilight
+					option(value="vibrant_ink") Vibrant Ink
+		tr
+			td
+				label(for="fontsize") Font Size
+			td
+				select#fontsize(size="1") 
+					option(value="10px") 10px
+					option(value="11px") 11px
+					option(value="12px", selected="selected") 12px
+					option(value="14px") 14px
+					option(value="16px") 16px
+					option(value="20px") 20px
+					option(value="24px") 24px
+		tr
+			td
+				label(for="highlight_active") Highlight Active Line
+			td
+				input(type="checkbox", name="highlight_active")#highlight_active.checked
+		tr
+			td
+				label(for="show_hidden") Show Invisibles
+			td
+				input(type="checkbox", name="show_hidden")#show_hidden 
+		tr
+			td
+				label(for="soft_wrap") Soft Wrap
+			td
+				select#soft_wrap(size="1") 
+					option(value="off") Off
+					option(value="40") 40 Chars
+					option(value="80") 80 Chars
+					option(value="free") Free
+		tr
+			td
+				label(for="show_gutter") Show Gutter
+			td
+				input(type="checkbox")#show_gutter.checked
+		tr
+			td
+				label(for="show_print_margin") Show Print Margin
+			td
+				input(type="checkbox")#show_print_margin.checked
+		tr
+			td
+				label(for="soft_tab") Use Soft Tab
+			td
+				input(type="checkbox")#soft_tab.checked
+		tr
+			td
+				label(for="highlight_selected_word") Highlight selected word
+			td
+				input(type="checkbox")#highlight_selected_word.checked
+
+script(type='text/javascript')
+
+	var themes = {};
+	function loadTheme(name) {
+		//check if the theme source files have been loaded before
+		if(themes[name]){
+			editor.setTheme(themes[name]);
+			return;
+		}
+
+		var fileName = "src/theme-" + name + ".js";
+		loadScriptFile(fileName, function(){
+			var path = "ace/theme/"+name; 
+			themes[name] = path;
+			editor.setTheme(path);
+		});
+	}
+
+	var modes = {};
+	function loadMode(name){
+		//check if the language source files have been loaded before		 
+		if(modes[name]) {
+			editor.getSession().setMode(new modes[name]);
+			return;
+		}
+
+		var fileName = "src/mode-" + name + ".js";
+		loadScriptFile(fileName, function(){
+			var Mode = require("ace/mode/"+name).Mode;
+			modes[name] = Mode;
+			editor.getSession().setMode(new Mode());
+		});
+	}
+
+	//dynamically load javascript source file
+	function loadScriptFile(path, callback) {
+		var head = document.getElementsByTagName('head')[0];
+		var s = document.createElement('script');
+
+		s.src = path;
+		head.appendChild(s);
+
+		s.onload = callback;
+	}	   
+

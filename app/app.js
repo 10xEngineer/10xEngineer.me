@@ -1,5 +1,6 @@
 var express = require('express');
 var mongo = require('mongoskin');
+var request = require('request');
 
 var fs = require('fs');
 var util = require('util');
@@ -53,7 +54,7 @@ io.set('log level', 0);
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-//  app.use(express.bodyParser({uploadDir:'./uploads'}));
+//  app.use(express.bodyParser({uploadDir:'./upload'});
   app.use(express.cookieParser());
   app.use(express.session({
     store: sessionStore,
@@ -306,7 +307,6 @@ app.post('/file-upload', loadGlobals, function(req, res, next) {
 
 app.post('/submitCode', loadGlobals, function(req, res, next){
   console.log('in app.js::submitCode');
-
   var source = req.param('sourcecode', '');
   console.log('source=',source);
   var compile_res, compile_err = submitCode(source);
@@ -326,24 +326,27 @@ app.post('/submitCode', loadGlobals, function(req, res, next){
 
 // IDEONE documentation http://ideone.com/files/ideone-api.pdf
 submitCode = function(code) {
-	//var rpc = require('jsonrpc').RPCHandler;
-	if( !rpc ) {
-		console.log('ERROR: rpc not defined');
-		return null, null;
-	}
-	dnode.connect({}, wsdlurl),
-		showNotification = function(notif) {
-			alert(notif.message);
-			return notif.error, notif.message;
-		};
-	socket.listenRPC('testFunction', function(params) {
-		if(params.error) {
-			alert('testFunction error: '+params.error);
-			return params.error, params.message;
-		}
-	}).listenRPC('notification', showNotification);
-
-	return null, null;
+  request(
+    { method: 'PUT'
+    , uri: wsdlurl
+    , multipart: 
+      [ { 'Content-type': 'application/json'
+        ,  body: JSON.stringify({"jsonrpc": "2.0", "method": "getLanguages", "params": {"user": "velniukas", "pass": "limehouse"}, "id": 1})
+        }
+      ] 
+    }
+  , function (error, response, body) {
+      if(response.statusCode == 201){
+        console.log('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
+		return response.statusCode, response.body;
+      } else {
+        console.log('error: '+ response.statusCode)
+        console.log(body);
+		return response.statusCode, response.body;
+      }
+    }
+  )
+  
 }
 
 app.get('/about', loadGlobals, function(req, res){
