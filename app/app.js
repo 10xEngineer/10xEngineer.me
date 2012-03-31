@@ -5,31 +5,12 @@ var sessionStore = new RedisStore();
 
 var log4js = require('log4js');
 log = log4js.getLogger('app');
-var path = require('path');
 
 // Prototype Utilities
 require('./utils/prototypeUtils');
 
 // Read configuration
-// TODO: transform it to something better
-var siteConfig, codeConfig, dbConfig;
-if (path.existsSync('./configLocal.js')) {
-  var config = require('./configLocal.js');
-  mail = require('mail').Mail(
-    config.getMailConfig()
-  );
-  siteConfig = config.getSiteConfig();
-  codeConfig = config.getCodeConfig();
-  dbConfig = config.getDBConfig();
-
-  log.info(siteConfig);
-  log.info(codeConfig);
-  log.info(dbConfig);
-
-}
-else {
-  log.error('Please copy configDefault.js to configLocal.js and replace applicable values.');
-}
+var config = require('./helpers/config');
 
 // ----------------
 // Redis
@@ -42,6 +23,8 @@ client.on("error", function (err) {
     log.error("[Redis] " + err);
 });
 
+// Authentication Middleware
+var authMiddleware = require('./helpers/auth')(config.auth);
 
 // ----------------
 // Express
@@ -52,7 +35,8 @@ var app = module.exports = express.createServer();
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  //app.use(express.bodyParser({uploadDir:'./upload'});
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({
     store: sessionStore,
@@ -66,11 +50,14 @@ app.configure(function(){
   //  _: require("underscore")
   //});
 
-  app.use(express.methodOverride());
+  app.use(authMiddleware.middleware());
   //app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
+
+// Everyauth view helper
+authMiddleware.helpExpress(app);
 
 // Express environment config
 app.configure('development', function(){
@@ -87,11 +74,12 @@ app.configure('production', function(){
 // ----------------
 // MongoDB Config
 // ----------------
-var db = mongo.db(dbConfig.mongoDB + dbConfig.database_collection)
-postDb = db.collection('post');
-userDb = db.collection('user');
-courseDb = db.collection('course');
-categoryDb = db.collection('category');
+//var db = mongo.db(dbConfig.mongoDB + dbConfig.database_collection)
+//postDb = db.collection('post');
+//userDb = db.collection('user');
+//courseDb = db.collection('course');
+//categoryDb = db.collection('category');
+var db = require('./helpers/database').db;
 
 
 // Sample code to test database connection
@@ -114,14 +102,6 @@ getNextInt('saves', function(error, count) {
 
 // Sample database queries
 // TODO: Migrate to a separate file
-loadLastFivePosts = function (req, res, next) {
-  postDb.find({requires_verification: { $ne: true }}).sort({created_at:-1}).limit(5).toArray(function(error, posts) { 
-    app.helpers({
-      lastFivePosts: posts
-    });
-    next();
-  });
-}
 
 loadSessionUser = function (req, res, next) {
   if (req.session.user && req.cookies.rememberme) {
@@ -139,7 +119,7 @@ loadSessionUser = function (req, res, next) {
   next();
 }
 
-loadGlobals = [loadSessionUser, loadLastFivePosts];
+loadGlobals = [loadSessionUser];
 
 loadCategories = function (req, res, next) {
   categoryDb.find().sort({name:1}).toArray(function(error, categories) {
@@ -182,154 +162,39 @@ loadCourse = function (req, res, next) {
 
 // Miscellaneous routes
 app.get('/', loadGlobals, function(req, res){
+  log.info(req.user);
   res.render('main', {
     title: '10xEngineer.me Home', 
-  loggedInUser:req.user, 
-  coursenav: "N",
-  Course: '',
-  Unit: ''
+    coursenav: "N",
+    Course: '',
+    Unit: ''
   });
 });
 
 app.get('/about', loadGlobals, function(req, res){
   res.render('default', {
     title: '10xEngineer.me About',
-    loggedInUser:req.user,
-  coursenav: "N",
+    coursenav: "N",
     text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
   });
 });
 
-// Courses-related routes
-app.get('/coursesold', loadGlobals, function(req, res){
-  res.render('overview', {
-    title: '10xEngineer.me Course List', 
-  loggedInUser:req.user, 
-  coursenav: "N",
-  Course: '',
-  Unit: ''
+app.get('/auth', loadGlobals, function(req, res){
+  res.render('users/login', {
+    title: 'Log In',
+    coursenav: "N",
+    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
   });
 });
 
-app.get('/course', loadGlobals, function(req, res){
-  res.render('course', {
-    title: '10xEngineer.me Course',
-  Course: 'CS99',
-  Unit: 'Devops', 
-  coursenav: "Y",
-  loggedInUser:req.user
-  });
-});
-
-app.get('/program', loadGlobals, function(req, res){
-  res.render('ide', {
-    title: '10xEngineer.me Course',
-  Course: 'CS99',
-  Unit: 'Devops',
-  coursenav: "Y",
-  loggedInUser:req.user,
-  code: '',
-  compile_results: '',
-  compile_errors: ''
-  });
-});
-
-app.get('/progress', loadGlobals, function(req, res){
-  res.render('progress', {
-    title: '10xEngineer.me Course', 
-  Course: 'CS99',
-  Unit: 'Devops', 
-  coursenav: "Y",
-  loggedInUser: req.user
-  });
-});
-
-app.get('/contentmanager', loadGlobals, function(req, res){
-  res.render('content_manager', {
-    title: '10xEngineer.me Course Creator', 
-  Course: '',
-  Unit: '', 
-  coursenav: "N",
-  contentfile: req.param('coursefile', ''),
-  loggedInUser: req.user
-  });
-});
-
-app.post('/file-upload', loadGlobals, function(req, res, next) {
-  console.log('Uploading file');
-  req.form.complete( function(err, fields, files) {
-    if (err) {
-      next(err);
-    } else {
-      console.log('Uploaded %s to %s', files.course.filename, files.course.path);
-      console.log('copying file from temp upload dir to course dir');
-      var tmp_path = files.course.path;
-      var target_path = './public/courses/' + files.course.name;
-      fs.rename(tmp_path, target_path, function(err) {
-        if(err) throw err;
-        // delete the temporary file
-        fs.unlink(tmp_path, function() {
-          if(err) throw err;
-          console.log('File uploaded to: '+target_path + ' - ' + files.course.size + ' bytes');
-          res.redirect('/contentmanager', {coursefile: target_path+'/'+files.course.name});
-        });
-      });     
-    }
-  });
-  
-  req.form.on('progress', function(bytesReceived, bytesExpected) {
-    var percent = (bytesReceived / bytesExpected * 100) | 0;
-    process.stdout.write('Uploading: %' + percent + '\r');
-  })
-
-});
-
-app.post('/submitCode', loadGlobals, function(req, res, next){
-  console.log('in app.js::submitCode');
-  var source = req.param('sourcecode', '');
-  console.log('source=',source);
-  var compile_res, compile_err = submitCode(source);
-  console.log('re-rendering ide');
-  res.render('ide', {
-    title: 'submitCode',
-  Course: req.param('Course', ''),
-  Unit: req.param('Unit', '(unknown)'),
-  coursenav: "Y",
-    code: source, 
-    compile_results: compile_res,
-  compile_errors: compile_err,
-    loggedInUser: req.user
-  });
-
-});
-
-// IDEONE documentation http://ideone.com/files/ideone-api.pdf
-submitCode = function(code) {
-  request(
-    { method: 'GET'
-    , uri: wsdlurl
-    , multipart: 
-      [ { 'Content-type': 'application/json'
-        ,  body: JSON.stringify({"jsonrpc": "2.0", "method": "getLanguages", "params": {"user": "velniukas", "pass": "limehouse"}, "id": 1})
-        }
-      ] 
-    }
-  , function (error, response, body) {
-      if(response.statusCode == 201){
-        console.log('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
-    return response.statusCode, response.body;
-      } else {
-        console.log('error: '+ response.statusCode)
-        console.log(body);
-    return response.statusCode, response.body;
-      }
-    }
-  )
-  
-}
 
 // Controllers
 require('./controllers/course')(app);
+
+
+// Startup
+app.listen(3000);
+log.info("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 
 
@@ -337,7 +202,6 @@ require('./controllers/course')(app);
 // -----------------------------------------------------------------------
 /*
 
-var request = require('request');
 var fs = require('fs');
 var util = require('util');
 var connect = require('connect');
@@ -409,7 +273,3 @@ io.sockets.on('connection', function (socket) {
 
 // -----------------------------------------------------------------------
 
-
-
-app.listen(3000);
-log.info("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
