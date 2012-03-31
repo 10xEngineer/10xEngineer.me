@@ -15,3 +15,19 @@
 				- if (typeof contentfile != "undefined") 
 					p #{contentfile}
 		.span3
+
+script(type='text/javascript')
+	function init() {
+		$('.dropdown-toggle').dropdown();
+		if( $('.carousel') ) {
+			$('.carousel').carousel({
+				interval: 2000
+			});
+		}
+		$(".collapse").collapse();
+
+		$(".accordion-heading.click").click(function() {
+			$(this).toggleClass('highlighted');
+			alert('toggle: '+ this.href.text)
+		});		
+	}

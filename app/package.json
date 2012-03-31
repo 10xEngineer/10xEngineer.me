@@ -7,6 +7,7 @@
     , "connect": "latest"
     , "mkdirp": "latest"
     , "mail": "latest"
+    , "reparse": "latest"
     , "jade": "latest"
     , "log4js": "latest"
     , "mongodb": "latest"
@@ -19,9 +20,9 @@
     , "eyes": "latest"
     , "request": "latest"
     , "mime": "latest"
-    , "soap": "latest"
     , "uglify-js": "latest"
     , "connect-form": "latest"
     , "util": "latest"
+    , "debug": "latest"
   }
 }

@@ -45,7 +45,7 @@
 					option(value="pastel_on_dark") Pastel on dark
 					option(value="solarized_dark") Solarized Dark
 					option(value="solarized_light") Solarized Light
-					option(value="textmate", selected="selected") TextMate
+					option(value="textmate-uncompressed", selected="selected") TextMate
 					option(value="twilight") Twilight
 					option(value="vibrant_ink") Vibrant Ink
 		tr
@@ -110,9 +110,9 @@ script(type='text/javascript')
 			return;
 		}
 
-		var fileName = "src/theme-" + name + ".js";
+		var fileName = name + ".js";
 		loadScriptFile(fileName, function(){
-			var path = "ace/theme/"+name; 
+			var path = "/javascripts/ace/theme/"+name; 
 			themes[name] = path;
 			editor.setTheme(path);
 		});
@@ -126,9 +126,9 @@ script(type='text/javascript')
 			return;
 		}
 
-		var fileName = "src/mode-" + name + ".js";
+		var fileName = name + ".js";
 		loadScriptFile(fileName, function(){
-			var Mode = require("ace/mode/"+name).Mode;
+			var Mode = require("/javascripts/ace/mode/"+name).Mode;
 			modes[name] = Mode;
 			editor.getSession().setMode(new Mode());
 		});
