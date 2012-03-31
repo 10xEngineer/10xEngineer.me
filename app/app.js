@@ -1,60 +1,58 @@
 var express = require('express');
 var mongo = require('mongoskin');
-var request = require('request');
-
-var fs = require('fs');
-var util = require('util');
-var PostHelper = require('./lib/post.js');
-var UserHelper = require('./lib/user.js');
-var AdminHelper = require('./lib/admin.js');
-var CourseHelper = require('./lib/course.js');
-var connect = require('connect');
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore();
-var redis = require("redis");
-var client = redis.createClient();
 
-var wsdlurl = 'http://ideone.com/api/1/service.json';
-var code = "";
-var ace = null;
-var editor = null;
 var log4js = require('log4js');
 log = log4js.getLogger('app');
 var path = require('path');
+
+// Prototype Utilities
+require('./utils/prototypeUtils');
+
+// Read configuration
+// TODO: transform it to something better
+var siteConfig, codeConfig, dbConfig;
 if (path.existsSync('./configLocal.js')) {
   var config = require('./configLocal.js');
   mail = require('mail').Mail(
     config.getMailConfig()
   );
-  siteInfo = config.getSiteConfig();
+  siteConfig = config.getSiteConfig();
   codeConfig = config.getCodeConfig();
   dbConfig = config.getDBConfig();
+
+  log.info(siteConfig);
+  log.info(codeConfig);
+  log.info(dbConfig);
+
 }
 else {
   log.error('Please copy configDefault.js to configLocal.js and replace applicable values.');
 }
 
-console.log(siteInfo);
-console.log(codeConfig);
-console.log(dbConfig);
+// ----------------
+// Redis
+// ----------------
 
-var Session = connect.middleware.session.Session,
-    parseCookie = connect.utils.parseCookie
+var redis = require("redis");
+var client = redis.createClient();
 
 client.on("error", function (err) {
-    console.log("Error " + err);
+    log.error("[Redis] " + err);
 });
 
+
+// ----------------
+// Express
+// ----------------
 var app = module.exports = express.createServer();
-var io = require('socket.io').listen(app); 
-io.set('log level', 0);
 
-// = Configuration
-
+// Express Middleware config
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-//  app.use(express.bodyParser({uploadDir:'./upload'});
+  //app.use(express.bodyParser({uploadDir:'./upload'});
   app.use(express.cookieParser());
   app.use(express.session({
     store: sessionStore,
@@ -64,16 +62,17 @@ app.configure(function(){
   }));
 
   // To include underscore etc inside Jade templates - add them here
-//  app.helpers({
-//	_: require("underscore")
-//  });
+  //app.helpers({
+  //  _: require("underscore")
+  //});
 
   app.use(express.methodOverride());
-//  app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+  //app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
 
+// Express environment config
 app.configure('development', function(){
   app.use(log4js.connectLogger(log, { level: log4js.levels.INFO }));
   log.setLevel('TRACE');
@@ -84,54 +83,19 @@ app.configure('production', function(){
   log.setLevel('INFO');
 });
 
-io.set('authorization', function (data, accept) {
-  if (data.headers.cookie) {
-    data.cookie = parseCookie(data.headers.cookie);
-    data.sessionID = data.cookie['my.sid'];
-    data.sessionStore = sessionStore;
-    sessionStore.get(data.sessionID, function (err, session) {
-      if (err) {
-        accept(err.message, false);
-      } else {
-        data.session = new Session(data, session);
-        accept(null, true);
-      }
-    });
-  } else {
-    return accept('No cookie transmitted.', false);
-  }
-});
 
-Array.prototype.unique = function() {
-  var o = {}, i, l = this.length, r = [];
-  for(i=0; i<l;i+=1) o[this[i]] = this[i];
-  for(i in o) {
-    if (o[i]) {
-      r.push(o[i]);
-    }
-  }
-  return r;
-};
-
-String.prototype.randomString = function(stringLength) {
-  var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-  if (!stringLength>0) {
-    var stringLength = 8;
-  }
-  var randomString = '';
-  for (var i=0; i<stringLength; i++) {
-    var rnum = Math.floor(Math.random() * chars.length);
-    randomString += chars.substring(rnum,rnum+1);
-  }
-  return randomString; 
-}
-
-// connect to the db and make the collections available globally
+// ----------------
+// MongoDB Config
+// ----------------
 var db = mongo.db(dbConfig.mongoDB + dbConfig.database_collection)
 postDb = db.collection('post');
 userDb = db.collection('user');
 courseDb = db.collection('course');
 categoryDb = db.collection('category');
+
+
+// Sample code to test database connection
+// TODO: Remove it when not needed
 getNextInt = function (type, callback) {
   db.collection('count').findAndModify({_id: type}, [['_id','asc']], {$inc: {count:1}}, {upsert:true,new:true}, function(error, result) { 
     if (error) {
@@ -148,6 +112,8 @@ getNextInt('saves', function(error, count) {
   log.info('Run ' + count + ' times.');
 });
 
+// Sample database queries
+// TODO: Migrate to a separate file
 loadLastFivePosts = function (req, res, next) {
   postDb.find({requires_verification: { $ne: true }}).sort({created_at:-1}).limit(5).toArray(function(error, posts) { 
     app.helpers({
@@ -210,98 +176,111 @@ loadCourse = function (req, res, next) {
   });
 }
 
-
+// ----------------
 // Routes
+// ----------------
+
+// Miscellaneous routes
 app.get('/', loadGlobals, function(req, res){
   res.render('main', {
     title: '10xEngineer.me Home', 
-	loggedInUser:req.user, 
-	coursenav: "N",
-	Course: '',
-	Unit: ''
+  loggedInUser:req.user, 
+  coursenav: "N",
+  Course: '',
+  Unit: ''
   });
 });
 
+app.get('/about', loadGlobals, function(req, res){
+  res.render('default', {
+    title: '10xEngineer.me About',
+    loggedInUser:req.user,
+  coursenav: "N",
+    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
+  });
+});
+
+// Courses-related routes
 app.get('/coursesold', loadGlobals, function(req, res){
   res.render('overview', {
     title: '10xEngineer.me Course List', 
-	loggedInUser:req.user, 
-	coursenav: "N",
-	Course: '',
-	Unit: ''
+  loggedInUser:req.user, 
+  coursenav: "N",
+  Course: '',
+  Unit: ''
   });
 });
 
 app.get('/course', loadGlobals, function(req, res){
   res.render('course', {
     title: '10xEngineer.me Course',
- 	Course: 'CS99',
-	Unit: 'Devops', 
-	coursenav: "Y",
-	loggedInUser:req.user
+  Course: 'CS99',
+  Unit: 'Devops', 
+  coursenav: "Y",
+  loggedInUser:req.user
   });
 });
 
 app.get('/program', loadGlobals, function(req, res){
   res.render('ide', {
     title: '10xEngineer.me Course',
-	Course: 'CS99',
-	Unit: 'Devops',
-	coursenav: "Y",
-	loggedInUser:req.user,
-	code: '',
-	compile_results: '',
-	compile_errors: ''
+  Course: 'CS99',
+  Unit: 'Devops',
+  coursenav: "Y",
+  loggedInUser:req.user,
+  code: '',
+  compile_results: '',
+  compile_errors: ''
   });
 });
 
 app.get('/progress', loadGlobals, function(req, res){
   res.render('progress', {
     title: '10xEngineer.me Course', 
-	Course: 'CS99',
-	Unit: 'Devops', 
-	coursenav: "Y",
-	loggedInUser: req.user
+  Course: 'CS99',
+  Unit: 'Devops', 
+  coursenav: "Y",
+  loggedInUser: req.user
   });
 });
 
 app.get('/contentmanager', loadGlobals, function(req, res){
   res.render('content_manager', {
     title: '10xEngineer.me Course Creator', 
-	Course: '',
-	Unit: '', 
-	coursenav: "N",
-	contentfile: req.param('coursefile', ''),
-	loggedInUser: req.user
+  Course: '',
+  Unit: '', 
+  coursenav: "N",
+  contentfile: req.param('coursefile', ''),
+  loggedInUser: req.user
   });
 });
 
 app.post('/file-upload', loadGlobals, function(req, res, next) {
-	console.log('Uploading file');
-	req.form.complete( function(err, fields, files) {
-		if (err) {
-			next(err);
-		} else {
-			console.log('Uploaded %s to %s', files.course.filename, files.course.path);
-			console.log('copying file from temp upload dir to course dir');
-			var tmp_path = files.course.path;
-			var target_path = './public/courses/' + files.course.name;
-			fs.rename(tmp_path, target_path, function(err) {
-				if(err) throw err;
-				// delete the temporary file
-				fs.unlink(tmp_path, function() {
-					if(err) throw err;
-					console.log('File uploaded to: '+target_path + ' - ' + files.course.size + ' bytes');
-					res.redirect('/contentmanager', {coursefile: target_path+'/'+files.course.name});
-				});
-			});			
-		}
-	});
-	
-	req.form.on('progress', function(bytesReceived, bytesExpected) {
-		var percent = (bytesReceived / bytesExpected * 100) | 0;
-		process.stdout.write('Uploading: %' + percent + '\r');
-	})
+  console.log('Uploading file');
+  req.form.complete( function(err, fields, files) {
+    if (err) {
+      next(err);
+    } else {
+      console.log('Uploaded %s to %s', files.course.filename, files.course.path);
+      console.log('copying file from temp upload dir to course dir');
+      var tmp_path = files.course.path;
+      var target_path = './public/courses/' + files.course.name;
+      fs.rename(tmp_path, target_path, function(err) {
+        if(err) throw err;
+        // delete the temporary file
+        fs.unlink(tmp_path, function() {
+          if(err) throw err;
+          console.log('File uploaded to: '+target_path + ' - ' + files.course.size + ' bytes');
+          res.redirect('/contentmanager', {coursefile: target_path+'/'+files.course.name});
+        });
+      });     
+    }
+  });
+  
+  req.form.on('progress', function(bytesReceived, bytesExpected) {
+    var percent = (bytesReceived / bytesExpected * 100) | 0;
+    process.stdout.write('Uploading: %' + percent + '\r');
+  })
 
 });
 
@@ -313,12 +292,12 @@ app.post('/submitCode', loadGlobals, function(req, res, next){
   console.log('re-rendering ide');
   res.render('ide', {
     title: 'submitCode',
-	Course: req.param('Course', ''),
-	Unit: req.param('Unit', '(unknown)'),
-	coursenav: "Y",
+  Course: req.param('Course', ''),
+  Unit: req.param('Unit', '(unknown)'),
+  coursenav: "Y",
     code: source, 
     compile_results: compile_res,
-	compile_errors: compile_err,
+  compile_errors: compile_err,
     loggedInUser: req.user
   });
 
@@ -338,30 +317,59 @@ submitCode = function(code) {
   , function (error, response, body) {
       if(response.statusCode == 201){
         console.log('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
-		return response.statusCode, response.body;
+    return response.statusCode, response.body;
       } else {
         console.log('error: '+ response.statusCode)
         console.log(body);
-		return response.statusCode, response.body;
+    return response.statusCode, response.body;
       }
     }
   )
   
 }
 
-app.get('/about', loadGlobals, function(req, res){
-  res.render('default', {
-    title: '10xEngineer.me About',
-    loggedInUser:req.user,
-	coursenav: "N",
-    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
-  });
-});
+// Controllers
+require('./controllers/course')(app);
 
-PostHelper.add_routes(app);
-UserHelper.add_routes(app);
-AdminHelper.add_routes(app, express);
-CourseHelper.add_routes(app);
+
+
+// TODO: Remove this useless code is not needed
+// -----------------------------------------------------------------------
+/*
+
+var request = require('request');
+var fs = require('fs');
+var util = require('util');
+var connect = require('connect');
+
+var wsdlurl = 'http://ideone.com/api/1/service.json';
+var code = "";
+var ace = null;
+var editor = null;
+
+var Session = connect.middleware.session.Session,
+    parseCookie = connect.utils.parseCookie
+
+var io = require('socket.io').listen(app); 
+io.set('log level', 0);
+
+io.set('authorization', function (data, accept) {
+  if (data.headers.cookie) {
+    data.cookie = parseCookie(data.headers.cookie);
+    data.sessionID = data.cookie['my.sid'];
+    data.sessionStore = sessionStore;
+    sessionStore.get(data.sessionID, function (err, session) {
+      if (err) {
+        accept(err.message, false);
+      } else {
+        data.session = new Session(data, session);
+        accept(null, true);
+      }
+    });
+  } else {
+    return accept('No cookie transmitted.', false);
+  }
+});
 
 app.get('/listen', loadGlobals, function(req, res){
   res.render('listen', {layout:false});
@@ -395,6 +403,13 @@ io.sockets.on('connection', function (socket) {
 //    chatProvider.save({line: data}); 
 //  });
 });
+
+*/
+
+
+// -----------------------------------------------------------------------
+
+
 
 app.listen(3000);
 log.info("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

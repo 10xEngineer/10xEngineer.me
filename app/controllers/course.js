@@ -1,7 +1,8 @@
 var mongo = require('mongoskin');
 var bcrypt = require('bcrypt'); 
 
-validateCourseData = function (req, callback) {
+
+var validateCourseData = function (req, callback) {
   errors = [];
   data = {};
   
@@ -59,10 +60,10 @@ validateCourseData = function (req, callback) {
       callback( null, data);
     }
   }
-}
+};
 
-exports.add_routes = function (app) {
-
+// Routes
+module.exports = function (app) {
   app.get('/course/create', loadGlobals, loadCategories, function(req, res){
     res.render('courses/create', {
       title: 'New Course',
