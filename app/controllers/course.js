@@ -1,7 +1,9 @@
 var mongo = require('mongoskin');
 var bcrypt = require('bcrypt'); 
+var request = require('request');
 
-validateCourseData = function (req, callback) {
+
+var validateCourseData = function (req, callback) {
   errors = [];
   data = {};
   
@@ -59,11 +61,143 @@ validateCourseData = function (req, callback) {
       callback( null, data);
     }
   }
+};
+
+// IDEONE documentation http://ideone.com/files/ideone-api.pdf
+var submitCode = function(code) {
+  request(
+    { method: 'GET'
+    , uri: wsdlurl
+    , multipart: 
+      [ { 'Content-type': 'application/json'
+        ,  body: JSON.stringify({"jsonrpc": "2.0", "method": "getLanguages", "params": {"user": "velniukas", "pass": "limehouse"}, "id": 1})
+        }
+      ] 
+    }
+  , function (error, response, body) {
+      if(response.statusCode == 201){
+        console.log('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
+    return response.statusCode, response.body;
+      } else {
+        console.log('error: '+ response.statusCode)
+        console.log(body);
+    return response.statusCode, response.body;
+      }
+    }
+  )
+  
 }
 
-exports.add_routes = function (app) {
 
-  app.get('/course/create', loadGlobals, loadCategories, function(req, res){
+
+// ------------
+// Routes
+// ------------
+module.exports = function (app) {
+
+  app.get('/coursesold', function(req, res){
+    res.render('overview', {
+      title: '10xEngineer.me Course List', 
+    loggedInUser:req.user, 
+    coursenav: "N",
+    Course: '',
+    Unit: ''
+    });
+  });
+
+  app.get('/course', function(req, res){
+    res.render('course', {
+      title: '10xEngineer.me Course',
+    Course: 'CS99',
+    Unit: 'Devops', 
+    coursenav: "Y",
+    loggedInUser:req.user
+    });
+  });
+
+  app.get('/program', function(req, res){
+    res.render('ide', {
+      title: '10xEngineer.me Course',
+    Course: 'CS99',
+    Unit: 'Devops',
+    coursenav: "Y",
+    loggedInUser:req.user,
+    code: '',
+    compile_results: '',
+    compile_errors: ''
+    });
+  });
+
+  app.get('/progress', function(req, res){
+    res.render('progress', {
+      title: '10xEngineer.me Course', 
+    Course: 'CS99',
+    Unit: 'Devops', 
+    coursenav: "Y",
+    loggedInUser: req.user
+    });
+  });
+
+  app.get('/contentmanager', function(req, res){
+    res.render('content_manager', {
+      title: '10xEngineer.me Course Creator', 
+    Course: '',
+    Unit: '', 
+    coursenav: "N",
+    contentfile: req.param('coursefile', ''),
+    loggedInUser: req.user
+    });
+  });
+
+  app.post('/file-upload', function(req, res, next) {
+    console.log('Uploading file');
+    req.form.complete( function(err, fields, files) {
+      if (err) {
+        next(err);
+      } else {
+        console.log('Uploaded %s to %s', files.course.filename, files.course.path);
+        console.log('copying file from temp upload dir to course dir');
+        var tmp_path = files.course.path;
+        var target_path = './public/courses/' + files.course.name;
+        fs.rename(tmp_path, target_path, function(err) {
+          if(err) throw err;
+          // delete the temporary file
+          fs.unlink(tmp_path, function() {
+            if(err) throw err;
+            console.log('File uploaded to: '+target_path + ' - ' + files.course.size + ' bytes');
+            res.redirect('/contentmanager', {coursefile: target_path+'/'+files.course.name});
+          });
+        });     
+      }
+    });
+    
+    req.form.on('progress', function(bytesReceived, bytesExpected) {
+      var percent = (bytesReceived / bytesExpected * 100) | 0;
+      process.stdout.write('Uploading: %' + percent + '\r');
+    })
+
+  });
+
+  app.post('/submitCode', function(req, res, next){
+    console.log('in app.js::submitCode');
+    var source = req.param('sourcecode', '');
+    console.log('source=',source);
+    var compile_res, compile_err = submitCode(source);
+    console.log('re-rendering ide');
+    res.render('ide', {
+      title: 'submitCode',
+    Course: req.param('Course', ''),
+    Unit: req.param('Unit', '(unknown)'),
+    coursenav: "Y",
+      code: source, 
+      compile_results: compile_res,
+    compile_errors: compile_err,
+      loggedInUser: req.user
+    });
+
+  });
+
+  app.get('/course/create', loadCategories, function(req, res){
     res.render('courses/create', {
       title: 'New Course',
       course: {_id:'',title:'',category:'',content:''},
@@ -71,7 +205,7 @@ exports.add_routes = function (app) {
     });
   });
 
-  app.post('/course/submit/0?', loadGlobals, function(req, res){
+  app.post('/course/submit/0?', function(req, res){
     data = {};
     validateCourseData(req, function (error, data){
       if (error) {
@@ -117,19 +251,19 @@ exports.add_routes = function (app) {
     });
   });
 
-  app.get('/course/verify', loadGlobals, function(req, res){
+  app.get('/course/verify', function(req, res){
     res.render('courses/verify', {
       title: 'Verify Course'
     });
   });
 
-  app.get('/course/verification_failed', loadGlobals, function(req, res){
+  app.get('/course/verification_failed', function(req, res){
     res.render('courses/verification_failed', {
       title: 'Could Not Verify Course'
     });
   });
 
-  app.get('/course/:id/verify', loadGlobals, loadCourse, loadCategories, function(req, res){
+  app.get('/course/:id/verify', loadCourse, loadCategories, function(req, res){
     var courseId = req.params.id;
     var verify = decodeURIComponent(req.query.verify);
     if (req.course && courseId && verify) {
@@ -163,7 +297,7 @@ exports.add_routes = function (app) {
 
   });
 
-  app.get('/course/:id/edit', loadGlobals, loadCategories, loadCourse, function(req, res, next){
+  app.get('/course/:id/edit', loadCategories, loadCourse, function(req, res, next){
     if (req.course && (req.is_admin || req.user._id === req.course.user_id)) {
       res.render('courses/edit', {
         title: 'Course ' + req.course.title,
@@ -175,7 +309,7 @@ exports.add_routes = function (app) {
     }
   });
 
-  app.get('/course/:id/remove', loadGlobals, loadCourse, function(req, res, next){
+  app.get('/course/:id/remove', loadCourse, function(req, res, next){
     if (!req.course || req.params.id === 'null') {
       res.redirect('/courses');
     }
@@ -203,7 +337,7 @@ exports.add_routes = function (app) {
     }
   });
 
-  app.get('/course/:id', loadGlobals, loadCourse, function(req, res){
+  app.get('/course/:id', loadCourse, function(req, res){
     if (!req.course) {
       res.redirect('/courses/');
     }
@@ -215,7 +349,7 @@ exports.add_routes = function (app) {
     }
   });
 
-  app.post('/course/validate/email/', loadGlobals, function(req, res){
+  app.post('/course/validate/email/', function(req, res){
     result = '';
     email = req.param('email');
     if (email) {
@@ -235,7 +369,7 @@ exports.add_routes = function (app) {
     }
   });
 
-  app.post('/course/submit/:id?', loadGlobals, loadCourse, function(req, res){
+  app.post('/course/submit/:id?', loadCourse, function(req, res){
     data = {};
     if (req.course && (req.is_admin || req.course.user_id == req.user._id)) {
       validateCourseData(req, function (error, data){
@@ -263,7 +397,7 @@ exports.add_routes = function (app) {
     }
   });
 
-  app.get('/courses', loadGlobals, loadCategories, function(req, res){
+  app.get('/courses', loadCategories, function(req, res){
     find = {requires_verification: { $ne: true }};
     if (req.param('category')) {
       find = {category: req.param('category'), requires_verification: { $ne: true } };
