@@ -44,7 +44,7 @@
 					li
 						a(href='/users')
 							i.icon-user.icon-white 
-							| #{JSON.stringify(everyauth.user)}
+							| #{everyauth.user.name}
 				-if(everyauth.loggedIn)
 					li
 						a(href='/admin')

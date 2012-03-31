@@ -95,7 +95,7 @@ var submitCode = function(code) {
 // ------------
 module.exports = function (app) {
 
-  app.get('/coursesold', loadGlobals, function(req, res){
+  app.get('/coursesold', function(req, res){
     res.render('overview', {
       title: '10xEngineer.me Course List', 
     loggedInUser:req.user, 
@@ -105,7 +105,7 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/course', loadGlobals, function(req, res){
+  app.get('/course', function(req, res){
     res.render('course', {
       title: '10xEngineer.me Course',
     Course: 'CS99',
@@ -115,7 +115,7 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/program', loadGlobals, function(req, res){
+  app.get('/program', function(req, res){
     res.render('ide', {
       title: '10xEngineer.me Course',
     Course: 'CS99',
@@ -128,7 +128,7 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/progress', loadGlobals, function(req, res){
+  app.get('/progress', function(req, res){
     res.render('progress', {
       title: '10xEngineer.me Course', 
     Course: 'CS99',
@@ -138,7 +138,7 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/contentmanager', loadGlobals, function(req, res){
+  app.get('/contentmanager', function(req, res){
     res.render('content_manager', {
       title: '10xEngineer.me Course Creator', 
     Course: '',
@@ -149,7 +149,7 @@ module.exports = function (app) {
     });
   });
 
-  app.post('/file-upload', loadGlobals, function(req, res, next) {
+  app.post('/file-upload', function(req, res, next) {
     console.log('Uploading file');
     req.form.complete( function(err, fields, files) {
       if (err) {
@@ -178,7 +178,7 @@ module.exports = function (app) {
 
   });
 
-  app.post('/submitCode', loadGlobals, function(req, res, next){
+  app.post('/submitCode', function(req, res, next){
     console.log('in app.js::submitCode');
     var source = req.param('sourcecode', '');
     console.log('source=',source);
@@ -197,7 +197,7 @@ module.exports = function (app) {
 
   });
 
-  app.get('/course/create', loadGlobals, loadCategories, function(req, res){
+  app.get('/course/create', loadCategories, function(req, res){
     res.render('courses/create', {
       title: 'New Course',
       course: {_id:'',title:'',category:'',content:''},
@@ -205,7 +205,7 @@ module.exports = function (app) {
     });
   });
 
-  app.post('/course/submit/0?', loadGlobals, function(req, res){
+  app.post('/course/submit/0?', function(req, res){
     data = {};
     validateCourseData(req, function (error, data){
       if (error) {
@@ -251,19 +251,19 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/course/verify', loadGlobals, function(req, res){
+  app.get('/course/verify', function(req, res){
     res.render('courses/verify', {
       title: 'Verify Course'
     });
   });
 
-  app.get('/course/verification_failed', loadGlobals, function(req, res){
+  app.get('/course/verification_failed', function(req, res){
     res.render('courses/verification_failed', {
       title: 'Could Not Verify Course'
     });
   });
 
-  app.get('/course/:id/verify', loadGlobals, loadCourse, loadCategories, function(req, res){
+  app.get('/course/:id/verify', loadCourse, loadCategories, function(req, res){
     var courseId = req.params.id;
     var verify = decodeURIComponent(req.query.verify);
     if (req.course && courseId && verify) {
@@ -297,7 +297,7 @@ module.exports = function (app) {
 
   });
 
-  app.get('/course/:id/edit', loadGlobals, loadCategories, loadCourse, function(req, res, next){
+  app.get('/course/:id/edit', loadCategories, loadCourse, function(req, res, next){
     if (req.course && (req.is_admin || req.user._id === req.course.user_id)) {
       res.render('courses/edit', {
         title: 'Course ' + req.course.title,
@@ -309,7 +309,7 @@ module.exports = function (app) {
     }
   });
 
-  app.get('/course/:id/remove', loadGlobals, loadCourse, function(req, res, next){
+  app.get('/course/:id/remove', loadCourse, function(req, res, next){
     if (!req.course || req.params.id === 'null') {
       res.redirect('/courses');
     }
@@ -337,7 +337,7 @@ module.exports = function (app) {
     }
   });
 
-  app.get('/course/:id', loadGlobals, loadCourse, function(req, res){
+  app.get('/course/:id', loadCourse, function(req, res){
     if (!req.course) {
       res.redirect('/courses/');
     }
@@ -349,7 +349,7 @@ module.exports = function (app) {
     }
   });
 
-  app.post('/course/validate/email/', loadGlobals, function(req, res){
+  app.post('/course/validate/email/', function(req, res){
     result = '';
     email = req.param('email');
     if (email) {
@@ -369,7 +369,7 @@ module.exports = function (app) {
     }
   });
 
-  app.post('/course/submit/:id?', loadGlobals, loadCourse, function(req, res){
+  app.post('/course/submit/:id?', loadCourse, function(req, res){
     data = {};
     if (req.course && (req.is_admin || req.course.user_id == req.user._id)) {
       validateCourseData(req, function (error, data){
@@ -397,7 +397,7 @@ module.exports = function (app) {
     }
   });
 
-  app.get('/courses', loadGlobals, loadCategories, function(req, res){
+  app.get('/courses', loadCategories, function(req, res){
     find = {requires_verification: { $ne: true }};
     if (req.param('category')) {
       find = {category: req.param('category'), requires_verification: { $ne: true } };

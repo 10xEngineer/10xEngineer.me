@@ -45,13 +45,7 @@ app.configure(function(){
     cookie: {maxAge: 31557600000 }
   }));
 
-  // To include underscore etc inside Jade templates - add them here
-  //app.helpers({
-  //  _: require("underscore")
-  //});
-
   app.use(authMiddleware.middleware());
-  //app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
@@ -103,24 +97,6 @@ getNextInt('saves', function(error, count) {
 // Sample database queries
 // TODO: Migrate to a separate file
 
-loadSessionUser = function (req, res, next) {
-  if (req.session.user && req.cookies.rememberme) {
-    req.user = req.session.user;
-  }
-  else {
-    req.user = {};
-  }
-  if (req.user.is_root) {
-    req.is_admin = true;
-  }
-  app.helpers({
-    loggedInUser: req.user
-  });
-  next();
-}
-
-loadGlobals = [loadSessionUser];
-
 loadCategories = function (req, res, next) {
   categoryDb.find().sort({name:1}).toArray(function(error, categories) {
     app.helpers({
@@ -161,8 +137,7 @@ loadCourse = function (req, res, next) {
 // ----------------
 
 // Miscellaneous routes
-app.get('/', loadGlobals, function(req, res){
-  log.info(req.user);
+app.get('/', function(req, res){
   res.render('main', {
     title: '10xEngineer.me Home', 
     coursenav: "N",
@@ -171,7 +146,7 @@ app.get('/', loadGlobals, function(req, res){
   });
 });
 
-app.get('/about', loadGlobals, function(req, res){
+app.get('/about', function(req, res){
   res.render('default', {
     title: '10xEngineer.me About',
     coursenav: "N",
@@ -179,7 +154,7 @@ app.get('/about', loadGlobals, function(req, res){
   });
 });
 
-app.get('/auth', loadGlobals, function(req, res){
+app.get('/auth', function(req, res){
   res.render('users/login', {
     title: 'Log In',
     coursenav: "N",

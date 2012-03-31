@@ -23,9 +23,9 @@ module.exports.findBySource = function(source, srcUser, callback) {
   if(source === 'twitter') {
     select['twitter.screen_name'] = srcUser.screen_name;
   } else if (source === 'google') {
-    select['google.email'] = srcUser.email;
+    select['email'] = srcUser.email;
   } else if (source === 'facebook') {
-    // TODO: Let's see
+    select['email'] = srcUser.email;
   }
 
   this.collection.findOne(select, function(error, dbUser) {
@@ -73,6 +73,10 @@ module.exports.createNew = function (user, source, promise) {
     if(source === 'twitter') {
       userObj['name'] = user.name;
     } else if(source === 'google') {
+      userObj['name'] = user.name;
+      userObj['email'] = user.email;
+    } else if(source === 'facebook') {
+      userObj['name'] = user.name;
       userObj['email'] = user.email;
     }
 
@@ -88,6 +92,13 @@ module.exports.updateUserBySource = function (dbUser, source, srcUser, promise) 
     promise.fulfill(dbUser);
   } else {
     dbUser[source] = srcUser;
+
+    if(!dbUser['name'] && srcUser['name']) {
+      dbUser['name'] = srcUser.name;
+    }
+    if(!dbUser.email && srcUser['email']) {
+      dbUser['email'] = srcUser.email;
+    }
 
     this.collection.save(dbUser, {}, function(error) {
       if(error) {
