@@ -327,7 +327,7 @@ app.post('/submitCode', loadGlobals, function(req, res, next){
 // IDEONE documentation http://ideone.com/files/ideone-api.pdf
 submitCode = function(code) {
   request(
-    { method: 'PUT'
+    { method: 'GET'
     , uri: wsdlurl
     , multipart: 
       [ { 'Content-type': 'application/json'

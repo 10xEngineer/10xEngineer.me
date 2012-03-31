@@ -36,6 +36,7 @@
 		$(document).ready(function() {
 			var editor = ace.edit("editor");
 		});
+		// get the source from the ACE editor and place it in a hidden field in the form to be submitted to the compiler
 		function captureSource(form) {
 			with( form ) {
 				console.log('form = ', form);
