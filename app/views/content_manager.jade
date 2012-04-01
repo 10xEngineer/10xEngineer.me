@@ -2,8 +2,8 @@
 	.row-fluid
 		.span3
 		.span6
-			form(action="/file-upload", method='POST', enctype='multipart/form-data').form-inline.well
-				input#course.input-large(type='file', placeholder='Course File')
+			form(action="/file-upload", method='POST', enctype='multipart/form-data', name='course-uploader').form-inline.well
+				input#course.input-large(name='course-file', type='file', placeholder='Course File')
 				input.btn.btn-primary.btn-large(type='submit', style='margin-left: 1em;') Upload course
 		.span3
 	.row-fluid
