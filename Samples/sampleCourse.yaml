@@ -1,0 +1,33 @@
+title: COURSENAME
+description: DESCRIPTION
+image: FILENAME (or URL)
+units
+  unit
+    title: INTRODUCTION
+      video: FILENAME (or URL)
+      notes: 
+      files: FILENAME(S) or URL(s)
+  unit
+    title: UNIT ONE
+      notes: some text
+      files: Some files / pdf's (FILENAMES or URLS)
+      lessons
+        lesson: 
+          title: How to make a ....
+          video: FILENAME or URL
+          notes: some text
+          question (optional)
+             type: (multiple-choice, select-one, type answers, programming exercise)
+             quiz-parameters:
+                background-image: e.g. last frame of the video 
+                inputs: location, names, type (to be overlaid over image)
+             programming-parameters:
+                 ide: language, initial line location etc
+                 input-code: skeleton code
+                 input-data: some text / json etc
+             answers: (name, value) If a programming exercise, the unit test to check the console output matches 
+
+    homework (same as lessons, but each 'lesson' has a mandatory question)      
+
+    office-hours
+       review-video: FILENAME or URL    

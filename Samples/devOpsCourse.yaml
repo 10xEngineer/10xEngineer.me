@@ -1,0 +1,67 @@
+title: Devops
+description: > 
+  "DevOps" is an emerging set of principles, methods and practices for communication, collaboration and integration between software development (application/software engineering) and IT operations (systems administration/infrastructure) professionals. It has developed in response to the emerging understanding of the interdependence and importance of both the development and operations disciplines in meeting an organization's goal of rapidly producing software products and services
+image: https://encrypted-tbn0.google.com/images?q=tbn:ANd9GcSYlEdiwQRZJSJyJVS8gkL6fQyNh9_GWqPiVtWfLiSUAR5fpYEs
+units
+  unit
+    title: INTRODUCTION
+      video: http://www.youtube.com/watch?feature=player_embedded&v=BQHMLD9bwq4
+      notes:  > Introduction
+        Hi! I'm your Instructor, Steve. I'll be giving you tips and hints below the lecture videos and quizzes. Here's our first tip:
+        To navigate through the unit click look to the side-bar to the right of the video.
+        Also check out the official Course Forums if you have any questions!
+      files: 
+  unit
+    title: UNIT 1
+      notes: 
+      files: 
+      lessons
+        lesson: 
+          title: Defining Devops
+          video: http://youtube.com/watch?v=hY08uML
+          notes: some notes 
+        lesson:
+          title: Devops Community
+          question:
+             type: multiple-choice
+             quiz-parameters:
+                background-image: https://encrypted-tbn1.google.com/images?q=tbn:ANd9GcQDT_Ojsoe7WKtSteVGgn7rP7MbUhNO1C3JcO_5Yips5W0I0XUkgA 
+                inputs:
+                  - checkbox: 
+                      name: Q&A
+                      position: 120,80
+                  - checkbox: 
+                      name: Operations
+                      position: 80,80
+                  - checkbox:
+                      name: Development
+                      position: 100,120
+                answers:
+                  ["Q&A": "true", "Operations": "true", "Development", "true"]
+  unit
+    title: HOMEWORK 1
+      notes: 
+      files: 
+      lessons
+        lesson: 
+          title: Your first puppet script
+          video: http://youtube.com/watch?v=hY08uML
+          notes: Change the permissions on the install.sh file to make it executable
+        lesson:
+          title: Devops Community
+          question:
+              type: programming
+              programming-parameters:
+                 ide: ["language":"python"]
+                 input-code: |
+                    import sys
+
+                    def main():
+                      # put your code here, for your output put the result into s, where it will be output to the console
+
+                      print(s)
+                 input-data: some input text
+             answers: ["0x777"]
+  unit
+    title: OFFICE HOURS 1
+       video: http://www.youtube.com/watch?feature=player_embedded&v=PckSUEQu3F8  
