@@ -4,8 +4,6 @@
   , "private": true
   , "dependencies": {
       "express": "latest"
-    , "connect": "latest"
-    , "mkdirp": "latest"
     , "mail": "latest"
     , "reparse": "latest"
     , "jade": "latest"
@@ -15,8 +13,6 @@
     , "redis": "latest"
     , "bcrypt": "latest"
     , "connect-redis": "latest"
-    , "socket.io": "latest"
-    , "vows": "latest"
     , "eyes": "latest"
     , "request": "latest"
     , "mime": "latest"
@@ -24,5 +20,6 @@
     , "connect-form": "latest"
     , "util": "latest"
     , "debug": "latest"
+    , "everyauth": "latest"
   }
 }

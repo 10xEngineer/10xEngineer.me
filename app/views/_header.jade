@@ -30,16 +30,30 @@
 					a(href='http://10xEngineer.me:80')
 						i.icon-map-marker.icon-white 
 						| Forum
-				li
-					a(href='/users')
-						i.icon-user.icon-white 
-						| Profile
-				-if(loggedInUser.is_admin)
+						
+			form.navbar-search.pull-right(action='')
+				input.search-query.span3(type='text', placeholder='Search Contents')
+
+			ul.nav.pull-right
+				-if(!everyauth.loggedIn)
+					li
+						a(href='/auth')
+							i.icon-user.icon-white
+							| Sign In
+				-if(everyauth.loggedIn)
+					li
+						a(href='/users')
+							i.icon-user.icon-white 
+							| #{everyauth.user.name}
+				-if(everyauth.loggedIn)
 					li
 						a(href='/admin')
 							i.icon-user.icon-white 
 							| Admin
-			form.navbar-search.pull-right(action='')
-				input.search-query.span3(type='text', placeholder='Search Contents')
+				-if(everyauth.loggedIn)
+					li
+						a(href='/logout')
+							i.icon-user.icon-white 
+							| Sign Out
 	- if(typeof(coursenav) != 'undefined' && coursenav == "Y")
 		include _coursenav
