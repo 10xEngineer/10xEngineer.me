@@ -55,6 +55,7 @@ app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
 //  app.use(express.bodyParser({uploadDir:'./upload'});
+  app.use(express.bodyParser());
   app.use(express.cookieParser());
   app.use(express.session({
     store: sessionStore,
@@ -311,43 +312,75 @@ app.post('/submitCode', loadGlobals, function(req, res, next){
   console.log('source=',source);
   var compile_res, compile_err = submitCode(source);
   console.log('re-rendering ide');
-  res.render('ide', {
-    title: 'submitCode',
-	Course: req.param('Course', ''),
-	Unit: req.param('Unit', '(unknown)'),
-	coursenav: "Y",
-    code: source, 
-    compile_results: compile_res,
-	compile_errors: compile_err,
-    loggedInUser: req.user
-  });
-
+  // res.render('ide', {
+  //    title: 'submitCode',
+  // 	Course: req.param('Course', ''),
+  // 	Unit: req.param('Unit', '(unknown)'),
+  // 	coursenav: "Y",
+  //    code: source, 
+  //    compile_results: compile_res,
+  // 	compile_errors: compile_err,
+  //    loggedInUser: req.user
+  //  });
+  
 });
 
 // IDEONE documentation http://ideone.com/files/ideone-api.pdf
-submitCode = function(code) {
+submitCode = function(res, code) {
   request(
     { method: 'GET'
     , uri: wsdlurl
-    , multipart: 
-      [ { 'Content-type': 'application/json'
-        ,  body: JSON.stringify({"jsonrpc": "2.0", "method": "getLanguages", "params": {"user": "velniukas", "pass": "limehouse"}, "id": 1})
-        }
-      ] 
+	, json: {
+				jsonrpc: "2.0",
+				method: "createSubmission", 
+				params: 
+				{
+					user: "velniukas", 
+					pass: "limehouse", 
+					sourcecode: code,
+					language: "112", //javascript
+					input:true //this is a parameter bug of the ideone API, it supposes to be a run time input, instead of an indicator to run code
+				}, 
+				"id": 1
+			}
     }
   , function (error, response, body) {
-      if(response.statusCode == 201){
-        console.log('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
-		return response.statusCode, response.body;
-      } else {
-        console.log('error: '+ response.statusCode)
-        console.log(body);
-		return response.statusCode, response.body;
-      }
+      	// res.writeHead(200, {'content-type': 'text/json' });
+		//res.contentType('json');
+		res.send( JSON.stringify(body) );
+      	res.end('\n');
     }
   )
   
 }
+
+app.post('/getCodeExecutionDetails', loadGlobals, function(req, res, next){
+  var linkCode = req.param('linkCode', '');
+  request(
+	{
+		method:'GET',
+		uri: wsdlurl,
+		json:{
+			jsonrpc: "2.0",
+			method: "getSubmissionDetails", 
+			params: 
+			{
+				user: "velniukas", 
+				pass: "limehouse", 
+				withSource: linkCode,
+				withOutput: true,
+				withCmpinfo: true
+			}, 
+			"id": 1
+		}
+	},
+	function(error, response, body){
+		res.writeHead(200, {'content-type': 'text/json' });
+		res.write( JSON.stringify(body) );
+        res.end('\n');             
+	}
+	)
+});
 
 app.get('/about', loadGlobals, function(req, res){
   res.render('default', {
@@ -394,6 +427,83 @@ io.sockets.on('connection', function (socket) {
 //    socket.broadcast.emit('repeat', { youSaid: data });
 //    chatProvider.save({line: data}); 
 //  });
+  	socket.on('submitcode', function(data){
+		console.log(data);
+		request(
+		    { method: 'GET'
+		    , uri: wsdlurl
+			, json: {
+						jsonrpc: "2.0",
+						method: "createSubmission", 
+						params: 
+						{
+							user: "velniukas", 
+							pass: "limehouse", 
+							sourceCode: data.source,
+							language: "112", //javascript
+							input:true, //this is a parameter bug of the ideone API, it supposes to be a run time input, instead of an indicator to run code
+							run:true
+						}, 
+						"id": 1
+					}
+		    }
+		  , function (error, response, body) {
+				console.log(body);
+		      	socket.emit('codesent', body);
+		    }
+		  )
+	});
+	
+	socket.on('getSubmissionStatus', function(data){
+		request(
+			{
+				method:'GET',
+				uri: wsdlurl,
+				json:{
+					jsonrpc: "2.0",
+					method: "getSubmissionStatus", 
+					params: 
+					{
+						user: "velniukas", 
+						pass: "limehouse",
+						link: data.linkCode, 
+					}, 
+					"id": 1
+				}
+			},
+			function(error, response, body){
+				console.log(body);
+				socket.emit('submissionStatus', body)           
+			}
+			)
+	})
+	
+	socket.on('getSubmissionDetails', function(data){
+		request(
+			{
+				method:'GET',
+				uri: wsdlurl,
+				json:{
+					jsonrpc: "2.0",
+					method: "getSubmissionDetails", 
+					params: 
+					{
+						user: "velniukas", 
+						pass: "limehouse",
+						link: data.linkCode, 
+						withSource: true,
+						withOutput: true,
+						withCmpinfo: true
+					}, 
+					"id": 1
+				}
+			},
+			function(error, response, body){
+				console.log(body);
+				socket.emit('submissionDetails', body)           
+			}
+			)
+	})
 });
 
 app.listen(3000);
