@@ -149,9 +149,37 @@ module.exports = function (app) {
     });
   });
 
+
+//File upload
+var fs = require('fs');
+
+
   app.post('/file-upload', function(req, res, next) {
-    console.log('Uploading file');
-    req.form.complete( function(err, fields, files) {
+
+    console.log('Uploading file', req.form); // form is there but not accessible
+//		console.log('Complete?', req.connection);
+//		console.log('Complete?', req.session);
+		var f = req.files['course-file'];
+		console.log('Uploaded %s to %s', f.filename, f.path);
+    console.log('copying file from temp upload dir to course dir');
+    var tmp_path = f.path;
+    var target_path = './public/courses/' + f.name;
+    fs.rename(tmp_path, target_path, function(err) {
+      if(err) throw err;
+      // delete the temporary file
+      fs.unlink(tmp_path, function() {
+        if(err) throw err;
+        console.log('File uploaded to: '+target_path + ' - ' + f.size + ' bytes');
+        res.render('content_manager', {
+		      title: '10xEngineer.me Course Creator', 
+		    Course: '',
+		    Unit: '', 
+		    coursenav: "N",
+				contentfile: req.param('coursefile', target_path),
+		    loggedInUser: req.user});
+      });
+    });
+/*    form.complete( function(err, fields, files) {
       if (err) {
         next(err);
       } else {
@@ -171,11 +199,11 @@ module.exports = function (app) {
       }
     });
     
-    req.form.on('progress', function(bytesReceived, bytesExpected) {
+    form.on('progress', function(bytesReceived, bytesExpected) {
       var percent = (bytesReceived / bytesExpected * 100) | 0;
       process.stdout.write('Uploading: %' + percent + '\r');
     })
-
+*/
   });
 
   app.post('/submitCode', function(req, res, next){
