@@ -206,7 +206,6 @@ io.sockets.on('connection', function (socket) {
 //  });
   	socket.on('submitcode', function(data){
 		console.log(data);
-		
 		request(
 		    { method: 'GET'
 		    , uri: wsdlurl
@@ -271,7 +270,8 @@ io.sockets.on('connection', function (socket) {
 						link: data.linkCode, 
 						withSource: true,
 						withOutput: true,
-						withCmpinfo: true
+						withCmpinfo: true,
+						withStderr: true
 					}, 
 					"id": 1
 				}

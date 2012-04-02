@@ -262,9 +262,12 @@
 		}
 		function submitSourceCode(){
 			var sourceCode = editor.getSession().getValue();
-			console.log($('#pageslide #mode').val());
-			var data = {'source':sourceCode, 'language':languages[$('#pageslide #mode').val()]};
-			console.log(data);
+			var languageCode = $('#pageslide #mode').val();
+			if(!languageCode){
+				languageCode = $('#mode').val();
+				console.log('test');
+			}
+			var data = {'source':sourceCode, 'language':languages[languageCode]};
 			socket.emit('submitcode', data);
 			$('#compile_results').text('Executing the code...');
 			$('#compile_errors').text('');
@@ -303,6 +306,6 @@
 		}
 		socket.on('submissionDetails', function(data){
 				$('#compile_results').text(data.result.output);
-				$('#compile_errors').text(errors[data.result.result]);
+				$('#compile_errors').text(errors[data.result.result]+'\\n'+data.result.stderr);
 		})
 		
