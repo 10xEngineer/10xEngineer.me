@@ -1,0 +1,28 @@
+h1= title
+.actions 
+  ul
+    li
+      a(href='/course/create') Add Course
+h3 Here are the Courses
+p
+  h4 Categories
+  ul.categories
+   - each category in categories
+     li 
+       a(href='/courses/?category=#{category.name}') #{category.name}
+   li
+     a(href='/courses/') All Courses
+table.data
+  tr
+    th Title
+    th Category
+    th User
+    th Created
+  - each course in courses
+    - courseDate = course._id.getTimestamp().toDateString()
+    tr
+      td
+        a(href='/course/#{course._id}') #{course.title} \n
+      td= course.category
+      td= courseUsers[course.user_id]
+      td= courseDate
