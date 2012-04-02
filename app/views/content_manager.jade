@@ -1,20 +1,14 @@
 .container-fluid
+	- if (contentfile) 
+		.row-fluid
+			.span6
+				#content.alert.alert-success
+					p uploaded: #{contentfile}
 	.row-fluid
-		.span3
 		.span6
 			form(action="/file-upload", method='POST', enctype='multipart/form-data', name='course-uploader').form-inline.well
 				input#course.input-large(name='course-file', type='file', placeholder='Course File')
 				input.btn.btn-primary.btn-large(type='submit', style='margin-left: 1em;') Upload course
-		.span3
-	.row-fluid
-		.span12
-	.row-fluid
-		.span3
-		.span6
-			#content.well
-				- if (typeof contentfile != "undefined") 
-					p #{contentfile}
-		.span3
 
 script(type='text/javascript')
 	function init() {
