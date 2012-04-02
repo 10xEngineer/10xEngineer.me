@@ -29,13 +29,14 @@ var authMiddleware = require('./helpers/auth')(config.auth);
 // ----------------
 // Express
 // ----------------
+
 var app = module.exports = express.createServer();
 
 // Express Middleware config
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.use(express.bodyParser());
+  app.use(express.bodyParser({uploadDir: __dirname + '/upload'}));
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({
