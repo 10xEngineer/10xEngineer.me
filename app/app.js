@@ -172,61 +172,23 @@ require('./controllers/course')(app);
 app.listen(3000);
 log.info("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 
-
-
-// TODO: Remove this useless code is not needed
-// -----------------------------------------------------------------------
-/*
-
-var fs = require('fs');
-var util = require('util');
-var connect = require('connect');
-
+//socket for ideone source code execution
+var request = require('request');
 var wsdlurl = 'http://ideone.com/api/1/service.json';
-var code = "";
-var ace = null;
-var editor = null;
-
-var Session = connect.middleware.session.Session,
-    parseCookie = connect.utils.parseCookie
-
-var io = require('socket.io').listen(app); 
+var io = require('socket.io').listen(app);
 io.set('log level', 0);
-
-io.set('authorization', function (data, accept) {
-  if (data.headers.cookie) {
-    data.cookie = parseCookie(data.headers.cookie);
-    data.sessionID = data.cookie['my.sid'];
-    data.sessionStore = sessionStore;
-    sessionStore.get(data.sessionID, function (err, session) {
-      if (err) {
-        accept(err.message, false);
-      } else {
-        data.session = new Session(data, session);
-        accept(null, true);
-      }
-    });
-  } else {
-    return accept('No cookie transmitted.', false);
-  }
-});
-
-app.get('/listen', loadGlobals, function(req, res){
-  res.render('listen', {layout:false});
-});
-
 io.sockets.on('connection', function (socket) {
-  var hs = socket.handshake; 
-  hs.session.info = {IConnected:'And all I got was this lousy status message.'}
-  if (hs.session.newPost) {
-    newPost = hs.session.newPost;
-    delete hs.session.newPost;
-    socket.broadcast.emit('newPost', { title: newPost.title, _id: newPost._id });
-  }
-  hs.session.touch().save();
-  socket.on('new post', function (data) {
-    socket.broadcast.emit('newPost', { title: data });
-  });
+  // var hs = socket.handshake; 
+  //   hs.session.info = {IConnected:'And all I got was this lousy status message.'}
+  //   if (hs.session.newPost) {
+  //     newPost = hs.session.newPost;
+  //     delete hs.session.newPost;
+  //     socket.broadcast.emit('newPost', { title: newPost.title, _id: newPost._id });
+  //   }
+  //   hs.session.touch().save();
+  //   socket.on('new post', function (data) {
+  //     socket.broadcast.emit('newPost', { title: data });
+  //   });    
 
 //  chatProvider.findAll(function(error, lines) {
 //    for (var i in lines) {
@@ -242,10 +204,81 @@ io.sockets.on('connection', function (socket) {
 //    socket.broadcast.emit('repeat', { youSaid: data });
 //    chatProvider.save({line: data}); 
 //  });
+  	socket.on('submitcode', function(data){
+		console.log(data);
+		request(
+		    { method: 'GET'
+		    , uri: wsdlurl
+			, json: {
+						jsonrpc: "2.0",
+						method: "createSubmission", 
+						params: 
+						{
+							user: "velniukas", 
+							pass: "limehouse", 
+							sourceCode: data.source,
+							language: "112", //javascript
+							input:true, //this is a parameter bug of the ideone API, it supposes to be a run time input, instead of an indicator to run code
+							run:true
+						}, 
+						"id": 1
+					}
+		    }
+		  , function (error, response, body) {
+				console.log(body);
+		      	socket.emit('codesent', body);
+		    }
+		  )
+	});
+	
+	socket.on('getSubmissionStatus', function(data){
+		request(
+			{
+				method:'GET',
+				uri: wsdlurl,
+				json:{
+					jsonrpc: "2.0",
+					method: "getSubmissionStatus", 
+					params: 
+					{
+						user: "velniukas", 
+						pass: "limehouse",
+						link: data.linkCode, 
+					}, 
+					"id": 1
+				}
+			},
+			function(error, response, body){
+				console.log(body);
+				socket.emit('submissionStatus', body)           
+			}
+			)
+	})
+	
+	socket.on('getSubmissionDetails', function(data){
+		request(
+			{
+				method:'GET',
+				uri: wsdlurl,
+				json:{
+					jsonrpc: "2.0",
+					method: "getSubmissionDetails", 
+					params: 
+					{
+						user: "velniukas", 
+						pass: "limehouse",
+						link: data.linkCode, 
+						withSource: true,
+						withOutput: true,
+						withCmpinfo: true
+					}, 
+					"id": 1
+				}
+			},
+			function(error, response, body){
+				console.log(body);
+				socket.emit('submissionDetails', body)           
+			}
+			)
+	})
 });
-
-*/
-
-
-// -----------------------------------------------------------------------
-

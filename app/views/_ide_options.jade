@@ -102,46 +102,54 @@
 
 script(type='text/javascript')
 
-	var themes = {};
-	function loadTheme(name) {
-		//check if the theme source files have been loaded before
-		if(themes[name]){
-			editor.setTheme(themes[name]);
-			return;
+	function init(){
+
+		//load default theme and language
+		loadTheme("textmate");	  
+		loadMode("javascript");
+
+		var themes = {};
+		function loadTheme(name) {
+			//check if the theme source files have been loaded before
+			if(themes[name]){
+				editor.setTheme(themes[name]);
+				return;
+			}
+
+			var fileName = "/javascripts/ace/theme/" + name + ".js";
+			loadScriptFile(fileName, function(){
+				var path = "ace/theme/"+name; 
+				themes[name] = path;
+				editor.setTheme(path);
+			});
 		}
 
-		var fileName = name + ".js";
-		loadScriptFile(fileName, function(){
-			var path = "/javascripts/ace/theme/"+name; 
-			themes[name] = path;
-			editor.setTheme(path);
-		});
-	}
+		var modes = {};
+		function loadMode(name){
+			//check if the language source files have been loaded before
+			console.log(modes);
+			if(modes[name]) {
+				editor.getSession().setMode(new modes[name]);
+				return;
+			}
 
-	var modes = {};
-	function loadMode(name){
-		//check if the language source files have been loaded before		 
-		if(modes[name]) {
-			editor.getSession().setMode(new modes[name]);
-			return;
+			var fileName = "/javascripts/ace/mode/" + name + ".js";
+			loadScriptFile(fileName, function(){
+				var Mode = require("ace/mode/"+name).Mode;
+				modes[name] = Mode;
+				editor.getSession().setMode(new Mode());
+			});
 		}
 
-		var fileName = name + ".js";
-		loadScriptFile(fileName, function(){
-			var Mode = require("/javascripts/ace/mode/"+name).Mode;
-			modes[name] = Mode;
-			editor.getSession().setMode(new Mode());
-		});
-	}
+		//dynamically load javascript source file
+		function loadScriptFile(path, callback) {
+			var head = document.getElementsByTagName('head')[0];
+			var s = document.createElement('script');
 
-	//dynamically load javascript source file
-	function loadScriptFile(path, callback) {
-		var head = document.getElementsByTagName('head')[0];
-		var s = document.createElement('script');
+			s.src = path;
+			head.appendChild(s);
 
-		s.src = path;
-		head.appendChild(s);
-
-		s.onload = callback;
-	}	   
+			s.onload = callback;
+		}  
+	}     
 
