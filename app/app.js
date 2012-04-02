@@ -95,11 +95,19 @@ getNextInt('saves', function(error, count) {
   log.info('Run ' + count + ' times.');
 });
 
-// Sample database queries
-// TODO: Migrate to a separate file
+
+// Custom middleware
+requireLogin = function (req, res, next) {
+  if(!req.loggedIn) {
+    log.debug('User not logged in, redirecting to /auth.');
+    res.redirect('/auth');
+  }
+}
+
+var categories = db.collection('category');
 
 loadCategories = function (req, res, next) {
-  categoryDb.find().sort({name:1}).toArray(function(error, categories) {
+  categories.find().sort({name:1}).toArray(function(error, categories) {
     app.helpers({
       categories: categories 
     });
@@ -107,21 +115,8 @@ loadCategories = function (req, res, next) {
   });
 }
 
-loadPost = function (req, res, next) {
-  postDb.findById(req.params.id, function(error, post) {
-    if (error || !post) {
-      log.trace('Could not find post!');
-    }
-    req.post = post;
-    app.helpers({
-      post: post 
-    });
-    next();
-  });
-}
-
 loadCourse = function (req, res, next) {
-  courseDb.findById(req.params.id, function(error, post) {
+  collection.findById(req.params.id, function(error, post) {
     if (error || !post) {
       log.trace('Could not find course!');
     }
@@ -132,6 +127,8 @@ loadCourse = function (req, res, next) {
     next();
   });
 }
+
+
 
 // ----------------
 // Routes

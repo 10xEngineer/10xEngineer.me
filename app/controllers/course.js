@@ -1,7 +1,12 @@
 var mongo = require('mongoskin');
 var bcrypt = require('bcrypt'); 
 var request = require('request');
+var fs = require('fs');
+var Promise = require('everyauth').Promise;
 
+// Load models
+var course = require('../models/course');
+var user = require('../models/user');
 
 var validateCourseData = function (req, callback) {
   errors = [];
@@ -29,28 +34,23 @@ var validateCourseData = function (req, callback) {
     if (!req.param('_id')) {
       data.created_at = new Date();
     }
-    if (!req.user._id && !req.param('_id')) {
+    if (!req.user.id && !req.param('_id')) {
       data.requires_verification = true;
       if (!req.param('email')) {
         callback('Email address required.');
       }
       else {
-        userDb.findOne({email: req.param('email')}, function( error, user) {
-          if (user && user.username) {
-            callback('Please log in to manage a course with this email address.');
-          }
-          else if (user && !user.username) {
+        user.findByEmail(req.param('email'), function( error, user) {
+          if (user && user.id) {
             data.user_id = user._id;
             callback( null, data);
-          }
-          else {
-            newUserInfo = {email: req.param('email')};
-            newUserInfo.created_at = new Date();
-            newUserInfo.modified_at = new Date();
-            getNextInt('users', function(error, id) {
-              newUserInfo._id = id;
-              data.user_id = id;
-              userDb.save( newUserInfo );
+          } else {
+            var newUser = {email: req.param('email')};
+            var promise = new Promise();
+            user.createNew(newUser, 'email', function(error, user) {
+              if(error) {
+                callback(error);
+              }
               callback( null, data);
             });
           }
@@ -95,16 +95,7 @@ var submitCode = function(code) {
 // ------------
 module.exports = function (app) {
 
-  app.get('/coursesold', function(req, res){
-    res.render('overview', {
-      title: '10xEngineer.me Course List', 
-    loggedInUser:req.user, 
-    coursenav: "N",
-    Course: '',
-    Unit: ''
-    });
-  });
-
+  // List existing courses
   app.get('/course', function(req, res){
     res.render('course', {
       title: '10xEngineer.me Course',
@@ -112,6 +103,74 @@ module.exports = function (app) {
     Unit: 'Devops', 
     coursenav: "Y",
     loggedInUser:req.user
+    });
+  });
+
+  // Create new course form
+  app.get('/course/create', loadCategories, function(req, res){
+    res.render('courses/create', {
+      title: 'New Course',
+      course: {_id:'',title:'',category:'',content:''},
+      //headContent:'course_create' 
+    });
+  });
+
+  // Create a new course
+  app.post('/course/create', function(req, res){
+    data = {};
+    validateCourseData(req, function (error, data){
+      if (error) {
+        log.error(error);
+        res.redirect('/course/create/?' + error);
+      }
+      else {
+        if (!data.user_id) {
+          data.user_id = req.user._id;
+        }
+        courseDb.save( data, function( error, course) {
+          id = course._id;
+          // Set session value so we can push out new course
+          if (data.requires_verification) {
+            var verifySalt = bcrypt.gen_salt_sync(10);  
+            var verifyHash = bcrypt.encrypt_sync(data.title+data.created_at, verifySalt);
+            var verifyLink = siteInfo.site_url + "/course/" + course._id + "/verify/?verify="+verifyHash; 
+            var deleteLink = siteInfo.site_url + "/course/" + course._id + "/remove?verify="+verifyHash; 
+            var verificationMessage = "Hi!<br /> Click to verify your course '" + course.title + "' <a href=\"" + verifyLink + "\">" + verifyLink + "</a>!";
+            verificationMessage += "<br /><br />When you're done with it, you can delete the course from this link: <a href=\"" + deleteLink + "\"" + deleteLink + "</a>";
+            // Add an edit link some day.
+            console.log(verificationMessage);
+            mail.message({
+              'MIME-Version': '1.0',
+              'Content-type': 'text/html;charset=UTF-8',
+              from: 'Management <' + siteInfo.site_email  + '>',
+              to: [req.param('email')],
+              subject: 'Verify Course'
+            })
+            .body(verificationMessage)
+            .send(function(err) {
+              if (err) log.error(err);
+            });
+            res.redirect('/course/verify');
+          }
+          else {
+            //Set the course info in the session to let socket.io know about it.
+            req.session.newCourse = {title: course.title, _id: id};
+            res.redirect('/course/' + id);
+          }
+        });
+      }
+    });
+  });
+
+
+  // Load old course page. TODO: remove when not needed
+  app.get('/coursesold', function(req, res){
+    res.render('overview', {
+      title: '10xEngineer.me Course List', 
+    loggedInUser:req.user, 
+    coursenav: "N",
+    Course: '',
+    Unit: ''
     });
   });
 
@@ -140,30 +199,27 @@ module.exports = function (app) {
 
   app.get('/contentmanager', function(req, res){
     res.render('content_manager', {
-      title: '10xEngineer.me Course Creator', 
-    Course: '',
-    Unit: '', 
-    coursenav: "N",
-    contentfile: req.param('coursefile', ''),
-    loggedInUser: req.user
+      title: '10xEngineer.me Course Creator',
+      contentfile: req.param('coursefile', '')
     });
   });
 
 
-//File upload
-var fs = require('fs');
+  app.post('/contentmanager', function(req, res, next) {
 
-
-  app.post('/file-upload', function(req, res, next) {
-
-    console.log('Uploading file', req.form); // form is there but not accessible
-//		console.log('Complete?', req.connection);
-//		console.log('Complete?', req.session);
+    log.info('Uploading file', req.body); // form is there but not accessible
 		var f = req.files['course-file'];
 		console.log('Uploaded %s to %s', f.filename, f.path);
     console.log('copying file from temp upload dir to course dir');
-    var tmp_path = f.path;
-    var target_path = './public/courses/' + f.name;
+
+    // Read the uploaded file and parse it into a course structure
+    var parsedCourse = require(f.path);
+    log.info("Parsed Course: " + parsedCourse);
+
+    // Check 
+
+    /*
+    var target_path = './uploads/' + f.name;
     fs.rename(tmp_path, target_path, function(err) {
       if(err) throw err;
       // delete the temporary file
@@ -179,6 +235,7 @@ var fs = require('fs');
 		    loggedInUser: req.user});
       });
     });
+*/
 /*    form.complete( function(err, fields, files) {
       if (err) {
         next(err);
@@ -223,60 +280,6 @@ var fs = require('fs');
       loggedInUser: req.user
     });
 
-  });
-
-  app.get('/course/create', loadCategories, function(req, res){
-    res.render('courses/create', {
-      title: 'New Course',
-      course: {_id:'',title:'',category:'',content:''},
-      headContent:'course_create' 
-    });
-  });
-
-  app.post('/course/submit/0?', function(req, res){
-    data = {};
-    validateCourseData(req, function (error, data){
-      if (error) {
-        log.error(error);
-        res.redirect('/course/create/?' + error);
-      }
-      else {
-        if (!data.user_id) {
-          data.user_id = req.user._id;
-        }
-        courseDb.save( data, function( error, course) {
-          id = course._id;
-          // Set session value so we can push out new course
-          if (data.requires_verification) {
-            var verifySalt = bcrypt.gen_salt_sync(10);  
-            var verifyHash = bcrypt.encrypt_sync(data.title+data.created_at, verifySalt);
-            var verifyLink = siteInfo.site_url + "/course/" + course._id + "/verify/?verify="+verifyHash; 
-            var deleteLink = siteInfo.site_url + "/course/" + course._id + "/remove?verify="+verifyHash; 
-            var verificationMessage = "Hi!<br /> Click to verify your course '" + course.title + "' <a href=\"" + verifyLink + "\">" + verifyLink + "</a>!";
-            verificationMessage += "<br /><br />When you're done with it, you can delete the course from this link: <a href=\"" + deleteLink + "\"" + deleteLink + "</a>";
-            // Add an edit link some day.
-            console.log(verificationMessage);
-            mail.message({
-              'MIME-Version': '1.0',
-              'Content-type': 'text/html;charset=UTF-8',
-              from: 'Management <' + siteInfo.site_email  + '>',
-              to: [req.param('email')],
-              subject: 'Verify Course'
-            })
-            .body(verificationMessage)
-            .send(function(err) {
-              if (err) log.error(err);
-            });
-            res.redirect('/course/verify');
-          }
-          else {
-            //Set the course info in the session to let socket.io know about it.
-            req.session.newCourse = {title: course.title, _id: id};
-            res.redirect('/course/' + id);
-          }
-        });
-      }
-    });
   });
 
   app.get('/course/verify', function(req, res){

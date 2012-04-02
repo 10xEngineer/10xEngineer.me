@@ -1,8 +1,8 @@
-form(method='POST', action='/course/submit/#{course._id}', id='courseForm')
+form(method='POST', action='/course/submit/#{course.id}', id='courseForm')
   p
     label(for="title") Title:
     input(value='#{course.title}', id='title', name='title', class='required')
-  - if (!loggedInUser._id && !course._id)
+  - if (!user.id && !course._id)
     p
       label(for="email") Email Address:
       input(value='', id='email', name='email', class='required email')

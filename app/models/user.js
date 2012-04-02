@@ -16,6 +16,17 @@ module.exports.findById = function(id, callback) {
   });
 };
 
+module.exports.findByEmail = function(email, callback) {
+
+  this.collection.findOne({email: email}, function(error, dbUser) {
+    if (error) {
+      return callback(error);
+    }
+
+    callback(null, dbUser);
+  });
+};
+
 module.exports.findBySource = function(source, srcUser, callback) {
 
   var select = {};
@@ -53,7 +64,7 @@ module.exports.findOrCreate = function(source, user, promise) {
         log.trace('Could not find user!');
 
         // if no, add a new user with specified info
-        self.createNew(user, source, promise);
+        self.createNewPromise(user, source, promise);
       } else {
         // if yes, merge/update the info
         self.updateUserBySource(dbUser, source, user, promise);
@@ -62,12 +73,25 @@ module.exports.findOrCreate = function(source, user, promise) {
   }
 };
 
-module.exports.createNew = function (user, source, promise) {
+module.exports.createNewPromise = function (user, source, promise) {
+  this.createNew(user, source, function(error, dbUser) {
+    if(error) {
+      promise.fail(error);
+    }
+    
+    promise.fulfill(dbUser);
+  });
+};
+
+module.exports.createNew = function (user, source, callback) {
   if(!source) {
     // TODO: Assume it's email
   } else {
+    var now = new Date();
     var userObj = {
       id: "".randomString(),
+      created_at: now.getTime(),
+      modified_at: now.getTime()
     };
 
     if(source === 'twitter') {
@@ -78,12 +102,14 @@ module.exports.createNew = function (user, source, promise) {
     } else if(source === 'facebook') {
       userObj['name'] = user.name;
       userObj['email'] = user.email;
+    } else if(source === 'email') {
+      userObj['email'] = user.email;
     }
 
     userObj[source] = user;
 
     this.collection.insert(userObj);
-    promise.fulfill(userObj);
+    callback(null, userObj);
   }
 };
 
@@ -91,7 +117,9 @@ module.exports.updateUserBySource = function (dbUser, source, srcUser, promise) 
   if(!source) {
     promise.fulfill(dbUser);
   } else {
+    var now = new Date();
     dbUser[source] = srcUser;
+    dbUser['modified_at'] = now.getTime();
 
     if(!dbUser['name'] && srcUser['name']) {
       dbUser['name'] = srcUser.name;
