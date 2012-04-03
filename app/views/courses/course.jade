@@ -1,4 +1,5 @@
-//suppose it will be merged...
+//Course Homepage (Landing page)
+include _header
 .container-fluid.course-index.inner-index
 	.row-fluid
 		.span10
@@ -6,13 +7,13 @@
 				a(href="#{video}") Video Link
 			- else
 				include _player
-		.span2(style='background-color:black; color:white;')
+		.span2
 			include _sidebar
 	.row-fluid
 		p
 	.row-fluid
 		.span10
-			include ../_additionalfooter
+			include _footer
 
 script(type='text/javascript')
 	function init() {

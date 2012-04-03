@@ -28,10 +28,11 @@ html(lang="en")
 			.container-fluid
 				section#navbar
 					include _header
-				section#content!= body
-				section#sidebar
-				footer
-					p &copy;2012 10xEngineer.me. All rights reserved.
+			.container
+					section#content!= body
+					section#sidebar
+					footer
+						p &copy;2012 10xEngineer.me. All rights reserved.
 			#pageslide(style='display:none')
 			script(type='text/javascript', src='/javascripts/jquery.fittext.js')
 			script(type='text/javascript', src='/javascripts/jquery.pageslide.js') 

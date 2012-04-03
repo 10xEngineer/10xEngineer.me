@@ -1,0 +1,27 @@
+.container-fluid
+	.row-fluid
+		.span10
+			ul.breadcrumb
+				li
+					a(href='/courses') Courses
+					span.divider /
+
+				li
+					a(href='#') CS
+					span.divider /
+
+				li
+					a.active(href='#') #{title}
+		//
+			.span7
+				ul.nav.nav-pills
+					li.active
+						a(href='#overview') Overview
+					li
+						a(href='/ContentManager') Course Content
+					li
+						a(href='/') Discussion
+					li
+						a(href='#announcements') Announcements
+					li
+						a(href='/progress') Progress

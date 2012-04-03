@@ -1,9 +1,19 @@
+//@@deprecated
 .row-fluid
-	.container(data-spy='scroll', style='background-color:black;color:white;')
-		- var sections = ['UNIT', 'HOMEWORK', 'OFFICE HOURS']
-		each i in [1,2,3,4,5,6,7]
-			each section in sections
-				p.bold(style='color:white;')
-					a(href='/program') #{section} #{i}
-.row-fluid(style='background-color:white;')
-	a.btn.btn-primary.btn-large NEXT
+		.sidebar.well
+			ul.nav.nav-list( data-spy="scroll" )
+				li.nav-header Course Content
+				- var sections = ['UNIT', 'HOMEWORK', 'OFFICE HOURS']
+				each i in [1,2,3,4,5,6,7]
+					each section in sections
+						li
+							a(href='/program') #{section} #{i}
+				li.divider
+				li.nav-header Tool
+					li
+						a(href='/program') IDE
+					li
+						a(href='/progress') TEST
+
+//.row-fluid
+//	a.btn.btn-primary.btn-large NEXT

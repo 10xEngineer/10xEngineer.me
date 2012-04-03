@@ -306,10 +306,11 @@ module.exports = function (app) {
     }
     else {
       // TODO: let user subscribe to the course instead of this??
+			console.log("course", req.course)
       req.course.user = user;
 
       res.render('courses/course', {
-        title: 'Course > ' + req.course.title
+        title: req.course.title
       });
     }
   });

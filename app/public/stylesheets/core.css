@@ -1,4 +1,7 @@
 /* Global style */
+body {
+	background: url(../img/furley_bg.png);
+}
 footer {
 	margin-top: 30px;
 }
@@ -33,9 +36,51 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b5998', end
 background: linear-gradient(top, #3B5998 0%,#3B5998 50%,#325190 50%,#325190 100%);
 }
 .main-page .page-header h1 { width: 90%; }
-
+/* widgets */
 ul.carousel-inner,  ul.carousel-inner li.item { margin:0; }
 .carousel-inner li { color: #fff }
+.well { 
+	background-color: white;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px; 
+}
+.sidebar.well {
+	padding: 8px 0; 
+}
+.sidebar .nav .nav-header {
+	color:#333;
+}
+
+/* Better Tab */
+.nav-tabs {
+	margin-bottom:0;
+}
+.tab-content {
+	border: 1px solid #DDD;
+	border-top:none;
+}
+.tab-pane {
+	background-color: #fff;
+	padding: 18px;
+	
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.nav-tabs > .active > a {
+	pointer-events: none; /* Avoid Lock/Double Clicking in sequence: li.active -> li */
+}
+/* Video player */
+.jp-video {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	
+}
 
 @media screen and (max-width:480px) {
 	p{	
