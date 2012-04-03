@@ -54,7 +54,7 @@ ul.carousel-inner,  ul.carousel-inner li.item { margin:0; }
 .sidebar .nav .nav-header {
 	color:#333;
 }
-
+.nav-tabs.nav-stacked > li > a { background-color:#fff }
 /* Better Tab */
 .nav-tabs {
 	margin-bottom:0;
@@ -74,6 +74,18 @@ ul.carousel-inner,  ul.carousel-inner li.item { margin:0; }
 .nav-tabs > .active > a {
 	pointer-events: none; /* Avoid Lock/Double Clicking in sequence: li.active -> li */
 }
+/* IDE */
+#pageslide {
+	background: #fff url(../img/snow.png);
+	-webkit-box-shadow: inset 0 0 28px 2px rgba(0,0,0,0.4);
+	-moz-shadow: inset 0 0 28px 2px rgba(0,0,0,0.4);
+	box-shadow: inset 0 0 28px 2px rgba(0,0,0,0.4);
+}
+
+.action-bar {
+	margin-bottom: 6px;
+}
+
 /* Video player */
 .jp-video {
 	-webkit-box-sizing: border-box;

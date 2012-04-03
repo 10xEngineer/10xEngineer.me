@@ -1,3 +1,6 @@
+//- @@TODO: move the file into other location if only course use it
+//- @@TODO: Tabs is okay but need other content
+//- require pageslide ace2
 .container-fluid
 	link(rel="stylesheet", href="/stylesheets/ribbon.css")
 	style(type="text/css")
@@ -5,9 +8,17 @@
 			width:120px;
 		}
 	.row-fluid
+
 		.span10
-				form(onsubmit='return captureSource(this)', action="/submitCode", method='POST')#editform.well
-					a.open(href='#modal') Settings
+			.row-fluid
+				form#editform.well(onsubmit='return captureSource(this)', action="/submitCode", method='POST')
+					.row-fluid.action-bar
+						.btn-group.pull-left
+							a.btn Run					
+							a.btn.open(href='#modal') Settings
+						.btn-group.pull-right
+							a.btn Help
+					
 					.row-fluid
 						#panel.well(style='display:none;position:absolute;background:whitesmoke;z-index:999;')
 							#modal(style='margin-top:10px')
@@ -119,29 +130,25 @@
 									input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')
 									#editor(style='position:relative;width:100%;height:400px;resize:both;overflow:hidden;')
 							.form-actions
-								a.button.btn.btn-primary(onclick='submitSourceCode()') RUN
-								a.button.btn SUBMIT
-								a.button.btn CLEAR
+								span.danger
+									a.button.btn.btn-danger CLEAR
+								span.pull-right
+									a.button.btn.btn-submit SUBMIT
+			.row-fluid
+				.well
+					p#compile_results #{compile_results} || Run to see results
+					p(style='color:red')#compile_errors #{compile_errors} || Run to see any potential errors
+			.row-fluid
+					include courses/_footer 
+			.row-fluid
+				p.pull-right 10xEngineer.me uses 
+					a(href="http://ideone.com") ideone.com 
+					| &copy; by 
+					a(href="http://sphere-research.com") Sphere Research Labs
+
 		.span2
-			include _sidebar
-	.row-fluid
-		.span10
-			p
-	.row-fluid
-		.span10.well
-			p#compile_results #{compile_results} || Run to see results
-			p(style='color:red')#compile_errors #{compile_errors} || Run to see any potential errors
-	.row-fluid
-		.span10
-	.row-fluid
-		.span10
-			include _additionalfooter
-	.row-fluid
-		p.pull-right 10xEngineer.me uses 
-			a(href="http://ideone.com") ideone.com 
-			| &copy; by 
-			a(href="http://sphere-research.com") Sphere Research Labs
-	.row-fluid
+			include courses/_sidebar
+
 	script(type='text/javascript', src='/javascripts/ace/ace.js')
 	script(type='text/javascript')
 		var editor;

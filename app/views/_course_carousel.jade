@@ -1,6 +1,8 @@
+//- require bootstrap-carousel
+
 - var courses = {'CS99': { name: 'DEVOPS', instructor: 'Steve M.', enrolled: false, open: true },'CS101': { name: 'OPENSTACK', instructor: 'Vinci W.', enrolled: false, open: true },'CS102': { name: 'LOW LATENCY ALGO', instructor: 'Steve M.', enrolled: false, open: true },'CS103': { name: 'SECURITIES OPERATIONS', instructor: 'Katak S', enrolled: false, open: true },'CS104': { name: 'BLACKHAT', instructor: 'Steve M.', enrolled: false, open: true },'CS105': { name: 'LOLCODE K1TTAH', instructor: 'Ralph O.', enrolled: false, open: true },'CS106': { name: 'F# MASTERY', instructor: 'Steve M.', enrolled: false, open: true }}
 
-.carousel#course-carousel.slide.span6.hidden-phone
+.carousel#course-carousel.slide.span8.hidden-phone
 	ul.carousel-inner
 		each course, code in courses
 			li.item
@@ -13,7 +15,7 @@
 						h3 #{code} - #{course.name}
 						p Taught by #{course.instructor}
 						p
-							a(href='/course')					
+							a(href='/courses/2')					
 								if ( course.enrolled || course.open )
 									span.btn.btn-primary.btn-large GO TO YOUR COURSE
 								else
@@ -22,11 +24,11 @@
 	a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
 	a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
 
-aslide.course-list.span6
+aslide.course-list.span4
 	ul.nav.nav-tabs.nav-stacked
 		each course, code in courses
 			li.item
-					a(href='/course')
+					a(href='/courses/2')
 						#{code} - #{course.name}
 
 
