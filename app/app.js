@@ -217,7 +217,7 @@ io.sockets.on('connection', function (socket) {
 							user: "velniukas", 
 							pass: "limehouse", 
 							sourceCode: data.source,
-							language: "112", //javascript
+							language: data.language, //javascript
 							input:true, //this is a parameter bug of the ideone API, it supposes to be a run time input, instead of an indicator to run code
 							run:true
 						}, 
@@ -233,27 +233,27 @@ io.sockets.on('connection', function (socket) {
 	
 	socket.on('getSubmissionStatus', function(data){
 		request(
-			{
-				method:'GET',
-				uri: wsdlurl,
-				json:{
-					jsonrpc: "2.0",
-					method: "getSubmissionStatus", 
-					params: 
-					{
-						user: "velniukas", 
-						pass: "limehouse",
-						link: data.linkCode, 
-					}, 
-					"id": 1
+				{
+					method:'GET',
+					uri: wsdlurl,
+					json:{
+						jsonrpc: "2.0",
+						method: "getSubmissionStatus", 
+						params: 
+						{
+							user: "velniukas", 
+							pass: "limehouse",
+							link: data.linkCode, 
+						}, 
+						"id": 1
+					}
+				},
+				function(error, response, body){
+					console.log(body);
+					socket.emit('submissionStatus', body)           
 				}
-			},
-			function(error, response, body){
-				console.log(body);
-				socket.emit('submissionStatus', body)           
-			}
-			)
-	})
+				)
+	});
 	
 	socket.on('getSubmissionDetails', function(data){
 		request(
@@ -270,7 +270,8 @@ io.sockets.on('connection', function (socket) {
 						link: data.linkCode, 
 						withSource: true,
 						withOutput: true,
-						withCmpinfo: true
+						withCmpinfo: true,
+						withStderr: true
 					}, 
 					"id": 1
 				}
@@ -279,6 +280,6 @@ io.sockets.on('connection', function (socket) {
 				console.log(body);
 				socket.emit('submissionDetails', body)           
 			}
-			)
-	})
+		)
+	}); 
 });
