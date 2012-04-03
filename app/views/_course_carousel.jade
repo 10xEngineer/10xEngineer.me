@@ -1,23 +1,37 @@
-.carousel#course-carousel.hero-unit.slide.span12
-	ul.thumbnails.carousel-inner
-		li.span4.item.active
-			.thumbnail
-				a(href='/course')
-					img(src="http://placekitten.com/350/300")
-				h3 CS99 - DEVOPS
-				p Taught by Steve Messina
-				a(href='/course')
-					button.btn.btn-primary.btn-large GO TO YOUR COURSE
-		- var courses = ['OPENSTACK', 'LOW LATENCY ALGO', 'SECURITIES OPERATIONS', 'BLACKHAT', 'LOLCODE K1TTAH', 'BRAINF*CK MASTERY']
-		each course, i in courses
-			li.span4.item
-				.thumbnail
+- var courses = {'CS99': { name: 'DEVOPS', instructor: 'Steve M.', enrolled: false, open: true },'CS101': { name: 'OPENSTACK', instructor: 'Vinci W.', enrolled: false, open: true },'CS102': { name: 'LOW LATENCY ALGO', instructor: 'Steve M.', enrolled: false, open: true },'CS103': { name: 'SECURITIES OPERATIONS', instructor: 'Katak S', enrolled: false, open: true },'CS104': { name: 'BLACKHAT', instructor: 'Steve M.', enrolled: false, open: true },'CS105': { name: 'LOLCODE K1TTAH', instructor: 'Ralph O.', enrolled: false, open: true },'CS106': { name: 'F# MASTERY', instructor: 'Steve M.', enrolled: false, open: true }}
+
+.carousel#course-carousel.slide.span6.hidden-phone
+	ul.carousel-inner
+		each course, code in courses
+			li.item
 					a(href='/course')
-						img(src="http://placekitten.com/g/350/300")
-					h3 CS 10#{i} - #{course}
-					p Taught by Steve Messina
-					a(href='/course')
-						button.btn.btn-large LEARN MORE
+						if (course.instructor === "Steve M.")
+							img.repsonsive(src="http://placekitten.com/900/480")
+						else
+							img.repsonsive(src="http://placekitten.com/g/900/480")
+					.carousel-caption
+						h3 #{code} - #{course.name}
+						p Taught by #{course.instructor}
+						p
+							a(href='/course')					
+								if ( course.enrolled || course.open )
+									span.btn.btn-primary.btn-large GO TO YOUR COURSE
+								else
+									span.btn.btn-large LEARN MORE
 	// carousel-nav
 	a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
 	a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
+
+aslide.course-list.span6
+	ul.nav.nav-tabs.nav-stacked
+		each course, code in courses
+			li.item
+					a(href='/course')
+						#{code} - #{course.name}
+
+
+script
+	$(function(){
+		$('.item').first().addClass("active");
+		$('.carousel').carousel({ interval: 6000, pause:"hover"})
+	})
