@@ -74,21 +74,11 @@ app.configure('production', function(){
 //userDb = db.collection('user');
 //courseDb = db.collection('course');
 //categoryDb = db.collection('category');
-var db = require('./helpers/database').db;
-
 
 // Sample code to test database connection
 // TODO: Remove it when not needed
-getNextInt = function (type, callback) {
-  db.collection('count').findAndModify({_id: type}, [['_id','asc']], {$inc: {count:1}}, {upsert:true,new:true}, function(error, result) { 
-    if (error) {
-      callback('Could not determine count for ' + type);
-    }
-    callback(null, result.count);
-  });
-};
-
-getNextInt('saves', function(error, count) {
+var count = require('./models/count');
+count.getNext('saves', function(error, count) {
   if (error) {
     log.warn('Could not determine count');
   }
@@ -104,29 +94,16 @@ requireLogin = function (req, res, next) {
   }
 }
 
-var categories = db.collection('category');
+requireAdmin = function (req, res, next) {
+  // TODO: Implement with backend integration
+  if(req.loggedIn) req.user.role = 'admin';
 
-loadCategories = function (req, res, next) {
-  categories.find().sort({name:1}).toArray(function(error, categories) {
-    app.helpers({
-      categories: categories 
-    });
-    next();
-  });
+  if(!req.loggedIn || !req.user.role === 'admin') {
+    log.debug('User not logged in, redirecting to /auth.');
+    res.redirect('/auth');
+  }
 }
 
-loadCourse = function (req, res, next) {
-  collection.findById(req.params.id, function(error, post) {
-    if (error || !post) {
-      log.trace('Could not find course!');
-    }
-    req.course = course;
-    app.helpers({
-      course: course 
-    });
-    next();
-  });
-}
 
 
 

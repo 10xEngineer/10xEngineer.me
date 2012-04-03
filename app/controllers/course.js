@@ -2,11 +2,16 @@ var mongo = require('mongoskin');
 var bcrypt = require('bcrypt'); 
 var request = require('request');
 var fs = require('fs');
-var Promise = require('everyauth').Promise;
 
 // Load models
 var course = require('../models/course');
 var user = require('../models/user');
+var category = require('../models/category');
+
+
+// ---------------------
+// Middleware
+// ---------------------
 
 var validateCourseData = function (req, callback) {
   errors = [];
@@ -88,6 +93,37 @@ var submitCode = function(code) {
   
 }
 
+var loadCourse = function (req, res, next) {
+  var id = parseInt(req.params.id);
+  course.findById(id, function(error, course) {
+    if (error || !course) {
+      log.trace('Could not find course!');
+    }
+    req.course = course;
+
+    var helper = {
+      course: course 
+    }
+    
+    if(typeof(course.units[0].video) != 'undefined') {
+      helper['video'] = course.units[0].video;
+      helper['videoType'] = course.units[0].videoType;
+    }
+
+    req.app.helpers(helper);
+    next();
+  });
+}
+
+
+var loadCategories = function (req, res, next) {
+  category.getAll(function(error, categories) {
+    req.app.helpers({
+      categories: categories 
+    });
+    next();
+  });
+}
 
 
 // ------------
@@ -96,18 +132,27 @@ var submitCode = function(code) {
 module.exports = function (app) {
 
   // List existing courses
-  app.get('/course', function(req, res){
-    res.render('course', {
-      title: '10xEngineer.me Course',
-    Course: 'CS99',
-    Unit: 'Devops', 
-    coursenav: "Y",
-    loggedInUser:req.user
+  app.get('/courses', loadCategories, function(req, res){
+
+    course.get({
+      category: req.param.category
+    }, function(error, courses){
+      res.render('courses', { 
+        title: 'Courses',
+        courses: courses
+      });
     });
   });
 
   // Create new course form
-  app.get('/course/create', loadCategories, function(req, res){
+  app.get('/courses/create', loadCategories, function(req, res){
+    if(error) {
+      log.error(error);
+      res.render('courses/create', {
+        error: error
+      });
+    }
+
     res.render('courses/create', {
       title: 'New Course',
       course: {_id:'',title:'',category:'',content:''},
@@ -116,18 +161,17 @@ module.exports = function (app) {
   });
 
   // Create a new course
-  app.post('/course/create', function(req, res){
-    data = {};
+  app.post('/courses/create', function(req, res){
     validateCourseData(req, function (error, data){
       if (error) {
         log.error(error);
         res.redirect('/course/create/?' + error);
       }
       else {
-        if (!data.user_id) {
-          data.user_id = req.user._id;
+        if (!data.created_by) {
+          data.created_by = req.user.id;
         }
-        courseDb.save( data, function( error, course) {
+        course.createNew( data, function( error, course) {
           id = course._id;
           // Set session value so we can push out new course
           if (data.requires_verification) {
@@ -155,13 +199,179 @@ module.exports = function (app) {
           else {
             //Set the course info in the session to let socket.io know about it.
             req.session.newCourse = {title: course.title, _id: id};
-            res.redirect('/course/' + id);
+            res.redirect('/courses/' + id + '/edit');
           }
         });
       }
     });
   });
 
+  // TODO: Quick course import tool
+  app.get('/courses/import', function(req, res){
+    res.render('content_manager', {
+      title: '10xEngineer.me Course Creator',
+      contentfile: req.param('coursefile', '')
+    });
+  });
+
+  // Temporary course import using json file upload
+  app.post('/courses/import', function(req, res, next) {
+
+    log.info('Uploading file', req.body); // form is there but not accessible
+    var f = req.files['course-file'];
+    console.log('Uploaded %s to %s', f.filename, f.path);
+    console.log('copying file from temp upload dir to course dir');
+
+    // Read the uploaded file and parse it into a course structure
+    var parsedCourse;
+    try {
+      parsedCourse = JSON.parse(fs.readFileSync(f.path, 'utf-8'));
+    } catch (e) {
+      log.error(e);
+      res.redirect('/courses/import', {error: e});
+    }
+
+    // Check whether the uploaded course already exists
+    course.findOne({name: parsedCourse.title}, function(error, dbCourse) {
+      if(error) {
+        log.error(error);
+        res.render('content_manager', {
+          title: '10xEngineer.me Course Creator',
+          contentfile: req.param('coursefile', ''),
+          error: error
+        });
+      }
+
+      if(dbCourse) {
+        log.error('Course already exists: ' + parsedCourse.title);
+        res.render('content_manager', {
+          title: '10xEngineer.me Course Creator',
+          contentfile: req.param('coursefile', ''),
+          error: "Course named " + parsedCourse.title + " already exists in the database. Please delete and re-upload."
+        });
+      } else {
+        course.createNew(parsedCourse, function(error) {
+          log.info('new course created.');
+          res.redirect('/courses/import?success=true');
+        });
+      }
+    });
+
+    /*
+    var target_path = './uploads/' + f.name;
+    fs.rename(tmp_path, target_path, function(err) {
+      if(err) throw err;
+      // delete the temporary file
+      fs.unlink(tmp_path, function() {
+        if(err) throw err;
+        console.log('File uploaded to: '+target_path + ' - ' + f.size + ' bytes');
+        res.render('content_manager', {
+          title: '10xEngineer.me Course Creator', 
+        Course: '',
+        Unit: '', 
+        coursenav: "N",
+        contentfile: req.param('coursefile', target_path),
+        loggedInUser: req.user});
+      });
+    });
+*/
+/*    form.complete( function(err, fields, files) {
+      if (err) {
+        next(err);
+      } else {
+        console.log('Uploaded %s to %s', files.course.filename, files.course.path);
+        console.log('copying file from temp upload dir to course dir');
+        var tmp_path = files.course.path;
+        var target_path = './public/courses/' + files.course.name;
+        fs.rename(tmp_path, target_path, function(err) {
+          if(err) throw err;
+          // delete the temporary file
+          fs.unlink(tmp_path, function() {
+            if(err) throw err;
+            console.log('File uploaded to: '+target_path + ' - ' + files.course.size + ' bytes');
+            res.redirect('/contentmanager', {coursefile: target_path+'/'+files.course.name});
+          });
+        });     
+      }
+    });
+    
+    form.on('progress', function(bytesReceived, bytesExpected) {
+      var percent = (bytesReceived / bytesExpected * 100) | 0;
+      process.stdout.write('Uploading: %' + percent + '\r');
+    })
+*/
+  });
+
+  app.get('/courses/:id', loadCourse, function(req, res){
+    if (!req.course) {
+      res.redirect('/courses/');
+    }
+    else {
+      // TODO: let user subscribe to the course instead of this??
+      req.course.user = user;
+
+      res.render('courses/course', {
+        title: 'Course > ' + req.course.title
+      });
+    }
+  });
+
+  app.get('/courses/:id/edit', loadCategories, loadCourse, function(req, res, next){
+    if (req.course && (req.user.role === 'admin' || req.user._id === req.course.created_by)) {
+      res.render('courses/edit', {
+        title: 'Course ' + req.course.title,
+        headContent:'course_edit'
+      });
+    }
+    else {
+      res.redirect('/courses/' + req.params.id);
+    }
+  });
+
+  app.get('/courses/:id/remove', loadCourse, function(req, res, next){
+    if (!req.course || req.params.id === 'null') {
+      res.redirect('/courses');
+    }
+    if (req.query.verify) {
+      var verify = decodeURIComponent(req.query.verify);
+      if (req.course && req.course.title && bcrypt.compare_sync(req.course.title + req.course.created_at, verify)) {
+        course.remove(req.params.id, function(error){
+          if (error) {
+            log.error(error);
+          }
+        });
+      }
+      res.redirect('/courses/');
+    }
+    else if (req.is_admin || req.user.id === req.course.created_by) {
+      course.remove(req.params.id, function(error){
+        if (error) {
+          log.error(error);
+        }
+      });
+      res.redirect('/courses/');
+    }
+    else {
+      res.redirect('/courses/' + req.params.id);
+    }
+  });
+
+
+
+
+
+// --------------------------------------------------------------
+
+
+  app.get('/course', function(req, res){
+    res.render('course', {
+      title: '10xEngineer.me Course',
+    Course: 'CS99',
+    Unit: 'Devops', 
+    coursenav: "Y",
+    loggedInUser:req.user
+    });
+  });
 
   // Load old course page. TODO: remove when not needed
   app.get('/coursesold', function(req, res){
@@ -197,71 +407,6 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/contentmanager', function(req, res){
-    res.render('content_manager', {
-      title: '10xEngineer.me Course Creator',
-      contentfile: req.param('coursefile', '')
-    });
-  });
-
-
-  app.post('/contentmanager', function(req, res, next) {
-
-    log.info('Uploading file', req.body); // form is there but not accessible
-		var f = req.files['course-file'];
-		console.log('Uploaded %s to %s', f.filename, f.path);
-    console.log('copying file from temp upload dir to course dir');
-
-    // Read the uploaded file and parse it into a course structure
-    var parsedCourse = require(f.path);
-    log.info("Parsed Course: " + parsedCourse);
-
-    // Check 
-
-    /*
-    var target_path = './uploads/' + f.name;
-    fs.rename(tmp_path, target_path, function(err) {
-      if(err) throw err;
-      // delete the temporary file
-      fs.unlink(tmp_path, function() {
-        if(err) throw err;
-        console.log('File uploaded to: '+target_path + ' - ' + f.size + ' bytes');
-        res.render('content_manager', {
-		      title: '10xEngineer.me Course Creator', 
-		    Course: '',
-		    Unit: '', 
-		    coursenav: "N",
-				contentfile: req.param('coursefile', target_path),
-		    loggedInUser: req.user});
-      });
-    });
-*/
-/*    form.complete( function(err, fields, files) {
-      if (err) {
-        next(err);
-      } else {
-        console.log('Uploaded %s to %s', files.course.filename, files.course.path);
-        console.log('copying file from temp upload dir to course dir');
-        var tmp_path = files.course.path;
-        var target_path = './public/courses/' + files.course.name;
-        fs.rename(tmp_path, target_path, function(err) {
-          if(err) throw err;
-          // delete the temporary file
-          fs.unlink(tmp_path, function() {
-            if(err) throw err;
-            console.log('File uploaded to: '+target_path + ' - ' + files.course.size + ' bytes');
-            res.redirect('/contentmanager', {coursefile: target_path+'/'+files.course.name});
-          });
-        });     
-      }
-    });
-    
-    form.on('progress', function(bytesReceived, bytesExpected) {
-      var percent = (bytesReceived / bytesExpected * 100) | 0;
-      process.stdout.write('Uploading: %' + percent + '\r');
-    })
-*/
-  });
 
   app.post('/submitCode', function(req, res, next){
     console.log('in app.js::submitCode');
@@ -328,57 +473,6 @@ module.exports = function (app) {
 
   });
 
-  app.get('/course/:id/edit', loadCategories, loadCourse, function(req, res, next){
-    if (req.course && (req.is_admin || req.user._id === req.course.user_id)) {
-      res.render('courses/edit', {
-        title: 'Course ' + req.course.title,
-        headContent:'course_edit'
-      });
-    }
-    else {
-      res.redirect('/course/' + req.params.id);
-    }
-  });
-
-  app.get('/course/:id/remove', loadCourse, function(req, res, next){
-    if (!req.course || req.params.id === 'null') {
-      res.redirect('/courses');
-    }
-    if (req.query.verify) {
-      var verify = decodeURIComponent(req.query.verify);
-      if (req.course && req.course.title && bcrypt.compare_sync(req.course.title + req.course.created_at, verify)) {
-        courseDb.removeById(req.params.id, function(error, id){
-          if (error) {
-            log.error(error);
-          }
-        });
-      }
-      res.redirect('/courses/');
-    }
-    else if (req.is_admin || req.user._id === req.course.user_id) {
-      courseDb.removeById(req.params.id, function(error, id){
-        if (error) {
-          log.error(error);
-        }
-      });
-      res.redirect('/courses/');
-    }
-    else {
-      res.redirect('/course/' + req.params.id);
-    }
-  });
-
-  app.get('/course/:id', loadCourse, function(req, res){
-    if (!req.course) {
-      res.redirect('/courses/');
-    }
-    else {
-      userDb.findOne({_id: parseInt(req.course.user_id)}, function(error, user) {
-        req.course.user = user;
-        res.render('courses/course', { title: 'Course > ' + req.course.title });
-      });
-    }
-  });
 
   app.post('/course/validate/email/', function(req, res){
     result = '';
@@ -428,36 +522,4 @@ module.exports = function (app) {
     }
   });
 
-  app.get('/courses', loadCategories, function(req, res){
-    find = {requires_verification: { $ne: true }};
-    if (req.param('category')) {
-      find = {category: req.param('category'), requires_verification: { $ne: true } };
-    }
-    courseDb.find(find).sort({created_at:-1}).toArray(function(error, courses) { 
-      courseUsers = {};
-      courseUserIds = [];
-      for (var i in courses) {
-        courseUserIds.push(courses[i].user_id);
-      }
-      courseUserIds = courseUserIds.unique();
-      userDb.find({_id: {$in: courseUserIds}}).toArray(function(error, users) {
-        courseUsers = [];
-        if (error) {
-          log.error(error);
-        }
-        else {
-          for (var i in users) {
-            if (users[i]._id) {
-              courseUsers[users[i]._id] = users[i].name;
-            }
-          }
-        }
-        res.render('courses', { 
-          title: 'Courses',
-          courses: courses,
-          courseUsers: courseUsers
-        });
-      });
-    });
-  });
 }

@@ -16,13 +16,13 @@ table.data
   tr
     th Title
     th Category
-    th User
+    th Users
     th Created
   - each course in courses
-    - courseDate = course._id.getTimestamp().toDateString()
+    - courseDate = new Date(course.created_at)
     tr
       td
-        a(href='/course/#{course._id}') #{course.title} \n
+        a(href='/courses/#{course._id}') #{course.title} \n
       td= course.category
-      td= courseUsers[course.user_id]
+      td= course.users.length
       td= courseDate

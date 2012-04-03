@@ -21,5 +21,6 @@
     , "util": "latest"
     , "debug": "latest"
     , "everyauth": "latest"
+    , "socket.io": "latest"
   }
 }
