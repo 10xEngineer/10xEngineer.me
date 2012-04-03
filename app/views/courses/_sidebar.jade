@@ -1,0 +1,16 @@
+.row-fluid
+	.container(data-spy='scroll', style='background-color:black;color:white;')
+		- var units = course.units
+		each unit, i in units
+			- if (!unit.lessons)
+				p.bold(style='color:white;')
+					a(href='/courses/#{course._id}/#{i+1}') #{unit.title}
+			- else
+				p.bold(style='color:white;') #{unit.title}
+
+				each lesson, j in unit.lessons
+					p.bold(style='color:white;')
+						a(href='/courses/#{course._id}/#{i+1}/#{j+1}') #{lesson.title}
+
+.row-fluid(style='background-color:white;')
+	a.btn.btn-primary.btn-large NEXT

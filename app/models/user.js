@@ -1,17 +1,29 @@
 var db = require('../helpers/database').db;
 
-module.exports = {
-  collection: db.collection('users')
-};
+module.exports = db.collection('users');
+
+
+module.exports.count = require('./count');
 
 module.exports.findById = function(id, callback) {
 
-  this.collection.findOne({id: id}, function(error, dbUser) {
+  this.findOne({id: id}, function(error, dbUser) {
     if (error) {
       return callback(error);
     }
 
     log.info('findById called');
+    callback(null, dbUser);
+  });
+};
+
+module.exports.findByEmail = function(email, callback) {
+
+  this.findOne({email: email}, function(error, dbUser) {
+    if (error) {
+      return callback(error);
+    }
+
     callback(null, dbUser);
   });
 };
@@ -28,7 +40,7 @@ module.exports.findBySource = function(source, srcUser, callback) {
     select['email'] = srcUser.email;
   }
 
-  this.collection.findOne(select, function(error, dbUser) {
+  this.findOne(select, function(error, dbUser) {
     if (error) {
       callback(error);
     }
@@ -53,7 +65,7 @@ module.exports.findOrCreate = function(source, user, promise) {
         log.trace('Could not find user!');
 
         // if no, add a new user with specified info
-        self.createNew(user, source, promise);
+        self.createNewPromise(user, source, promise);
       } else {
         // if yes, merge/update the info
         self.updateUserBySource(dbUser, source, user, promise);
@@ -62,28 +74,50 @@ module.exports.findOrCreate = function(source, user, promise) {
   }
 };
 
-module.exports.createNew = function (user, source, promise) {
+module.exports.createNewPromise = function (user, source, promise) {
+  this.createNew(user, source, function(error, dbUser) {
+    if(error) {
+      promise.fail(error);
+    }
+    
+    promise.fulfill(dbUser);
+  });
+};
+
+module.exports.createNew = function (user, source, callback) {
   if(!source) {
     // TODO: Assume it's email
   } else {
-    var userObj = {
-      id: "".randomString(),
-    };
+    this.count.getNext('user', function(error, id) {
+      if(error) {
+        callback(error);
+      }
 
-    if(source === 'twitter') {
-      userObj['name'] = user.name;
-    } else if(source === 'google') {
-      userObj['name'] = user.name;
-      userObj['email'] = user.email;
-    } else if(source === 'facebook') {
-      userObj['name'] = user.name;
-      userObj['email'] = user.email;
-    }
+      var now = new Date();
+      var userObj = {
+        _id: id,
+        id: id,
+        created_at: now.getTime(),
+        modified_at: now.getTime()
+      };
 
-    userObj[source] = user;
+      if(source === 'twitter') {
+        userObj['name'] = user.name;
+      } else if(source === 'google') {
+        userObj['name'] = user.name;
+        userObj['email'] = user.email;
+      } else if(source === 'facebook') {
+        userObj['name'] = user.name;
+        userObj['email'] = user.email;
+      } else if(source === 'email') {
+        userObj['email'] = user.email;
+      }
 
-    this.collection.insert(userObj);
-    promise.fulfill(userObj);
+      userObj[source] = user;
+
+      this.insert(userObj);
+      callback(null, userObj);
+    });
   }
 };
 
@@ -91,7 +125,9 @@ module.exports.updateUserBySource = function (dbUser, source, srcUser, promise) 
   if(!source) {
     promise.fulfill(dbUser);
   } else {
+    var now = new Date();
     dbUser[source] = srcUser;
+    dbUser['modified_at'] = now.getTime();
 
     if(!dbUser['name'] && srcUser['name']) {
       dbUser['name'] = srcUser.name;
@@ -100,7 +136,7 @@ module.exports.updateUserBySource = function (dbUser, source, srcUser, promise) 
       dbUser['email'] = srcUser.email;
     }
 
-    this.collection.save(dbUser, {}, function(error) {
+    this.save(dbUser, {}, function(error) {
       if(error) {
         log.error(error);
       }
