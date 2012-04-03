@@ -1,6 +1,6 @@
 .row-fluid
 	.container(data-spy='scroll', style='background-color:black;color:white;')
-		- var units = course.units
+		- var units = course.units || []
 		each unit, i in units
 			- if (!unit.lessons)
 				p.bold(style='color:white;')

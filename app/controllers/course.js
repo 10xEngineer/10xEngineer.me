@@ -206,7 +206,9 @@ module.exports = function (app) {
   app.get('/courses/import', function(req, res){
     res.render('content_manager', {
       title: '10xEngineer.me Course Creator',
-      contentfile: req.param('coursefile', '')
+			description: 'Create courses with its units from JSON file.',
+      contentfile: req.param('coursefile', ''),
+			success: req.params.success || false
     });
   });
 

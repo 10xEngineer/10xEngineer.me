@@ -1,9 +1,16 @@
 .container-fluid
-	- if (contentfile) 
-		.row-fluid
-			.span6
-				#content.alert.alert-success
-					p uploaded: #{contentfile}
+	- if (typeof contentfile != 'undefined' && contentfile) 
+				.alert.alert-success
+					| uploaded: #{contentfile}
+	- if (typeof success != 'undefined')
+				.alert.alert-success
+					| Course Import Successed.
+	- if (typeof error != 'undefined')
+				.alert.alert-error
+					| #{error}
+		
+	header.page-header
+		h1 #{title}
 	.row-fluid
 		.span6
 			form(method='POST', enctype='multipart/form-data', name='course-uploader').form-inline.well
