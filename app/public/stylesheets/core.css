@@ -2,6 +2,8 @@
 footer {
 	margin-top: 30px;
 }
+/* helper */
+img.repsonsive { max-width:100%; }
 /* Per page style */
 .main-page .page-header {
 	width:100%;
@@ -31,6 +33,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b5998', end
 background: linear-gradient(top, #3B5998 0%,#3B5998 50%,#325190 50%,#325190 100%);
 }
 .main-page .page-header h1 { width: 90%; }
+
+ul.carousel-inner,  ul.carousel-inner li.item { margin:0; }
+.carousel-inner li { color: #fff }
+
 @media screen and (max-width:480px) {
 	p{	
 	font-size: .9em;
