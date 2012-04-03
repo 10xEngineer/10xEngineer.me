@@ -1,0 +1,12 @@
+#container-fluid(type='width:100%;')
+
+	link(type='text/css', href='/javascripts/medialementplayer.css')
+
+	video(width="100%", controls="controls" preload="none")#video
+		source(type="video/mp4", src="http://www.youtube.com/watch?v=4DMuBp1vNn4")
+
+	script(src='/javascripts/mediaelement-and-player.min.js')
+	script(type='text/javascript')
+		function init() {
+			$('video').mediaelementplayer();
+		}
