@@ -1,0 +1,23 @@
+form(method='POST', action='/course/create', id='courseForm')
+  p
+    label(for="title") Title:
+    input(value='#{course.title}', id='title', name='title', class='required')
+  - if (!user.id && !course._id)
+    p
+      label(for="email") Email Address:
+      input(value='', id='email', name='email', class='required email')
+  p
+    label(for="category") Category:
+    select(name="category", id="category")
+      option(value="#{course.category}") -- Select Category #{course.category} --
+      - each category in categories
+        - if (category.name === course.category)
+          option(value="#{category.name}", selected="selected") #{category.name}
+        - else
+          option(value="#{category.name}") #{category.name}
+  p
+    label(for="content") Content:
+    textarea(name='content', id='content', class='required')
+      #{course.content}
+  p
+    input(type='submit', value='Submit')
