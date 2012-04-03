@@ -105,10 +105,13 @@ var loadCourse = function (req, res, next) {
       course: course 
     }
     
+    // Hack commented. Write full handler instead
+    /*
     if(typeof(course.units[0].video) != 'undefined') {
       helper['video'] = course.units[0].video;
       helper['videoType'] = course.units[0].videoType;
     }
+    */
 
     req.app.helpers(helper);
     next();
@@ -146,13 +149,6 @@ module.exports = function (app) {
 
   // Create new course form
   app.get('/courses/create', loadCategories, function(req, res){
-    if(error) {
-      log.error(error);
-      res.render('courses/create', {
-        error: error
-      });
-    }
-
     res.render('courses/create', {
       title: 'New Course',
       course: {_id:'',title:'',category:'',content:''},
