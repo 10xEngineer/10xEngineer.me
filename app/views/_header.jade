@@ -20,9 +20,7 @@
 						b.caret
 					ul.dropdown-menu
 						li
-							a(href='#') CS101 DEVOPS
-						li
-							a(href='#') CS102 LOW LATENCY ALGO
+							a(href='#') My Courses
 						li.divider
 						li
 							a(href='#') Upcoming Courses
@@ -39,21 +37,21 @@
 					li
 						a(href='/auth')
 							i.icon-user.icon-white
-							| Sign In
+							|  Sign In
 				-if(everyauth.loggedIn)
 					li
 						a(href='/users')
 							i.icon-user.icon-white 
-							| #{everyauth.user.name}
+							|  #{everyauth.user.name}
 				-if(everyauth.loggedIn)
 					li
 						a(href='/admin')
 							i.icon-user.icon-white 
-							| Admin
+							|  Admin
 				-if(everyauth.loggedIn)
 					li
 						a(href='/logout')
 							i.icon-user.icon-white 
-							| Sign Out
+							|  Sign Out
 	- if(typeof(coursenav) != 'undefined' && coursenav == "Y")
 		include _coursenav
