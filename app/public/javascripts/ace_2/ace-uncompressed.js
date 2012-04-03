@@ -55,7 +55,6 @@ if (global.require && global.define) {
     
 var _define = function(module, deps, payload) {
     if (typeof module !== 'string') {
-		console.log(typeof module);
         if (_define.original)
             _define.original.apply(window, arguments);
         else {

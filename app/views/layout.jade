@@ -5,13 +5,13 @@ html(lang="en")
 		title #{title}
 		link(rel="stylesheet", href="/stylesheets/bootstrap.min.css")
 		link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap-responsive.min.css')
-		link(type='text/css', href='/stylesheets/jplayer.blue.monday.css', rel='stylesheet')
+		link(type='text/css', href='/stylesheets/jplayer.cyan.flag.css', rel='stylesheet')
 		link(type='text/css', href='/stylesheets/jquery.pageslide.css')
 		script(type='text/javascript', src='/javascripts/jquery-1.7.1.min.js')
 		script(type='text/javascript', src='/javascripts/bootstrap.min.js')
-		script(type='text/javascript', src='/javascripts/ace/ace.js')
+		script(type='text/javascript', src='/javascripts/ace_2/ace.js')
 		script(type='text/javascript', src='/javascripts/jplayer/jquery.jplayer.min.js')
-		script(type='text/javascript', src='/javascripts/jquery.pageslide.min.js')
+ 
 		script(src='/socket.io/socket.io.js')
 		- if (typeof headContent === "string")
 			!= partial(headContent);
@@ -32,7 +32,8 @@ html(lang="en")
 				section#sidebar
 				footer
 					p 2012 10xEngineer.me. All rights reserved.
-
+			#pageslide(style='display:none')
+			script(type='text/javascript', src='/javascripts/jquery.pageslide.js') 
 		script(type='text/javascript')
 			$(document).ready(function() {
 				if(typeof init == 'function') { 
