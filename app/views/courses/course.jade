@@ -4,7 +4,8 @@ include _header
 	.row-fluid
 		.span10
 			- if(typeof(video) != 'undefined' && typeof(videoType) != 'undefined')
-				a(href="#{video}") Video Link
+				iframe(width="800", height="480", src="#{video}", frameborder="0", allowfullscreen="true")
+
 			- else
 				include _player
 		.span2
