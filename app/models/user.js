@@ -85,10 +85,11 @@ module.exports.createNewPromise = function (user, source, promise) {
 };
 
 module.exports.createNew = function (user, source, callback) {
+  var self = this;
   if(!source) {
     // TODO: Assume it's email
   } else {
-    this.count.getNext('user', function(error, id) {
+    self.count.getNext('user', function(error, id) {
       if(error) {
         callback(error);
       }
@@ -115,7 +116,7 @@ module.exports.createNew = function (user, source, callback) {
 
       userObj[source] = user;
 
-      this.insert(userObj);
+      self.insert(userObj);
       callback(null, userObj);
     });
   }
