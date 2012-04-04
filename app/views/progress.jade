@@ -1,8 +1,17 @@
+//- subject to move into courses/
+style
+	.layer-wrapper { position: relative; width:100%; height:100% }
+	.layer { position:absolute; width:100%; height:100% }
+	.g-radio-button { position:absolute; display:block; }
+	.form-control { height:80px; bottom:0; padding-top:20px; text-align: center; background: rgba(0,0,0,0.5); }
+
 .row-fluid
-	.span2
-	.span6
-		- var sections = ['FIRST QUIZ', 'WHAT IS A ...', 'FIRST PROGRAMMING QUIZ', 'WOULD YOU RATHER', 'EAT QUIZ', 'PYTHON EXPRESSIONS', 'SPEED OF LIGHT' ]
-		each section, i in sections
-			p.bold
-				a(href='#') #{section}
-	.span2
+		- var quiz = {  question: { src: "/quiz/2/quiz-1.jpg", width: 898, height: 500 }, answers:[{ val: "A", x: 92, y:140 }, { val:"B", x: 92, y:166}, { val:"C", x: 92, y:190}, { val:"D", x: 92, y:215}]  }
+		form#quiz.layer-wrapper(action="#",method="post", style="width:#{quiz.question.width}px; height:#{quiz.question.height}px")
+			img.question-body.layer(src="#{quiz.question.src}")
+			.ans-wrapper.layer
+				#choices.layer-wrapper
+					each ans, i in quiz.answers
+							input.g-radio-button(type="radio", name="quiz-1", style="left:#{ans.x}px; top:#{ans.y}px;", value="#{ans.val}")
+			.form-control.layer
+				button.btn.btn-primary.btn-large(type="submit") Answer
