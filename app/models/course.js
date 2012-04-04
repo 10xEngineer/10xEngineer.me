@@ -51,6 +51,6 @@ module.exports.createNew = function (course, callback) {
   });
 };
 
-module.exports.remove = function(id, callback) {
-  this.removeById(id, {}, callback);
+module.exports.removeById = function(id, callback) {
+  this.remove({_id: parseInt(id)}, {}, callback);
 };
