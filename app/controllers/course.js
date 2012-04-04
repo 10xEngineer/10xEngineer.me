@@ -95,23 +95,47 @@ var submitCode = function(code) {
 
 var loadCourse = function (req, res, next) {
   var id = parseInt(req.params.id);
+  var unit = parseInt(req.params.unit);
+  var lesson = parseInt(req.params.lesson);
+
   course.findById(id, function(error, course) {
     if (error || !course) {
       log.trace('Could not find course!');
     }
     req.course = course;
-
     var helper = {
       course: course 
     }
     
-    // Hack commented. Write full handler instead
-    /*
-    if(typeof(course.units[0].video) != 'undefined') {
-      helper['video'] = course.units[0].video;
-      helper['videoType'] = course.units[0].videoType;
+    try {
+      if(typeof(unit) != 'undefined') {
+        unit = parseInt(unit);
+        if(typeof(lesson) != 'undefined') {
+          lesson = parseInt(lesson);
+        } else {
+          // Set default lesson value
+          lesson = 0;
+        }
+      } else {
+        // Set default unit value
+        unit = 0;
+      }
+    } catch (e) {
+      log.error(e);
+      next();
     }
-    */
+
+    // Check if specified unit exists. If not, redirect to course home
+    if(course && course.units && course.units[unit-1]) {
+      // Set the unit object in UI helper
+      var unitObj = req.unit = helper['unit'] = course.units[unit-1];
+
+      // Check if specified lesson exists. If not, redirect to unit home
+      if(unitObj.lessons && unitObj.lessons[lesson-1]) {
+        // Set the lesson object in UI helper
+        req.lesson = helper['lesson'] = unitObj.lessons[lesson-1];
+      }
+    }
 
     req.app.helpers(helper);
     next();
@@ -226,7 +250,7 @@ module.exports = function (app) {
       parsedCourse = JSON.parse(fs.readFileSync(f.path, 'utf-8'));
     } catch (e) {
       log.error(e);
-      res.redirect('/courses/import', {error: e});
+      //res.redirect('/courses/import', {error: e});
     }
 
     // Check whether the uploaded course already exists
@@ -248,70 +272,34 @@ module.exports = function (app) {
           error: "Course named " + parsedCourse.title + " already exists in the database. Please delete and re-upload."
         });
       } else {
+        parsedCourse['created_by'] = req.user.id;
         course.createNew(parsedCourse, function(error) {
           log.info('new course created.');
           res.redirect('/courses/import?success=true');
         });
       }
     });
-
-    /*
-    var target_path = './uploads/' + f.name;
-    fs.rename(tmp_path, target_path, function(err) {
-      if(err) throw err;
-      // delete the temporary file
-      fs.unlink(tmp_path, function() {
-        if(err) throw err;
-        console.log('File uploaded to: '+target_path + ' - ' + f.size + ' bytes');
-        res.render('content_manager', {
-          title: '10xEngineer.me Course Creator', 
-        Course: '',
-        Unit: '', 
-        coursenav: "N",
-        contentfile: req.param('coursefile', target_path),
-        loggedInUser: req.user});
-      });
-    });
-*/
-/*    form.complete( function(err, fields, files) {
-      if (err) {
-        next(err);
-      } else {
-        console.log('Uploaded %s to %s', files.course.filename, files.course.path);
-        console.log('copying file from temp upload dir to course dir');
-        var tmp_path = files.course.path;
-        var target_path = './public/courses/' + files.course.name;
-        fs.rename(tmp_path, target_path, function(err) {
-          if(err) throw err;
-          // delete the temporary file
-          fs.unlink(tmp_path, function() {
-            if(err) throw err;
-            console.log('File uploaded to: '+target_path + ' - ' + files.course.size + ' bytes');
-            res.redirect('/contentmanager', {coursefile: target_path+'/'+files.course.name});
-          });
-        });     
-      }
-    });
-    
-    form.on('progress', function(bytesReceived, bytesExpected) {
-      var percent = (bytesReceived / bytesExpected * 100) | 0;
-      process.stdout.write('Uploading: %' + percent + '\r');
-    })
-*/
   });
 
   app.get('/courses/:id', loadCourse, function(req, res){
     if (!req.course) {
       res.redirect('/courses/');
-    }
-    else {
+    } else {
       // TODO: let user subscribe to the course instead of this??
-			console.log("course", req.course)
+      log.trace("course", req.course)
       req.course.user = user;
 
-      res.render('courses/course', {
+      var renderParams = {
         title: req.course.title
-      });
+      };
+
+      var unit = req.unit;
+      if(unit && unit.video && unit.videoType) {
+        renderParams['video'] = unit.video;
+        renderParams['videoType'] = unit.videoType;
+      }
+      
+      res.render('courses/course', renderParams);
     }
   });
 
@@ -331,27 +319,69 @@ module.exports = function (app) {
     if (!req.course || req.params.id === 'null') {
       res.redirect('/courses');
     }
-    if (req.query.verify) {
-      var verify = decodeURIComponent(req.query.verify);
-      if (req.course && req.course.title && bcrypt.compare_sync(req.course.title + req.course.created_at, verify)) {
-        course.remove(req.params.id, function(error){
-          if (error) {
-            log.error(error);
-          }
-        });
-      }
-      res.redirect('/courses/');
-    }
-    else if (req.is_admin || req.user.id === req.course.created_by) {
-      course.remove(req.params.id, function(error){
+    log.info('Removing...');
+
+    // Temporarily allowing everybody to remove courses
+    //if (req.is_admin || req.user.id == req.course.created_by) {
+      course.removeById(req.params.id, function(error){
         if (error) {
           log.error(error);
         }
+        res.redirect('/courses/');
       });
-      res.redirect('/courses/');
-    }
-    else {
+    /*} else {
+      log.info(req.user.id + " " + req.course.created_by);
       res.redirect('/courses/' + req.params.id);
+    }*/
+  });
+
+  app.get('/courses/:id/:unit', loadCourse, function(req, res){
+    if (!req.course) {
+      res.redirect('/courses/');
+    } else if (!req.unit) {
+      res.redirect('/courses/' + req.params.id);
+    } else {
+      // TODO: let user subscribe to the course instead of this??
+      log.trace("course", req.course)
+      req.course.user = user;
+
+      var renderParams = {
+        title: req.course.title
+      };
+
+      var unit = req.unit;
+      if(unit.video && unit.videoType) {
+        renderParams['video'] = unit.video;
+        renderParams['videoType'] = unit.videoType;
+      }
+
+      res.render('courses/course', renderParams);
+    }
+  });
+
+  app.get('/courses/:id/:unit/:lesson', loadCourse, function(req, res){
+    if (!req.course) {
+      res.redirect('/courses/');
+    } else if (!req.unit) {
+      res.redirect('/courses/' + req.params.id);
+    } else if (!req.lesson) {
+      res.redirect('/courses/' + req.params.id + '/' + req.params.unit);
+    } else {
+      // TODO: let user subscribe to the course instead of this??
+      log.trace("course", req.course)
+      req.course.user = user;
+
+      var renderParams = {
+        title: req.course.title
+      };
+
+      var lesson = req.lesson;
+      if(lesson.video && lesson.videoType) {
+        renderParams['video'] = lesson.video;
+        renderParams['videoType'] = lesson.videoType;
+      }
+      
+      res.render('courses/course', renderParams);
     }
   });
 
@@ -449,99 +479,5 @@ module.exports = function (app) {
 
   });
 
-  app.get('/course/verify', function(req, res){
-    res.render('courses/verify', {
-      title: 'Verify Course'
-    });
-  });
-
-  app.get('/course/verification_failed', function(req, res){
-    res.render('courses/verification_failed', {
-      title: 'Could Not Verify Course'
-    });
-  });
-
-  app.get('/course/:id/verify', loadCourse, loadCategories, function(req, res){
-    var courseId = req.params.id;
-    var verify = decodeURIComponent(req.query.verify);
-    if (req.course && courseId && verify) {
-      if (req.course && req.course.title && bcrypt.compare_sync(req.course.title + req.course.created_at, verify)) {
-        log.trace('Verified course ' + req.course.title + '!');
-        req.course.requires_verification = false;
-        delete req.course._id;
-        courseDb.updateById(
-          courseId,
-          {$set: req.course},
-          {multi:false,safe:true},
-          function(error, course) {
-            if (error) {
-              log.error(error);
-            }
-          }
-        );
-        //Set the course info in the session to let socket.io know about it.
-        req.session.newCourse = {title: req.course.title, _id: courseId};
-        res.redirect('/course/' + courseId);
-      }
-      else {
-        log.trace('Could not verify course ' + JSON.stringify(req.course) + '!');
-        res.redirect('/course/verification_failed/' + req.params.id);
-      }
-    }
-    else {
-      log.trace('Something went wrong while tring to verify course!');
-      res.redirect('/course/verification_failed/');
-    }
-
-  });
-
-
-  app.post('/course/validate/email/', function(req, res){
-    result = '';
-    email = req.param('email');
-    if (email) {
-      userDb.findOne({username: {$ne: null},email: email}, function (error, user) {
-        if (user) {
-          result = 'false';
-        }
-        else {
-          result = 'true';
-        }
-        res.render('validate.jade', {layout:false, result: result});
-      });
-    }
-    else {
-      result = 'false';
-      res.render('validate.jade', {layout:false, result: result});
-    }
-  });
-
-  app.post('/course/submit/:id?', loadCourse, function(req, res){
-    data = {};
-    if (req.course && (req.is_admin || req.course.user_id == req.user._id)) {
-      validateCourseData(req, function (error, data){
-        if (error) {
-          log.error('Errors: ' + error);
-          res.redirect('/course/' + req.params.id + '/edit/?' + error);
-        }
-        else {
-          courseDb.updateById(
-            req.params.id,
-            {$set: data},
-            {multi:false,safe:true},
-            function(error, course) {
-              if (error) {
-                log.error(error);
-              }
-              res.redirect('/course/' + req.params.id);
-            }
-          );
-        }
-      });
-    }
-    else {
-      res.redirect('/');
-    }
-  });
 
 }
