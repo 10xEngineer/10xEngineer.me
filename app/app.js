@@ -239,8 +239,8 @@ io.sockets.on('connection', function (socket) {
 					method: "getSubmissionDetails", 
 					params: 
 					{
-						user: "velniukas", 
-						pass: "limehouse",
+						user: "10xengineer", 
+						pass: "secret",
 						link: data.linkCode, 
 						withSource: true,
 						withOutput: true,

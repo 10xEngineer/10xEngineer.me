@@ -391,8 +391,8 @@ module.exports = function (app) {
     coursenav: "Y",
     loggedInUser:req.user,
     code: '',
-    compile_results: '',
-    compile_errors: ''
+	compile_result: '',
+    compile_output: ''
     });
   });
 

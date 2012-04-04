@@ -11,10 +11,10 @@
 
 		.span10
 			.row-fluid
-				form#editform.well(onsubmit='return captureSource(this)', action="/submitCode", method='POST')
+				form#editform.well(onsubmit='return submitSourceCode(this)', action="/submitCode", method='POST')
 					.row-fluid.action-bar
 						.btn-group.pull-left
-							a.btn Run					
+							a.btn.btn-primary(onclick='submitSourceCode()') Run
 							a.btn.open(href='#modal') Settings
 						.btn-group.pull-right
 							a.btn Help
@@ -123,7 +123,7 @@
 												label(for="highlight_selected_word") Highlight selected word
 											td
 												input(type="checkbox")#highlight_selected_word.checked
-								a(href="javascript:$.pageslide.close()") Close
+								a(href="javascript:$.pageslide.close()").btn.btn-info Close
 
 						#source-editor(style='position:absolution;')	
 							.controls
@@ -136,8 +136,8 @@
 									a.button.btn.btn-submit SUBMIT
 			.row-fluid
 				.well
-					p#compile_results #{compile_results} || Run to see results
-					p(style='color:red')#compile_errors #{compile_errors} || Run to see any potential errors
+					p#compile_result #{compile_result} || Run to see results or errors
+					p(style='white-space: pre;').pre#compile_output #{compile_output}
 			.row-fluid
 					include courses/_footer 
 			.row-fluid
@@ -268,6 +268,9 @@
 			'javascript' : '112'
 		}
 		function submitSourceCode(){
+			$('#compile_result').addClass('alert').addClass('alert-info');
+			$('#compile_result').text('COMPILING...\\n');
+			$('#compile_output').hide();
 			var sourceCode = editor.getSession().getValue();
 			var languageCode = $('#pageslide #mode').val();
 			if(!languageCode){
@@ -275,27 +278,30 @@
 				console.log('test');
 			}
 			var data = {'source':sourceCode, 'language':languages[languageCode]};
+			console.log('submitSourceCode: ', data);
 			socket.emit('submitcode', data);
-			$('#compile_results').text('Executing the code...');
-			$('#compile_errors').text('');
+
 			
 		}
 		//Receive the link code for later check
 		var linkCode;
 		socket.on('codesent', function(data){
 			linkCode = data.result.link;
+			console.log('getting link code: ', linkCode);
 			setTimeout(function(){
 				socket.emit('getSubmissionStatus', {linkCode:linkCode});
-			}, 3000);
+			}, 1000);
 		});
 
 		
 		socket.on('submissionStatus', function(data){
 			if(data.result.status == 0){
+				console.log('still waiting...');
 				socket.emit('getSubmissionDetails', {linkCode:linkCode});
 				
 			}
 			else {
+				console.log('Done..getSubmissionStatus next.. ');
 				socket.emit('getSubmissionStatus', {linkCode:linkCode});
 			}
 			});
@@ -311,8 +317,27 @@
 			'19': "illegal system call – the program tried to call illegal system function",
 			'20': "internal error – some problem occurred on ideone.com; try to submit the paste again and if that fails too, then please contact us"
 		}
+
 		socket.on('submissionDetails', function(data){
-				$('#compile_results').text(data.result.output);
-				$('#compile_errors').text(errors[data.result.result]+'\\n'+data.result.stderr);
-		})
-		
+				console.log('gotSubmissionDetails: ', data.result);
+				var res = $('#compile_result');
+				var out = $('#compile_output');
+				out.removeClass('alert').removeClass('alert-info').removeClass('alert-error').show();
+				res.removeClass('alert').removeClass('alert-warning').removeClass('alert-success');
+
+				if(typeof data.result.output != 'undefined' && data.result.result == 15) {
+					console.log('success: ', data.result.output);
+					res.addClass('alert').addClass('alert-success');
+					res.text("COMPILED OK\\n");
+					out.addClass('alert').addClass('alert-info');
+					out.text(data.result.output);
+				}
+				else
+				if(typeof data.result.stderr != 'undefined' && data.result.stderr != "" || data.result.result != 15) {
+					console.log('error: ', data.result.result);
+					res.addClass('alert').addClass('alert-warning');
+					res.text(errors[data.result.result]);
+					out.addClass('alert').addClass('alert-error');
+					out.text(data.result.stderr);
+				}
+		});
