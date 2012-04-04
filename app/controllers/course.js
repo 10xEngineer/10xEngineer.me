@@ -398,14 +398,37 @@ module.exports = function (app) {
 
   app.get('/progress', function(req, res){
     res.render('progress', {
-      title: '10xEngineer.me Course', 
-    Course: 'CS99',
-    Unit: 'Devops', 
-    coursenav: "Y",
-    loggedInUser: req.user
+      title: 'Devops', 
+    	Course: 'CS99',
+    	Unit: 'Devops',
+    	loggedInUser: req.user,
+			message:''
     });
   });
 
+	// mock router to send dummy output. 
+  app.post('/progress', function(req, res, next){
+		var is_correct = false;
+		var ans = req.body['quiz-1']; //@@TODO
+		//guard
+		console.log("GET params: ", req.params); //get or router params
+		console.log("POST params",req.body); //post
+		
+		//process the login there.
+		if(ans === 'A')
+			is_correct = true;
+			
+    res.render('progress', {
+	    title: 'Devops',
+			message: 'Your answer is: '+ ans + ". "+ ((is_correct) ? "That is correct!":"That is wrong"),
+    	Course: 'CS99',
+    	Unit: 'Devops', 
+    	loggedInUser: req.user,
+			correct: is_correct,
+			choice: ans 
+    });
+
+  });
 
   app.post('/submitCode', function(req, res, next){
     console.log('in app.js::submitCode');
