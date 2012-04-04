@@ -5,7 +5,7 @@
     "units": [
         {
             "title": "INTRODUCTION",
-            "video": "http://www.youtube.com/watch?feature=player_embedded&v=BQHMLD9bwq4",
+            "video": "http://www.youtube.com/embed/BQHMLD9bwq4",
             "videoType": "youtube",
             "notes": "Introduction\nHi! I'm your Instructor, Steve. I'll be giving you tips and hints below the lecture videos and quizzes. Here's our first tip:\nTo navigate through the unit click look to the side-bar to the right of the video.\nAlso check out the official Course Forums if you have any questions!"
         },
@@ -14,7 +14,7 @@
             "lessons": [
                 {
                     "title": "Defining Devops",
-                    "video": "http://youtube.com/watch?v=hY08uML",
+                    "video": "http://www.youtube.com/embed/hY08uML",
                     "videoType": "youtube",
                     "notes": "some notes"
                 },
@@ -54,7 +54,7 @@
             "lessons": [
                 {
                     "title": "Your first puppet script",
-                    "video": "http://youtube.com/watch?v=hY08uML",
+                    "video": "http://www.youtube.com/embed/hY08uML",
                     "videoType": "youtube",
                     "notes": "Change the permissions on the install.sh file to make it executable"
                 },
@@ -76,7 +76,7 @@
         },
         {
             "title": "OFFICE HOURS 1",
-            "video": "http://www.youtube.com/watch?feature=player_embedded&v=PckSUEQu3F8",
+            "video": "http://www.youtube.com/embed/PckSUEQu3F8",
             "videoType": "youtube"
         }
     ]
