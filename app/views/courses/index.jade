@@ -37,7 +37,16 @@
 						li.item
 							a(href='/courses/#{course._id}')
 								#{course.category} #{course.title}
-	.row-fluid.span12
+	.row-fluid.span8
+		a.button(href='#')
+			i.icon-th-large 
+			span  Grid
+		span
+		| 
+		a.button(href='#')
+			i.icon-retweet
+			span  Carousel
+	.row-fluid.span8
 		h4 Categories
 			ul.categories
 			- each category in categories
