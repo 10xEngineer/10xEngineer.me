@@ -250,7 +250,7 @@ module.exports = function (app) {
       parsedCourse = JSON.parse(fs.readFileSync(f.path, 'utf-8'));
     } catch (e) {
       log.error(e);
-      res.redirect('/courses/import', {error: e});
+      //res.redirect('/courses/import', {error: e});
     }
 
     // Check whether the uploaded course already exists
