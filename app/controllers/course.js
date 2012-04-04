@@ -312,6 +312,7 @@ module.exports = function (app) {
     });
   });
 
+  // Load specific course
   app.get('/courses/:id', validCoursePermission('courses', 'read'), loadCourse, function(req, res){
     if (!req.course) {
       res.redirect('/courses/');
@@ -343,10 +344,22 @@ module.exports = function (app) {
         title: 'Course ' + req.course.title,
         headContent:'course_edit'
       });
-    }
-    else {
+    /*} else {
       res.redirect('/courses/' + req.params.id);
-    }
+    }*/
+  });
+
+  // Save edits made to the course
+  app.post('/courses/:id/edit', loadCategories, loadCourse, function(req, res, next){
+    // TODO: Allowing everyone to edit the course for now
+    //if (req.course && (req.user.role === 'admin' || req.user._id === req.course.created_by)) {
+      res.render('courses/edit', {
+        title: 'Course ' + req.course.title,
+        headContent:'course_edit'
+      });
+    /*} else {
+      res.redirect('/courses/' + req.params.id);
+    }*/
   });
 
   app.get('/courses/:id/remove', validCoursePermission('courses', 'delete'), loadCourse, function(req, res, next){
