@@ -12,7 +12,7 @@ module.exports.findById = function(id, callback) {
       return callback(error);
     }
 
-    log.info('findById called');
+    //log.info('findById called');
     callback(null, dbUser);
   });
 };

@@ -12,18 +12,6 @@ html(lang="en")
 		script(type='text/javascript', src='/javascripts/bootstrap.min.js')
 		script(type='text/javascript', src='/javascripts/ace_2/ace.js')
 		script(type='text/javascript', src='/javascripts/jplayer/jquery.jplayer.min.js')
-		script(src='/socket.io/socket.io.js')
-		- if (typeof headContent === "string")
-			!= partial(headContent);
-		//if lt IE 8
-			script(src="http://html5shiv.googlecode.com/svn/trunk/html5.js")
-
-		script
-			var socket = io.connect();
-			socket.on('newPost', function (data) {
-				postLink = ' <a href="/post/' + data._id + '">' + data.title + '</a>';
-				$('#recentPosts').prepend($('<p>').append(postLink));
-			});
 		body
 			.container-fluid
 				section#navbar
@@ -33,11 +21,14 @@ html(lang="en")
 					section#sidebar
 					footer
 						p &copy;2012 10xEngineer.me. All rights reserved.
+
 			#pageslide(style='display:none')
 			script(type='text/javascript', src='/javascripts/jquery.fittext.js')
 			script(type='text/javascript', src='/javascripts/jquery.pageslide.js') 
 			script(src='/javascripts/core.init.js')
+
 		script(type='text/javascript')
+			// call the partial-specific javascript helper: init() function when the partials are completed loading
 			$(document).ready(function() {
 				if(typeof init == 'function') { 
 					init(); 

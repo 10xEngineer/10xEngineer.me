@@ -1,29 +1,53 @@
 //- Course Admin index?
-h1= title
-.actions 
-  ul
-    li
-      a(href='/courses/create') Add Course
-h3 Here are the Courses
-p
-  h4 Categories
-  ul.categories
-   - each category in categories
-     li 
-       a(href='/courses/?category=#{category.name}') #{category.name}
-   li
-     a(href='/courses/') All Courses
-table.data
-  tr
-    th Title
-    th Category
-    th Users
-    th Created
-  - each course in courses
-    - courseDate = new Date(course.created_at)
-    tr
-      td
-        a(href='/courses/#{course._id}') #{course.title} \n
-      td= course.category
-      td= course.users.length
-      td= courseDate
+
+.container-fluid.course-index.inner-index
+	.row-fluid
+		.actions
+			.span8
+				a(href='/courses/create').btn.btn-large.btn-primary.pull-left Add Course
+				a(href='/courses/import').btn.btn-large.btn-inverse.pull-right Import a course
+	.row-fluid
+		p
+	.row-fluid
+		.span8
+			.carousel#course-carousel.slide.span8.hidden-phone
+					ul.carousel-inner
+						each course, code in courses
+							li.item
+									a(href='/courses/#{course._id}')
+										img.repsonsive(src="http://placekitten.com/900/480")
+									.carousel-caption
+										h3 #{course._id}: #{course.category} - #{course.title}
+										p Taught by Steve M.
+										p
+											a(href='/courses/#{course._id}')
+												if ( course.enrolled || course.open )
+													span.btn.btn-primary.btn-large GO TO YOUR COURSE
+												else
+													span.btn.btn-large LEARN MORE
+					// carousel-nav
+					a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
+					a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
+		.span1
+			p
+		.span3
+			aslide.course-list.span4
+				ul.nav.nav-tabs.nav-stacked
+					each course, code in courses
+						li.item
+							a(href='/courses/#{course._id}')
+								#{course.category} #{course.title}
+	.row-fluid.span12
+		h4 Categories
+			ul.categories
+			- each category in categories
+				li 
+					a(href='/courses/?category=#{category.name}').label.label-info #{category.name}
+				li
+					a(href='/courses/') All Courses
+
+	script(type='text/javascript')
+		function init() {
+			$('.item').first().addClass("active");
+			$('.carousel').carousel({ interval: 3000, pause:"hover"});
+		}
