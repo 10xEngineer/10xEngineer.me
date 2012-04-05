@@ -150,7 +150,9 @@
 			include courses/_sidebar
 
 	script(type='text/javascript', src='/javascripts/ace/ace.js')
+	script(type='text/javascript', src='/socket.io/socket.io.js')
 	script(type='text/javascript')
+		var socket=io.connect();
 		var editor;
 		var themes = {};
 		function loadTheme(name) {
