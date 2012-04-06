@@ -5,13 +5,19 @@
 				li
 					a(href='/courses') Courses
 					span.divider /
+				- if(typeof (course) != 'undefined')
+					li
+						a(href='/courses/#{course._id}') #{course.title}
+						span.divider /
+					- if(typeof (unit_id) != 'undefined')
+						li
+							a(href='/courses/#{course._id}/#{unit_id}') #{unit.title}
+							span.divider /
+						- if(typeof (lesson_id) != 'undefined')
+							li
+								a(href='/courses/#{course._id}/#{unit_id}/#{lesson_id}') #{lesson.title}
+								span.divider /
 
-				li
-					a(href='#') CS
-					span.divider /
-
-				li
-					a.active(href='#') #{title}
 		//
 			.span7
 				ul.nav.nav-pills

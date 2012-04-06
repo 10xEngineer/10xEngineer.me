@@ -81,11 +81,11 @@ var submitCode = function(code) {
     }
   , function (error, response, body) {
       if(response.statusCode == 201){
-        console.log('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
+        log.info('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
     return response.statusCode, response.body;
       } else {
-        console.log('error: '+ response.statusCode)
-        console.log(body);
+        log.info('error: '+ response.statusCode)
+        log.info(body);
     return response.statusCode, response.body;
       }
     }
@@ -202,7 +202,7 @@ module.exports = function (app) {
             var verificationMessage = "Hi!<br /> Click to verify your course '" + course.title + "' <a href=\"" + verifyLink + "\">" + verifyLink + "</a>!";
             verificationMessage += "<br /><br />When you're done with it, you can delete the course from this link: <a href=\"" + deleteLink + "\"" + deleteLink + "</a>";
             // Add an edit link some day.
-            console.log(verificationMessage);
+            log.info(verificationMessage);
             mail.message({
               'MIME-Version': '1.0',
               'Content-type': 'text/html;charset=UTF-8',
@@ -241,8 +241,8 @@ module.exports = function (app) {
 
     log.info('Uploading file', req.body); // form is there but not accessible
     var f = req.files['course-file'];
-    console.log('Uploaded %s to %s', f.filename, f.path);
-    console.log('copying file from temp upload dir to course dir');
+    log.info('Uploaded %s to %s', f.filename, f.path);
+    log.info('copying file from temp upload dir to course dir');
 
     // Read the uploaded file and parse it into a course structure
     var parsedCourse;
@@ -342,7 +342,7 @@ module.exports = function (app) {
       res.redirect('/courses/' + req.params.id);
     } else {
       // TODO: let user subscribe to the course instead of this??
-      log.trace("course", req.course)
+      //log.trace("course", req.course)
       req.course.user = user;
 
       var renderParams = {
@@ -353,8 +353,9 @@ module.exports = function (app) {
       if(unit.video && unit.videoType) {
         renderParams['video'] = unit.video;
         renderParams['videoType'] = unit.videoType;
+		renderParams['unit_id'] = req.params.unit;
       }
-
+      log.trace('unit: '+req.params.unit);
       res.render('courses/course', renderParams);
     }
   });
@@ -368,7 +369,7 @@ module.exports = function (app) {
       res.redirect('/courses/' + req.params.id + '/' + req.params.unit);
     } else {
       // TODO: let user subscribe to the course instead of this??
-      log.trace("course", req.course)
+      //log.trace("course", req.course)
       req.course.user = user;
 
       var renderParams = {
@@ -379,8 +380,11 @@ module.exports = function (app) {
       if(lesson.video && lesson.videoType) {
         renderParams['video'] = lesson.video;
         renderParams['videoType'] = lesson.videoType;
+		renderParams['unit_id'] = req.params.unit;
+		renderParams['lesson_id'] = req.params.lesson;
       }
-      
+      log.trace('unit: '+req.params.unit);
+	  log.trace('lesson: '+req.params.lesson);
       res.render('courses/course', renderParams);
     }
   });
@@ -436,13 +440,19 @@ module.exports = function (app) {
     });
   });
 
+  app.get('/quiz', function(req, res){
+    res.render('quiz', {
+   		loggedInUser: req.user
+    });
+  });
+
 	// mock router to send dummy output. 
   app.post('/progress', function(req, res, next){
 		var is_correct = false;
 		var ans = req.body['quiz-1']; //@@TODO
 		//guard
-		console.log("GET params: ", req.params); //get or router params
-		console.log("POST params",req.body); //post
+		log.info("GET params: ", req.params); //get or router params
+		log.info("POST params",req.body); //post
 		
 		//process the login there.
 		if(ans === 'A')
@@ -461,11 +471,11 @@ module.exports = function (app) {
   });
 
   app.post('/submitCode', function(req, res, next){
-    console.log('in app.js::submitCode');
+    log.info('in app.js::submitCode');
     var source = req.param('sourcecode', '');
-    console.log('source=',source);
+    log.info('source=',source);
     var compile_res, compile_err = submitCode(source);
-    console.log('re-rendering ide');
+    log.info('re-rendering ide');
     res.render('ide', {
       title: 'submitCode',
     Course: req.param('Course', ''),

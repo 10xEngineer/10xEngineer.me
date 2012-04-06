@@ -9,7 +9,7 @@
 				each unit, i in units
 					- if (!unit.lessons)
 						li
-							a(href='/courses/#{course._id}/#{i+1}') #{unit.title}
+							a(href='/courses/#{course._id}/#{i+1}/1') #{unit.title}
 					- else
 						li.nav-header 
 							i.icon-chevron-down
@@ -27,7 +27,7 @@
 						a(href='/program') 
 							| IDE
 					li
-						a(href='/progress') 
+						a(href='/quiz') 
 							| TEST
 
 //.row-fluid
