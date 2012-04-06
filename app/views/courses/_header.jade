@@ -9,11 +9,11 @@
 					li
 						a(href='/courses/#{course._id}') #{course.title}
 						span.divider /
-					- if(typeof (unit_id) != 'undefined')
+					- if(typeof (unit_id) != 'undefined' && typeof(unit) != 'undefined')
 						li
 							a(href='/courses/#{course._id}/#{unit_id}') #{unit.title}
 							span.divider /
-						- if(typeof (lesson_id) != 'undefined')
+						- if(typeof (lesson_id) != 'undefined' && typeof(lesson) != 'undefined')
 							li
 								a(href='/courses/#{course._id}/#{unit_id}/#{lesson_id}') #{lesson.title}
 								span.divider /

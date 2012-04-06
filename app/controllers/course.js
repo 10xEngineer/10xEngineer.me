@@ -399,10 +399,7 @@ module.exports = function (app) {
   app.get('/course', function(req, res){
     res.render('course', {
       title: '10xEngineer.me Course',
-    Course: 'CS99',
-    Unit: 'Devops', 
-    coursenav: "Y",
-    loggedInUser:req.user
+      loggedInUser:req.user
     });
   });
 
@@ -410,19 +407,12 @@ module.exports = function (app) {
   app.get('/coursesold', function(req, res){
     res.render('overview', {
       title: '10xEngineer.me Course List', 
-    loggedInUser:req.user, 
-    coursenav: "N",
-    Course: '',
-    Unit: ''
+	  loggedInUser:req.user
     });
   });
 
   app.get('/program', function(req, res){
     res.render('ide', {
-      title: '10xEngineer.me Course',
-    Course: 'CS99',
-    Unit: 'Devops',
-    coursenav: "Y",
     loggedInUser:req.user,
     code: '',
 	compile_result: '',
@@ -430,6 +420,7 @@ module.exports = function (app) {
     });
   });
 
+/* @@TODO: reimplement to show user progress through courses
   app.get('/progress', function(req, res){
     res.render('progress', {
       title: 'Devops', 
@@ -439,15 +430,19 @@ module.exports = function (app) {
 			message:''
     });
   });
+*/
 
-  app.get('/quiz', function(req, res){
+  app.get('/quiz/:id/:unit/:lesson', function(req, res){
     res.render('quiz', {
-   		loggedInUser: req.user
+		loggedInUser: req.user,
+		message: '',
+		unit_id: req.params.unit,
+		lesson_id: req.params.lesson		
     });
   });
 
 	// mock router to send dummy output. 
-  app.post('/progress', function(req, res, next){
+  app.post('/quiz/:id/:unit/:lesson', function(req, res, next){
 		var is_correct = false;
 		var ans = req.body['quiz-1']; //@@TODO
 		//guard
@@ -458,14 +453,14 @@ module.exports = function (app) {
 		if(ans === 'A')
 			is_correct = true;
 			
-    res.render('progress', {
-	    title: 'Devops',
-			message: 'Your answer is: '+ ans + ". "+ ((is_correct) ? "That is correct!":"That is wrong"),
-    	Course: 'CS99',
-    	Unit: 'Devops', 
-    	loggedInUser: req.user,
-			correct: is_correct,
-			choice: ans 
+    res.render('quiz', {
+	    title: 'Devops Quiz',
+		message: 'Your answer is: '+ ans + ". "+ ((is_correct) ? "That is correct!":"That is wrong"),
+		loggedInUser: req.user,
+		correct: is_correct,
+		choice: ans,
+		unit_id: req.params.unit,
+		lesson_id: req.params.lesson 
     });
 
   });
@@ -480,7 +475,6 @@ module.exports = function (app) {
       title: 'submitCode',
     Course: req.param('Course', ''),
     Unit: req.param('Unit', '(unknown)'),
-    coursenav: "Y",
       code: source, 
       compile_results: compile_res,
     compile_errors: compile_err,
