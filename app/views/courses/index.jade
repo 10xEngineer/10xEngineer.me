@@ -14,13 +14,13 @@
 					ul.carousel-inner
 						each course, code in courses
 							li.item
-									a(href='/courses/#{course._id}')
+									a(href='/courses/#{course._id}/1')
 										img.repsonsive(src="http://placekitten.com/900/480")
 									.carousel-caption
 										h3 #{course._id}: #{course.category} - #{course.title}
 										p Taught by Steve M.
 										p
-											a(href='/courses/#{course._id}')
+											a(href='/courses/#{course._id}/1')
 												if ( course.enrolled || course.open )
 													span.btn.btn-primary.btn-large GO TO YOUR COURSE
 												else
