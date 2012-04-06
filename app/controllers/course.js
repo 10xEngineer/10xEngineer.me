@@ -411,12 +411,16 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/program', function(req, res){
+  app.get('/program/:course/:unit/:lesson', function(req, res){
     res.render('ide', {
     loggedInUser:req.user,
     code: '',
 	compile_result: '',
-    compile_output: ''
+    compile_output: '',
+	course: req.params.course,
+	id: req.params.course._id,
+	unit_id: req.params.unit,
+	lesson_id: req.params.lesson
     });
   });
 
@@ -436,6 +440,7 @@ module.exports = function (app) {
     res.render('quiz', {
 		loggedInUser: req.user,
 		message: '',
+		course: req.params.id,
 		unit_id: req.params.unit,
 		lesson_id: req.params.lesson		
     });
@@ -459,6 +464,7 @@ module.exports = function (app) {
 		loggedInUser: req.user,
 		correct: is_correct,
 		choice: ans,
+		course: req.params.id,
 		unit_id: req.params.unit,
 		lesson_id: req.params.lesson 
     });
@@ -473,15 +479,15 @@ module.exports = function (app) {
     log.info('re-rendering ide');
     res.render('ide', {
       title: 'submitCode',
-    Course: req.param('Course', ''),
-    Unit: req.param('Unit', '(unknown)'),
+	  course: req.params.id,
+	  unit_id: req.params.unit,
+	  lesson_id: req.params.lesson,
       code: source, 
       compile_results: compile_res,
-    compile_errors: compile_err,
+      compile_errors: compile_err,
       loggedInUser: req.user
     });
 
   });
-
 
 }

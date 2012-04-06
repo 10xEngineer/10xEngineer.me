@@ -1,14 +1,17 @@
 //- @@TODO: move the file into other location if only course use it
 //- @@TODO: Tabs is okay but need other content
 //- require pageslide ace2
+
+include /courses/_header
+
 .container-fluid
 	link(rel="stylesheet", href="/stylesheets/ribbon.css")
 	style(type="text/css")
 		#pageslide select{
 			width:120px;
 		}
-	.row-fluid
 
+	.row-fluid
 		.span10
 			.row-fluid
 				form#editform.well(onsubmit='return submitSourceCode(this)', action="/submitCode", method='POST')
@@ -173,7 +176,7 @@
 		var modes = {};
 		function loadMode(name){
 			//check if the language source files have been loaded before
-			console.log(modes);
+			log.info(modes);
 			if(modes[name]) {
 				editor.getSession().setMode(new modes[name]);
 				return;
@@ -277,10 +280,10 @@
 			var languageCode = $('#pageslide #mode').val();
 			if(!languageCode){
 				languageCode = $('#mode').val();
-				console.log('test');
+				log.info('test');
 			}
 			var data = {'source':sourceCode, 'language':languages[languageCode]};
-			console.log('submitSourceCode: ', data);
+			log.info('submitSourceCode: ', data);
 			socket.emit('submitcode', data);
 
 			
@@ -289,7 +292,7 @@
 		var linkCode;
 		socket.on('codesent', function(data){
 			linkCode = data.result.link;
-			console.log('getting link code: ', linkCode);
+			log.info('getting link code: ', linkCode);
 			setTimeout(function(){
 				socket.emit('getSubmissionStatus', {linkCode:linkCode});
 			}, 1000);
@@ -298,12 +301,12 @@
 		
 		socket.on('submissionStatus', function(data){
 			if(data.result.status == 0){
-				console.log('still waiting...');
+				log.info('still waiting...');
 				socket.emit('getSubmissionDetails', {linkCode:linkCode});
 				
 			}
 			else {
-				console.log('Done..getSubmissionStatus next.. ');
+				log.info('Done..getSubmissionStatus next.. ');
 				socket.emit('getSubmissionStatus', {linkCode:linkCode});
 			}
 			});
@@ -321,14 +324,14 @@
 		}
 
 		socket.on('submissionDetails', function(data){
-				console.log('gotSubmissionDetails: ', data.result);
+				log.info('gotSubmissionDetails: ', data.result);
 				var res = $('#compile_result');
 				var out = $('#compile_output');
 				out.removeClass('alert').removeClass('alert-info').removeClass('alert-error').show();
 				res.removeClass('alert').removeClass('alert-warning').removeClass('alert-success');
 
 				if(typeof data.result.output != 'undefined' && data.result.result == 15) {
-					console.log('success: ', data.result.output);
+					log.info('success: ', data.result.output);
 					res.addClass('alert').addClass('alert-success');
 					res.text("COMPILED OK\\n");
 					out.addClass('alert').addClass('alert-info');
@@ -336,7 +339,7 @@
 				}
 				else
 				if(typeof data.result.stderr != 'undefined' && data.result.stderr != "" || data.result.result != 15) {
-					console.log('error: ', data.result.result);
+					log.info('error: ', data.result.result);
 					res.addClass('alert').addClass('alert-warning');
 					res.text(errors[data.result.result]);
 					out.addClass('alert').addClass('alert-error');
