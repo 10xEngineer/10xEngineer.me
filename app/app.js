@@ -81,6 +81,10 @@ count.getNext('saves', function(error, count) {
   log.info('Run ' + count + ' times.');
 });
 
+// Migrate database schema
+// TODO: Find a way to wait before this finishes executing
+require('./helpers/dbMigrator')(config.db);
+
 
 // Custom middleware
 requireLogin = function (req, res, next) {
