@@ -1,8 +1,6 @@
-
-
-.navbar
+.navbar.span12
 	.navbar-inner
-		.container-fluid(style='width: auto;')
+		.container
 			a.btn.btn-navbar(data-toggle="collapse",data-target=".nav-collapse")
 				span.icon-bar
 				span.icon-bar
@@ -14,47 +12,43 @@
 				span(style='color:orange;font-weight:bold;') .
 				span(style='color:white;') me
 				// img(src='/img/10xengineer.me.png', alt='10xEngineer.me')
-			div.nav-collapse
-				ul.nav
-					li.active
-						a(href='/')
-							i.icon-home.icon-white 
-							| Home
-					li.dropdown
-						a.dropdown-toggle(href='/courses', data-toggle='dropdown')
-							i.icon-calendar.icon-white 
-							| Courses
-							b.caret
-						ul.dropdown-menu
-							li
-								a(href='#') My Courses
-							li.divider
-							li
-								a(href='#') Upcoming Courses
-					li.dropdown
-						a(href='http://10xEngineer.me:80')
-							i.icon-map-marker.icon-white 
-							| Forum
-				form.navbar-search.pull-right(action='')
-					input.search-query.span3(type='text', placeholder='Search Contents')
-				ul.nav.pull-right
-					-if(!everyauth.loggedIn)
+			ul.nav.nav-collapse
+				li.active
+					a(href='/')
+						i.icon-home.icon-white 
+						| Home
+				li.dropdown
+					a.dropdown-toggle(href='/courses', data-toggle='dropdown')
+						i.icon-calendar.icon-white 
+						| Courses
+						b.caret
+					ul.dropdown-menu
 						li
-							a(href='/auth')
-								i.icon-user.icon-white
-								|  Sign In
-					-if(everyauth.loggedIn)
+							a(href='#') My Courses
+						li.divider
 						li
-							a(href='/users')
+							a(href='#') Upcoming Courses
+				li.dropdown
+					a(href='http://10xEngineer.me:80')
+						i.icon-map-marker.icon-white 
+						| Forum
+			//form.navbar-search.pull-right(action='')
+			//	input.search-query.span3(type='text', placeholder='Search Contents')
+			ul.nav.pull-right.nav-collapse
+				-if(!everyauth.loggedIn)
+					li
+						a(href='/auth')
+							i.icon-user.icon-white
+							|  Sign In
+				-if(everyauth.loggedIn)
+					li
+						a(href='/users/#{user.id}')
+							- if(user.isAdmin == undefined)
+								i.icon-eye-open.icon-white
+							- else
 								i.icon-user.icon-white 
-								|  #{everyauth.user.name}
-					-if(everyauth.loggedIn)
-						li
-							a(href='/admin')
-								i.icon-user.icon-white 
-								|  Admin
-					-if(everyauth.loggedIn)
-						li
-							a(href='/logout')
-								i.icon-user.icon-white 
-								|  Sign Out
+							|  #{everyauth.user.name}
+					li
+						a(href='/logout')
+							i.icon-star-empty.icon-white
+							|  Sign Out

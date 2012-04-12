@@ -160,14 +160,18 @@ module.exports = function (app) {
 
   // List existing courses
   app.get('/courses', loadCategories, function(req, res){
-
+	var registered_courses = [];
+	if( typeof(req.user) != 'undefined' && typeof(req.user.registered_courses) != 'undefined')
+		registered_courses = req.user.registered_courses;
+	log.info('user = ', req.user);
+	log.info('registered courses = ', registered_courses);
     course.get({
       category: req.param.category
     }, function(error, courses){
       res.render('courses', { 
         title: 'Courses',
         courses: courses,
-		registered_courses: req.user.registered_courses
+		registered_courses: registered_courses
       });
     });
   });
@@ -346,8 +350,9 @@ module.exports = function (app) {
 	  
       res.redirect('/courses/' + req.params.id);
     } else {
-      // TODO: let user subscribe to the course instead of this??
-      //log.trace("course", req.course)
+      // if the user hasn't registered for this course, register them now
+      log.trace("course", req.course);
+	  log.trace("chapter/unit", req.unit);
       req.course.user = user;
 
       var renderParams = {

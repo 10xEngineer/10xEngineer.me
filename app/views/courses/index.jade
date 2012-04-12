@@ -1,41 +1,40 @@
 //- Course Admin index?
-
 .container-fluid.course-index.inner-index
-	.row-fluid
-		p.actions.clearfix.span8
+	-if(user != undefined  )
+		.row-fluid
+			.span1
+			p.actions.clearfix.span10
 				a(href='/courses/create').btn.btn-large.btn-primary.pull-left Add Course
 				a(href='/courses/import').btn.btn-large.btn-inverse.pull-right Import a course
-	.row-fluid.style(height='400px')
-		.span8
+		.span1
+	.row-fluid
+		.span1
+		.span10
 			.carousel#course-carousel.slide.hidden-phone
-					ul.carousel-inner
+					ul.carousel-inner.style(width: '100%', height: '600px')
 						each course, code in courses
 							li.item.ribbon-wrapper
-								- if (registered_courses[course._id])
+								- if (registered_courses != undefined && registered_courses[course._id])
 									.ribbon-wrapper-green
-										.ribbon-green IN PROGRESS
+										- if(registered_courses[course._id].status == 'COMPLETED')
+											.ribbon-green COMPLETED
+										- else
+											.ribbon-green(style='color: yellow;') IN PROGRESS
 								a(href='/courses/#{course._id}/1')
-									img.responsive(src="#{course.image}", height='400px', width='100%')
+									img.responsive(src="#{course.image}", height='80%', width='100%')
 								.carousel-caption
 									h3 #{course.title}
 									p Taught by Steve M.
-									p
-										a(href='/courses/#{course._id}/1')
-											if ( course.enrolled || course.open )
-												span.btn.btn-primary.btn-large GO TO YOUR COURSE
-											else
-												span.btn.btn-large LEARN MORE
+										span.pull-right
+											- if (registered_courses != undefined && registered_courses[course._id])
+												a(href='/courses/#{course._id}/1').btn.btn-primary.btn-large GO TO YOUR COURSE
+											- else
+												a(href='/courses/#{course._id}/1').btn.btn-large.btn-info START LEARNING
 
 					// carousel-nav
 					a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
 					a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
-		.span4
-			aslide.course-list
-				ul.nav.nav-tabs.nav-stacked
-					each course, code in courses
-						li.item
-							a(href='/courses/#{course._id}/1')
-								#{course.title}
+		.span1
 	.row-fluid.span8
 		a.button(href='#')
 			i.icon-th-large 
@@ -45,14 +44,6 @@
 		a.button(href='#')
 			i.icon-retweet
 			span  Carousel
-	.row-fluid.span8
-		h4 Categories
-			ul.categories
-			- each category in categories
-				li 
-					a(href='/courses/?category=#{category.name}').label.label-info #{category.name}
-				li
-					a(href='/courses/') All Courses
 
 	script(type='text/javascript')
 		function init() {
