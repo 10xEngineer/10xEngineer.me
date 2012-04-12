@@ -85,6 +85,24 @@ style
 		-moz-box-shadow:0 0 2px #000;
 	}
 
+	#iPicture {
+		margin:0 auto;
+		width:auto;
+		height:500px;
+		overflow:auto; /* allow scrollbar */
+		position:relative;
+	}
+	#iPicture {
+		margin:0 auto;
+		height:100%;
+	}
+	#iPicture-inner { }
+	.picture-frame input { padding:0; }
+	.buttonSave { 
+		-webkit-box-sizing: border-box; 
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
 	a.nextstep { display: none; }
 
 - var auto_select =	 (typeof choice != 'undefined') ? true: false;
@@ -122,22 +140,17 @@ style
 
 			#edit.tab-pane
 				- var quiz = {	question: { src: "", width: 898, height: 500 }, answers:[{ val: "A", x: 92, y:140 }, { val:"B", x: 92, y:166}, { val:"C", x: 92, y:190}, { val:"D", x: 92, y:215}]	}
-				form#quiz.layer-wrapper(action="/quiz/2/",method="post", style="width:#{quiz.question.width}px; height:#{quiz.question.height}px")
-					img.question-body.layer(src="#{quiz.question.src}")
-					.ans-wrapper.layer
-						#choices.layer-wrapper
-							each ans, i in quiz.answers
-									- var selected = (auto_select && ans.val === choice) ? 'true':'';
-									- var match = (has_match && selected) ? 'true':'';
-									span.choice-wrapper(style="left:#{ans.x}px; top:#{ans.y}px;", data-matched="#{match}")
-										input.g-radio-button(type="radio", name="quiz-1", value="#{ans.val}", data-checked="#{selected}")
-					.form-control.layer
-						button.btn.btn-primary.btn-large(type="submit") Answer
+				#show
+					#iPicture.picture-frame
+							.slide.quiz-pane
+								#picture1.quiz-bg(style="background: url('/quiz/2/quiz-1.jpg') no-repeat scroll 0 0 #393737; width: 900px; height: 500px;position:relative")
+	
 
-//- should have a footer & sidebar
-script(src="/javascripts/jquery.filedrop.js")
-
-script(src="/javascripts/quiz.edit.script.js")
-
-script
-	$(function(){ $('.nextstep').on("click", function(e){ $('a.edit').tab('show'); return false; }); })
+	//- should have a footer & sidebar
+	script
+		$(function(){ $('.nextstep').on("click", function(e){ $('a.edit').tab('show'); return false; }); })
+		yepnope({ load: '/stylesheets/jquery.ipicture.css'});
+	script(src="/javascripts/jquery-ui-1.8.16.custom.min.js")
+	script(src="/javascripts/jquery.filedrop.js")
+	script(src="/javascripts/jquery.ipicture.js")
+	script(src="/javascripts/quiz.edit.script.js")

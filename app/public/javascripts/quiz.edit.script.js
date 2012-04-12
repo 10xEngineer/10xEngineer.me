@@ -108,6 +108,121 @@ $(function(){
 	
 	function callNext(res){
 		$('a.nextstep').show();
+		
 	}
 
+});
+
+$(function(){
+
+	$( "#iPicture" ).iPicture({
+		animation: true,
+		animationBg: "bgblack",
+		animationType: "ltr-slide",
+		pictures: ["picture1","picture2","picture3","picture4","picture5"],
+		button: "moreblack",
+		moreInfos:{					
+			"picture1": [{
+					    "id": "tooltip1",
+					    "descr": "furniture: 299$",
+					    "top": "185px",
+					    "left": "393px"
+					},
+					{
+					    "id": "tooltip2",
+					    "descr": "sofa: 199$",
+					    "top": "346px",
+					    "left": "483px"
+					},
+					{
+					    "id": "tooltip3",
+					    "descr": "silver candle: 2.99$",
+					    "top": "461px",
+					    "left": "556px"
+					}],
+			"picture2": [{
+					    "id": "tooltip4",
+					    "descr": "window",
+					    "top": "71px",
+					    "left": "423px"
+					},
+					{
+					    "id": "tooltip5",
+					    "descr": "basket",
+					    "top": "438px",
+					    "left": "192px"
+					},
+					{
+					    "id": "tooltip6",
+					    "descr": "hoven",
+					    "top": "460px",
+					    "left": "673px"
+					}],
+			"picture3": [{
+					    "id": "tooltip7",
+					    "descr": "Organize the kitchen!",
+					    "top": "391px",
+					    "left": "560px"
+					},
+					{
+					    "id": "tooltip8",
+					    "descr": "Hoven: 399$",
+					    "top": "160px",
+					    "left": "268px"
+					},
+					{
+					    "id": "tooltip9",
+					    "descr": "chest of drawers",
+					    "top": "386px",
+					    "left": "180px"
+					}],
+			"picture4": [{
+					    "id": "tooltip10",
+					    "descr": "pasta maker",
+					    "top": "277px",
+					    "left": "672px"
+					},
+					{
+					    "id": "tooltip11",
+					    "descr": "stool",
+					    "top": "291px",
+					    "left": "281px"
+					},
+					{
+					    "id": "tooltip12",
+					    "descr": "shelf",
+					    "top": "144px",
+					    "left": "579px"
+					},
+					{
+					    "id": "tooltip13",
+					    "descr": "Dishes",
+					    "top": "183px",
+					    "left": "181px"
+					}],
+			"picture5": [{
+					    "id": "tooltip14",
+					    "descr": "bed: 199$",
+					    "top": "398px",
+					    "left": "351px"
+					},
+					{
+					    "id": "tooltip15",
+					    "descr": "asian style lamp",
+					    "top": "146px",
+					    "left": "380px"
+					},
+					{
+					    "id": "tooltip16",
+					    "descr": "console: 105$",
+					    "top": "273px",
+					    "left": "567px"
+					}]},
+		modify: true,
+		initialize: false
+	});
+
+
+
+  
 });
