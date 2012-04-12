@@ -12,9 +12,6 @@ include courses/_header
 - var auto_select =  (typeof choice != 'undefined') ? true: false;
 - var has_match = (typeof correct != 'undefined' && auto_select) ? true:false;
 .container-fluid
-	header.page-header
-		h1 Quiz
-
 	.row-fluid
 		.span10
 			-if (typeof(message) != 'undefined' && message)

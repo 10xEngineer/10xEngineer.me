@@ -8,23 +8,25 @@
 				a(href='/courses/import').btn.btn-large.btn-inverse.pull-right Import a course
 	.row-fluid
 		p
-	.row-fluid
+	.row-fluid.style(height='400px')
 		.span8
 			.carousel#course-carousel.slide.span8.hidden-phone
 					ul.carousel-inner
 						each course, code in courses
-							li.item
-									a(href='/courses/#{course._id}/1')
-										img.repsonsive(src="http://placekitten.com/900/480")
-									.carousel-caption
-										h3 #{course._id}: #{course.category} - #{course.title}
-										p Taught by Steve M.
-										p
-											a(href='/courses/#{course._id}/1')
-												if ( course.enrolled || course.open )
-													span.btn.btn-primary.btn-large GO TO YOUR COURSE
-												else
-													span.btn.btn-large LEARN MORE
+							li.item.ribbon-wrapper
+								.ribbon-wrapper-green
+									.ribbon-green IN PROGRESS
+								a(href='/courses/#{course._id}/1')
+									img.responsive(src="#{course.image}", height='400px', width='100%')
+								.carousel-caption
+									h3 #{course.title}
+									p Taught by Steve M.
+									p
+										a(href='/courses/#{course._id}/1')
+											if ( course.enrolled || course.open )
+												span.btn.btn-primary.btn-large GO TO YOUR COURSE
+											else
+												span.btn.btn-large LEARN MORE
 					// carousel-nav
 					a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
 					a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
@@ -36,7 +38,7 @@
 					each course, code in courses
 						li.item
 							a(href='/courses/#{course._id}/1')
-								#{course.category} #{course.title}
+								#{course.title}
 	.row-fluid.span8
 		a.button(href='#')
 			i.icon-th-large 

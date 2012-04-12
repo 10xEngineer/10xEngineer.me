@@ -1,0 +1,106 @@
+#showcase {
+  background: url(/img/landing/tab1-bg-v2.png) no-repeat;
+}
+
+#bottom-tabs {
+  /*width: 960px;*/
+  height: 70px;
+  margin: 0 auto;
+  background: #cac8c8;
+  position: relative;
+  /*
+		box-shadow: inset
+	0 1px 4px rgba(0, 0, 0, 0.5),
+	0 1px 1px rgba(255, 255, 255, 0.8);
+-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5),
+	0 1px 1px rgba(255, 255, 255, 0.8);
+-khtml-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5),
+	0 1px 1px rgba(255, 255, 255, 0.8);
+-webkit-box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5),
+	0 1px 1px rgba(255, 255, 255, 0.8);
+	*/
+
+}
+#bottom-tabs ul li {
+  display: block;
+  float: left;
+  height: 70px;
+  /*width: 320px;*/
+  list-style-type: none;
+  /*spacing between nav items*/
+
+  background: #cac8c8 url(/img/landing/top-tab-shadow.png) repeat-x;
+}
+#bottom-tabs a {
+  display: block;
+  /*width: 280px;*/
+  margin: 0 auto;
+  padding-left: 40px;
+  text-align: center;
+  color: #2a2a2a;
+  height: 70px;
+  line-height: 70px;
+  text-decoration: none;
+  text-shadow: #fff 0 1px 0;
+  font-weight: 400;
+  font-size: 14px;
+}
+#bottom-tabs li.tab1 a {
+  background: transparent url(/img/landing/icon-what.png) no-repeat 60px;
+  -moz-box-shadow: inset 1em 1em 2em -16px #333333;
+  -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
+  box-shadow: inset 1em 1em 2em -16px #333333;
+}
+#bottom-tabs li.tab2 a {
+  background: transparent url(/img/landing/icon-why.png) no-repeat 60px;
+  -moz-box-shadow: inset 1em 1em 2em -16px #333333;
+  -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
+  box-shadow: inset 1em 1em 2em -16px #333333;
+}
+#bottom-tabs li.tab3 a {
+  background: transparent url(/img/landing/icon-who.png) no-repeat 60px;
+  -moz-box-shadow: inset 1em 1em 2em -16px #333333;
+  -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
+  box-shadow: inset 1em 1em 2em -16px #333333;
+}
+/* hover state and selected are the same */
+#tab1 #bottom-tabs li.tab1 a, #tab2 #bottom-tabs li.tab2 a, #tab3 d#bottom-tabs li.tab3 a {
+  background-color: #fff;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+}
+#tab1 #bottom-tabs li.tab1 {
+  background: url(/img/landing/tab1-tab-bg.png);
+}
+#tab1 #bottom-tabs li.tab1 a {
+  background-color: transparent;
+}
+#tab3 #bottom-tabs li.tab3 a {
+  background-color: #f4f4f5;
+}
+#bottom-tabs a:hover {
+  background-color: #eee;
+  color: #5f0d7a;
+  text-shadow: #ffffff 0 1px 0;
+}
+#tab1 #bottom-tabs li.tab3 a {
+  -moz-box-shadow: inset 0em 1em 2em -16px #333333, -1px 0 0 #666666;
+  -webkit-box-shadow: inset 0em 1em 2em -16px #333333, -1px 0 0 rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0em 1em 2em -16px #333333, -1px 0 0 #666666;
+}
+#tab3 #bottom-tabs li.tab2 a {
+  -moz-box-shadow: inset -1em 1em 2em -16px #333333, -1px 0 0 #666666;
+  -webkit-box-shadow: inset -1em 1em 2em -16px #333333, -1px 0 0 rgba(0, 0, 0, 0.3);
+  box-shadow: inset -1em 1em 2em -16px #333333, -1px 0 0 #666666;
+}
+#tab3 #bottom-tabs li.tab1 a {
+  -moz-box-shadow: inset 0em 1em 2em -16px #333333;
+  -webkit-box-shadow: inset 0em 1em 2em -16px #333333;
+  box-shadow: inset 0em 1em 2em -16px #333333;
+}
+#tab2 #bottom-tabs li.tab1 a {
+  -moz-box-shadow: inset -1em 1em 2em -16px #333333;
+  -webkit-box-shadow: inset -1em 1em 2em -16px #333333;
+  box-shadow: inset -1em 1em 2em -16px #333333;
+}
