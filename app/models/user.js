@@ -146,3 +146,49 @@ module.exports.updateUserBySource = function (dbUser, source, srcUser, promise) 
   }
 };
 
+module.exports.findOrCreateRegisteredCourse = function(user, course_id) {		
+	if(!user.registered_courses)
+		user.registered_courses = {};
+	
+	if(!user.registered_courses[course_id]){
+		var setValue = {};
+		setValue["registered_courses."+course_id] = {};
+    	this.update({id:user.id},{"$set":setValue});
+	} 
+	
+	return user.registered_courses[course_id];		
+}
+
+module.exports.findOrCreateLesson = function(user, course_id, chapter_id, lesson_id){
+	var course = this.findOrCreateRegisteredCourse(user, course_id);
+	var query = {};
+	query["registered_courses."+course_id+".chapters."+chapter_id+".lessons."+lesson_id] = {"$exists": true};
+	var lesson_status;
+	try{
+		lesson_status = user.registered_courses[course_id].chapters[chapter_id].lessons[lesson_id];
+	}catch(e){
+		
+	}
+	
+	if (!lesson_status)
+	{
+		var setValue = {};
+		setValue["registered_courses."+course_id+".chapters."+chapter_id+".lessons."+lesson_id] = 
+		{
+			status:"In Progress"
+		};
+		console.log(setValue);
+		this.update({id:user.id}, {"$set": setValue});
+		return {status:"In Progress"};
+	}
+	return lesson_status;
+}
+
+module.exports.updateLessonProgress = function(user_id, course_id, chapter_id, lesson_id, status){
+	var setValue = {};
+	setValue["registered_courses."+course_id+".chapters."+chapter_id+".lessons"+lesson_id] = 
+	{
+		status: status
+	}
+	this.update({id:user_id}, {"$set":setValue});
+}
