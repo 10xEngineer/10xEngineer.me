@@ -1,6 +1,6 @@
 //- Course Admin index?
 .container-fluid.course-index.inner-index
-	-if(user != undefined  )
+	-if(user != undefined && user.role == 'admin')
 		.row-fluid
 			.span1
 			p.actions.clearfix.span10
@@ -14,7 +14,7 @@
 					ul.carousel-inner.style(width: '100%', height: '600px')
 						each course, code in courses
 							li.item.ribbon-wrapper
-								- if (registered_courses != undefined && registered_courses[course._id])
+								- if (registered_courses != undefined && registered_courses[course._id] && user != undefined)
 									.ribbon-wrapper-green
 										- if(registered_courses[course._id].status == 'COMPLETED')
 											.ribbon-green COMPLETED
@@ -26,10 +26,10 @@
 									h3 #{course.title}
 									p Taught by Steve M.
 										span.pull-right
-											- if (registered_courses != undefined && registered_courses[course._id])
+											- if (registered_courses != undefined && registered_courses[course._id] && user != undefined)
 												a(href='/courses/#{course._id}/1').btn.btn-primary.btn-large GO TO YOUR COURSE
 											- else
-												a(href='/courses/#{course._id}/1').btn.btn-large.btn-info START LEARNING
+												a(href='/courses/#{course._id}').btn.btn-large.btn-info LEARN MORE
 
 					// carousel-nav
 					a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;

@@ -43,11 +43,15 @@
 				-if(everyauth.loggedIn)
 					li
 						a(href='/users/#{user.id}')
-							- if(user.isAdmin == undefined)
+							- if(user.role == 'admin')
 								i.icon-eye-open.icon-white
 							- else
 								i.icon-user.icon-white 
-							|  #{everyauth.user.name}
+							|  #{everyauth.user.name} 
+							- if(user.role == 'admin')
+								| ( 
+								strong(style='color:yellow') #{user.role}
+								| )
 					li
 						a(href='/logout')
 							i.icon-star-empty.icon-white

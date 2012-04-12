@@ -2,7 +2,7 @@ exports.getSiteConfig = function () {
   configValues =  {
     url: 'http://localhost:3000',
     site_name: '10xEngineer.me',
-    site_email: 'steve.g.messina@gmail.com'
+    site_email: '10xengineer@gmail.com'
   }
 
   return configValues;
@@ -55,6 +55,16 @@ exports.getAuthConfigLocal = function() {
 			clientId: '1041276452869.apps.googleusercontent.com',
 			clientSecret: '7fMR8QidXiToK0IauOyL2Jgj'
 		}
+	}
+	
+	return configValues;
+}
+
+// default initial site admins
+exports.getAdminConfig = function() {
+	configValues = {
+		// add the identifier by twitter id, email, google, etc - NOTE: currently logging in by different methods creates duplicate users
+		twitter: 'steve_messina' 
 	}
 	
 	return configValues;

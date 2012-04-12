@@ -1,7 +1,7 @@
 var db = require('../helpers/database').db;
+var config = require('../helpers/config');
 
 module.exports = db.collection('users');
-
 
 module.exports.count = require('./count');
 
@@ -16,6 +16,7 @@ module.exports.findById = function(id, callback) {
     callback(null, dbUser);
   });
 };
+
 
 module.exports.findByEmail = function(email, callback) {
 
@@ -113,7 +114,12 @@ module.exports.createNew = function (user, source, callback) {
       } else if(source === 'email') {
         userObj['email'] = user.email;
       }
-
+	
+	  // check against the default site admin list from console
+	  if( config.admin[source] == user.name || config.admin[source] == user.email ) {
+	    log.info('New user is an admin: ', config.admin[source]);
+		userObj['role'] = 'admin';
+	  } 
       userObj[source] = user;
 
       self.insert(userObj);
