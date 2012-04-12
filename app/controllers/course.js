@@ -166,7 +166,8 @@ module.exports = function (app) {
     }, function(error, courses){
       res.render('courses', { 
         title: 'Courses',
-        courses: courses
+        courses: courses,
+		registered_courses: req.user.registered_courses
       });
     });
   });
@@ -288,7 +289,10 @@ module.exports = function (app) {
       // TODO: let user subscribe to the course instead of this??
       log.trace("course", req.course)
       req.course.user = user;
-
+	  
+	  //subscribe to the course, if not yet registered
+      user.findOrCreateRegisteredCourse(req.user, req.course._id);
+	  
       var renderParams = {
         title: req.course.title
       };
@@ -339,6 +343,7 @@ module.exports = function (app) {
     if (!req.course) {
       res.redirect('/courses/');
     } else if (!req.unit) {
+	  
       res.redirect('/courses/' + req.params.id);
     } else {
       // TODO: let user subscribe to the course instead of this??
@@ -361,6 +366,10 @@ module.exports = function (app) {
   });
 
   app.get('/courses/:id/:unit/:lesson', loadCourse, function(req, res){
+	req.course = req.params.id;
+	req.unit = req.params.unit;
+	req.lesson = req.params.lesson;
+	
     if (!req.course) {
       res.redirect('/courses/');
     } else if (!req.unit) {
@@ -369,6 +378,10 @@ module.exports = function (app) {
       res.redirect('/courses/' + req.params.id + '/' + req.params.unit);
     } else {
       // TODO: let user subscribe to the course instead of this??
+	  var lesson_progress = user.findOrCreateLesson(req.user, req.course, req.unit, req.lesson, function(lesson_status){
+	  		console.log("lesson_status:"+lesson_status); 
+	  });
+      
       //log.trace("course", req.course)
       req.course.user = user;
 

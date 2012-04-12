@@ -5,19 +5,15 @@
 		p.actions.clearfix.span8
 				a(href='/courses/create').btn.btn-large.btn-primary.pull-left Add Course
 				a(href='/courses/import').btn.btn-large.btn-inverse.pull-right Import a course
-	.row-fluid
-<<<<<<< HEAD
-		p
 	.row-fluid.style(height='400px')
-=======
->>>>>>> 27462222f2e7c3fa9aff22690f67cfd21baef9f0
 		.span8
 			.carousel#course-carousel.slide.hidden-phone
 					ul.carousel-inner
 						each course, code in courses
 							li.item.ribbon-wrapper
-								.ribbon-wrapper-green
-									.ribbon-green IN PROGRESS
+								- if (registered_courses[course._id])
+									.ribbon-wrapper-green
+										.ribbon-green IN PROGRESS
 								a(href='/courses/#{course._id}/1')
 									img.responsive(src="#{course.image}", height='400px', width='100%')
 								.carousel-caption
@@ -29,6 +25,7 @@
 												span.btn.btn-primary.btn-large GO TO YOUR COURSE
 											else
 												span.btn.btn-large LEARN MORE
+
 					// carousel-nav
 					a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
 					a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
