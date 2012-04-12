@@ -2,15 +2,17 @@
 
 .container-fluid.course-index.inner-index
 	.row-fluid
-		.actions
-			.span8
+		p.actions.clearfix.span8
 				a(href='/courses/create').btn.btn-large.btn-primary.pull-left Add Course
 				a(href='/courses/import').btn.btn-large.btn-inverse.pull-right Import a course
 	.row-fluid
+<<<<<<< HEAD
 		p
 	.row-fluid.style(height='400px')
+=======
+>>>>>>> 27462222f2e7c3fa9aff22690f67cfd21baef9f0
 		.span8
-			.carousel#course-carousel.slide.span8.hidden-phone
+			.carousel#course-carousel.slide.hidden-phone
 					ul.carousel-inner
 						each course, code in courses
 							li.item.ribbon-wrapper
@@ -30,10 +32,8 @@
 					// carousel-nav
 					a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
 					a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
-		.span1
-			p
-		.span3
-			aslide.course-list.span4
+		.span4
+			aslide.course-list
 				ul.nav.nav-tabs.nav-stacked
 					each course, code in courses
 						li.item
