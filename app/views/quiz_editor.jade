@@ -1,0 +1,143 @@
+style
+	#dropbox {
+		border-radius:3px;
+		position: relative;
+		margin:80px auto 90px;
+		min-height: 290px;
+		overflow: hidden;
+		padding-bottom: 40px;
+		box-shadow:0 0 4px rgba(0,0,0,0.3) inset,0 -3px 2px rgba(0,0,0,0.1);
+		background-color: #212123;
+		color:#fff;
+	}
+	#dropbox .message {
+		text-align: center;
+		padding-top:160px;
+		display: block;
+	}
+
+	#dropbox .message i {
+		color:#ccc;
+		font-size:0.9em;
+	}
+
+	#dropbox:before {
+		border-radius:3px 3px 0 0;
+	}
+
+
+
+	#dropbox .preview {
+		width:245px;
+		height: 215px;
+		float:left;
+		margin: 55px 0 0 60px;
+		position: relative;
+		text-align: center;
+	}
+
+	#dropbox .preview img {
+		max-width: 240px;
+		max-height:180px;
+		border:3px solid #fff;
+		display: block;
+
+		box-shadow:0 0 2px #000;
+		-webkit-box-shadow:0 0 2px #000;
+		-moz-box-shadow:0 0 2px #000;
+	}
+
+	#dropbox .imageHolder {
+		display: inline-block;
+		position:relative;
+	}
+
+	#dropbox .uploaded {
+		position: absolute;
+		top:0;
+		left:0;
+		height:130px;
+		width:100%;
+		background: rgba(255,255,255,0.5);
+		display: none;
+		color: #448944;
+		padding-top:50px;
+	}
+
+	#dropbox .preview.done {
+	}
+	#dropbox .preview.done .uploaded {
+		-webkit-box-shadow:0 0 5px #448944;
+		-moz-box-shadow:0 0 5px #448944;
+		box-shadow:0 0 5px #448944;
+		display:block;
+	}
+	#dropbox .progressHolder {
+		position: absolute;
+		background-color:#252f38;
+		height:12px;
+		width:100%;
+		left:0;
+		bottom: 0;
+
+		box-shadow:0 0 2px #000;
+		-webkit-box-shadow:0 0 2px #000;
+		-moz-box-shadow:0 0 2px #000;
+	}
+
+	a.nextstep { display: none; }
+
+- var auto_select =	 (typeof choice != 'undefined') ? true: false;
+- var has_match = (typeof correct != 'undefined' && auto_select) ? true:false;
+.container-fluid
+	header.page-header
+		h1 Quiz　Editor
+
+	.row-fluid
+		.span10
+			-if (message)
+				- if (has_match && correct)
+					.alert.alert-success
+						| #{message}
+				- else
+					.alert.alert-error
+						| #{message}
+
+	.row-fluid
+		ul.nav.nav-pills
+			li.active
+				a.upload(href="#upload",data-toggle="pill") Upload
+			li
+				a.edit(href="#edit",data-toggle="pill") Edit
+
+	.row-fluid
+		.tab-content
+			#upload.tab-pane.active
+				#dropbox
+					span.message 
+						| Drop images here to upload. 
+						br
+						i (they will only be visible to you)
+				a.nextstep.btn(href="#") Next Step: Edit
+
+			#edit.tab-pane
+				- var quiz = {	question: { src: "", width: 898, height: 500 }, answers:[{ val: "A", x: 92, y:140 }, { val:"B", x: 92, y:166}, { val:"C", x: 92, y:190}, { val:"D", x: 92, y:215}]	}
+				form#quiz.layer-wrapper(action="/quiz/2/",method="post", style="width:#{quiz.question.width}px; height:#{quiz.question.height}px")
+					img.question-body.layer(src="#{quiz.question.src}")
+					.ans-wrapper.layer
+						#choices.layer-wrapper
+							each ans, i in quiz.answers
+									- var selected = (auto_select && ans.val === choice) ? 'true':'';
+									- var match = (has_match && selected) ? 'true':'';
+									span.choice-wrapper(style="left:#{ans.x}px; top:#{ans.y}px;", data-matched="#{match}")
+										input.g-radio-button(type="radio", name="quiz-1", value="#{ans.val}", data-checked="#{selected}")
+					.form-control.layer
+						button.btn.btn-primary.btn-large(type="submit") Answer
+
+//- should have a footer & sidebar
+script(src="/javascripts/jquery.filedrop.js")
+
+script(src="/javascripts/quiz.edit.script.js")
+
+script
+	$(function(){ $('.nextstep').on("click", function(e){ $('a.edit').tab('show'); return false; }); })
