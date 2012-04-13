@@ -27,15 +27,24 @@
   height: 70px;
   /*width: 320px;*/
   list-style-type: none;
+  margin-left:0;
   /*spacing between nav items*/
 
-  background: #cac8c8 url(/img/landing/top-tab-shadow.png) repeat-x;
+  /*background: #cac8c8 url(/img/landing/top-tab-shadow.png) repeat-x;*/
 }
+
+#bottom-tabs li a.selected{
+	background-color:#DFDFDF;
+	-moz-box-shadow: 1em 1em 2em -16px #333333;
+    -webkit-box-shadow: 1em 1em 2em -16px #333333;
+	box-shadow:1em 1em 2em -16px #333333;
+}
+
 #bottom-tabs a {
   display: block;
   /*width: 280px;*/
   margin: 0 auto;
-  padding-left: 40px;
+  /*padding-left: 40px;*/
   text-align: center;
   color: #2a2a2a;
   height: 70px;
@@ -45,19 +54,20 @@
   font-weight: 400;
   font-size: 14px;
 }
-#bottom-tabs li.tab1 a {
+
+#bottom-tabs li.tab1 a:not(.selected) {
   background: transparent url(/img/landing/icon-what.png) no-repeat 60px;
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
   box-shadow: inset 1em 1em 2em -16px #333333;
 }
-#bottom-tabs li.tab2 a {
+#bottom-tabs li.tab2 a:not(.selected) {
   background: transparent url(/img/landing/icon-why.png) no-repeat 60px;
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
   box-shadow: inset 1em 1em 2em -16px #333333;
 }
-#bottom-tabs li.tab3 a {
+#bottom-tabs li.tab3 a:not(.selected) {
   background: transparent url(/img/landing/icon-who.png) no-repeat 60px;
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
