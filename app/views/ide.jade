@@ -128,10 +128,10 @@ include /courses/_header
 												input(type="checkbox")#highlight_selected_word.checked
 								a(href="javascript:$.pageslide.close()").btn.btn-info Close
 
-						#source-editor(style='position:absolution;')	
+						#source-editor 
 							.controls
 									input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')
-									#editor(style='position:relative;width:100%;height:400px;resize:both;overflow:hidden;')
+									#editor(style='position:relative;width:100%;height:400px;resize:both')
 							.form-actions
 								span.danger
 									a.button.btn.btn-danger CLEAR
@@ -203,6 +203,9 @@ include /courses/_header
 
 		function init() {
 			editor = ace.edit('editor');
+			$(window).resize(function(){
+				editor.resize();
+			})
 			$(".open").pageslide({direction: "right", modal: true, iframe:false});
 
 			if( $('editor') ) {
