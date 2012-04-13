@@ -55,20 +55,35 @@
   font-size: 14px;
 }
 
+#bottom-tabs li.tab1 a{
+	background-image: url(/img/landing/icon-what.png);
+	background-repeat:no-repeat;
+	background-position:20px;
+}
+
+#bottom-tabs li.tab2 a{
+	background-image: url(/img/landing/icon-why.png);
+	background-repeat:no-repeat;
+	background-position:20px;
+}
+
+#bottom-tabs li.tab3 a{
+	background-image: url(/img/landing/icon-who.png);
+	background-repeat:no-repeat;
+	background-position:20px;
+}
+
 #bottom-tabs li.tab1 a:not(.selected) {
-  background: transparent url(/img/landing/icon-what.png) no-repeat 60px;
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
   box-shadow: inset 1em 1em 2em -16px #333333;
 }
 #bottom-tabs li.tab2 a:not(.selected) {
-  background: transparent url(/img/landing/icon-why.png) no-repeat 60px;
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
   box-shadow: inset 1em 1em 2em -16px #333333;
 }
 #bottom-tabs li.tab3 a:not(.selected) {
-  background: transparent url(/img/landing/icon-who.png) no-repeat 60px;
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
   box-shadow: inset 1em 1em 2em -16px #333333;
