@@ -65,6 +65,10 @@
 	background-image: url(/img/landing/icon-why.png);
 	background-repeat:no-repeat;
 	background-position:20px;
+	border-left-width:1px;
+	border-left-style:solid;
+	border-right-width:1px;
+	border-right-style:solid;
 }
 
 #bottom-tabs li.tab3 a{
@@ -76,17 +80,17 @@
 #bottom-tabs li.tab1 a:not(.selected) {
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
-  box-shadow: inset 1em 1em 2em -16px #333333;
+  box-shadow: inset 0em 1em 2em -16px #333333;
 }
 #bottom-tabs li.tab2 a:not(.selected) {
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
-  box-shadow: inset 1em 1em 2em -16px #333333;
+  box-shadow: inset 0em 1em 2em -16px #333333;
 }
 #bottom-tabs li.tab3 a:not(.selected) {
   -moz-box-shadow: inset 1em 1em 2em -16px #333333;
   -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
-  box-shadow: inset 1em 1em 2em -16px #333333;
+  box-shadow: inset 0em 1em 2em -16px #333333;
 }
 /* hover state and selected are the same */
 #tab1 #bottom-tabs li.tab1 a, #tab2 #bottom-tabs li.tab2 a, #tab3 d#bottom-tabs li.tab3 a {
