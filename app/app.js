@@ -69,12 +69,6 @@ app.configure('production', function(){
 // ----------------
 // MongoDB Config
 // ----------------
-//var db = mongo.db(dbConfig.mongoDB + dbConfig.database_collection)
-//postDb = db.collection('post');
-//userDb = db.collection('user');
-//courseDb = db.collection('course');
-//categoryDb = db.collection('category');
-
 // Sample code to test database connection
 // TODO: Remove it when not needed
 var count = require('./models/count');
@@ -152,34 +146,8 @@ var wsdlurl = 'http://ideone.com/api/1/service.json';
 var io = require('socket.io').listen(app);
 io.set('log level', 0);
 io.sockets.on('connection', function (socket) {
-  // var hs = socket.handshake; 
-  //   hs.session.info = {IConnected:'And all I got was this lousy status message.'}
-  //   if (hs.session.newPost) {
-  //     newPost = hs.session.newPost;
-  //     delete hs.session.newPost;
-  //     socket.broadcast.emit('newPost', { title: newPost.title, _id: newPost._id });
-  //   }
-  //   hs.session.touch().save();
-  //   socket.on('new post', function (data) {
-  //     socket.broadcast.emit('newPost', { title: data });
-  //   });    
-
-//  chatProvider.findAll(function(error, lines) {
-//    for (var i in lines) {
-//      message = lines[i].line;
-//      var messageId = '';
-//      if (hs.session.user && hs.session.user.is_admin) {
-//        messageId = lines[i]._id;
-//      }
-//      socket.emit('repeat', { youSaid: message, messageId: messageId });
-//    }
-//  }); 
-//  socket.on('user message', function (data) {
-//    socket.broadcast.emit('repeat', { youSaid: data });
-//    chatProvider.save({line: data}); 
-//  });
   	socket.on('submitcode', function(data){
-		console.log(data);
+		log.info(data);
 		request(
 		    { method: 'GET'
 		    , uri: wsdlurl
@@ -199,7 +167,7 @@ io.sockets.on('connection', function (socket) {
 					}
 		    }
 		  , function (error, response, body) {
-				console.log(body);
+				log.info(body);
 		      	socket.emit('codesent', body);
 		    }
 		  )
@@ -223,7 +191,7 @@ io.sockets.on('connection', function (socket) {
 					}
 				},
 				function(error, response, body){
-					console.log(body);
+					log.info(body);
 					socket.emit('submissionStatus', body)           
 				}
 				)
@@ -251,7 +219,7 @@ io.sockets.on('connection', function (socket) {
 				}
 			},
 			function(error, response, body){
-				console.log(body);
+				log.info(body);
 				socket.emit('submissionDetails', body)           
 			}
 		)

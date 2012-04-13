@@ -1,7 +1,7 @@
 var path = require('path');
-var siteConfig, codeConfig, dbConfig, authConfig;
+var siteConfig, codeConfig, dbConfig, authConfig, adminConfig;
 
-console.log(path.resolve('./configLocal.js'));
+log.info(path.resolve('./configLocal.js'));
 
 if (path.existsSync('./configLocal.js')) {
   var config = require('../configLocal.js');
@@ -13,11 +13,13 @@ if (path.existsSync('./configLocal.js')) {
   dbConfig = config.getDBConfig();
   //authConfig = config.getAuthConfig();
   authConfig = config.getAuthConfigLocal();
+  adminConfig = config.getAdminConfig();
 
   log.info(siteConfig);
   log.info(codeConfig);
   log.info(dbConfig);
   log.info(authConfig);
+  log.info(adminConfig);
 }
 else {
   log.error('Please copy configDefault.js to configLocal.js and replace applicable values.');
@@ -28,5 +30,6 @@ module.exports = {
   site: siteConfig,
   code: codeConfig,
   db: dbConfig,
-  auth: authConfig
+  auth: authConfig,
+  admin: adminConfig
 }
