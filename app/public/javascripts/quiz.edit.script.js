@@ -9,7 +9,7 @@ $(function(){
 	
 		maxfiles: 5,
 		maxfilesize: 2,
-		url: '/quiz/edit',
+		url: '/quiz/upload',
 	
 		uploadFinished:function(i,file,res){
 			var f = $.data(file);
@@ -219,7 +219,12 @@ $(function(){
 					    "left": "567px"
 					}]},
 		modify: true,
-		initialize: false
+		initialize: false,
+		onSave: function(widget){
+			console.log(widget);
+			var data = JSON.stringify(widget.options.moreInfos);
+			$.post("/quiz/save", {'layout': data }, function(){ alert("Save success") })
+		}
 	});
 
 

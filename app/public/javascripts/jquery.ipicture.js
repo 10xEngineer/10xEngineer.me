@@ -332,7 +332,7 @@
 				};
 		
 		$('#'+self.element.attr('id')+' .save').on('click', function() {
-			save();
+			save(self);
 		});
 	},
 	

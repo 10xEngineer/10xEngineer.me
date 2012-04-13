@@ -448,7 +448,7 @@ module.exports = function (app) {
   });
 
 	// Temporary course import using json file upload
-  app.post('/quiz/edit', function(req, res, next) {
+  app.post('/quiz/upload', function(req, res, next) {
 		try {
 			var msg = '';
 
@@ -500,6 +500,15 @@ module.exports = function (app) {
 		}
 
   });
+
+	app.post('/quiz/save', function(req, res, next) {
+		
+		//TODO: implement the save logic there
+		
+		res.send(JSON.stringify({'status': "OK", 'message': "Quiz Saved" }))
+		
+	})
+
 
   app.get('/quiz/:id/:unit/:lesson', function(req, res){
     res.render('quiz', {
