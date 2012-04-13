@@ -153,9 +153,11 @@ module.exports.updateUserBySource = function (dbUser, source, srcUser, promise) 
 };
 
 module.exports.findOrCreateRegisteredCourse = function(user, course_id) {		
+	//initialize the registered course.
 	if(!user.registered_courses)
 		user.registered_courses = {};
 	
+	//if the course hasn't been taken before, put it into the registered course under user.
 	if(!user.registered_courses[course_id]){
 		var setValue = {};
 		setValue["registered_courses."+course_id] = {};
@@ -169,7 +171,9 @@ module.exports.findOrCreateLesson = function(user, course_id, chapter_id, lesson
 	var course = this.findOrCreateRegisteredCourse(user, course_id);
 	var query = {};
 	query["registered_courses."+course_id+".chapters."+chapter_id+".lessons."+lesson_id] = {"$exists": true};
+	
 	var lesson_status;
+	//check if the lesson has been taken
 	try{
 		lesson_status = user.registered_courses[course_id].chapters[chapter_id].lessons[lesson_id];
 	}catch(e){
