@@ -1,15 +1,17 @@
 $(function(){
 
 	var dropbox = $('#dropbox'),
-		message = $('.message', dropbox);
-		delay = 500;
+			message = $('.message', dropbox),
+			delay = 500,
+			url = '/quiz/upload';
+			
 	dropbox.filedrop({
 		// The name of the $_FILES entry:
-		paramname:'files',
+		'paramname':'files',
 	
-		maxfiles: 5,
-		maxfilesize: 2,
-		url: '/quiz/upload',
+		'maxfiles': 5,
+		'maxfilesize': 2, //in MB
+		'url': url,
 	
 		uploadFinished:function(i,file,res){
 			var f = $.data(file);
@@ -25,10 +27,10 @@ $(function(){
 					showMessage('Your browser does not support HTML5 file uploads!');
 					break;
 				case 'TooManyFiles':
-					alert('Too many files! Please select 5 at most! (configurable)');
+					alert('Too many files! Please select **'+this.maxfiles+'** at most!');
 					break;
 				case 'FileTooLarge':
-					alert(file.name+' is too large! Please upload files up to 2mb (configurable).');
+					alert(file.name+' is too large! Please upload files up to **'+this.maxfilesize+'MB**');
 					break;
 				default:
 					break;
@@ -86,7 +88,7 @@ $(function(){
 			// e.target.result holds the DataURL which
 			// can be used as a source of the image:
 		
-			image.attr('src',e.target.result);
+			image.attr('src', e.target.result);
 		};
 	
 		// Reading the file as a DataURL. When finished,
@@ -107,6 +109,7 @@ $(function(){
 	}
 	
 	function callNext(res){
+		console.log(res)
 		$('a.nextstep').show();
 		
 	}
@@ -114,7 +117,7 @@ $(function(){
 });
 
 $(function(){
-
+	var url = "/quiz/save";
 	$( "#iPicture" ).iPicture({
 		animation: true,
 		animationBg: "bgblack",
@@ -223,7 +226,7 @@ $(function(){
 		onSave: function(widget){
 			console.log(widget);
 			var data = JSON.stringify(widget.options.moreInfos);
-			$.post("/quiz/save", {'layout': data }, function(){ alert("Save success") })
+			$.post(url, {'layout': data }, function(){ alert("Save success") })
 		}
 	});
 
