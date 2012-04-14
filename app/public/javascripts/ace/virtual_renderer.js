@@ -555,7 +555,7 @@ var VirtualRenderer = function(container, theme) {
         };
 
         // For debugging.
-        // console.log(JSON.stringify(this.layerConfig));
+        // log.info(JSON.stringify(this.layerConfig));
 
         this.$gutterLayer.element.style.marginTop = (-offset) + "px";
         this.content.style.marginTop = (-offset) + "px";

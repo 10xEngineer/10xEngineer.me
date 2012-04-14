@@ -98,7 +98,7 @@ module.exports = {
             "    var str = \"{ foo()\";",
             "    if (debug) {",
             "        // write str (a string) to the console",
-            "        console.log(str);",
+            "        log.info(str);",
             "    }",
             "    str += \" bar() }\";",
             "}"
@@ -120,7 +120,7 @@ module.exports = {
             "    var str = \"{ foo()\";",
             "    if (debug) {",
             "        // write str (a string) to the console",
-            "        console.log(str);",
+            "        log.info(str);",
             "    }",
             "    str += \" bar() }\";",
             "}"
@@ -141,7 +141,7 @@ module.exports = {
             "    var str = \"{ foo()\";",
             "    if (debug) {",
             "        // write str a string) to the console",
-            "        console.log(str);",
+            "        log.info(str);",
             "    ",
             "    str += \" bar() \";",
             "}"
@@ -380,7 +380,7 @@ module.exports = {
             line = lang.stringTrimRight(line);
             var tokens = EditSession.prototype.$getDisplayTokens(line);
             var splits = EditSession.prototype.$computeWrapSplits(tokens, wrapLimit, tabSize);
-            // console.log("String:", line, "Result:", splits, "Expected:", assertEqual);
+            // log.info("String:", line, "Result:", splits, "Expected:", assertEqual);
             assert.ok(splits.length == assertEqual.length);
             for (var i = 0; i < splits.length; i++) {
                 assert.ok(splits[i] == assertEqual[i]);

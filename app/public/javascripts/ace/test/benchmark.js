@@ -50,7 +50,7 @@ module.exports = {
     },
     
     tearDown : function() {
-        console.log("took: ", Date.now() - this.start + "ms");
+        log.info("took: ", Date.now() - this.start + "ms");
     },
     
     "test: document to screen position": function() {
@@ -62,7 +62,7 @@ module.exports = {
         for (var i=0; i<6000; i++)
             s.documentToScreenPosition(i, 0);
 
-        console.log(s.$rowCache.length);
+        log.info(s.$rowCache.length);
     },
     
     "test: screen to document position": function() {
@@ -74,7 +74,7 @@ module.exports = {
         for (var i=0; i<6000; i++)
             s.documentToScreenPosition(i, 0);
 
-        console.log(s.$rowCache.length);
+        log.info(s.$rowCache.length);
     }
 };
 

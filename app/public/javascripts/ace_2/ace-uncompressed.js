@@ -2666,7 +2666,7 @@ var decoders = {
     chrome: function(e) {
         var stack = e.stack;
         if (!stack) {
-            console.log(e);
+            log.info(e);
             return [];
         }
         return stack.replace(/^.*?\n/, '').
@@ -2681,7 +2681,7 @@ var decoders = {
     firefox: function(e) {
         var stack = e.stack;
         if (!stack) {
-            console.log(e);
+            log.info(e);
             return [];
         }
         // stack = stack.replace(/^.*?\n/, '');
@@ -8328,8 +8328,8 @@ var EditSession = function(text, mode) {
             try {
                 this.$worker = this.$mode.createWorker(this);
             } catch (e) {
-                console.log("Could not load worker");
-                console.log(e);
+                log.info("Could not load worker");
+                log.info(e);
                 this.$worker = null;
             }
         }
@@ -13603,7 +13603,7 @@ var VirtualRenderer = function(container, theme) {
         };
 
         // For debugging.
-        // console.log(JSON.stringify(this.layerConfig));
+        // log.info(JSON.stringify(this.layerConfig));
 
         this.$gutterLayer.element.style.marginTop = (-offset) + "px";
         this.content.style.marginTop = (-offset) + "px";

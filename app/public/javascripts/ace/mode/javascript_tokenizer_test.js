@@ -67,7 +67,7 @@ module.exports = {
     },
 
     "test: tokenize 'standard' functions" : function() {
-        var line = "string.charCodeAt(23); document.getElementById('test'); console.log('Here it is');";
+        var line = "string.charCodeAt(23); document.getElementById('test'); log.info('Here it is');";
 
         var tokens = this.tokenizer.getLineTokens(line, "start").tokens;
 
@@ -178,13 +178,13 @@ module.exports = {
     },
     
     "test skipping escaped chars": function() {
-        var line = "console.log('Meh\\nNeh');"
+        var line = "log.info('Meh\\nNeh');"
         var tokens = this.tokenizer.getLineTokens(line, "start").tokens;
 
         assert.equal(11, tokens.length);
         assert.equal("constant.language.escape", tokens[6].type);
         
-        line = "console.log('\\u1232Feh');";
+        line = "log.info('\\u1232Feh');";
         tokens = this.tokenizer.getLineTokens(line, "start").tokens;
 
         assert.equal(10, tokens.length);

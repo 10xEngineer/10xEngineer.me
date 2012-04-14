@@ -49,14 +49,14 @@ async.plugin({
     
     inspect: function() {
         return this.each(function(item, next) {
-            console.log(JSON.stringify(item))
+            log.info(JSON.stringify(item))
             next()
         })
     },
     
     print: function() {
         return this.each(function(item, next) {
-            console.log(item)
+            log.info(item)
             next()
         })
     }    

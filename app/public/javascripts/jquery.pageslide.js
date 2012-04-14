@@ -28,7 +28,7 @@
      */
     function _load( url, useIframe ) {
         // Are we loading an element from the page or a URL?
-		console.log(useIframe);
+		log.info(useIframe);
         if ( url.indexOf("#") === 0 ) {
 			//Here is a modified code, different from the original. By Kata
 			//if it is not an empty node, then assume it has been loaded before and preserve the states of the elements under.

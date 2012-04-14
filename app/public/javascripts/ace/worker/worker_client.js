@@ -74,14 +74,14 @@ var WorkerClient = function(topLevelNamespaces, packagedJs, mod, classname) {
 
     var _self = this;
     this.$worker.onerror = function(e) {
-        window.console && console.log && console.log(e);
+        window.console && log.info && log.info(e);
         throw e;
     };
     this.$worker.onmessage = function(e) {
         var msg = e.data;
         switch(msg.type) {
             case "log":
-                window.console && console.log && console.log(msg.data);
+                window.console && log.info && log.info(msg.data);
                 break;
 
             case "event":

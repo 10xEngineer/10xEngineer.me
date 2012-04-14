@@ -534,8 +534,8 @@ var EditSession = function(text, mode) {
             try {
                 this.$worker = this.$mode.createWorker(this);
             } catch (e) {
-                console.log("Could not load worker");
-                console.log(e);
+                log.info("Could not load worker");
+                log.info(e);
                 this.$worker = null;
             }
         }

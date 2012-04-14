@@ -20,7 +20,7 @@ oop.inherits(exports.TestGenerator, async.Generator)
     
     this.exec = function() {
         this.run().report().summary(function(err, passed) {
-            console.log("DONE")
+            log.info("DONE")
         })
     }
     
@@ -53,12 +53,12 @@ oop.inherits(exports.TestGenerator, async.Generator)
             var name = test.name
             if (test.suiteName)
                 name = test.suiteName + ": " + test.name
-            console.log(color + "[" + test.count + "/" + test.index + "] " + name + " " + (test.passed ? "OK" : "FAIL") + "\x1b[0m")
+            log.info(color + "[" + test.count + "/" + test.index + "] " + name + " " + (test.passed ? "OK" : "FAIL") + "\x1b[0m")
             if (!test.passed)                
                 if (test.err.stack)
-                    console.log(test.err.stack)
+                    log.info(test.err.stack)
                 else
-                    console.log(test.err)
+                    log.info(test.err)
                     
             next()
         })
@@ -74,13 +74,13 @@ oop.inherits(exports.TestGenerator, async.Generator)
             else
                 failed += 1
         }).end(function() {
-            console.log("")
-            console.log("Summary:")
-            console.log("")
-            console.log(                  "Total number of tests: " + (passed + failed))
-            passed && console.log("\x1b[32mPassed tests:          " + passed + "\x1b[0m")
-            failed && console.log("\x1b[31mFailed tests:          " + failed + "\x1b[0m")
-            console.log("")            
+            log.info("")
+            log.info("Summary:")
+            log.info("")
+            log.info(                  "Total number of tests: " + (passed + failed))
+            passed && log.info("\x1b[32mPassed tests:          " + passed + "\x1b[0m")
+            failed && log.info("\x1b[31mFailed tests:          " + failed + "\x1b[0m")
+            log.info("")            
             callback(null, failed == 0)
         })
     }

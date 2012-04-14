@@ -59,7 +59,7 @@ module.exports = {
     // TODO: disable. not yet implemented
     "!test tokenize string with interpolation": function() {
         var tokens = this.tokenizer.getLineTokens('"#{ 22 / 7 } is a decent approximation of π"', "start").tokens;
-        console.log(tokens);
+        log.info(tokens);
         assert.equal(tokens.length, 12);
         //assert.equal(tokens[0].type, "keyword");
     }

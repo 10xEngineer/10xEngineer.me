@@ -72,7 +72,7 @@ async.list(tests)
             console.error(err);
             msg += "<pre class='error'>" + err + "</pre>";
         } else {
-            console.log(msg);
+            log.info(msg);
         }
 
         node.innerHTML = msg;
@@ -96,9 +96,9 @@ async.list(tests)
             (passed ? "Passed tests: " + passed + "<br>" : ""),
             (failed ? "Failed tests: " + failed + "<br>" : "")
         ].join("")
-        console.log("Total number of tests: " + (passed + failed));
-        console.log("Passed tests: " + passed);
-        console.log("Failed tests: " + failed);
+        log.info("Total number of tests: " + (passed + failed));
+        log.info("Passed tests: " + passed);
+        log.info("Failed tests: " + failed);
     })
 
 });

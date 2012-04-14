@@ -52,7 +52,7 @@ module.exports = {
         var el = document.createElement("div");
         
         if (!el.getBoundingClientRect) {
-            console.log("Skipping test: This test only runs in the browser");
+            log.info("Skipping test: This test only runs in the browser");
             return;
         }
         

@@ -20,7 +20,7 @@ module.exports = {
 *\n\
 */\n\
 function hello (a, b, c) {\n\
-    console.log(a * b + c + 'sup?');\n\
+    log.info(a * b + c + 'sup?');\n\
 }";
         var mode = new JavaScriptMode();
         
@@ -29,7 +29,7 @@ function hello (a, b, c) {\n\
             result = highlighter.render(snippet, mode, theme);
         }
         catch (e) {
-            console.log(e);
+            log.info(e);
             isError = true;
         }
         // todo: write something more meaningful
@@ -44,7 +44,7 @@ function hello (a, b, c) {\n\
 *\n\
 */\n\
 function hello (a, b, c) {\n\
-    console.log(a * b + c + 'sup?');\n\
+    log.info(a * b + c + 'sup?');\n\
 }";
         var mode = new JavaScriptMode();
         
@@ -62,7 +62,7 @@ function hello (a, b, c) {\n\
 *\n\
 */\n\
 function hello (a, b, c) {\n\
-    console.log(a * b + c + 'sup?');\n\
+    log.info(a * b + c + 'sup?');\n\
 }";
         var mode = new JavaScriptMode();
         

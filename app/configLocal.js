@@ -20,7 +20,7 @@ exports.getDBConfig = function() {
 exports.getMailConfig = function () {
   configValues =  {
     host: 'smtp.gmail.com',
-    username: 'steve.g.messina@gmail.com',
+    username: '10xengineer@gmail.com',
     password: 'password'
   }
 

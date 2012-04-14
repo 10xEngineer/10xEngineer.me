@@ -1393,7 +1393,7 @@ function CliView(cli, env) {
     // TODO: we should have a better way to specify command lines???
     this.element = this.doc.getElementById('cockpitInput');
     if (!this.element) {
-        // console.log('No element with an id of cockpit. Bailing on cli');
+        // log.info('No element with an id of cockpit. Bailing on cli');
         return;
     }
 
@@ -2288,7 +2288,7 @@ Templater.prototype.handleError = function(message, ex) {
  * @param message the error message to report.
  */
 Templater.prototype.logError = function(message) {
-  window.console && window.console.log && console.log(message);
+  window.console && window.log.info && log.info(message);
 };
 
 exports.Templater = Templater;

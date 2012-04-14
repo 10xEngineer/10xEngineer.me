@@ -60,8 +60,8 @@ oop.inherits(JavaScriptWorker, Mirror);
         try {
             parser.parse(value);
         } catch(e) {
-//            console.log("narcissus")
-//            console.log(e);
+//            log.info("narcissus")
+//            log.info(e);
             var chunks = e.message.split(":")
             var message = chunks.pop().trim();
             var lineNumber = parseInt(chunks.pop().trim()) - 1;
@@ -73,14 +73,14 @@ oop.inherits(JavaScriptWorker, Mirror);
             });
             return;
         } finally {
-//            console.log("parse time: " + (new Date() - start));
+//            log.info("parse time: " + (new Date() - start));
         }
         
 //        var start = new Date();
-//        console.log("jslint")
+//        log.info("jslint")
         lint(value, {undef: false, onevar: false, passfail: false});
         this.sender.emit("jslint", lint.errors);        
-//        console.log("lint time: " + (new Date() - start));
+//        log.info("lint time: " + (new Date() - start));
     }
     
 }).call(JavaScriptWorker.prototype);
