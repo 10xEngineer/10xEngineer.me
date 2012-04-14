@@ -6,6 +6,8 @@ var sessionStore = new RedisStore();
 var log4js = require('log4js');
 log = log4js.getLogger('app');
 
+appRoot = __dirname;
+
 // Prototype Utilities
 require('./utils/prototypeUtils');
 
@@ -36,7 +38,7 @@ var app = module.exports = express.createServer();
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.use(express.bodyParser({uploadDir: __dirname + '/upload'}));
+  app.use(express.bodyParser({uploadDir: __dirname + '/upload', keepExtensions: true }));
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({

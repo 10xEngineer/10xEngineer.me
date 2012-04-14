@@ -34,4 +34,5 @@ nbproject
 .idea
 node_modules
 app/node_modules
-upload/*
+app/upload/*
+app/public/quiz/*

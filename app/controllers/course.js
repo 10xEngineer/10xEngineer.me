@@ -2,6 +2,7 @@ var mongo = require('mongoskin');
 var bcrypt = require('bcrypt'); 
 var request = require('request');
 var fs = require('fs');
+var path = require('path')
 
 // Load models
 var course = require('../models/course');
@@ -363,7 +364,7 @@ module.exports = function (app) {
       if(unit.video && unit.videoType) {
         renderParams['video'] = unit.video;
         renderParams['videoType'] = unit.videoType;
-		renderParams['unit_id'] = req.params.unit;
+				renderParams['unit_id'] = req.params.unit;
       }
       log.trace('unit: '+req.params.unit);
       res.render('courses/course', renderParams);
@@ -398,11 +399,11 @@ module.exports = function (app) {
       if(lesson.video && lesson.videoType) {
         renderParams['video'] = lesson.video;
         renderParams['videoType'] = lesson.videoType;
-		renderParams['unit_id'] = req.params.unit;
-		renderParams['lesson_id'] = req.params.lesson;
+				renderParams['unit_id'] = req.params.unit;
+				renderParams['lesson_id'] = req.params.lesson;
       }
       log.trace('unit: '+req.params.unit);
-	  log.trace('lesson: '+req.params.lesson);
+	  	log.trace('lesson: '+req.params.lesson);
       res.render('courses/course', renderParams);
     }
   });
@@ -453,6 +454,81 @@ module.exports = function (app) {
     });
   });
 */
+
+	// Need to add back :id/:unit/:lesson
+	app.get('/quiz/edit', function(req, res){
+    res.render('quiz_editor', {
+		loggedInUser: req.user,
+		message: '',
+//		course: req.params.id,
+//		unit_id: req.params.unit,
+//		lesson_id: req.params.lesson		
+    });
+  });
+
+	// Temporary course import using json file upload
+  app.post('/quiz/upload', function(req, res, next) {
+		try {
+			var msg = '';
+
+	    var f = req.files['files'];
+	
+	    log.info('[Quiz] Uploaded %s -> %s', f.filename, f.path);
+	
+	
+			var tmp_path = f.path;
+			var new_name = path.basename(f.path);
+			var public_path = 'quiz/' + new_name;
+			var target_path = appRoot+'/public/' + public_path;
+
+			var src = '/'+public_path;
+			
+			log.info('[Quiz] Copying %s -> %s', tmp_path, target_path);
+			fs.renameSync(tmp_path, target_path);
+			fs.unlink(tmp_path); //Don't use unlinkSync there, it will throw ENOENT as always
+			res.send(JSON.stringify({'status': "success", 'message': msg, 'src': src}));
+			/*
+			, function(err) {
+
+			  if(err){
+					msg = "Error occur in file system (Relocation)";
+					console.log("Upload Error:", msg, err)
+					res.send(JSON.stringify({'status': "error", 'message': msg }))
+					throw err;
+				} 
+
+			  // delete the temporary file
+
+			  fs.unlink(tmp_path, function(err) {
+
+			    if(err){
+						msg = "Error occur in file system (Clearing)";
+						console.log("Upload Error:", msg, err);
+						res.send(JSON.stringify({'status': "error", 'message': msg }))
+						throw err;
+					}
+
+			    msg = 'File uploaded, Size: '+ f.size + ' bytes';
+			    res.send(JSON.stringify({'status': "success", 'message': msg, 'src': src}));
+
+			  });
+
+			});*/
+		} catch (e) {
+			console.log("[Quiz] Error in Quiz upload", e)
+			 res.send(JSON.stringify({'status': "error", 'message': e.message }))
+		}
+
+  });
+
+	app.post('/quiz/save', function(req, res, next) {
+		
+		//TODO: implement the save logic there
+		
+		res.send(JSON.stringify({'status': "OK", 'message': "Quiz Saved" }))
+		
+	})
+
 
   app.get('/quiz/:id/:unit/:lesson', function(req, res){
     res.render('quiz', {
