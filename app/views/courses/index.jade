@@ -7,11 +7,10 @@
 				a(href='/courses/create').btn.btn-large.btn-primary.pull-left Add Course
 				a(href='/courses/import').btn.btn-large.btn-inverse.pull-right Import a course
 		.span1
-	.row-fluid
-		.span1
-		.span10
+	#carousel.row
+		.span10.offset1
 			.carousel#course-carousel.slide.hidden-phone
-					ul.carousel-inner.style(width: '100%', height: '600px')
+					ul.carousel-inner(style="width:100%; height:600px")
 						each course, code in courses
 							li.item.ribbon-wrapper
 								- if (registered_courses != undefined && registered_courses[course._id] && user != undefined)
@@ -21,7 +20,7 @@
 										- else
 											.ribbon-green(style='color: yellow;') IN PROGRESS
 								a(href='/courses/#{course._id}/1')
-									img.responsive(src="#{course.image}", height='80%', width='100%')
+									img.responsive(src="#{course.image}", style="height:400px; width:100%")
 								.carousel-caption
 									h3 #{course.title}
 									p Taught by Steve M.
@@ -35,18 +34,41 @@
 					a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
 					a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
 		.span1
+	#grid.row-fluid(style='display:none')
+		ul.thumbnails
+			each course, code in courses
+				li.span3.well
+					.ribbon-wrapper
+						- if (registered_courses != undefined && registered_courses[course._id] && user != undefined)
+							.ribbon-wrapper-green
+								- if(registered_courses[course._id].status == 'COMPLETED')
+									.ribbon-green COMPLETED
+								- else
+									.ribbon-green(style='color: yellow;') IN PROGRESS
+					a.thumbnail(href="/courses/#{course._id}/1")
+						img(src="#{course.image}")
+					p
+						#{course.content}
 	.row-fluid.span8
-		a.button(href='#')
+		a#show_grid.button(href='#')
 			i.icon-th-large 
 			span  Grid
 		span
 		| 
-		a.button(href='#')
+		a#show_carousel.button(href='#')
 			i.icon-retweet
 			span  Carousel
 
 	script(type='text/javascript')
 		function init() {
 			$('.item').first().addClass("active");
-			$('.carousel').carousel({ interval: 3000, pause:"hover"});
+			$('.carousel').carousel(/*{ interval: 3000, pause:"hover"}*/);
+			$('#show_grid').click(function(e){
+				$('#grid').show(500);
+				$('#carousel').hide();
+			});
+			$('#show_carousel').click(function(e){
+				$('#carousel').show(500);
+				$('#grid').hide();
+			})
 		}

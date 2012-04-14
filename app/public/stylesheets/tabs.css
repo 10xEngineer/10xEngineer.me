@@ -78,18 +78,18 @@
 }
 
 #bottom-tabs li.tab1 a:not(.selected) {
-  -moz-box-shadow: inset 1em 1em 2em -16px #333333;
-  -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
+  -moz-box-shadow: inset 0em 1em 2em -16px #333333;
+  -webkit-box-shadow: inset 0em 1em 2em -16px #333333;
   box-shadow: inset 0em 1em 2em -16px #333333;
 }
 #bottom-tabs li.tab2 a:not(.selected) {
-  -moz-box-shadow: inset 1em 1em 2em -16px #333333;
-  -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
+  -moz-box-shadow: inset 0em 1em 2em -16px #333333;
+  -webkit-box-shadow: inset 0em 1em 2em -16px #333333;
   box-shadow: inset 0em 1em 2em -16px #333333;
 }
 #bottom-tabs li.tab3 a:not(.selected) {
-  -moz-box-shadow: inset 1em 1em 2em -16px #333333;
-  -webkit-box-shadow: inset 1em 1em 2em -16px #333333;
+  -moz-box-shadow: inset 0em 1em 2em -16px #333333;
+  -webkit-box-shadow: inset 0em 1em 2em -16px #333333;
   box-shadow: inset 0em 1em 2em -16px #333333;
 }
 /* hover state and selected are the same */
