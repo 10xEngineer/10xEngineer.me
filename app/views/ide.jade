@@ -131,7 +131,7 @@ include /courses/_header
 						#source-editor 
 							.controls
 									input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')
-									#editor(style='position:relative;width:100%;height:400px;resize:both')
+									#editor(style='position:relative;width:100%;height:400px;resize:vertical')
 							.form-actions
 								span.danger
 									a.button.btn.btn-danger CLEAR
@@ -203,9 +203,6 @@ include /courses/_header
 
 		function init() {
 			editor = ace.edit('editor');
-			$(window).resize(function(){
-				editor.resize();
-			})
 			$(".open").pageslide({direction: "right", modal: true, iframe:false});
 
 			if( $('editor') ) {
