@@ -6,6 +6,8 @@ var sessionStore = new RedisStore();
 var log4js = require('log4js');
 log = log4js.getLogger('app');
 
+appRoot = __dirname;
+
 // Prototype Utilities
 require('./utils/prototypeUtils');
 

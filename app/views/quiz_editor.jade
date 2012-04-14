@@ -98,6 +98,10 @@ style
 	}
 	#iPicture-inner { }
 	.picture-frame input { padding:0; }
+	.quiz-pane { position: relative; }
+	.quiz-bg { overflow: hidden; }
+	.quiz-bg, .quiz-wrapper { position: absolute; top:0; left:0 }
+	.quiz { width: auto; height: 500px; }
 	.buttonSave { 
 		-webkit-box-sizing: border-box; 
 		-moz-box-sizing: border-box;
@@ -142,8 +146,6 @@ style
 				- var quiz = {	question: { src: "", width: 898, height: 500 }, answers:[{ val: "A", x: 92, y:140 }, { val:"B", x: 92, y:166}, { val:"C", x: 92, y:190}, { val:"D", x: 92, y:215}]	}
 				#show
 					#iPicture.picture-frame
-							.slide.quiz-pane
-								#picture1.quiz-bg(style="background: url('/quiz/2/quiz-1.jpg') no-repeat scroll 0 0 #393737; width: 900px; height: 500px;position:relative")
 	
 
 	//- should have a footer & sidebar
