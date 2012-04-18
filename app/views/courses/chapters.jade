@@ -18,10 +18,10 @@ include _header
   .row-fluid
     ul.chapters
       - if(typeof(course.chapters) != 'undefined')
-        each chapter, i in course.chapters
+        each chapter in course.chapters
           - if(chapter.status == 'published' || (user != undefined && user.role == 'admin'))
             li.chapter
-              a(href='/courses/#{course._id}/#{i+1}/')
+              a(href='/chapters/#{chapter.id}/')
                 h3
                   #{chapter.title}
               - if(user != undefined && user.role == 'admin')
@@ -32,6 +32,6 @@ include _header
                   a.btn.btn-success.pull-right(href='/chapters/#{chapter.id}/publish', style='margin-right: 5px;') Publish
                 - else
                   a.btn.btn-success.pull-right(href='/chapters/#{chapter.id}/unpublish', style='margin-right: 5px;') Unpublish
-                button.btn.pull-right(type='button', style='margin-right: 5px;') Edit
+                a.btn.pull-right(href='/chapters/#{chapter.id}/edit', style='margin-right: 5px;') Edit
               .progress(style='margin: 10px 0;')
                 .bar(style="width: 0%;")

@@ -38,6 +38,32 @@ module.exports = function (app) {
     });
   });
 
+  // Load a chapter
+  app.get('/chapters/:id', function(req, res) {
+    var chapterId = parseInt(req.params.id);
+
+    chapter.findById(chapterId, function(error, chapter) {
+      if(error) {
+        log.error(error);
+      }
+
+      res.render('chapters', {
+        title: chapter.title,
+        chapter: chapter
+      });
+    });
+  });
+
+  // Display create lesson page
+  app.get('/chapters/:id/create_lesson', function(req, res) {
+    var chapterId = parseInt(req.params.id);
+
+    res.render('chapters/lesson_create', {
+      title: chapter.title,
+      lesson: {title: '', description: ''}
+    });
+  });
+
   // Remove a chapter
   app.get('/chapters/:id/remove', function(req, res) {
     var chapterId = parseInt(req.params.id);
