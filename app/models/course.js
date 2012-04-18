@@ -54,3 +54,90 @@ module.exports.createNew = function (course, callback) {
 module.exports.removeById = function(id, callback) {
   this.remove({_id: parseInt(id)}, {}, callback);
 };
+
+module.exports.addChapter = function(chapter, callback) {
+  var self = this;
+
+  self.findById(chapter.course, function(error, course) {
+    if(error) {
+      callback(error);
+    }
+
+    if(typeof(course.chapters) != 'object') {
+      course.chapters = [];
+    }
+
+    course.chapters.push({
+      id: chapter._id,
+      title: chapter.title,
+      status: chapter.status
+    });
+
+    self.save(course, function(error) {
+      if(error) {
+        callback(error);
+      }
+
+      callback();
+    });
+  });
+};
+
+module.exports.updateChapter = function(chapter, callback) {
+  var self = this;
+
+  self.findById(chapter.course, function(error, course) {
+    if(error) {
+      callback(error);
+    }
+
+    for(var index in course.chapters) {
+      var dbChapter = course.chapters[index];
+      if(dbChapter.id === chapter._id) {
+        dbChapter['title'] = chapter.title;
+        dbChapter['status'] = chapter.status;
+
+        course.chapters[index] = dbChapter;
+        break;
+      }
+    }
+
+    log.info(course);
+    self.save(course, function(error) {
+      if(error) {
+        callback(error);
+      }
+
+      callback();
+    });
+  });
+};
+
+module.exports.removeChapter = function(chapter, callback) {
+  var self = this;
+
+  self.findById(chapter.course, function(error, course) {
+    if(error) {
+      callback(error);
+    }
+
+    for(var index in course.chapters) {
+      var dbChapter = course.chapters[index];
+      if(dbChapter.id === chapter._id) {
+        
+        course.chapters.splice(index - 1, 1);
+        break;
+      }
+    }
+
+    log.info(course);
+    self.save(course, function(error) {
+      if(error) {
+        callback(error);
+      }
+
+      callback();
+    });
+  });
+};
+
