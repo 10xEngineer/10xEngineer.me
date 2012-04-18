@@ -141,6 +141,7 @@ app.get('/auth', function(req, res){
 // Controllers
 require('./controllers/course')(app);
 require('./controllers/admin')(app);
+require('./controllers/chapter')(app);
 
 
 // Startup
