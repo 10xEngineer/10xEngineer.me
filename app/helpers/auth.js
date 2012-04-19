@@ -4,8 +4,18 @@ var user = require('../models/user');
 // TODO: Debug flag. Turn off for production use.
 everyauth.debug = true;
 
-module.exports = function (config) {
 
+module.exports = function (config) {
+  var redirectAction = function(res, data){
+    var session = data.session;
+	var redirectTo = session.redirectTo;
+	delete session.redirectTo;
+	if(redirectTo)
+		res.redirect(redirectTo);
+	else
+		res.redirect('/');
+  };
+	
   // Google
   everyauth.google
     .appId(config.google.clientId)
@@ -22,7 +32,7 @@ module.exports = function (config) {
 
       return promise;
     })
-    .redirectPath('/');
+    .sendResponse(redirectAction);
 
   // Twitter
   everyauth.twitter
@@ -37,7 +47,7 @@ module.exports = function (config) {
 
       return promise;
     })
-    .redirectPath('/');
+    .redirectPath(redirectAction);
 
   // Facebook
   everyauth.facebook
@@ -53,7 +63,7 @@ module.exports = function (config) {
 
       return promise;
     })
-    .redirectPath('/');
+    .redirectPath(redirectAction);
 
   // To inject user object through express middleware
   everyauth.everymodule.findUserById( function (userId, callback) {
