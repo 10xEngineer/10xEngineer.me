@@ -152,19 +152,29 @@ var loadCategories = function (req, res, next) {
   });
 }
 
+var validUser = function(req, res, next) { 
+	if(req.user == undefined && req.url != '/courses'){
+		req.session.redirectTo = req.url;
+		res.redirect('/auth');
+		return;
+	}
+	
+	next();
+}
 
 // ------------
 // Routes
 // ------------
 module.exports = function (app) {
-
+  //filter for checking if the users have login
+  app.all('/courses/:op?/*',validUser, function(req, res, next){
+	next();
+  });
   // List existing courses
   app.get('/courses', loadCategories, function(req, res){
 	var registered_courses = [];
 	if( typeof(req.user) != 'undefined' && typeof(req.user.registered_courses) != 'undefined')
 		registered_courses = req.user.registered_courses;
-	log.info('user = ', req.user);
-	log.info('registered courses = ', registered_courses);
     course.get({
       category: req.param.category
     }, function(error, courses){
