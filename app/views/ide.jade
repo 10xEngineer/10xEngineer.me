@@ -6,6 +6,7 @@ include /courses/_header
 
 .container-fluid
 	link(rel="stylesheet", href="/stylesheets/ribbon.css")
+	link(rel="stylesheet", href="/stylesheets/jquery-ui-lightness/jquery-ui-1.8.19.custom.css")
 	style(type="text/css")
 		#pageslide select{
 			width:120px;
@@ -131,7 +132,7 @@ include /courses/_header
 						#source-editor 
 							.controls
 									input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')
-									#editor(style='position:relative;width:100%;height:400px;resize:vertical')
+									#editor(style='position:relative;width:100%;height:400px;')
 							.form-actions
 								span.danger
 									a.button.btn.btn-danger CLEAR
@@ -154,6 +155,7 @@ include /courses/_header
 
 	script(type='text/javascript', src='/javascripts/ace/ace.js')
 	script(type='text/javascript', src='/socket.io/socket.io.js')
+	script(type='text/javascript', src='/javascripts/jquery-ui/jquery-ui-1.8.19.custom.min.js')
 	script(type='text/javascript')
 		var socket=io.connect();
 		var editor;
@@ -204,6 +206,12 @@ include /courses/_header
 		function init() {
 			editor = ace.edit('editor');
 			$(".open").pageslide({direction: "right", modal: true, iframe:false});
+
+			$('#editor').resizable({
+				resize: function(event, ui){
+					editor.resize();
+				}
+			})
 
 			if( $('editor') ) {
 				//binding the setting panel events
