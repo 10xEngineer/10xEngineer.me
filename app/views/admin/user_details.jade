@@ -40,7 +40,7 @@
 									input(type="checkbox", name='read', checked)
 								- else
 									input(type="checkbox", name='read')
-							td.write
+							td.edit
 								- if(ability.can(usr.abilities,"edit",'courses',key))
 									input(type='checkbox', name='edit', checked)
 								-else
@@ -63,7 +63,7 @@
 						input.span1(type="text")
 					td.read
 							input(type="checkbox", name='read')
-					td.write
+					td.edit
 							input(type='checkbox', name='edit')
 					td.delete
 							input(type='checkbox', name='delete')
@@ -76,7 +76,7 @@ script(type='text/javascript')
 				courseAbilities[courseId] = [];
 				if($(value).find('td.read input').is(':checked'))
 					courseAbilities[courseId].push('read');
-				if($(value).find('td.write input').is(':checked'))
+				if($(value).find('td.edit input').is(':checked'))
 					courseAbilities[courseId].push('edit');
 				if($(value).find('td.delete input').is(':checked'))
 					courseAbilities[courseId].push('delete');
