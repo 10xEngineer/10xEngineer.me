@@ -99,7 +99,8 @@ module.exports.createNew = function (user, source, callback) {
         _id: id,
         id: id,
         created_at: now.getTime(),
-        modified_at: now.getTime()
+        modified_at: now.getTime(),
+				abilities: {}
       };
 
       if(source === 'twitter') {
@@ -113,14 +114,16 @@ module.exports.createNew = function (user, source, callback) {
       } else if(source === 'email') {
         userObj['email'] = user.email;
       }
-	
-	  // check against the default site admin list from console
-	  if( config.admin[source] == user.name || config.admin[source] == user.email ) {
-	    log.info('New user is an admin: ', config.admin[source]);
-		userObj['role'] = 'admin';
-	  } 
+	    
+	  	// check against the default site admin list from console
+		  if( config.admin[source] == user.name || config.admin[source] == user.email ) {
+		    log.info('New user is an admin: ', config.admin[source]);
+				//going to be deprecated
+				userObj['role'] = 'admin';
+				userObj.abilities.role = 'admin';
+		  } 
       userObj[source] = user;
-
+      
       self.insert(userObj);
       callback(null, userObj);
     });
