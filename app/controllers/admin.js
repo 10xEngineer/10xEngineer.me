@@ -31,7 +31,9 @@ module.exports = function(app){
 			else{
 				user.email = req.body.email;
 				user.name = req.body.name;
-				user.role = req.body.role;
+				if(user.abilities == undefined || user.abilities == null)
+					user.abilities = {};
+				user.abilities.role = req.body.role;
 				user.abilities.courses = {}; 
 				_.each(req.body.abilities, function(value, key){
 					user.abilities.courses[key] = value;
