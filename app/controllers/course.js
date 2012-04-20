@@ -264,7 +264,7 @@ module.exports = function (app) {
     }
   });
 
-  app.get('/courses/:id/edit', validCoursePermission('courses', 'edit'), loadCategories, loadCourse, function(req, res, next){
+  app.get('/courses/:id/edit', validCoursePermission('courses', 'edit'), loadCourse, function(req, res, next){
     if (!req.course) {
       res.redirect('/courses/');
     } else {
