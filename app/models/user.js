@@ -17,7 +17,6 @@ module.exports.findById = function(id, callback) {
   });
 };
 
-
 module.exports.findByEmail = function(email, callback) {
 
   this.findOne({email: email}, function(error, dbUser) {
@@ -151,6 +150,14 @@ module.exports.updateUserBySource = function (dbUser, source, srcUser, promise) 
     });
   }
 };
+
+module.exports.updateUser = function(dbUser, callback){
+	this.save(dbUser, {}, function(error){
+		if(error)
+			log.error(error);
+		callback(error, dbUser);
+	})
+}
 
 module.exports.findOrCreateRegisteredCourse = function(user, course_id) {		
 	//initialize the registered course.
