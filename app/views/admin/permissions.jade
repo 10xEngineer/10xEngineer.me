@@ -1,0 +1,19 @@
+script(type='text/javascript', src='/javascripts/jquery-1.7.1.min.js')				
+script(type='text/javascript', src='/javascripts/jstree/dist/jstree.min.js')
+#permission_tree
+	ul
+		li
+			a
+				|row1
+		li
+			a
+				|row2
+		li
+			a
+				|row3
+
+script(type='text/javascript')
+	$(document).ready(function(){
+		$('#permission_tree').jstree({"plugins":["html_data","themes"]});
+	})
+

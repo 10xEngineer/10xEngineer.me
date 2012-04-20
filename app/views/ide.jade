@@ -135,7 +135,7 @@ include /courses/_header
 									#editor(style='position:relative;width:100%;height:400px;')
 							.form-actions
 								span.danger
-									a.button.btn.btn-danger CLEAR
+									a#clear.button.btn.btn-danger CLEAR
 								span.pull-right
 									a.button.btn.btn-submit SUBMIT
 			.row-fluid
@@ -178,7 +178,6 @@ include /courses/_header
 		var modes = {};
 		function loadMode(name){
 			//check if the language source files have been loaded before
-			log.info(modes);
 			if(modes[name]) {
 				editor.getSession().setMode(new modes[name]);
 				return;
@@ -205,6 +204,8 @@ include /courses/_header
 
 		function init() {
 			editor = ace.edit('editor');
+			var undoManager = require('ace/undomanager').UndoManager;
+			editor.getSession().setUndoManager(new undoManager())
 			$(".open").pageslide({direction: "right", modal: true, iframe:false});
 
 			$('#editor').resizable({
@@ -272,6 +273,10 @@ include /courses/_header
 				loadTheme("textmate");	  
 				loadMode("javascript");
 			}
+
+			$('a#clear').click(function(e){
+				console.log(editor.getSession().getUndoManager());
+			})
 		}
 
 		//Submit the code to be created on IDEONE compiler
@@ -288,10 +293,8 @@ include /courses/_header
 			var languageCode = $('#pageslide #mode').val();
 			if(!languageCode){
 				languageCode = $('#mode').val();
-				log.info('test');
 			}
 			var data = {'source':sourceCode, 'language':languages[languageCode]};
-			log.info('submitSourceCode: ', data);
 			socket.emit('submitcode', data);
 
 			
@@ -300,7 +303,6 @@ include /courses/_header
 		var linkCode;
 		socket.on('codesent', function(data){
 			linkCode = data.result.link;
-			log.info('getting link code: ', linkCode);
 			setTimeout(function(){
 				socket.emit('getSubmissionStatus', {linkCode:linkCode});
 			}, 1000);
@@ -309,12 +311,10 @@ include /courses/_header
 		
 		socket.on('submissionStatus', function(data){
 			if(data.result.status == 0){
-				log.info('still waiting...');
 				socket.emit('getSubmissionDetails', {linkCode:linkCode});
 				
 			}
 			else {
-				log.info('Done..getSubmissionStatus next.. ');
 				socket.emit('getSubmissionStatus', {linkCode:linkCode});
 			}
 			});
@@ -332,14 +332,12 @@ include /courses/_header
 		}
 
 		socket.on('submissionDetails', function(data){
-				log.info('gotSubmissionDetails: ', data.result);
 				var res = $('#compile_result');
 				var out = $('#compile_output');
 				out.removeClass('alert').removeClass('alert-info').removeClass('alert-error').show();
 				res.removeClass('alert').removeClass('alert-warning').removeClass('alert-success');
 
 				if(typeof data.result.output != 'undefined' && data.result.result == 15) {
-					log.info('success: ', data.result.output);
 					res.addClass('alert').addClass('alert-success');
 					res.text("COMPILED OK\\n");
 					out.addClass('alert').addClass('alert-info');
@@ -347,7 +345,6 @@ include /courses/_header
 				}
 				else
 				if(typeof data.result.stderr != 'undefined' && data.result.stderr != "" || data.result.result != 15) {
-					log.info('error: ', data.result.result);
 					res.addClass('alert').addClass('alert-warning');
 					res.text(errors[data.result.result]);
 					out.addClass('alert').addClass('alert-error');

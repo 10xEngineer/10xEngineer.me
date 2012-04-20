@@ -9,6 +9,9 @@ var course = require('../models/course');
 var user = require('../models/user');
 var category = require('../models/category');
 
+// Load Helpers
+var ability = require('../helpers/ability');
+
 
 // ---------------------
 // Middleware
@@ -163,14 +166,26 @@ var validUser = function(req, res, next) {
 	next();
 }
 
+var validCoursePermission = function(target, action){
+	return function(req, res, next){
+		if(!ability.can(req.user.abilities, action, target, req.params.id)){
+			res.write('content is not accessible for your account.');
+			res.end();
+			return;
+		}
+		next();
+	}
+}
+
 // ------------
 // Routes
 // ------------
 module.exports = function (app) {
   //filter for checking if the users have login
-  app.all('/courses/:op?/*',validUser, function(req, res, next){
-	next();
+  app.all('/courses/:op?/*', validUser, function(req, res, next){
+		next();
   });
+
   // List existing courses
   app.get('/courses', loadCategories, function(req, res){
 	var registered_courses = [];
@@ -297,7 +312,7 @@ module.exports = function (app) {
     });
   });
 
-  app.get('/courses/:id', loadCourse, function(req, res){
+  app.get('/courses/:id', validCoursePermission('courses', 'read'), loadCourse, function(req, res){
     if (!req.course) {
       res.redirect('/courses/');
     } else {
@@ -322,7 +337,7 @@ module.exports = function (app) {
     }
   });
 
-  app.get('/courses/:id/edit', loadCategories, loadCourse, function(req, res, next){
+  app.get('/courses/:id/edit', validCoursePermission('courses', 'edit'), loadCategories, loadCourse, function(req, res, next){
     if (req.course && (req.user.role === 'admin' || req.user._id === req.course.created_by)) {
       res.render('courses/edit', {
         title: 'Course ' + req.course.title,
@@ -334,7 +349,7 @@ module.exports = function (app) {
     }
   });
 
-  app.get('/courses/:id/remove', loadCourse, function(req, res, next){
+  app.get('/courses/:id/remove', validCoursePermission('courses', 'delete'), loadCourse, function(req, res, next){
     if (!req.course || req.params.id === 'null') {
       res.redirect('/courses');
     }
@@ -354,7 +369,7 @@ module.exports = function (app) {
     }*/
   });
 
-  app.get('/courses/:id/:unit', loadCourse, function(req, res){
+  app.get('/courses/:id/:unit', validCoursePermission('courses', 'read'), loadCourse, function(req, res){
     if (!req.course) {
       res.redirect('/courses/');
     } else if (!req.unit) {
@@ -381,7 +396,7 @@ module.exports = function (app) {
     }
   });
 
-  app.get('/courses/:id/:unit/:lesson', loadCourse, function(req, res){
+  app.get('/courses/:id/:unit/:lesson', validCoursePermission('courses', 'read'), loadCourse, function(req, res){
 	req.course = req.params.id;
 	req.unit = req.params.unit;
 	req.lesson = req.params.lesson;
