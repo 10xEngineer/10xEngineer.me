@@ -17,28 +17,24 @@ var ability = require('../helpers/ability');
 var validateCourseData = function (req, callback) {
   errors = [];
   data = {};
-  
-  if (!req.param) {
-    errors.push('No course to validate!');  
+
+  if (!req.body.title) {
+    errors.push('Title required.');  
   }
-  else {
-    if (!req.param('title')) {
-      errors.push('Title required.');  
-    }
-    if (!req.param('description')) {
-      errors.push('Description required.');  
-    }
+  if (!req.body.description) {
+    errors.push('Description required.');  
   }
+
   if (errors.length > 0) {
     callback(errors);
-  }
-  else {
-    data.title = req.param('title');
-    data.content = req.param('description');
-    data.modified_at = new Date();
-    if (!req.param('_id')) {
-      data.created_at = new Date();
+  } else {
+    data.title = req.body.title;
+    data.description = req.body.description;
+
+    if(req.body.image) {
+      data.image = req.body.image;
     }
+
     callback( null, data);
   }
 };
@@ -180,8 +176,7 @@ module.exports = function (app) {
       if (error) {
         log.error(error);
         res.redirect('/course/create/?' + error);
-      }
-      else {
+      } else {
         if (!data.created_by) {
           data.created_by = req.user.id;
         }
