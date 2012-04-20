@@ -54,13 +54,58 @@ module.exports = function (app) {
     });
   });
 
+  // Edit chapter information
+  app.get('/chapters/:id/edit', function(req, res) {
+    var chapterId = parseInt(req.params.id);
+
+    chapter.findById(chapterId, function(error, chapter) {
+      if(error) {
+        log.error(error);
+      }
+
+      res.render('chapters/edit', {
+        title: chapter.title,
+        chapter: chapter
+      });
+    });
+  });
+
+  // Save edited chapter
+  app.post('/chapters/:id/edit', function(req, res){
+    var chapterId = parseInt(req.params.id);
+
+    chapter.findById(chapterId, function(error, dbChapter) {
+      if(error) {
+        log.error(error);
+      }
+
+      dbChapter['title'] = req.body.title;
+      dbChapter['description'] = req.body.description;
+
+      chapter.save(dbChapter, function(error) {
+        if(error) {
+          log.error(error);
+        }
+
+        res.redirect('/chapters/' + chapterId);
+      })
+    });
+  });
+
   // Display create lesson page
   app.get('/chapters/:id/create_lesson', function(req, res) {
     var chapterId = parseInt(req.params.id);
 
-    res.render('chapters/lesson_create', {
-      title: chapter.title,
-      lesson: {title: '', description: ''}
+    chapter.findById(chapterId, function(error, dbChapter) {
+      if(error) {
+        log.error(error);
+      }
+
+      res.render('chapters/lesson_create', {
+        title: chapter.title,
+        chapter: dbChapter,
+        lesson: {title: '', description: ''}
+      });
     });
   });
 
