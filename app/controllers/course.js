@@ -1,5 +1,3 @@
-var mongo = require('mongoskin');
-var bcrypt = require('bcrypt'); 
 var request = require('request');
 var fs = require('fs');
 var path = require('path')
@@ -7,7 +5,6 @@ var path = require('path')
 // Load models
 var course = require('../models/course');
 var user = require('../models/user');
-var category = require('../models/category');
 
 // Load Helpers
 var ability = require('../helpers/ability');
@@ -20,55 +17,25 @@ var ability = require('../helpers/ability');
 var validateCourseData = function (req, callback) {
   errors = [];
   data = {};
-  
-  if (!req.param) {
-    errors.push('No course to validate!');  
+
+  if (!req.body.title) {
+    errors.push('Title required.');  
   }
-  else {
-    if (!req.param('title')) {
-      errors.push('Title required.');  
-    }
-    if (!req.param('content')) {
-      errors.push('Content required.');  
-    }
+  if (!req.body.description) {
+    errors.push('Description required.');  
   }
+
   if (errors.length > 0) {
     callback(errors);
-  }
-  else {
-    data.title = req.param('title');
-    data.content = req.param('content');
-    data.category = req.param('category');
-    data.modified_at = new Date();
-    if (!req.param('_id')) {
-      data.created_at = new Date();
+  } else {
+    data.title = req.body.title;
+    data.description = req.body.description;
+
+    if(req.body.image) {
+      data.image = req.body.image;
     }
-    if (!req.user.id && !req.param('_id')) {
-      data.requires_verification = true;
-      if (!req.param('email')) {
-        callback('Email address required.');
-      }
-      else {
-        user.findByEmail(req.param('email'), function( error, user) {
-          if (user && user.id) {
-            data.user_id = user._id;
-            callback( null, data);
-          } else {
-            var newUser = {email: req.param('email')};
-            var promise = new Promise();
-            user.createNew(newUser, 'email', function(error, user) {
-              if(error) {
-                callback(error);
-              }
-              callback( null, data);
-            });
-          }
-        });
-      }
-    }
-    else {
-      callback( null, data);
-    }
+
+    callback( null, data);
   }
 };
 
@@ -99,7 +66,7 @@ var submitCode = function(code) {
 
 var loadCourse = function (req, res, next) {
   var id = parseInt(req.params.id);
-  var unit = parseInt(req.params.unit);
+  var chapter = parseInt(req.params.chapter);
   var lesson = parseInt(req.params.lesson);
 
   course.findById(id, function(error, course) {
@@ -112,8 +79,8 @@ var loadCourse = function (req, res, next) {
     }
     
     try {
-      if(typeof(unit) != 'undefined') {
-        unit = parseInt(unit);
+      if(typeof(chapter) != 'undefined') {
+        chapter = parseInt(chapter);
         if(typeof(lesson) != 'undefined') {
           lesson = parseInt(lesson);
         } else {
@@ -122,7 +89,7 @@ var loadCourse = function (req, res, next) {
         }
       } else {
         // Set default unit value
-        unit = 0;
+        chapter = 0;
       }
     } catch (e) {
       log.error(e);
@@ -130,14 +97,14 @@ var loadCourse = function (req, res, next) {
     }
 
     // Check if specified unit exists. If not, redirect to course home
-    if(course && course.units && course.units[unit-1]) {
+    if(course && course.units && course.units[chapter-1]) {
       // Set the unit object in UI helper
-      var unitObj = req.unit = helper['unit'] = course.units[unit-1];
+      var chapterObj = req.chapter = helper['chapter'] = course.units[chapter-1];
 
       // Check if specified lesson exists. If not, redirect to unit home
-      if(unitObj.lessons && unitObj.lessons[lesson-1]) {
+      if(chapterObj.lessons && chapterObj.lessons[lesson-1]) {
         // Set the lesson object in UI helper
-        req.lesson = helper['lesson'] = unitObj.lessons[lesson-1];
+        req.lesson = helper['lesson'] = chapterObj.lessons[lesson-1];
       }
     }
 
@@ -146,15 +113,6 @@ var loadCourse = function (req, res, next) {
   });
 }
 
-
-var loadCategories = function (req, res, next) {
-  category.getAll(function(error, categories) {
-    req.app.helpers({
-      categories: categories 
-    });
-    next();
-  });
-}
 
 var validUser = function(req, res, next) { 
 	if(req.user == undefined && req.url != '/courses'){
@@ -187,27 +145,28 @@ module.exports = function (app) {
   });
 
   // List existing courses
-  app.get('/courses', loadCategories, function(req, res){
-	var registered_courses = [];
-	if( typeof(req.user) != 'undefined' && typeof(req.user.registered_courses) != 'undefined')
-		registered_courses = req.user.registered_courses;
-    course.get({
-      category: req.param.category
-    }, function(error, courses){
+  app.get('/courses', function(req, res){
+    var registered_courses = [];
+    if( typeof(req.user) != 'undefined' && typeof(req.user.registered_courses) != 'undefined') {
+      registered_courses = req.user.registered_courses;
+    }
+
+    log.info('user = ', req.user);
+    log.info('registered courses = ', registered_courses);
+    course.get({}, function(error, courses){
       res.render('courses', { 
         title: 'Courses',
         courses: courses,
-		registered_courses: registered_courses
+        registered_courses: registered_courses
       });
     });
   });
 
   // Create new course form
-  app.get('/courses/create', loadCategories, function(req, res){
+  app.get('/courses/create', function(req, res){
     res.render('courses/create', {
       title: 'New Course',
-      course: {_id:'',title:'',category:'',content:''},
-      //headContent:'course_create' 
+      course: {_id:'',title:'',description:''},
     });
   });
 
@@ -217,53 +176,28 @@ module.exports = function (app) {
       if (error) {
         log.error(error);
         res.redirect('/course/create/?' + error);
-      }
-      else {
+      } else {
         if (!data.created_by) {
           data.created_by = req.user.id;
         }
         course.createNew( data, function( error, course) {
           id = course._id;
-          // Set session value so we can push out new course
-          if (data.requires_verification) {
-            var verifySalt = bcrypt.gen_salt_sync(10);  
-            var verifyHash = bcrypt.encrypt_sync(data.title+data.created_at, verifySalt);
-            var verifyLink = siteInfo.site_url + "/course/" + course._id + "/verify/?verify="+verifyHash; 
-            var deleteLink = siteInfo.site_url + "/course/" + course._id + "/remove?verify="+verifyHash; 
-            var verificationMessage = "Hi!<br /> Click to verify your course '" + course.title + "' <a href=\"" + verifyLink + "\">" + verifyLink + "</a>!";
-            verificationMessage += "<br /><br />When you're done with it, you can delete the course from this link: <a href=\"" + deleteLink + "\"" + deleteLink + "</a>";
-            // Add an edit link some day.
-            log.info(verificationMessage);
-            mail.message({
-              'MIME-Version': '1.0',
-              'Content-type': 'text/html;charset=UTF-8',
-              from: 'Management <' + siteInfo.site_email  + '>',
-              to: [req.param('email')],
-              subject: 'Verify Course'
-            })
-            .body(verificationMessage)
-            .send(function(err) {
-              if (err) log.error(err);
-            });
-            res.redirect('/course/verify');
-          }
-          else {
-            //Set the course info in the session to let socket.io know about it.
-            req.session.newCourse = {title: course.title, _id: id};
-            res.redirect('/courses/' + id + '/edit');
-          }
+
+          //Set the course info in the session to let socket.io know about it.
+          req.session.newCourse = {title: course.title, _id: id};
+          res.redirect('/courses/' + id);
         });
       }
     });
   });
 
-  // TODO: Quick course import tool
+  // TODO: Quick course import tool. Modify to support the new course format
   app.get('/courses/import', function(req, res){
     res.render('content_manager', {
       title: '10xEngineer.me Course Creator',
-			description: 'Create courses with its units from JSON file.',
+      description: 'Create courses with its units from JSON file.',
       contentfile: req.param('coursefile', ''),
-			success: req.params.success || false
+      success: req.params.success || false
     });
   });
 
@@ -312,43 +246,39 @@ module.exports = function (app) {
     });
   });
 
+  // Load specific course and display chapter index
   app.get('/courses/:id', validCoursePermission('courses', 'read'), loadCourse, function(req, res){
     if (!req.course) {
       res.redirect('/courses/');
     } else {
-      // TODO: let user subscribe to the course instead of this??
       log.trace("course", req.course)
-      req.course.user = user;
-	  
-	  //subscribe to the course, if not yet registered
+    
+      //subscribe to the course, if not yet registered
       user.findOrCreateRegisteredCourse(req.user, req.course._id);
-	  
+    
       var renderParams = {
-        title: req.course.title
+        title: req.course.title,
       };
 
-      var unit = req.unit;
-      if(unit && unit.video && unit.videoType) {
-        renderParams['video'] = unit.video;
-        renderParams['videoType'] = unit.videoType;
-      }
-      
-      res.render('courses/course', renderParams);
+      res.render('courses/chapters', renderParams);
     }
   });
 
   app.get('/courses/:id/edit', validCoursePermission('courses', 'edit'), loadCategories, loadCourse, function(req, res, next){
-    if (req.course && (req.user.role === 'admin' || req.user._id === req.course.created_by)) {
-      res.render('courses/edit', {
-        title: 'Course ' + req.course.title,
-        headContent:'course_edit'
-      });
-    }
-    else {
-      res.redirect('/courses/' + req.params.id);
+    if (!req.course) {
+      res.redirect('/courses/');
+    } else {
+      log.trace("course", req.course)
+    
+      var renderParams = {
+        title: req.course.title,
+      };
+
+      res.render('courses/edit', renderParams);
     }
   });
 
+  // Remove entire course and its chapters
   app.get('/courses/:id/remove', validCoursePermission('courses', 'delete'), loadCourse, function(req, res, next){
     if (!req.course || req.params.id === 'null') {
       res.redirect('/courses');
@@ -373,12 +303,12 @@ module.exports = function (app) {
     if (!req.course) {
       res.redirect('/courses/');
     } else if (!req.unit) {
-	  
+    
       res.redirect('/courses/' + req.params.id);
     } else {
       // if the user hasn't registered for this course, register them now
       log.trace("course", req.course);
-	  log.trace("chapter/unit", req.unit);
+    log.trace("chapter/unit", req.unit);
       req.course.user = user;
 
       var renderParams = {
@@ -389,18 +319,42 @@ module.exports = function (app) {
       if(unit.video && unit.videoType) {
         renderParams['video'] = unit.video;
         renderParams['videoType'] = unit.videoType;
-				renderParams['unit_id'] = req.params.unit;
+        renderParams['unit_id'] = req.params.unit;
       }
       log.trace('unit: '+req.params.unit);
       res.render('courses/course', renderParams);
     }
   });
 
+  app.get('/courses/:id/:unit/edit', loadCourse, function(req, res){
+    if (!req.course) {
+      res.redirect('/courses/');
+    } else if (!req.unit) {
+      res.redirect('/courses/' + req.params.id);
+    } else {
+      // TODO: let user subscribe to the course instead of this??
+      log.trace("course", req.course)
+      req.course.user = user;
+
+      var renderParams = {
+        title: req.course.title
+      };
+
+      var unit = req.unit;
+      if(unit.video && unit.videoType) {
+        renderParams['video'] = unit.video;
+        renderParams['videoType'] = unit.videoType;
+      }
+
+      res.render('courses/course', renderParams);
+    }
+  });
+
   app.get('/courses/:id/:unit/:lesson', validCoursePermission('courses', 'read'), loadCourse, function(req, res){
-	req.course = req.params.id;
-	req.unit = req.params.unit;
-	req.lesson = req.params.lesson;
-	
+    req.course = req.params.id;
+    req.unit = req.params.unit;
+    req.lesson = req.params.lesson;
+  
     if (!req.course) {
       res.redirect('/courses/');
     } else if (!req.unit) {
@@ -409,9 +363,9 @@ module.exports = function (app) {
       res.redirect('/courses/' + req.params.id + '/' + req.params.unit);
     } else {
       // TODO: let user subscribe to the course instead of this??
-	  var lesson_progress = user.findOrCreateLesson(req.user, req.course, req.unit, req.lesson, function(lesson_status){
-	  		console.log("lesson_status:"+lesson_status); 
-	  });
+    var lesson_progress = user.findOrCreateLesson(req.user, req.course, req.unit, req.lesson, function(lesson_status){
+        console.log("lesson_status:"+lesson_status); 
+    });
       
       //log.trace("course", req.course)
       req.course.user = user;
@@ -424,11 +378,11 @@ module.exports = function (app) {
       if(lesson.video && lesson.videoType) {
         renderParams['video'] = lesson.video;
         renderParams['videoType'] = lesson.videoType;
-				renderParams['unit_id'] = req.params.unit;
-				renderParams['lesson_id'] = req.params.lesson;
+        renderParams['unit_id'] = req.params.unit;
+        renderParams['lesson_id'] = req.params.lesson;
       }
       log.trace('unit: '+req.params.unit);
-	  	log.trace('lesson: '+req.params.lesson);
+      log.trace('lesson: '+req.params.lesson);
       res.render('courses/course', renderParams);
     }
   });
@@ -451,7 +405,7 @@ module.exports = function (app) {
   app.get('/coursesold', function(req, res){
     res.render('overview', {
       title: '10xEngineer.me Course List', 
-	  loggedInUser:req.user
+    loggedInUser:req.user
     });
   });
 
@@ -459,12 +413,12 @@ module.exports = function (app) {
     res.render('ide', {
     loggedInUser:req.user,
     code: '',
-	compile_result: '',
+  compile_result: '',
     compile_output: '',
-	course: req.params.course,
-	id: req.params.course._id,
-	unit_id: req.params.unit,
-	lesson_id: req.params.lesson
+  course: req.params.course,
+  id: req.params.course._id,
+  unit_id: req.params.unit,
+  lesson_id: req.params.lesson
     });
   });
 
@@ -472,120 +426,120 @@ module.exports = function (app) {
   app.get('/progress', function(req, res){
     res.render('progress', {
       title: 'Devops', 
-    	Course: 'CS99',
-    	Unit: 'Devops',
-    	loggedInUser: req.user,
-			message:''
+      Course: 'CS99',
+      Unit: 'Devops',
+      loggedInUser: req.user,
+      message:''
     });
   });
 */
 
-	// Need to add back :id/:unit/:lesson
-	app.get('/quiz/edit', function(req, res){
+  // Need to add back :id/:unit/:lesson
+  app.get('/quiz/edit', function(req, res){
     res.render('quiz_editor', {
-		loggedInUser: req.user,
-		message: '',
-//		course: req.params.id,
-//		unit_id: req.params.unit,
-//		lesson_id: req.params.lesson		
+    loggedInUser: req.user,
+    message: '',
+//    course: req.params.id,
+//    unit_id: req.params.unit,
+//    lesson_id: req.params.lesson    
     });
   });
 
-	// Temporary course import using json file upload
+  // Temporary course import using json file upload
   app.post('/quiz/upload', function(req, res, next) {
-		try {
-			var msg = '';
+    try {
+      var msg = '';
 
-	    var f = req.files['files'];
-	
-	    log.info('[Quiz] Uploaded %s -> %s', f.filename, f.path);
-	
-	
-			var tmp_path = f.path;
-			var new_name = path.basename(f.path);
-			var public_path = 'quiz/' + new_name;
-			var target_path = appRoot+'/public/' + public_path;
+      var f = req.files['files'];
+  
+      log.info('[Quiz] Uploaded %s -> %s', f.filename, f.path);
+  
+  
+      var tmp_path = f.path;
+      var new_name = path.basename(f.path);
+      var public_path = 'quiz/' + new_name;
+      var target_path = appRoot+'/public/' + public_path;
 
-			var src = '/'+public_path;
-			
-			log.info('[Quiz] Copying %s -> %s', tmp_path, target_path);
-			fs.renameSync(tmp_path, target_path);
-			fs.unlink(tmp_path); //Don't use unlinkSync there, it will throw ENOENT as always
-			res.send(JSON.stringify({'status': "success", 'message': msg, 'src': src}));
-			/*
-			, function(err) {
+      var src = '/'+public_path;
+      
+      log.info('[Quiz] Copying %s -> %s', tmp_path, target_path);
+      fs.renameSync(tmp_path, target_path);
+      fs.unlink(tmp_path); //Don't use unlinkSync there, it will throw ENOENT as always
+      res.send(JSON.stringify({'status': "success", 'message': msg, 'src': src}));
+      /*
+      , function(err) {
 
-			  if(err){
-					msg = "Error occur in file system (Relocation)";
-					console.log("Upload Error:", msg, err)
-					res.send(JSON.stringify({'status': "error", 'message': msg }))
-					throw err;
-				} 
+        if(err){
+          msg = "Error occur in file system (Relocation)";
+          console.log("Upload Error:", msg, err)
+          res.send(JSON.stringify({'status': "error", 'message': msg }))
+          throw err;
+        } 
 
-			  // delete the temporary file
+        // delete the temporary file
 
-			  fs.unlink(tmp_path, function(err) {
+        fs.unlink(tmp_path, function(err) {
 
-			    if(err){
-						msg = "Error occur in file system (Clearing)";
-						console.log("Upload Error:", msg, err);
-						res.send(JSON.stringify({'status': "error", 'message': msg }))
-						throw err;
-					}
+          if(err){
+            msg = "Error occur in file system (Clearing)";
+            console.log("Upload Error:", msg, err);
+            res.send(JSON.stringify({'status': "error", 'message': msg }))
+            throw err;
+          }
 
-			    msg = 'File uploaded, Size: '+ f.size + ' bytes';
-			    res.send(JSON.stringify({'status': "success", 'message': msg, 'src': src}));
+          msg = 'File uploaded, Size: '+ f.size + ' bytes';
+          res.send(JSON.stringify({'status': "success", 'message': msg, 'src': src}));
 
-			  });
+        });
 
-			});*/
-		} catch (e) {
-			console.log("[Quiz] Error in Quiz upload", e)
-			 res.send(JSON.stringify({'status': "error", 'message': e.message }))
-		}
+      });*/
+    } catch (e) {
+      console.log("[Quiz] Error in Quiz upload", e)
+       res.send(JSON.stringify({'status': "error", 'message': e.message }))
+    }
 
   });
 
-	app.post('/quiz/save', function(req, res, next) {
-		
-		//TODO: implement the save logic there
-		
-		res.send(JSON.stringify({'status': "OK", 'message': "Quiz Saved" }))
-		
-	})
+  app.post('/quiz/save', function(req, res, next) {
+    
+    //TODO: implement the save logic there
+    
+    res.send(JSON.stringify({'status': "OK", 'message': "Quiz Saved" }))
+    
+  })
 
 
   app.get('/quiz/:id/:unit/:lesson', function(req, res){
     res.render('quiz', {
-		loggedInUser: req.user,
-		message: '',
-		course: req.params.id,
-		unit_id: req.params.unit,
-		lesson_id: req.params.lesson		
+    loggedInUser: req.user,
+    message: '',
+    course: req.params.id,
+    unit_id: req.params.unit,
+    lesson_id: req.params.lesson    
     });
   });
 
-	// mock router to send dummy output. 
+  // mock router to send dummy output. 
   app.post('/quiz/:id/:unit/:lesson', function(req, res, next){
-		var is_correct = false;
-		var ans = req.body['quiz-1']; //@@TODO
-		//guard
-		log.info("GET params: ", req.params); //get or router params
-		log.info("POST params",req.body); //post
-		
-		//process the login there.
-		if(ans === 'A')
-			is_correct = true;
-			
+    var is_correct = false;
+    var ans = req.body['quiz-1']; //@@TODO
+    //guard
+    log.info("GET params: ", req.params); //get or router params
+    log.info("POST params",req.body); //post
+    
+    //process the login there.
+    if(ans === 'A')
+      is_correct = true;
+      
     res.render('quiz', {
-	    title: 'Devops Quiz',
-		message: 'Your answer is: '+ ans + ". "+ ((is_correct) ? "That is correct!":"That is wrong"),
-		loggedInUser: req.user,
-		correct: is_correct,
-		choice: ans,
-		course: req.params.id,
-		unit_id: req.params.unit,
-		lesson_id: req.params.lesson 
+      title: 'Devops Quiz',
+    message: 'Your answer is: '+ ans + ". "+ ((is_correct) ? "That is correct!":"That is wrong"),
+    loggedInUser: req.user,
+    correct: is_correct,
+    choice: ans,
+    course: req.params.id,
+    unit_id: req.params.unit,
+    lesson_id: req.params.lesson 
     });
 
   });
@@ -598,9 +552,9 @@ module.exports = function (app) {
     log.info('re-rendering ide');
     res.render('ide', {
       title: 'submitCode',
-	  course: req.params.id,
-	  unit_id: req.params.unit,
-	  lesson_id: req.params.lesson,
+    course: req.params.id,
+    unit_id: req.params.unit,
+    lesson_id: req.params.lesson,
       code: source, 
       compile_results: compile_res,
       compile_errors: compile_err,
