@@ -1,0 +1,97 @@
+.container-fluid
+	.well.span10
+		.row-fluid
+			| Email:
+			input#email(value='#{usr.email}')
+			input#user_id(type='hidden', value='#{usr.id}')
+		.row-fluid
+			| Name:
+			input#name(value='#{usr.name}')
+		.row-fluid
+			| Role:
+			input#role(value='#{usr.role}')
+		.row-fluid
+			b Permissions
+			table#permissions.table
+				tr
+					th
+						|Course Id
+					th
+						|Read
+					th
+						|Modify
+					th
+						|Delete
+				- if (usr.abilities.courses)
+					each course, key in usr.abilities.courses
+						tr.permission(name='#{key}')
+							td.course_id
+								a(href='/courses/#{key}') #{key}
+								input(type="hidden", value='#{key}')
+							td.read
+								- if(ability.can(course,"read"))
+									input(type="checkbox", name='read', checked)
+								- else
+									input(type="checkbox", name='read')
+							td.write
+								- if(ability.can(course, "write"))
+									input(type='checkbox', name='write', checked)
+								-else
+									input(type='checkbox', name='write')
+							td.delete
+								- if(ability.can(course, "delete"))
+									input(type='checkbox', name='delete', checked)
+								-else
+									input(type='checkbox', name='delete')
+		.row-fluid
+			input#add_permission.btn.pull-left(value='Add Permission')
+			input#change_permission.btn.pull-right.btn-info(value='Change Permissions')
+		#status.row-fluid
+			span.label.label-success(style='display:none') Updated
+			span.label.label-warning(style='display:none') Update Failed
+		#template(style='display:none')
+			table
+				tr.permission
+					td.course_id
+						input.span1(type="text")
+					td.read
+							input(type="checkbox", name='read')
+					td.write
+							input(type='checkbox', name='write')
+					td.delete
+							input(type='checkbox', name='delete')
+script(type='text/javascript')
+	function init(){
+		$('#change_permission').click(function(e){
+			var courseAbilities = {};
+			$('#permissions tr.permission').each(function(index, value){
+				var courseId = $(value).find('td.course_id input').val();
+				courseAbilities[courseId] = [];
+				if($(value).find('td.read input').is(':checked'))
+					courseAbilities[courseId].push('read');
+				if($(value).find('td.write input').is(':checked'))
+					courseAbilities[courseId].push('write');
+				if($(value).find('td.delete input').is(':checked'))
+					courseAbilities[courseId].push('delete');
+				console.log(courseAbilities);
+			});
+			$.post('/admin/user/'+$('#user_id').val(), 
+			{
+				abilities : courseAbilities,
+				email: $('#email').val(), 
+				name: $('#name').val(), 
+				role: $('#role').val()
+			}, function(data){
+				$('#status .label').hide();
+				if(data.status === 'success'){
+					$('#status .label-success').show(500);
+				}else
+				{
+					$('#status .label-warning').show(500);
+				}
+			})
+		});
+		$('#add_permission').click(function(e){
+			$('#template tr').clone().appendTo('table#permissions');
+		});
+	}
