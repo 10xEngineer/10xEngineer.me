@@ -1,0 +1,10 @@
+form(method='POST', id='chapterForm')
+  p
+    label(for="title") Title:
+    input.required(value='#{chapter.title}', id='title', name='title')
+  p
+    label(for="description") Description:
+    textarea.required(name='description', id='description')
+      #{chapter.description}
+  p
+    input.btn.btn-primary(type='submit', value='Submit')

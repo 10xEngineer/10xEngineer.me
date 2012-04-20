@@ -11,7 +11,8 @@ exports.getSiteConfig = function () {
 exports.getDBConfig = function() {
 	configValues = {
 		address: 'localhost:27017/',
-		database: 'bootstrap'
+		database: 'bootstrap',
+		schemaVersion: 1
 	}
 	
 	return configValues;

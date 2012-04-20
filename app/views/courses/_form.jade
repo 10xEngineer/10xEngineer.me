@@ -1,23 +1,26 @@
-form(method='POST', action='/courses/create', id='courseForm')
+form(method='POST', id='courseForm')
   p
     label(for="title") Title:
-    input(value='#{course.title}', id='title', name='title', class='required')
-  - if (!user.loggedIn && !course._id)
-    p
-      label(for="email") Email Address:
-      input(value='', id='email', name='email', class='required email')
+    input.required(value='#{course.title}', id='title', name='title')
   p
-    label(for="category") Category:
-    select(name="category", id="category")
-      option(value="#{course.category}") -- Select Category #{course.category} --
-      - each category in categories
-        - if (category.name === course.category)
-          option(value="#{category.name}", selected="selected") #{category.name}
-        - else
-          option(value="#{category.name}") #{category.name}
+    label(for="description") Description:
+    textarea.required(name='description', id='description')
+      #{course.description}
   p
-    label(for="content") Content:
-    textarea(name='content', id='content', class='required')
-      #{course.content}
+    label(for="selectImage") Image:
+    button.btn(type='button', name='selectImage', id='selectImage') Choose
+    .previewPane
+      - if(course.image)
+        img(src='#{course.image}')
+        input(type='hidden', name='image', value='#{course.image}')
   p
-    input(type='submit', value='Submit')
+    input.btn.btn-primary(type='submit', value='Submit')
+
+script
+  filepicker.setKey('462_D0Z1RnO8iMRHhSZb');
+  $("#selectImage").click(function(){
+    filepicker.getFile(filepicker.MIMETYPES.IMAGES, {'multiple':false}, function(url, token, data) {
+      $('.previewPane > img').attr("src", url);
+      $('.previewPane > input[type=hidden]').val(url);
+    });
+  });
