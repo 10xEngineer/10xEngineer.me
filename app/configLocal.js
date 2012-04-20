@@ -11,7 +11,8 @@ exports.getSiteConfig = function () {
 exports.getDBConfig = function() {
 	configValues = {
 		address: 'localhost:27017/',
-		database: 'bootstrap'
+		database: 'bootstrap',
+		schemaVersion: 1
 	}
 	
 	return configValues;
@@ -20,7 +21,7 @@ exports.getDBConfig = function() {
 exports.getMailConfig = function () {
   configValues =  {
     host: 'smtp.gmail.com',
-    username: 'steve.g.messina@gmail.com',
+    username: '10xengineer@gmail.com',
     password: 'password'
   }
 

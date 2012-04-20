@@ -106,6 +106,48 @@ ul.carousel-inner,  ul.carousel-inner li.item { margin:0; }
 	
 }
 
+/* Chapters */
+
+div.course-header {
+	margin-bottom: 220px;
+}
+
+div.course-header .course-img,
+div.course-header .course-content {
+	display: inline-block;
+	float: left;
+}
+
+div.course-header .course-img img {
+	width: auto;
+	height: 200px;
+}
+div.course-header .course-content {
+	width: 75%;
+	margin: 0px 0px 0px 20px;
+}
+div.course-header .course-content .btn-strip .btn {
+	margin-right: 10px;
+}
+
+ul.chapters li {
+	margin: 5px 0;
+	background: white;
+	padding: 10px;
+	border: solid 1px #eee;
+	border-radius: 10px 10px;
+	list-style: none;
+	margin-left: 0;
+	margin-bottom: 18px;
+}
+
+ul.chapters li a, ul.chapters li a h3{
+	display: inline;
+}
+
+/* Chapters End */
+
+
 @media screen and (max-width:480px) {
 	p{	
 	font-size: .9em;
