@@ -135,7 +135,7 @@ include /courses/_header
 									#editor(style='position:relative;width:100%;height:400px;')
 							.form-actions
 								span.danger
-									a#clear.button.btn.btn-danger CLEAR
+									a#clear.button.btn.btn-danger RESET
 								span.pull-right
 									a.button.btn.btn-submit SUBMIT
 			.row-fluid
@@ -203,7 +203,7 @@ include /courses/_header
 		}
 
 		function init() {
-			editor = ace.edit('editor');
+			editor = ace.edit('editor', {initialContent:'hello world!'});
 			var undoManager = require('ace/undomanager').UndoManager;
 			editor.getSession().setUndoManager(new undoManager())
 			$(".open").pageslide({direction: "right", modal: true, iframe:false});
@@ -275,7 +275,7 @@ include /courses/_header
 			}
 
 			$('a#clear').click(function(e){
-				console.log(editor.getSession().getUndoManager());
+				editor.getSession().setValue("insert skeleton code here");
 			})
 		}
 
