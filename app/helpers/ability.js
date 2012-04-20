@@ -7,7 +7,7 @@ module.exports.can = function(abilities, action, target, target_id){
 	var actionPermissions; 
 	try{
 		actionPermissions = abilities[target][target_id]
-	}catch()
+	}catch(e)
 	{
 		return false;
 	}
