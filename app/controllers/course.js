@@ -3,11 +3,11 @@ var fs = require('fs');
 var path = require('path')
 
 // Load models
-var course = require('../models/course');
-var user = require('../models/user');
+var Course = load.model('Course');
+var User = load.model('User');
 
 // Load Helpers
-var ability = require('../helpers/ability');
+var ability = load.helper('ability');
 
 
 // ---------------------
@@ -69,7 +69,7 @@ var loadCourse = function (req, res, next) {
   var chapter = parseInt(req.params.chapter);
   var lesson = parseInt(req.params.lesson);
 
-  course.findById(id, function(error, course) {
+  Course.findById(id, function(error, course) {
     if (error || !course) {
       log.trace('Could not find course!');
     }
@@ -153,7 +153,7 @@ module.exports = function (app) {
 
     log.info('user = ', req.user);
     log.info('registered courses = ', registered_courses);
-    course.get({}, function(error, courses){
+    Course.find({}, function(error, courses){
       res.render('courses', { 
         title: 'Courses',
         courses: courses,
@@ -180,7 +180,7 @@ module.exports = function (app) {
         if (!data.created_by) {
           data.created_by = req.user.id;
         }
-        course.createNew( data, function( error, course) {
+        Course.createNew( data, function( error, course) {
           id = course._id;
 
           //Set the course info in the session to let socket.io know about it.

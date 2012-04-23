@@ -12,14 +12,7 @@ if (path.existsSync(appRoot + '/configLocal.js')) {
   //authConfig = config.getAuthConfig();
   authConfig = config.getAuthConfigLocal();
   adminConfig = config.getAdminConfig();
-
-  log.info(siteConfig);
-  log.info(codeConfig);
-  log.info(dbConfig);
-  log.info(authConfig);
-  log.info(adminConfig);
-}
-else {
+} else {
   log.error('Please copy configDefault.js to configLocal.js and replace applicable values.');
   process.exit();
 }

@@ -10,7 +10,7 @@ exports.getSiteConfig = function () {
 
 exports.getDBConfig = function() {
 	configValues = {
-		address: 'localhost:27017/',
+		address: 'mongodb://localhost/',
 		database: 'bootstrap',
 		schemaVersion: 1
 	}

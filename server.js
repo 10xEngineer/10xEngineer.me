@@ -34,22 +34,16 @@ client.on("error", function (err) {
 // Intitialize
 mongoose.connect(config.db.address + config.db.database);
 
+mongoose.connection.on('open', function() {
+  log.info('Database connection established.');
+});
+
 log.info('Initializing models');
 // Register models
 load.model_init('count');
 load.model_init('user');
 load.model_init('course');
 load.model_init('chapter');
-
-// Sample code to test database connection
-// TODO: Remove it when not needed
-var count = load.model('Count');
-count.getNext('saves', function(error, count) {
-  if (error) {
-    log.warn('Could not determine count');
-  }
-  log.info('Run ' + count + ' times.');
-});
 
 // Migrate database schema
 // TODO: Find a way to wait before this finishes executing
@@ -67,7 +61,7 @@ var app = module.exports = express.createServer();
 
 // Express Middleware config
 app.configure(function(){
-  app.set('views', __dirname + '/views');
+  app.set('views', __dirname + '/app/views');
   app.set('view engine', 'jade');
   app.use(express.bodyParser({uploadDir: __dirname + '/upload', keepExtensions: true }));
   app.use(express.methodOverride());
@@ -161,6 +155,17 @@ load.controller('chapter')(app);
 // Startup
 app.listen(3000);
 log.info("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+
+// Sample code to test database connection
+// TODO: Remove it when not needed
+var Count = load.model('Count');
+Count.getNext('saves', function(error, count) {
+  if (error) {
+    log.warn('Could not determine count');
+  }
+  log.info('Run ' + count + ' times.');
+});
+
 
 //socket for ideone source code execution
 var request = require('request');

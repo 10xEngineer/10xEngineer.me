@@ -11,6 +11,8 @@ var Chapter = new Schema({
   course: { type: Number, ref: 'Course', required: true },
   created_at: { type: Date, default: Date.now },
   modified_at: { type: Date, default: Date.now }
+}, {
+  collection: 'chapters'
 });
 
 // Set default id

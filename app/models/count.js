@@ -4,6 +4,8 @@ var mongoose = require('mongoose')
 var Count = new Schema({
   _id: { type: String, index: true, lowercase: true, trim: true },
   count: { type: Number }
+}, {
+  collection: 'count'
 });
 
 Count.statics.getNext = function (type, callback) {

@@ -1,5 +1,5 @@
 var everyauth = require('everyauth');
-var user = require('../models/user');
+var User = load.model('User');
 
 // TODO: Debug flag. Turn off for production use.
 everyauth.debug = true;
@@ -28,7 +28,7 @@ module.exports = function (config) {
       googleUser.expiresIn = extra.expires_in;
 
       var promise = this.Promise();
-      user.findOrCreate('google', googleUser, promise);
+      User.findOrCreate('google', googleUser, promise);
 
       return promise;
     })
@@ -43,11 +43,11 @@ module.exports = function (config) {
     .findOrCreateUser( function (sess, accessToken, accessSecret, twitUser) {
       var promise = this.Promise();
       
-      user.findOrCreate('twitter', twitUser, promise);
+      User.findOrCreate('twitter', twitUser, promise);
 
       return promise;
     })
-    .redirectPath(redirectAction);
+    .sendResponse(redirectAction);
 
   // Facebook
   everyauth.facebook
@@ -59,7 +59,7 @@ module.exports = function (config) {
     .findOrCreateUser( function (session, accessToken, accessTokenExtra, fbUserMetadata) {
       var promise = this.Promise();
       
-      user.findOrCreate('facebook', fbUserMetadata, promise);
+      User.findOrCreate('facebook', fbUserMetadata, promise);
 
       return promise;
     })
@@ -67,7 +67,7 @@ module.exports = function (config) {
 
   // To inject user object through express middleware
   everyauth.everymodule.findUserById( function (userId, callback) {
-    user.findById(userId, callback);
+    User.findById(userId, callback);
   });
 
   return everyauth;
