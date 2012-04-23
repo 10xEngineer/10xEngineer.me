@@ -1,102 +1,39 @@
-var db = require('../helpers/database').db;
+var mongoose = require('mongoose')
+  , Schema = mongoose.Schema;
 
-module.exports = db.collection('chapters');
+var Count = mongoose.model('Count');
+var Course = mongoose.model('Course');
 
-var count = require('./count');
-var course = require('./course');
+var Chapter = new Schema({
+  _id: { type: Number, index: true, required: true },
+  title: { type: String, index: true, trim: true, required: true },
+  status: { type: String, default: 'draft', enum: ['draft', 'punlished'], required: true },
+  course: { type: Number, ref: 'Course', required: true },
+  created_at: { type: Date, default: Date.now },
+  modified_at: { type: Date, default: Date.now }
+});
 
-module.exports.findById = function (id, callback) {
-  this.findOne({_id: id}, function(error, chapter){
-    if(error) {
-      callback(error);
-    }
+// Set default id
+Chapter.pre('save', function(next) {
+  var chapter = this;
+  if(!chapter._id) {
+    Count.getNext('chapter', function(error, id) {
+      chapter._id = id;
+      next();
+    })
+  }
+});
 
-    callback(null, chapter);
-  });
+Chapter.methods.publish = function(publish, callback) {
+  var chapter = this;
+  
+  if(chapter.publish) {
+    chapter.status = 'published';
+  } else {
+    chapter.status = 'draft';
+  }
+
+  this.save(callback);
 };
 
-module.exports.createNew = function (chapter, callback) {
-  var self = this;
-
-  count.getNext('chapter', function(error, id) {
-    if(error) {
-      callback(error);
-    }
-
-    var now = new Date();
-
-    chapter['_id'] = id;
-    chapter['created_at'] = now.getTime();
-    chapter['modified_at'] = now.getTime();
-    chapter['status'] = 'draft';
-    self.save(chapter, function(error) {
-      if(error) {
-        callback(error);
-      }
-
-      // Update course
-      course.addChapter(chapter, function(error) {
-        callback(null, chapter);
-      });
-    });
-  });
-};
-
-module.exports.publish = function(id, publish, callback) {
-  var self = this;
-
-  self.findById(id, function(error, chapter) {
-    if(error) {
-      callback(error);
-    }
-
-    if(!chapter) {
-      callback('Chapter not found');
-    }
-
-    if(publish) {
-      chapter['status'] = 'published';
-    } else {
-      chapter['status'] = 'draft';
-    }
-    
-    self.save(chapter, function(error) {
-      if(error) {
-        callback(error);
-      }
-
-      // Update course
-      course.updateChapter(chapter, function(error) {
-        if(error) {
-          callback(error);
-        }
-
-        callback(null, chapter);
-      });
-    });
-  });
-};
-
-module.exports.removeChapter = function(id, callback) {
-  var self = this;
-
-  self.findById(id, function(error, chapter) {
-    if(error) {
-      callback(error);
-    }
-
-    course.removeChapter(chapter, function(error) {
-      if(error) {
-        callback(error);
-      }
-
-      self.remove({_id: id}, function(error) {
-        if(error) {
-          callback(error);
-        }
-
-        callback();
-      });
-    });
-  });
-};
+mongoose.model('Chapter', Chapter);

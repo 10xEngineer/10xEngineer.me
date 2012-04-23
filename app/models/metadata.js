@@ -1,3 +1,4 @@
+
 var db = require('../helpers/database').db;
 
 module.exports = {

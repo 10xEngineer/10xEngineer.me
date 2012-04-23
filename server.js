@@ -1,5 +1,5 @@
 var express = require('express');
-var mongo = require('mongoskin');
+var mongoose = require('mongoose');
 var RedisStore = require('connect-redis')(express);
 var sessionStore = new RedisStore();
 
@@ -27,6 +27,34 @@ var client = redis.createClient();
 client.on("error", function (err) {
     log.error("[Redis] " + err);
 });
+
+// ----------------
+// MongoDB Config
+// ----------------
+// Intitialize
+mongoose.connect(config.db.address + config.db.database);
+
+log.info('Initializing models');
+// Register models
+load.model_init('count');
+load.model_init('user');
+load.model_init('course');
+load.model_init('chapter');
+
+// Sample code to test database connection
+// TODO: Remove it when not needed
+var count = load.model('Count');
+count.getNext('saves', function(error, count) {
+  if (error) {
+    log.warn('Could not determine count');
+  }
+  log.info('Run ' + count + ' times.');
+});
+
+// Migrate database schema
+// TODO: Find a way to wait before this finishes executing
+//load.helper('dbMigrator')(config.db);
+
 
 // Authentication Middleware
 var authMiddleware = load.helper('auth')(config.auth);
@@ -70,23 +98,6 @@ app.configure('production', function(){
   log.setLevel('INFO');
 });
 
-
-// ----------------
-// MongoDB Config
-// ----------------
-// Sample code to test database connection
-// TODO: Remove it when not needed
-var count = load.model('count');
-count.getNext('saves', function(error, count) {
-  if (error) {
-    log.warn('Could not determine count');
-  }
-  log.info('Run ' + count + ' times.');
-});
-
-// Migrate database schema
-// TODO: Find a way to wait before this finishes executing
-load.helper('dbMigrator')(config.db);
 
 
 // Custom middleware

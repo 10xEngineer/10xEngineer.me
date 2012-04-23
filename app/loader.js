@@ -1,4 +1,5 @@
 var path = require('path');
+var mongoose = require('mongoose');
 var rootPath = path.join(process.cwd(), 'app');
 
 module.exports = function(appRoot) {
@@ -11,6 +12,8 @@ var Load = function(type, name) {
   var type = args[0];
   if(type == 'model') {
     return loadModel(name);
+  } else if(type == 'model_init') {
+    return initModel(name);
   } else if(type == 'helper') {
     return loadHelper(name);
   } else if(type == 'controller') {
@@ -21,9 +24,13 @@ var Load = function(type, name) {
   }
 };
 
-var loadModel = Load.model = function(name) {
+var initModel = Load.model_init = function(name) {
   var modelPath = rootPath + '/models';
   return require(path.join(modelPath, name));
+};
+
+var loadModel = Load.model = function(name) {
+  return mongoose.model(name);
 };
 
 var loadHelper = Load.helper = function(name) {
