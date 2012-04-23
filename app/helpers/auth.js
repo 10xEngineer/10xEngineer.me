@@ -1,11 +1,13 @@
 var everyauth = require('everyauth');
 var User = load.model('User');
 
+var config = load.helper('config').auth;
+
 // TODO: Debug flag. Turn off for production use.
 everyauth.debug = true;
 
 
-module.exports = function (config) {
+module.exports = function () {
   var redirectAction = function(res, data){
     var session = data.session;
 	var redirectTo = session.redirectTo;

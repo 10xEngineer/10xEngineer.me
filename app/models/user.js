@@ -4,8 +4,9 @@ var mongoose = require('mongoose')
 var Count = mongoose.model('Count');
 var config = load.helper('config');
 
+// Make _id a Numver once old schemas are migrated from version 1 to 2
 var UserSchema = new Schema({
-  _id: { type: Number, index: true },
+  _id: { type: {}, index: true },
   email: { type: String, index: true, trim: true },
   name: { type: String, trim: true },
   image: { type: String },
@@ -35,7 +36,6 @@ var UserSchema = new Schema({
 // Set default id
 UserSchema.pre('save', function(next) {
   var user = this;
-  log.info('user._id: ', !user._id);
   if(!user._id) {
     Count.getNext('user', function(error, id) {
       user._id = id;
@@ -45,6 +45,17 @@ UserSchema.pre('save', function(next) {
     next();
   }
 });
+
+// TODO: Temporary override until _id type is set to Number
+UserSchema.statics.findById = function(id, callback) {
+  try {
+    id = parseInt(id);
+  } catch(error) {
+    log.warn('Database migration required');
+  }
+
+  this.findOne({ _id: id }, callback);
+};
 
 UserSchema.statics.findOrCreate = function(source, userData, promise) {
   findBySource(source, userData, function(error, dbUser){
@@ -81,7 +92,6 @@ UserSchema.statics.findOrCreate = function(source, userData, promise) {
         }
 
         dbUser.save(function(error) {
-          log.info('here');
           if(error) {
             promise.fail(error);
           }

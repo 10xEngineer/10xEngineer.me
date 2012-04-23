@@ -6,6 +6,8 @@ var sessionStore = new RedisStore();
 var log4js = require('log4js');
 log = log4js.getLogger('app');
 
+_ = require('underscore');
+
 appRoot = process.cwd();
 
 // Module loader
@@ -41,17 +43,18 @@ mongoose.connection.on('open', function() {
 log.info('Initializing models');
 // Register models
 load.model_init('count');
+load.model_init('metadata');
 load.model_init('user');
 load.model_init('course');
 load.model_init('chapter');
 
 // Migrate database schema
 // TODO: Find a way to wait before this finishes executing
-//load.helper('dbMigrator')(config.db);
+load.helper('dbMigrator')();
 
 
 // Authentication Middleware
-var authMiddleware = load.helper('auth')(config.auth);
+var authMiddleware = load.helper('auth')();
 
 // ----------------
 // Express
@@ -113,14 +116,13 @@ requireAdmin = function (req, res, next) {
 }
 
 
-
-
 // ----------------
 // Routes
 // ----------------
 
 // Miscellaneous routes
 app.get('/', function(req, res){
+  log.info(req.user);
   res.render('main', {
     title: '10xEngineer.me Home', 
     coursenav: "N",

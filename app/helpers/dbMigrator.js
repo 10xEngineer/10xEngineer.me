@@ -1,32 +1,76 @@
-var metadata = require('../models/metadata');
+var config = load.helper('config');
+var dbConfig = config.db;
 
-module.exports = function(dbConfig) {
+var Metadata = load.model('Metadata');
+var Count = load.model('Count');
+var User = load.model('User');
+
+module.exports = function() {
   var self = this;
 
   // Check current schema version from database
-  metadata.getValue('schemaVersion', function(error, currentVersion) {
+  Metadata.getValue('schemaVersion', function(error, currentVersion) {
     if(error) {
       log.error(error);
     }
 
-    if(currentVersion && currentVersion !== dbConfig.schemaVersion) {
+    if(currentVersion !== dbConfig.schemaVersion) {
       // Schema has changed. Execute migration functions.
-      self.migrateSchema(currentVersion, dbConfig.schemaVersion);
+      migrateSchema(currentVersion, dbConfig.schemaVersion, function(version) {
+
+        // Update schemaVersion in the database
+        Metadata.setValue('schemaVersion', version);
+      });
     }
   });
 };
 
-module.exports.migrateSchema = function(dbVersion, codeVersion) {
-  for(var i=dbVersion; i<codeVersion; i++) {
+var migrateSchema = function(dbVersion, codeVersion, done) {
+  if(dbVersion < codeVersion) {
+    log.info('Migrating the database from version ' + dbVersion + ' to ' + codeVersion);
 
-    // TODO: Move the actual migration code to individual functions later
-    if(i == 1) {
-      // TODO: Code to migrate database from version 1 to 2.
-    } else if(i == 2) {
-      // TODO: 2 to 3, and so on...
-    }
+    migrate(dbVersion, codeVersion, function() {
+      process.nextTick(function() {
+        migrateSchema(++dbVersion, codeVersion, done);
+        log.info('Database has been successfully migrated to version ', dbVersion);
+      });
+    });
+  } else {
+    done(codeVersion);
   }
+};
 
-  // Update schemaVersion in the database
-  metadata.setValue('schemaVersion', codeVersion);
+var migrate = function(dbVersion, codeVersion, done) {
+  // TODO: Move the actual migration code to individual functions later
+  if(dbVersion == 1) {
+    // User _id is converted to a number from string
+    User.find({ _id: { $not: { $type: 16 }}}, function(error, users) {
+      if(error) {
+        log.error(error);
+        process.exit();
+      }
+
+      var length = users.length;
+      log.info(length);
+      _.each(users, function(user, index) {
+        Count.getNext('user', function(error, id) {
+          // Clone current user
+          var newUser = JSON.parse(JSON.stringify(user));
+
+          newUser._id = id;
+          delete newUser.id;
+          
+          user.collection.save(newUser, function(error) {
+            user.remove();
+          });
+
+          if(index == length - 1) {
+            done();
+          }
+        });
+      });
+    });
+  } else if(dbVersion == 2) {
+    // TODO: 2 to 3, and so on...
+  }
 };
