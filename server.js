@@ -6,13 +6,16 @@ var sessionStore = new RedisStore();
 var log4js = require('log4js');
 log = log4js.getLogger('app');
 
-appRoot = __dirname;
+appRoot = process.cwd();
 
-// Prototype Utilities
-require('./utils/prototypeUtils');
+// Module loader
+load = require(appRoot + '/app/loader')(appRoot);
+
+// Prototype Utilities (TODO: Use underscore instead?)
+require('./app/utils/prototypeUtils');
 
 // Read configuration
-var config = require('./helpers/config');
+var config = load.helper('config');
 
 // ----------------
 // Redis
@@ -26,7 +29,7 @@ client.on("error", function (err) {
 });
 
 // Authentication Middleware
-var authMiddleware = require('./helpers/auth')(config.auth);
+var authMiddleware = load.helper('auth')(config.auth);
 
 // ----------------
 // Express
@@ -73,7 +76,7 @@ app.configure('production', function(){
 // ----------------
 // Sample code to test database connection
 // TODO: Remove it when not needed
-var count = require('./models/count');
+var count = load.model('count');
 count.getNext('saves', function(error, count) {
   if (error) {
     log.warn('Could not determine count');
@@ -83,7 +86,7 @@ count.getNext('saves', function(error, count) {
 
 // Migrate database schema
 // TODO: Find a way to wait before this finishes executing
-require('./helpers/dbMigrator')(config.db);
+load.helper('dbMigrator')(config.db);
 
 
 // Custom middleware
@@ -139,9 +142,9 @@ app.get('/auth', function(req, res){
 
 
 // Controllers
-require('./controllers/course')(app);
-require('./controllers/admin')(app);
-require('./controllers/chapter')(app);
+load.controller('course')(app);
+load.controller('admin')(app);
+load.controller('chapter')(app);
 
 
 // Startup

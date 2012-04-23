@@ -1,10 +1,8 @@
 var path = require('path');
 var siteConfig, codeConfig, dbConfig, authConfig, adminConfig;
 
-log.info(path.resolve('./configLocal.js'));
-
-if (path.existsSync('./configLocal.js')) {
-  var config = require('../configLocal.js');
+if (path.existsSync(appRoot + '/configLocal.js')) {
+  var config = require(appRoot + '/configLocal.js');
   mail = require('mail').Mail(
     config.getMailConfig()
   );
