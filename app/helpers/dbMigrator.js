@@ -4,6 +4,7 @@ var dbConfig = config.db;
 var Metadata = load.model('Metadata');
 var Count = load.model('Count');
 var User = load.model('User');
+var Role = load.model('Role');
 
 module.exports = function() {
   var self = this;
@@ -71,6 +72,28 @@ var migrate = function(dbVersion, codeVersion, done) {
       });
     });
   } else if(dbVersion == 2) {
-    // TODO: 2 to 3, and so on...
+    // Delete default users and enter default roles in database
+    User.remove({}, function(error) {
+      log.info('Deleted all the users');
+
+      var defaultRole = new Role();
+      defaultRole.permissions = [];
+      defaultRole.permissions.push('course_all_read');
+
+      defaultRole.save(function(error){
+        // Add admin role
+        var adminRole = new Role();
+        adminRole._id = 'admin';
+        adminRole.permissions = [];
+        adminRole.permissions.push('course_all_all');
+        adminRole.permissions.push('user_all');
+
+        adminRole.save(function(error) {
+          done();
+        });
+      });
+    });
+  } else if(dbversion == 3) {
+
   }
 };

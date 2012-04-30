@@ -12,7 +12,7 @@ exports.getDBConfig = function() {
 	configValues = {
 		address: 'mongodb://localhost/',
 		database: 'bootstrap',
-		schemaVersion: 2
+		schemaVersion: 3
 	}
 	
 	return configValues;

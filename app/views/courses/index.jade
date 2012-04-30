@@ -19,16 +19,16 @@
                       .ribbon-green COMPLETED
                     - else
                       .ribbon-green(style='color: yellow;') IN PROGRESS
-                a(href='/courses/#{course._id}/1')
+                a(href='/course/#{course._id}/')
                   img.responsive(src="#{course.image}", style="height:400px; width:100%")
                 .carousel-caption
                   h3 #{course.title}
                   p Taught by Steve M.
                     span.pull-right
                       - if (registered_courses != undefined && registered_courses[course._id] && user != undefined)
-                        a.btn.btn-primary.btn-large(href='/courses/#{course._id}/1') GO TO YOUR COURSE
+                        a.btn.btn-primary.btn-large(href='/course/#{course._id}/') GO TO YOUR COURSE
                       - else
-                        a.btn.btn-large.btn-info(href='/courses/#{course._id}') LEARN MORE
+                        a.btn.btn-large.btn-info(href='/course/#{course._id}') LEARN MORE
 
           // carousel-nav
           a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
@@ -45,7 +45,7 @@
                   .ribbon-green COMPLETED
                 - else
                   .ribbon-green(style='color: yellow;') IN PROGRESS
-          a.thumbnail(href="/courses/#{course._id}/1")
+          a.thumbnail(href="/course/#{course._id}/")
             img(src="#{course.image}")
           p
             #{course.content}

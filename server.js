@@ -44,6 +44,7 @@ log.info('Initializing models');
 // Register models
 load.model_init('count');
 load.model_init('metadata');
+load.model_init('role');
 load.model_init('user');
 load.model_init('course');
 load.model_init('chapter');
@@ -77,14 +78,26 @@ app.configure(function(){
   }));
 
   app.use(authMiddleware.middleware());
-  app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+  app.use(app.router);
+});
+
+// Configure Locals
+app.use(function(req, res){
+  // expose "error" and "message" to all
+  // views that are rendered.
+  res.locals.error = req.session.error || '';
+  res.locals.message = req.session.message || '';
+  // remove them so they're not displayed on subsequent renders
+  delete req.session.error;
+  delete req.session.message;
 });
 
 // Everyauth view helper
 authMiddleware.helpExpress(app);
 
 // Express environment config
+var errorOptions = { dumpExceptions: true, showStack: true }
 app.configure('development', function(){
   app.use(log4js.connectLogger(log, { level: log4js.levels.INFO }));
   log.setLevel('TRACE');
@@ -93,8 +106,11 @@ app.configure('development', function(){
 app.configure('production', function(){
   log4js.addAppender(log4js.fileAppender('app.log'), 'app');
   log.setLevel('INFO');
+  errorOptions = {};
 });
 
+// Attach custom error handler middleware
+app.use(load.middleware('errorHandler')(errorOptions));
 
 
 // Custom middleware
@@ -116,42 +132,8 @@ requireAdmin = function (req, res, next) {
 }
 
 
-// ----------------
 // Routes
-// ----------------
-
-// Miscellaneous routes
-app.get('/', function(req, res){
-  log.info(req.user);
-  res.render('main', {
-    title: '10xEngineer.me Home', 
-    coursenav: "N",
-    Course: '',
-    Unit: ''
-  });
-});
-
-app.get('/about', function(req, res){
-  res.render('default', {
-    title: '10xEngineer.me About',
-    coursenav: "N",
-    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
-  });
-});
-
-app.get('/auth', function(req, res){
-  res.render('users/login', {
-    title: 'Log In',
-    coursenav: "N",
-    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
-  });
-});
-
-
-// Controllers
-load.controller('course')(app);
-load.controller('admin')(app);
-load.controller('chapter')(app);
+load.routes()(app);
 
 
 // Startup
@@ -175,82 +157,82 @@ var wsdlurl = 'http://ideone.com/api/1/service.json';
 var io = require('socket.io').listen(app);
 io.set('log level', 0);
 io.sockets.on('connection', function (socket) {
-  	socket.on('submitcode', function(data){
-		log.info(data);
-		request(
-		    { method: 'GET'
-		    , uri: wsdlurl
-			, json: {
-						jsonrpc: "2.0",
-						method: "createSubmission", 
-						params: 
-						{
-							user: "velniukas", 
-							pass: "limehouse", 
-							sourceCode: data.source,
-							language: data.language, //javascript
-							input:true, //this is a parameter bug of the ideone API, it supposes to be a run time input, instead of an indicator to run code
-							run:true
-						}, 
-						"id": 1
-					}
-		    }
-		  , function (error, response, body) {
-				log.info(body);
-		      	socket.emit('codesent', body);
-		    }
-		  )
-	});
-	
-	socket.on('getSubmissionStatus', function(data){
-		request(
-				{
-					method:'GET',
-					uri: wsdlurl,
-					json:{
-						jsonrpc: "2.0",
-						method: "getSubmissionStatus", 
-						params: 
-						{
-							user: "velniukas", 
-							pass: "limehouse",
-							link: data.linkCode, 
-						}, 
-						"id": 1
-					}
-				},
-				function(error, response, body){
-					log.info(body);
-					socket.emit('submissionStatus', body)           
-				}
-				)
-	});
-	
-	socket.on('getSubmissionDetails', function(data){
-		request(
-			{
-				method:'GET',
-				uri: wsdlurl,
-				json:{
-					jsonrpc: "2.0",
-					method: "getSubmissionDetails", 
-					params: 
-					{
-						user: "10xengineer", 
-						pass: "secret",
-						link: data.linkCode, 
-						withSource: true,
-						withOutput: true,
-						withCmpinfo: true,
-						withStderr: true
-					}, 
-					"id": 1
-				}
-			},
-			function(error, response, body){
-				log.info(body);
-				socket.emit('submissionDetails', body)           
-			}
-		)
-	}); 
+    socket.on('submitcode', function(data){
+    log.info(data);
+    request(
+        { method: 'GET'
+        , uri: wsdlurl
+      , json: {
+            jsonrpc: "2.0",
+            method: "createSubmission", 
+            params: 
+            {
+              user: "velniukas", 
+              pass: "limehouse", 
+              sourceCode: data.source,
+              language: data.language, //javascript
+              input:true, //this is a parameter bug of the ideone API, it supposes to be a run time input, instead of an indicator to run code
+              run:true
+            }, 
+            "id": 1
+          }
+        }
+      , function (error, response, body) {
+        log.info(body);
+            socket.emit('codesent', body);
+        }
+      )
+  });
+  
+  socket.on('getSubmissionStatus', function(data){
+    request(
+        {
+          method:'GET',
+          uri: wsdlurl,
+          json:{
+            jsonrpc: "2.0",
+            method: "getSubmissionStatus", 
+            params: 
+            {
+              user: "velniukas", 
+              pass: "limehouse",
+              link: data.linkCode, 
+            }, 
+            "id": 1
+          }
+        },
+        function(error, response, body){
+          log.info(body);
+          socket.emit('submissionStatus', body)           
+        }
+        )
+  });
+  
+  socket.on('getSubmissionDetails', function(data){
+    request(
+      {
+        method:'GET',
+        uri: wsdlurl,
+        json:{
+          jsonrpc: "2.0",
+          method: "getSubmissionDetails", 
+          params: 
+          {
+            user: "10xengineer", 
+            pass: "secret",
+            link: data.linkCode, 
+            withSource: true,
+            withOutput: true,
+            withCmpinfo: true,
+            withStderr: true
+          }, 
+          "id": 1
+        }
+      },
+      function(error, response, body){
+        log.info(body);
+        socket.emit('submissionDetails', body)           
+      }
+    )
+  }); 
 });

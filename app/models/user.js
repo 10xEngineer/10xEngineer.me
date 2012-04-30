@@ -11,7 +11,7 @@ var UserSchema = new Schema({
   name: { type: String, trim: true },
   image: { type: String },
   courses: [{ type: Number, ref: 'Course'}],
-  abilities: {},
+  roles: [{ type: String, ref: 'Role' }],
   created_at: { type: Date, default: Date.now },
   modified_at: { type: Date, default: Date.now },
   google: {
@@ -36,6 +36,12 @@ var UserSchema = new Schema({
 // Set default id
 UserSchema.pre('save', function(next) {
   var user = this;
+  
+  // Assign "default" role to new user
+  if(!user.roles || user.roles.length == 0) {
+    user.roles.push('default');
+  }
+
   if(!user._id) {
     Count.getNext('user', function(error, id) {
       user._id = id;
