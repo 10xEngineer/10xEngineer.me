@@ -16,8 +16,12 @@ var Load = function(type, name) {
     return initModel(name);
   } else if(type == 'helper') {
     return loadHelper(name);
+  } else if(type == 'middleware') {
+    return loadMiddleware(name);
   } else if(type == 'controller') {
     return loadController(name);
+  } else if(type == 'routes') {
+    return loadRoutes();
   } else {
     log.error('Invalid type');
     process.exit(1);
@@ -38,7 +42,17 @@ var loadHelper = Load.helper = function(name) {
   return require(path.join(helperPath, name));
 };
 
+var loadMiddleware = Load.middleware = function(name) {
+  var middlewarePath = rootPath + '/middleware';
+  return require(path.join(middlewarePath, name));
+};
+
 var loadController = Load.controller = function(name) {
-  var controllerPath = rootPath + '/controllers';
+  var controllerPath = rootPath + '/routes';
   return require(path.join(controllerPath, name));
+};
+
+var loadRoutes = Load.routes = function() {
+  var routesPath = rootPath + '/routes';
+  return require(routesPath);
 };
