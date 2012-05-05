@@ -1,11 +1,13 @@
 var everyauth = require('everyauth');
-var user = require('../models/user');
+var User = load.model('User');
+
+var config = load.helper('config').auth;
 
 // TODO: Debug flag. Turn off for production use.
 everyauth.debug = true;
 
 
-module.exports = function (config) {
+module.exports = function () {
   var redirectAction = function(res, data){
     var session = data.session;
 	var redirectTo = session.redirectTo;
@@ -28,7 +30,7 @@ module.exports = function (config) {
       googleUser.expiresIn = extra.expires_in;
 
       var promise = this.Promise();
-      user.findOrCreate('google', googleUser, promise);
+      User.findOrCreate('google', googleUser, promise);
 
       return promise;
     })
@@ -43,11 +45,11 @@ module.exports = function (config) {
     .findOrCreateUser( function (sess, accessToken, accessSecret, twitUser) {
       var promise = this.Promise();
       
-      user.findOrCreate('twitter', twitUser, promise);
+      User.findOrCreate('twitter', twitUser, promise);
 
       return promise;
     })
-    .redirectPath(redirectAction);
+    .sendResponse(redirectAction);
 
   // Facebook
   everyauth.facebook
@@ -59,7 +61,7 @@ module.exports = function (config) {
     .findOrCreateUser( function (session, accessToken, accessTokenExtra, fbUserMetadata) {
       var promise = this.Promise();
       
-      user.findOrCreate('facebook', fbUserMetadata, promise);
+      User.findOrCreate('facebook', fbUserMetadata, promise);
 
       return promise;
     })
@@ -67,76 +69,9 @@ module.exports = function (config) {
 
   // To inject user object through express middleware
   everyauth.everymodule.findUserById( function (userId, callback) {
-    user.findById(userId, callback);
+    User.findById(userId, callback);
   });
 
   return everyauth;
 }
-/*
-
-
-everyauth
-  .password
-    .loginWith('email')
-    .getLoginPath('/login')
-    .postLoginPath('/login')
-    .loginView('login.jade')
-//    .loginLocals({
-//      title: 'Login'
-//    })
-//    .loginLocals(function (req, res) {
-//      return {
-//        title: 'Login'
-//      }
-//    })
-    .loginLocals( function (req, res, done) {
-      setTimeout( function () {
-        done(null, {
-          title: 'Async login'
-        });
-      }, 200);
-    })
-    .authenticate( function (login, password) {
-      var errors = [];
-      if (!login) errors.push('Missing login');
-      if (!password) errors.push('Missing password');
-      if (errors.length) return errors;
-      var user = usersByLogin[login];
-      if (!user) return ['Login failed'];
-      if (user.password !== password) return ['Login failed'];
-      return user;
-    })
-
-    .getRegisterPath('/register')
-    .postRegisterPath('/register')
-    .registerView('register.jade')
-//    .registerLocals({
-//      title: 'Register'
-//    })
-//    .registerLocals(function (req, res) {
-//      return {
-//        title: 'Sync Register'
-//      }
-//    })
-    .registerLocals( function (req, res, done) {
-      setTimeout( function () {
-        done(null, {
-          title: 'Async Register'
-        });
-      }, 200);
-    })
-    .validateRegistration( function (newUserAttrs, errors) {
-      var login = newUserAttrs.login;
-      if (usersByLogin[login]) errors.push('Login already taken');
-      return errors;
-    })
-    .registerUser( function (newUserAttrs) {
-      var login = newUserAttrs[this.loginKey()];
-      return usersByLogin[login] = addUser(newUserAttrs);
-    })
-
-    .loginSuccessRedirect('/')
-    .registerSuccessRedirect('/');
-
-*/
 

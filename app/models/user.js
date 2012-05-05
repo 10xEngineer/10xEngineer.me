@@ -1,46 +1,162 @@
-var db = require('../helpers/database').db;
-var config = require('../helpers/config');
+var mongoose = require('mongoose')
+  , Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId;
 
-module.exports = db.collection('users');
+var Count = mongoose.model('Count');
+var config = load.helper('config');
 
-module.exports.count = require('./count');
+// Make _id a Numver once old schemas are migrated from version 1 to 2
+var UserSchema = new Schema({
+  _id: { type: ObjectId },
+  id: { type: Number, unique: true, index: true },
+  email: { type: String, index: true, trim: true },
+  name: { type: String, trim: true },
+  image: { type: String },
+  courses: [{ type: ObjectId, ref: 'Course'}],
+  roles: [{ type: String }],
+  created_at: { type: Date, default: Date.now },
+  modified_at: { type: Date, default: Date.now },
+  google: {
+    name: String,
+    email: String,
+    picture: String
+  },
+  facebook: {
+    username: String,
+    name: String,
+    email: String
+  },
+  twitter: {
+    name: String,
+    screen_name: String,
+    profile_image_url: String
+  }
+}, {
+  collection: 'users'
+});
 
-module.exports.findById = function(id, callback) {
+// Set default id
+UserSchema.pre('save', function(next) {
+  var user = this;
+  
+  // Assign "default" role to new user
+  if(!user.roles || user.roles.length == 0) {
+    user.roles.push('default');
+  }
 
-  this.findOne({id: id}, function(error, dbUser) {
+  if(!user.id) {
+    Count.getNext('user', function(error, id) {
+      user.id = id;
+      next();
+    })
+  } else {
+    next();
+  }
+});
+
+UserSchema.statics.findById = function(id, callback) {
+  try {
+    id = parseInt(id.toString());
+  } catch(error) {
+    log.warn('Database migration required');
+  }
+
+  this.findOne({ id: id }, callback);
+};
+
+UserSchema.statics.findOrCreate = function(source, userData, promise) {
+  findBySource(source, userData, function(error, dbUser){
     if (error) {
-      return callback(error);
+      promise.fail(error);
     }
 
-    //log.info('findById called');
-    callback(null, dbUser);
+    if(!dbUser) {
+      log.trace('Could not find user!');
+
+      // if no, add a new user with specified info
+      createNew(source, userData, function(error, dbUser) {
+        if(error) {
+          promise.fail(error);
+        }
+        
+        promise.fulfill(dbUser);
+      });
+    } else {
+      // if yes, merge/update the info
+      if(!source) {
+        promise.fulfill(dbUser);
+      } else {
+        var now = new Date();
+        dbUser[source] = userData;
+        dbUser.markModified(source);
+        dbUser.modified_at = now.getTime();
+
+        if(!dbUser.name && userData['name']) {
+          dbUser.name = userData.name;
+        }
+        if(!dbUser.email && userData['email']) {
+          dbUser.email = userData.email;
+        }
+
+        dbUser.save(function(error) {
+          if(error) {
+            promise.fail(error);
+          }
+          promise.fulfill(dbUser);
+        });
+      }
+    }
   });
 };
 
-module.exports.findByEmail = function(email, callback) {
+mongoose.model('User', UserSchema);
 
-  this.findOne({email: email}, function(error, dbUser) {
-    if (error) {
-      return callback(error);
+var User = mongoose.model('User');
+
+
+// Support functions
+
+var createNew = function(source, userData, callback) {
+  var newUser = new User();
+  if(userData.name) {
+    newUser.name = userData.name
+  }
+  if(userData.email) {
+    newUser.email = userData.email;
+  }
+
+  // check against the default site admin list from console
+  if(config.admin[source] == userData.email) {
+    log.info('New user is an admin: ', config.admin[source]);
+
+    //going to be deprecated
+    newUser['role'] = 'admin';
+    newUser.abilities.role = 'admin';
+  } 
+
+  newUser[source] = userData;
+  newUser.save(function(error) {
+    if(error) {
+      callback(error);
     }
 
-    callback(null, dbUser);
+    callback(null, newUser);
   });
 };
 
-module.exports.findBySource = function(source, srcUser, callback) {
+var findBySource = function(source, userData, callback) {
 
   var select = {};
 
   if(source === 'twitter') {
-    select['twitter.screen_name'] = srcUser.screen_name;
+    select['twitter.screen_name'] = userData.screen_name;
   } else if (source === 'google') {
-    select['email'] = srcUser.email;
+    select['email'] = userData.email;
   } else if (source === 'facebook') {
-    select['email'] = srcUser.email;
+    select['email'] = userData.email;
   }
 
-  this.findOne(select, function(error, dbUser) {
+  User.findOne(select, function(error, dbUser) {
     if (error) {
       callback(error);
     }
@@ -49,118 +165,8 @@ module.exports.findBySource = function(source, srcUser, callback) {
   });
 };
 
-module.exports.findOrCreate = function(source, user, promise) {
-  var self = this;
-  var user;
-  if (arguments.length === 1) { // password-based
-    // TODO: Implement password-based auth
-  } else { // non-password-based
-    
-    self.findBySource(source, user, function(error, dbUser){
-      if (error) {
-        log.error('Unknown error: ' + error);
-      }
 
-      if(!dbUser) {
-        log.trace('Could not find user!');
-
-        // if no, add a new user with specified info
-        self.createNewPromise(user, source, promise);
-      } else {
-        // if yes, merge/update the info
-        self.updateUserBySource(dbUser, source, user, promise);
-      }
-    });
-  }
-};
-
-module.exports.createNewPromise = function (user, source, promise) {
-  this.createNew(user, source, function(error, dbUser) {
-    if(error) {
-      promise.fail(error);
-    }
-    
-    promise.fulfill(dbUser);
-  });
-};
-
-module.exports.createNew = function (user, source, callback) {
-  var self = this;
-  if(!source) {
-    // TODO: Assume it's email
-  } else {
-    self.count.getNext('user', function(error, id) {
-      if(error) {
-        callback(error);
-      }
-
-      var now = new Date();
-      var userObj = {
-        _id: id,
-        id: id,
-        created_at: now.getTime(),
-        modified_at: now.getTime(),
-				abilities: {}
-      };
-
-      if(source === 'twitter') {
-        userObj['name'] = user.name;
-      } else if(source === 'google') {
-        userObj['name'] = user.name;
-        userObj['email'] = user.email;
-      } else if(source === 'facebook') {
-        userObj['name'] = user.name;
-        userObj['email'] = user.email;
-      } else if(source === 'email') {
-        userObj['email'] = user.email;
-      }
-	    
-	  	// check against the default site admin list from console
-		  if( config.admin[source] == user.name || config.admin[source] == user.email ) {
-		    log.info('New user is an admin: ', config.admin[source]);
-				//going to be deprecated
-				userObj['role'] = 'admin';
-				userObj.abilities.role = 'admin';
-		  } 
-      userObj[source] = user;
-      
-      self.insert(userObj);
-      callback(null, userObj);
-    });
-  }
-};
-
-module.exports.updateUserBySource = function (dbUser, source, srcUser, promise) {
-  if(!source) {
-    promise.fulfill(dbUser);
-  } else {
-    var now = new Date();
-    dbUser[source] = srcUser;
-    dbUser['modified_at'] = now.getTime();
-
-    if(!dbUser['name'] && srcUser['name']) {
-      dbUser['name'] = srcUser.name;
-    }
-    if(!dbUser.email && srcUser['email']) {
-      dbUser['email'] = srcUser.email;
-    }
-
-    this.save(dbUser, {}, function(error) {
-      if(error) {
-        log.error(error);
-      }
-      promise.fulfill(dbUser);
-    });
-  }
-};
-
-module.exports.updateUser = function(dbUser, callback){
-	this.save(dbUser, {}, function(error){
-		if(error)
-			log.error(error);
-		callback(error, dbUser);
-	})
-}
+// TODO: Migrate later
 
 module.exports.findOrCreateRegisteredCourse = function(user, course_id) {		
 	//initialize the registered course.

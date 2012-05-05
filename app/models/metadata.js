@@ -1,30 +1,15 @@
-var db = require('../helpers/database').db;
+var mongoose = require('mongoose')
+  , Schema = mongoose.Schema;
 
-module.exports = {
-  collection: db.collection('metadata')
-};
+var MetadataSchema = new Schema({
+  _id: { type: Number, default: 0 },
+  schemaVersion: { type: Number, default: 1 }
+}, {
+  collection: 'metadata'
+});
 
-module.exports.getDocument = function(callback) {
-  var self = this;
-  self.collection.findOne(function(error, doc) {
-    if(error) {
-      callback(error);
-    }
-
-    if(!doc) {
-      var blankObj = {
-        _id: 0
-      };
-      callback(null, blankObj);
-    } else {
-      callback(null, doc);
-    }
-  });
-};
-
-module.exports.getValue = function (key, callback) {
-  var self = this;
-  self.getDocument(function(error, doc) {
+MetadataSchema.statics.getValue = function(key, callback) {
+  getDocument(function(error, doc) {
     if(error) {
       callback(error);
     }
@@ -33,15 +18,36 @@ module.exports.getValue = function (key, callback) {
   });
 };
 
-module.exports.setValue = function (key, value) {
-  var self = this;
-  self.getDocument(function(error, doc) {
+MetadataSchema.statics.setValue = function(key, value) {
+  getDocument(function(error, doc) {
     if(error) {
       log.error(error);
     }
 
     doc[key] = value;
+    doc.markModified(key);
     
-    self.save(doc);
+    doc.save();
+  });
+};
+
+mongoose.model('Metadata', MetadataSchema);
+
+var Metadata = mongoose.model('Metadata');
+
+var getDocument = function(callback) {
+  Metadata.findOne(function(error, doc) {
+    if(error) {
+      callback(error);
+    }
+
+    if(!doc) {
+      doc = new Metadata();
+      doc.save(function(error){
+        callback(null, doc);
+      });
+    } else {
+      callback(null, doc);
+    }
   });
 };
