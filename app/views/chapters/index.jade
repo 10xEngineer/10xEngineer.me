@@ -1,32 +1,32 @@
 //- Chapter index (Lesson list)
+include _header
 .container-fluid.chapter-index.inner-index
   .row-fluid
     .chapter-header
       .chapter-content
         h2 #{chapter.title}
-        p #{chapter.description}
-        - if(user != undefined && user.role == 'admin')
+        p #{chapter.desc}
+        -if(everyauth.loggedIn && isAdmin)
           .btn-strip
-            a.btn.btn-success(href="/chapters/#{chapter._id}/create_lesson") Add Lesson
-            a.btn(href='/chapters/#{chapter._id}/edit') Edit Chapter Info
-            a.btn.btn-danger(href='') Delete Chapter
+            a.btn.btn-success(href="/lesson/create/#{chapter.id}") Add Lesson
+            a.btn(href='/chapter/#{chapter.id}/edit') Edit Chapter Info
+            a.btn.btn-danger(href='/chapter/#{chapter.id}/remove') Delete Chapter
 
   .row-fluid
     ul.lessons
       - if(typeof(chapter.lessons) != 'undefined')
         each lesson in chapter.lessons
-          li.chapter
-            a(href='/chapters/#{chapter.id}/')
-              h3
-                #{chapter.title}
-            - if(user != undefined && user.role == 'admin')
-              - if(chapter.status != 'published')
+          li.lesson
+            a(href='/lesson/#{lesson.id}/')
+              h3 #{lesson.title}
+            - if(everyauth.loggedIn && isAdmin)
+              - if(lesson.status != 'published')
                 | (Draft)
-              a.btn.btn-danger.pull-right(href='/chapters/#{chapter.id}/remove', style='margin-right: 5px;') Delete
-              - if(chapter.status != 'published')
-                a.btn.btn-success.pull-right(href='/chapters/#{chapter.id}/publish', style='margin-right: 5px;') Publish
+              a.btn.btn-danger.pull-right(href='/lesson/#{lesson.id}/remove', style='margin-right: 5px;') Delete
+              - if(lesson.status != 'published')
+                a.btn.btn-success.pull-right(href='/lesson/#{lesson.id}/publish', style='margin-right: 5px;') Publish
               - else
-                a.btn.btn-success.pull-right(href='/chapters/#{chapter.id}/unpublish', style='margin-right: 5px;') Unpublish
+                a.btn.btn-success.pull-right(href='/lesson/#{lesson.id}/unpublish', style='margin-right: 5px;') Unpublish
               button.btn.pull-right(type='button', style='margin-right: 5px;') Edit
             .progress(style='margin: 10px 0;')
               .bar(style="width: 0%;")

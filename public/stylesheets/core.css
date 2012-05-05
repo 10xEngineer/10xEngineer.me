@@ -1,0 +1,177 @@
+/* Global style */
+body {
+	background: url(../img/furley_bg.png);
+}
+footer {
+	margin-top: 30px;
+}
+
+/* helper */
+img.repsonsive { max-width:100%; }
+
+/* Per page style */
+/** Main Page **/
+.main-page .page-header {
+	width:100%;
+}
+.main-page .header-photo {
+	max-width: 100%;
+}
+.main-page .page-header h1 { width: 90%; }
+
+/** Auth Page **/
+.auth-page .auth-service {
+	list-style:none;
+	width: 180px;
+	margin:0 auto;
+}
+.auth-page .auth-service li {
+	margin-bottom: 0.5em;
+}
+.auth-page .auth-service li .btn {
+	display:block;
+}
+li.fb .btn {
+background: #3B5998;
+background: -moz-linear-gradient(top, #3B5998 0%, #3B5998 50%, #325190 50%, #325190 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3B5998), color-stop(50%,#3B5998), color-stop(50%,#325190), color-stop(100%,#325190));
+background: -webkit-linear-gradient(top, #3B5998 0%,#3B5998 50%,#325190 50%,#325190 100%);
+background: -o-linear-gradient(top, #3B5998 0%,#3B5998 50%,#325190 50%,#325190 100%);
+background: -ms-linear-gradient(top, #3B5998 0%,#3B5998 50%,#325190 50%,#325190 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b5998', endColorstr='#325190',GradientType=0 );
+background: linear-gradient(top, #3B5998 0%,#3B5998 50%,#325190 50%,#325190 100%);
+}
+/* widgets */
+/** carousel w/ list **/
+ul.carousel-inner,  ul.carousel-inner li.item { margin:0; }
+.carousel-inner li { color: #fff }
+
+/** Page Header **/
+.page-header { border-bottom: 1px solid #CCC; }
+
+/** Well & Welled Nav **/
+.well { 
+	background-color: white;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px; 
+}
+.sidebar.well {
+	padding: 8px 0; 
+}
+.sidebar .nav .nav-header {
+	color:#333;
+}
+
+/** Better Tab **/
+.nav-tabs.nav-stacked > li > a { background-color:#fff }
+.nav-tabs {
+	margin-bottom:0;
+}
+.tab-content {
+	border: 1px solid #DDD;
+	border-top:none;
+}
+.tab-pane {
+	background-color: #fff;
+	padding: 18px;
+	
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.nav-tabs > .active > a {
+	pointer-events: none; /* Avoid Lock/Double Clicking in sequence: li.active -> li */
+}
+/** IDE **/
+#pageslide {
+	background: #fff url(../img/snow.png);
+	-webkit-box-shadow: inset 0 0 28px 2px rgba(0,0,0,0.4);
+	-moz-shadow: inset 0 0 28px 2px rgba(0,0,0,0.4);
+	box-shadow: inset 0 0 28px 2px rgba(0,0,0,0.4);
+}
+
+.action-bar {
+	margin-bottom: 6px;
+}
+
+/** Video player **/
+.jp-video {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	
+}
+
+/* Chapters */
+
+div.course-header,
+div.chapter-header {
+	margin-bottom: 220px;
+}
+
+div.course-header .course-img,
+div.course-header .course-content,
+div.chapter-header .chapter-content {
+	display: inline-block;
+	float: left;
+}
+
+div.course-header .course-img img {
+	width: auto;
+	height: 200px;
+}
+div.course-header .course-content,
+div.chapter-header .chapter-content {
+	width: 75%;
+	margin: 0px 0px 0px 20px;
+}
+div.course-header .course-content .btn-strip .btn,
+div.chapter-header .chapter-content .btn-strip .btn {
+	margin-right: 10px;
+}
+
+ul.chapters li,
+ul.lessons li {
+	margin: 5px 0;
+	background: white;
+	padding: 10px;
+	border: solid 1px #eee;
+	border-radius: 10px 10px;
+	list-style: none;
+	margin-left: 0;
+	margin-bottom: 18px;
+}
+
+ul.chapters li a, ul.chapters li a h3,
+ul.lessons li a, ul.lessons li a h3 {
+	display: inline;
+}
+
+/* Chapters End */
+
+
+@media screen and (max-width:480px) {
+	p{	
+	font-size: .9em;
+	}
+	.navbar .container-fluid { padding: 0; }
+	.hero-unit { padding: 20px }
+}
+
+
+@media screen and (min-width: 700px) and (max-width:1199px) {
+	p{	
+	font-size: 1em;
+	}
+}
+
+
+@media screen and (min-width: 1200px) {
+	p{	
+	font-size: 1em;
+	}
+}
