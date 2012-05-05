@@ -16,8 +16,6 @@ module.exports.list = function(req, res){
     registered_courses = req.user.registered_courses;
   }
 
-  log.info('user = ', req.user);
-  log.info('registered courses = ', registered_courses);
   Course.find({}, function(error, courses){
     res.render('courses', { 
       title: 'Courses',
@@ -37,22 +35,22 @@ module.exports.createView = function(req, res){
 
 // Create a new course
 module.exports.create = function(req, res){
-  validateCourseData(req, function (error, data){
-    if (error) {
-      log.error(error);
-      res.redirect('/course/create/?' + error);
-    } else {
-      if (!data.created_by) {
-        data.created_by = req.user.id;
-      }
-      Course.createNew( data, function( error, course) {
-        id = course._id;
+  var course = new Course();
+  course.title = req.body.title;
+  course.desc = req.body.description;
+  course.image = req.body.image;
+  course.created_by = req.user._id;
 
-        //Set the course info in the session to let socket.io know about it.
-        req.session.newCourse = {title: course.title, _id: id};
-        res.redirect('/courses/' + id);
-      });
+  course.save(function(error) {
+    if(error) {
+      log.error(error);
     }
+
+    var id = course.id;
+
+    //Set the course info in the session to let socket.io know about it.
+    req.session.newCourse = {title: course.title, _id: course._id};
+    res.redirect('/course/' + id);
   });
 };
 
@@ -80,7 +78,7 @@ module.exports.import = function(req, res, next) {
     parsedCourse = JSON.parse(fs.readFileSync(f.path, 'utf-8'));
   } catch (e) {
     log.error(e);
-    //res.redirect('/courses/import', {error: e});
+    //res.redirect('/course/import', {error: e});
   }
 
   // Check whether the uploaded course already exists
@@ -105,7 +103,7 @@ module.exports.import = function(req, res, next) {
       parsedCourse['created_by'] = req.user.id;
       course.createNew(parsedCourse, function(error) {
         log.info('new course created.');
-        res.redirect('/courses/import?success=true');
+        res.redirect('/course/import?success=true');
       });
     }
   });
@@ -113,57 +111,33 @@ module.exports.import = function(req, res, next) {
 
 // Load specific course and display chapter index
 module.exports.show = function(req, res){
-  if (!req.course) {
-    res.redirect('/courses/');
-  } else {
-    log.trace("course", req.course)
-    
-    var renderParams = {
-      title: req.course.title,
-    };
-
-    res.render('courses/chapters', renderParams);
-  }
+  res.render('courses/chapters', {
+    title: req.course.title,
+    chapter: undefined
+  });
 };
 
 // Edit course
 module.exports.updateView = function(req, res, next){
-  if (!req.course) {
-    res.redirect('/courses/');
-  } else {
-    log.trace("course", req.course)
-  
-    var renderParams = {
-      title: req.course.title,
-    };
-
-    res.render('courses/edit', renderParams);
-  }
+  res.render('courses/edit', {
+    title: req.course.title
+  });
 };
 
 // TODO: Update course
 module.exports.update = function(req, res, next){
-  if (!req.course) {
-    res.redirect('/courses/');
-  } else {
-    log.trace("course", req.course)
-  
-    var renderParams = {
-      title: req.course.title,
-    };
-
-    res.render('courses/edit', renderParams);
-  }
+  res.render('courses/edit', {
+    title: req.course.title
+  });
 };
 
 // Remove entire course and its chapters
 module.exports.remove = function(req, res, next){
-  if (!req.course || req.params.id === 'null') {
-    res.redirect('/courses');
-  }
-  log.info('Removing...');
+  log.info('Removing course...');
 
-  course.removeById(req.params.id, function(error){
+  var course = req.course;
+
+  course.removeCourse(function(error){
     if (error) {
       log.error(error);
     }

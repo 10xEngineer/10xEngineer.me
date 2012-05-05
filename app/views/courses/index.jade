@@ -1,11 +1,11 @@
 //- Course Admin index?
 .container-fluid.course-index.inner-index
-  -if(user != undefined && user.role == 'admin')
+  -if(everyauth.loggedIn && isAdmin)
     .row-fluid
       .span1
-      p.actions.clearfix.span10
-        a(href='/courses/create').btn.btn-large.btn-primary.pull-left Add Course
-        a(href='/courses/import').btn.btn-large.btn-inverse.pull-right Import a course
+      p.actions.clearfix
+        a(href='/course/create').btn.btn-large.btn-primary.pull-left Add Course
+        a(href='/course/import').btn.btn-large.btn-inverse.pull-right Import a course
     .span1
   #carousel.row
     .span10.offset1
@@ -13,22 +13,22 @@
           ul.carousel-inner(style="width:100%; height:600px")
             each course, code in courses
               li.item.ribbon-wrapper
-                - if (registered_courses != undefined && registered_courses[course._id] && user != undefined)
+                - if (registered_courses != undefined && registered_courses[course.id] && user != undefined)
                   .ribbon-wrapper-green
-                    - if(registered_courses[course._id].status == 'COMPLETED')
+                    - if(registered_courses[course.id].status == 'COMPLETED')
                       .ribbon-green COMPLETED
                     - else
                       .ribbon-green(style='color: yellow;') IN PROGRESS
-                a(href='/course/#{course._id}/')
+                a(href='/course/#{course.id}/')
                   img.responsive(src="#{course.image}", style="height:400px; width:100%")
                 .carousel-caption
                   h3 #{course.title}
                   p Taught by Steve M.
                     span.pull-right
-                      - if (registered_courses != undefined && registered_courses[course._id] && user != undefined)
-                        a.btn.btn-primary.btn-large(href='/course/#{course._id}/') GO TO YOUR COURSE
+                      - if (registered_courses != undefined && registered_courses[course.id] && user != undefined)
+                        a.btn.btn-primary.btn-large(href='/course/#{course.id}/') GO TO YOUR COURSE
                       - else
-                        a.btn.btn-large.btn-info(href='/course/#{course._id}') LEARN MORE
+                        a.btn.btn-large.btn-info(href='/course/#{course.id}') LEARN MORE
 
           // carousel-nav
           a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
@@ -39,13 +39,13 @@
       each course, code in courses
         li.span3.well
           .ribbon-wrapper
-            - if (registered_courses != undefined && registered_courses[course._id] && user != undefined)
+            - if (registered_courses != undefined && registered_courses[course.id] && user != undefined)
               .ribbon-wrapper-green
-                - if(registered_courses[course._id].status == 'COMPLETED')
+                - if(registered_courses[course.id].status == 'COMPLETED')
                   .ribbon-green COMPLETED
                 - else
                   .ribbon-green(style='color: yellow;') IN PROGRESS
-          a.thumbnail(href="/course/#{course._id}/")
+          a.thumbnail(href="/course/#{course.id}/")
             img(src="#{course.image}")
           p
             #{course.content}

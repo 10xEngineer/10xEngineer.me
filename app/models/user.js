@@ -1,17 +1,19 @@
 var mongoose = require('mongoose')
-  , Schema = mongoose.Schema;
+  , Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId;
 
 var Count = mongoose.model('Count');
 var config = load.helper('config');
 
 // Make _id a Numver once old schemas are migrated from version 1 to 2
 var UserSchema = new Schema({
-  _id: { type: {}, index: true },
+  _id: { type: ObjectId },
+  id: { type: Number, unique: true, index: true },
   email: { type: String, index: true, trim: true },
   name: { type: String, trim: true },
   image: { type: String },
-  courses: [{ type: Number, ref: 'Course'}],
-  roles: [{ type: String, ref: 'Role' }],
+  courses: [{ type: ObjectId, ref: 'Course'}],
+  roles: [{ type: String }],
   created_at: { type: Date, default: Date.now },
   modified_at: { type: Date, default: Date.now },
   google: {
@@ -42,9 +44,9 @@ UserSchema.pre('save', function(next) {
     user.roles.push('default');
   }
 
-  if(!user._id) {
+  if(!user.id) {
     Count.getNext('user', function(error, id) {
-      user._id = id;
+      user.id = id;
       next();
     })
   } else {
@@ -52,15 +54,14 @@ UserSchema.pre('save', function(next) {
   }
 });
 
-// TODO: Temporary override until _id type is set to Number
 UserSchema.statics.findById = function(id, callback) {
   try {
-    id = parseInt(id);
+    id = parseInt(id.toString());
   } catch(error) {
     log.warn('Database migration required');
   }
 
-  this.findOne({ _id: id }, callback);
+  this.findOne({ id: id }, callback);
 };
 
 UserSchema.statics.findOrCreate = function(source, userData, promise) {

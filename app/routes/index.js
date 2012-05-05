@@ -1,5 +1,7 @@
 var main = load.controller('main');
 var course = load.controller('course');
+var chapter = load.controller('chapter');
+var lesson = load.controller('lesson');
 var quiz = load.controller('quiz');
 var admin = load.controller('admin');
 
@@ -10,30 +12,6 @@ var ability = load.helper('ability');
 // Middleware
 // ---------------------
 
-var validateCourseData = function (req, callback) {
-  errors = [];
-  data = {};
-
-  if (!req.body.title) {
-    errors.push('Title required.');  
-  }
-  if (!req.body.description) {
-    errors.push('Description required.');  
-  }
-
-  if (errors.length > 0) {
-    callback(errors);
-  } else {
-    data.title = req.body.title;
-    data.description = req.body.description;
-
-    if(req.body.image) {
-      data.image = req.body.image;
-    }
-
-    callback( null, data);
-  }
-};
 
 // IDEONE documentation http://ideone.com/files/ideone-api.pdf
 var submitCode = function(code) {
@@ -72,8 +50,7 @@ var validUser = function(req, res, next) {
 
 var validCoursePermission = function(entity, action){
   return function(req, res, next){
-    if(req.loggedIn && ability.can(req.user.roles, entity, req.course.id, action)){
-      log.info('here');
+    if(req.loggedIn && ability.can(req.user.roles, entity, req.course._id, action)){
       next();
       return;
     }
@@ -86,8 +63,29 @@ var validCoursePermission = function(entity, action){
 
 module.exports = function(app) {
 
+  // Interceptors
+  app.all('/*', function(req, res, next) {
+    
+    if(req.loggedIn) {
+      res.local('isAdmin', _.include(req.user.roles, 'admin'));
+    } else {
+      res.local('isAdmin', false);
+    }
+
+    next();
+  });
+
+  //filter for checking if the users have login
+  app.all('/courses/:op?/*', validUser, function(req, res, next){
+    next();
+  });
+
+
   // Load Express data middleware
   load.middleware('data')(app);
+
+
+  // Routes
 
   // Miscellaneous
   app.get('/', main.home);
@@ -107,7 +105,23 @@ module.exports = function(app) {
   app.get('/course/:courseId', validCoursePermission('course', 'read'), course.show);
   app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
   app.put('/course/:courseId', validCoursePermission('course', 'edit'), course.update);
-  app.delete('/course/:courseId', validCoursePermission('course', 'delete'), course.remove);
+  app.get('/course/:courseId/remove', validCoursePermission('course', 'delete'), course.remove);
+
+
+  // Chapter
+  app.get('/chapter/create/:courseId', chapter.createView);
+  app.post('/chapter/create/:courseId', chapter.create);
+  app.get('/chapter/:chapterId', chapter.show);
+  app.get('/chapter/:chapterId/edit', chapter.editView);
+  app.post('/chapter/:chapterId/edit', chapter.edit);
+  app.get('/chapter/:chapterId/remove', chapter.remove);
+  app.get('/chapter/:chapterId/publish', chapter.publish);
+  app.get('/chapter/:chapterId/unpublish', chapter.unpublish);
+
+
+  // Lesson
+  app.get('/lesson/create/:chapterId', lesson.createView);
+  app.post('/lesson/create/:chapterId', lesson.create);
 
 
   // Quiz
@@ -116,8 +130,11 @@ module.exports = function(app) {
   app.get('/quiz/:id/:unit/:lesson', quiz.view);
   app.post('/quiz/:id/:unit/:lesson', quiz.test);
 
+
   // Admin
   app.get('/admin', admin.show);
+  // TODO: Temporary admin path to make a user admin
+  app.get('/admin/:userId/:roleId', admin.assignRole);
 
 
 
@@ -142,20 +159,17 @@ module.exports = function(app) {
   });
 
   // Handles 404 errors. This should be the last route.
-  app.get('/*', function(req, res) {
-    throw new load.middleware('errorHandler').NotFound;
+  app.get('/*', function(req, res, next) {
+    log.info('404');
+    next(new Error('Not Found: ' + req.url));
+    //throw new load.middleware('errorHandler').NotFound('Page not found');
   });
 
 
   // Middleware
 
-  //filter for checking if the users have login
-  app.all('/courses/:op?/*', validUser, function(req, res, next){
-    next();
-  });
-
   // Convert a parameter to integer
-  app.param(['courseId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'userId'], function(req, res, next, num, name){ 
     req.params[name] = num = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('failed to parseInt ' + num));

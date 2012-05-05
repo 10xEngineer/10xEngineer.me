@@ -52,7 +52,10 @@ var migrate = function(dbVersion, codeVersion, done) {
       }
 
       var length = users.length;
-      log.info(length);
+      if(length == 0) {
+        done();
+      }
+
       _.each(users, function(user, index) {
         Count.getNext('user', function(error, id) {
           // Clone current user
@@ -81,9 +84,14 @@ var migrate = function(dbVersion, codeVersion, done) {
       defaultRole.permissions.push('course_all_read');
 
       defaultRole.save(function(error){
+        if(error) {
+          log.error(error);
+          process.exit();
+        }
+
         // Add admin role
         var adminRole = new Role();
-        adminRole._id = 'admin';
+        adminRole.name = 'admin';
         adminRole.permissions = [];
         adminRole.permissions.push('course_all_all');
         adminRole.permissions.push('user_all');

@@ -1,150 +1,99 @@
-var chapter = require('../models/chapter');
+var Chapter = load.model('Chapter');
 
-// ---------------------
-// Middleware
-// ---------------------
+module.exports = function() {};
 
-
-
-
-// ------------
-// Routes
-// ------------
-module.exports = function (app) {
-
-  // Create new course form
-  app.get('/chapters/create/:courseId', function(req, res){
-    res.render('chapters/create', {
-      title: 'New Chapter',
-      chapter: {_id: '', title: ''}
-    });
+// Create new chapter form
+module.exports.createView = function(req, res){
+  res.render('chapters/create', {
+    title: 'New Chapter',
+    chapter: {id: '', title: ''}
   });
+};
 
-  // Create a new course
-  app.post('/chapters/create/:courseId', function(req, res){
-    var data = {
-      course: parseInt(req.params.courseId),
-      title: req.body.title,
-      description: req.body.description
-    };
+// Create a new chapter
+module.exports.create = function(req, res){
+  var chapter = new Chapter();
+  chapter.title = req.body.title;
+  chapter.desc = req.body.description;
+  chapter.course = req.course._id;
+  chapter.created_by = req.user.id;
 
-    if (!data.created_by) {
-      data.created_by = req.user.id;
+  chapter.save(function(error) {
+    if(error) {
+      log.error(error);
     }
-    chapter.createNew( data, function( error, chapter) {
-      id = chapter._id;
 
-      res.redirect('/courses/' + req.params.courseId);
-    });
+    res.redirect('/course/' + req.course.id);
   });
+};
 
-  // Load a chapter
-  app.get('/chapters/:id', function(req, res) {
-    var chapterId = parseInt(req.params.id);
-
-    chapter.findById(chapterId, function(error, chapter) {
-      if(error) {
-        log.error(error);
-      }
-
-      res.render('chapters', {
-        title: chapter.title,
-        chapter: chapter
-      });
-    });
+// Load a chapter
+module.exports.show = function(req, res) {
+  res.render('chapters', {
+    title: req.chapter.title
   });
+};
 
-  // Edit chapter information
-  app.get('/chapters/:id/edit', function(req, res) {
-    var chapterId = parseInt(req.params.id);
-
-    chapter.findById(chapterId, function(error, chapter) {
-      if(error) {
-        log.error(error);
-      }
-
-      res.render('chapters/edit', {
-        title: chapter.title,
-        chapter: chapter
-      });
-    });
+// Edit chapter information
+module.exports.editView = function(req, res) {
+  res.render('chapters/edit', {
+    title: req.chapter.title
   });
+};
 
-  // Save edited chapter
-  app.post('/chapters/:id/edit', function(req, res){
-    var chapterId = parseInt(req.params.id);
+// Save edited chapter
+module.exports.edit = function(req, res){
+  var chapter = req.chapter;
 
-    chapter.findById(chapterId, function(error, dbChapter) {
-      if(error) {
-        log.error(error);
-      }
+  chapter.title = req.body.title;
+  chapter.desc = req.body.description;
 
-      dbChapter['title'] = req.body.title;
-      dbChapter['description'] = req.body.description;
+  chapter.save(function(error) {
+    if(error) {
+      log.error(error);
+    }
 
-      chapter.save(dbChapter, function(error) {
-        if(error) {
-          log.error(error);
-        }
-
-        res.redirect('/chapters/' + chapterId);
-      })
-    });
+    res.redirect('/chapter/' + chapter.id);
   });
+};
 
-  // Display create lesson page
-  app.get('/chapters/:id/create_lesson', function(req, res) {
-    var chapterId = parseInt(req.params.id);
+// Remove a chapter
+module.exports.remove = function(req, res) {
+  log.info('Removing chapter...');
 
-    chapter.findById(chapterId, function(error, dbChapter) {
-      if(error) {
-        log.error(error);
-      }
+  var chapter = req.chapter;
 
-      res.render('chapters/lesson_create', {
-        title: chapter.title,
-        chapter: dbChapter,
-        lesson: {title: '', description: ''}
-      });
-    });
+  chapter.removeChapter(function(error) {
+    if(error) {
+      log.error(error);
+      res.redirect('/chapter/:id');
+    }
+    res.redirect('/courses');
   });
+};
 
-  // Remove a chapter
-  app.get('/chapters/:id/remove', function(req, res) {
-    var chapterId = parseInt(req.params.id);
+// Publish a chapter
+module.exports.publish = function(req, res) {
+  var chapter = req.chapter;
 
-    chapter.removeChapter(chapterId, function(error) {
-      if(error) {
-        log.error(error);
-        res.redirect('/chapters/:id');
-      }
-      res.redirect('/courses');
-    });
+  chapter.publish(true, function(error) {
+    if(error) {
+      log.error(error);
+    }
+
+    res.redirect('/course/' + chapter.course.id);
   });
+};
 
-  // Publish a chapter
-  app.get('/chapters/:id/publish', function(req, res) {
-    var chapterId = parseInt(req.params.id);
+// unpublish a chapter
+module.exports.unpublish = function(req, res) {
+  var chapter = req.chapter;
 
-    chapter.publish(chapterId, true, function(error, chapter) {
-      if(error) {
-        log.error(error);
-      }
+  chapter.publish(false, function(error, chapter) {
+    if(error) {
+      log.error(error);
+    }
 
-      res.redirect('/courses/' + chapter.course);
-    });
-  });
-
-  // unpublish a chapter
-  app.get('/chapters/:id/unpublish', function(req, res) {
-    var chapterId = parseInt(req.params.id);
-
-    chapter.publish(chapterId, false, function(error, chapter) {
-      if(error) {
-        log.error(error);
-      }
-
-      res.redirect('/courses/' + chapter.course);
-    });
+    res.redirect('/course/' + chapter.course.id);
   });
 };

@@ -10,7 +10,7 @@ exports = module.exports = function errorHandler(options) {
 
   return function errorHandler(err, req, res, next) {
     res.statusCode = 500;
-    if(dumpExceptions) console.error(err.stack);
+    if(dumpExceptions) log.error(err);
     var app = res.app;
 
     if(err instanceof exports.NotFound) {

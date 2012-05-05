@@ -108,12 +108,14 @@ ul.carousel-inner,  ul.carousel-inner li.item { margin:0; }
 
 /* Chapters */
 
-div.course-header {
+div.course-header,
+div.chapter-header {
 	margin-bottom: 220px;
 }
 
 div.course-header .course-img,
-div.course-header .course-content {
+div.course-header .course-content,
+div.chapter-header .chapter-content {
 	display: inline-block;
 	float: left;
 }
@@ -122,15 +124,18 @@ div.course-header .course-img img {
 	width: auto;
 	height: 200px;
 }
-div.course-header .course-content {
+div.course-header .course-content,
+div.chapter-header .chapter-content {
 	width: 75%;
 	margin: 0px 0px 0px 20px;
 }
-div.course-header .course-content .btn-strip .btn {
+div.course-header .course-content .btn-strip .btn,
+div.chapter-header .chapter-content .btn-strip .btn {
 	margin-right: 10px;
 }
 
-ul.chapters li {
+ul.chapters li,
+ul.lessons li {
 	margin: 5px 0;
 	background: white;
 	padding: 10px;
@@ -141,7 +146,8 @@ ul.chapters li {
 	margin-bottom: 18px;
 }
 
-ul.chapters li a, ul.chapters li a h3{
+ul.chapters li a, ul.chapters li a h3,
+ul.lessons li a, ul.lessons li a h3 {
 	display: inline;
 }
 
