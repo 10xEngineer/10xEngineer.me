@@ -22,7 +22,7 @@
 			table#permissions.table
 				tr
 					th
-						|Course Id
+						|Page Id
 					th
 						|Read
 					th
@@ -33,20 +33,20 @@
 					each course, key in usr.abilities.courses
 						tr.permission(name='#{key}')
 							td.course_id
-								a(href='/courses/#{key}') #{key}
+								a(href='/pages/#{key}') #{key}
 								input(type="hidden", value='#{key}')
 							td.read
-								- if(ability.can(usr.abilities,"read",'courses',key))
+								- if(ability.can(usr.abilities,"read",'pages',key))
 									input(type="checkbox", name='read', checked)
 								- else
 									input(type="checkbox", name='read')
 							td.edit
-								- if(ability.can(usr.abilities,"edit",'courses',key))
+								- if(ability.can(usr.abilities,"edit",'pages',key))
 									input(type='checkbox', name='edit', checked)
 								-else
 									input(type='checkbox', name='edit')
 							td.delete
-								- if(ability.can(usr.abilities,"delete",'courses',key))
+								- if(ability.can(usr.abilities,"delete",'pages',key))
 									input(type='checkbox', name='delete', checked)
 								-else
 									input(type='checkbox', name='delete')

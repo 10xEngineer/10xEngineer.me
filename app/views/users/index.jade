@@ -28,14 +28,3 @@ ul#userMosaic\n
         td=userDate
         td 
           a(href='/user/#{user._id}/remove') Delete\n
-
-//p Or another way
-//ul.users
-//  != partial('user', users);
-//-p Or a third way
-//-ul.users
-//-  != partial('userGlobal', {collection: users, as: global});
-//-p Or a forth way
-//-ul.users
-//-  != partial('userPerson', {collection: users, as: 'person'});
-

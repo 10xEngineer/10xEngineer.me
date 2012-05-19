@@ -1,17 +1,16 @@
-[10xEngineer.me](http://github.com/velniukas/10xEngineer.me)
+[Minvy](http://github.com/velniukas/Minvy)
 =================
 
-10xEngineer.me is an online learning platform, with all your tools and environments built into the site. So you can learn and do the exercises and coursework on your mobile or anywhere you wish.
-It focuses on making the next generation of elite engineers and offers tailored courses to bring back the apprenticeship tradition. Only learn critical relevant skills to your vocation.
+Minvy brings the lean startup experience to the rest of the world.
 
 
 
 Copyright and license
 ---------------------
 
-Copyright 2012 Messina Ltd
+Copyright 2012 Minvy SWHK 2012 Team
 
-This work is the sole property of Steve Messina, Messina Ltd and 10xEngineer.me brand
+This work is the joint property of Steve Messina, and the SWHK 2012 Minvy team
 you may not use this work except in compliance with the License.
 
 Unless required by applicable law or agreed to in writing, software

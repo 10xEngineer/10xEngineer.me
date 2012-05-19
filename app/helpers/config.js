@@ -1,5 +1,5 @@
 var path = require('path');
-var siteConfig, codeConfig, dbConfig, authConfig, adminConfig;
+var siteConfig, dbConfig, authConfig, adminConfig;
 
 if (path.existsSync(appRoot + '/configLocal.js')) {
   var config = require(appRoot + '/configLocal.js');
@@ -7,9 +7,7 @@ if (path.existsSync(appRoot + '/configLocal.js')) {
     config.getMailConfig()
   );
   siteConfig = config.getSiteConfig();
-  codeConfig = config.getCodeConfig();
   dbConfig = config.getDBConfig();
-  //authConfig = config.getAuthConfig();
   authConfig = config.getAuthConfigLocal();
   adminConfig = config.getAdminConfig();
 } else {
@@ -19,7 +17,6 @@ if (path.existsSync(appRoot + '/configLocal.js')) {
 
 module.exports = {
   site: siteConfig,
-  code: codeConfig,
   db: dbConfig,
   auth: authConfig,
   admin: adminConfig

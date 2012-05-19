@@ -46,8 +46,6 @@ load.model_init('count');
 load.model_init('metadata');
 load.model_init('role');
 load.model_init('user');
-load.model_init('course');
-load.model_init('chapter');
 
 // Migrate database schema
 // TODO: Find a way to wait before this finishes executing
@@ -137,8 +135,8 @@ load.routes()(app);
 
 
 // Startup
-app.listen(3000);
-log.info("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+app.listen(config.site.port);
+log.info("Minvy server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 // Sample code to test database connection
 // TODO: Remove it when not needed
@@ -150,89 +148,3 @@ Count.getNext('saves', function(error, count) {
   log.info('Run ' + count + ' times.');
 });
 
-
-//socket for ideone source code execution
-var request = require('request');
-var wsdlurl = 'http://ideone.com/api/1/service.json';
-var io = require('socket.io').listen(app);
-io.set('log level', 0);
-io.sockets.on('connection', function (socket) {
-    socket.on('submitcode', function(data){
-    log.info(data);
-    request(
-        { method: 'GET'
-        , uri: wsdlurl
-      , json: {
-            jsonrpc: "2.0",
-            method: "createSubmission", 
-            params: 
-            {
-              user: "velniukas", 
-              pass: "limehouse", 
-              sourceCode: data.source,
-              language: data.language, //javascript
-              input:true, //this is a parameter bug of the ideone API, it supposes to be a run time input, instead of an indicator to run code
-              run:true
-            }, 
-            "id": 1
-          }
-        }
-      , function (error, response, body) {
-        log.info(body);
-            socket.emit('codesent', body);
-        }
-      )
-  });
-  
-  socket.on('getSubmissionStatus', function(data){
-    request(
-        {
-          method:'GET',
-          uri: wsdlurl,
-          json:{
-            jsonrpc: "2.0",
-            method: "getSubmissionStatus", 
-            params: 
-            {
-              user: "velniukas", 
-              pass: "limehouse",
-              link: data.linkCode, 
-            }, 
-            "id": 1
-          }
-        },
-        function(error, response, body){
-          log.info(body);
-          socket.emit('submissionStatus', body)           
-        }
-        )
-  });
-  
-  socket.on('getSubmissionDetails', function(data){
-    request(
-      {
-        method:'GET',
-        uri: wsdlurl,
-        json:{
-          jsonrpc: "2.0",
-          method: "getSubmissionDetails", 
-          params: 
-          {
-            user: "10xengineer", 
-            pass: "secret",
-            link: data.linkCode, 
-            withSource: true,
-            withOutput: true,
-            withCmpinfo: true,
-            withStderr: true
-          }, 
-          "id": 1
-        }
-      },
-      function(error, response, body){
-        log.info(body);
-        socket.emit('submissionDetails', body)           
-      }
-    )
-  }); 
-});

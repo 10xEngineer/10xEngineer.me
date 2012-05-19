@@ -1,1 +1,1 @@
-sudo start 10xEngineer.memonit -d 60 -c /etc/monit/monitrc
+sudo start minvymonit -d 60 -c /etc/monit/monitrc

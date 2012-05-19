@@ -81,7 +81,7 @@ var migrate = function(dbVersion, codeVersion, done) {
 
       var defaultRole = new Role();
       defaultRole.permissions = [];
-      defaultRole.permissions.push('course_all_read');
+      defaultRole.permissions.push('page_all_read');
 
       defaultRole.save(function(error){
         if(error) {
@@ -93,7 +93,7 @@ var migrate = function(dbVersion, codeVersion, done) {
         var adminRole = new Role();
         adminRole.name = 'admin';
         adminRole.permissions = [];
-        adminRole.permissions.push('course_all_all');
+        adminRole.permissions.push('page_all_all');
         adminRole.permissions.push('user_all');
 
         adminRole.save(function(error) {

@@ -1,8 +1,9 @@
 exports.getSiteConfig = function () {
   configValues =  {
     url: 'http://localhost:3000',
-    site_name: '10xEngineer.me',
-    site_email: '10xengineer@gmail.com'
+    port: 3000,
+    site_name: 'Minvy',
+    site_email: 'steve.g.messina@gmail.com'
   }
 
   return configValues;
@@ -11,8 +12,8 @@ exports.getSiteConfig = function () {
 exports.getDBConfig = function() {
 	configValues = {
 		address: 'mongodb://localhost/',
-		database: '10xengineer',
-		schemaVersion: 3
+		database: 'minvy',
+		schemaVersion: 1
 	}
 	
 	return configValues;
@@ -21,24 +22,11 @@ exports.getDBConfig = function() {
 exports.getMailConfig = function () {
   configValues =  {
     host: 'smtp.gmail.com',
-    username: '10xengineer@gmail.com',
+    username: 'steve.g.messina@gmail.com',
     password: 'password'
   }
 
   return configValues;
-}
-
-// IDEONE API setup
-exports.getCodeConfig = function() {
-	configValues = {
-		user: 'user',
-		password: 'password',
-		source_language: '1', //c++
-		run: true,
-		is_private: true
-	}
-	
-	return configValues;
 }
 
 // Local Authentication config keys

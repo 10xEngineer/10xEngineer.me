@@ -1,10 +1,5 @@
 var main = load.controller('main');
-var course = load.controller('course');
-var chapter = load.controller('chapter');
-var lesson = load.controller('lesson');
-var quiz = load.controller('quiz');
 var admin = load.controller('admin');
-
 var ability = load.helper('ability');
 
 
@@ -13,51 +8,14 @@ var ability = load.helper('ability');
 // ---------------------
 
 
-// IDEONE documentation http://ideone.com/files/ideone-api.pdf
-var submitCode = function(code) {
-  request(
-    { method: 'GET'
-    , uri: wsdlurl
-    , multipart: 
-      [ { 'Content-type': 'application/json'
-        ,  body: JSON.stringify({"jsonrpc": "2.0", "method": "getLanguages", "params": {"user": "velniukas", "pass": "limehouse"}, "id": 1})
-        }
-      ] 
-    }
-  , function (error, response, body) {
-      if(response.statusCode == 201){
-        log.info('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
-    return response.statusCode, response.body;
-      } else {
-        log.info('error: '+ response.statusCode)
-        log.info(body);
-    return response.statusCode, response.body;
-      }
-    }
-  )
-  
-}
-
 var validUser = function(req, res, next) { 
-  if(req.user == undefined && req.url != '/courses'){
+  if(req.user == undefined && req.url != '/'){
     req.session.redirectTo = req.url;
     res.redirect('/auth');
     return;
   }
   
   next();
-}
-
-var validCoursePermission = function(entity, action){
-  return function(req, res, next){
-    if(req.loggedIn && ability.can(req.user.roles, entity, req.course._id, action)){
-      next();
-      return;
-    }
-
-    res.write('content is not accessible for your account.');
-    res.end();
-  }
 }
 
 
@@ -76,9 +34,9 @@ module.exports = function(app) {
   });
 
   //filter for checking if the users have login
-  app.all('/courses/:op?/*', validUser, function(req, res, next){
-    next();
-  });
+  //app.all('/pages/:op?/*', validUser, function(req, res, next){
+  //  next();
+  //});
 
 
   // Load Express data middleware
@@ -94,69 +52,25 @@ module.exports = function(app) {
   // Note: All the actual authentication routes are handled by auth middleware (everyauth). Refer Auth helper for more.
 
 
-  // Course
-  app.get('/courses', course.list);
+  // Page
+/*  app.get('/pages', page.list);
 
-  app.get('/course/create', course.createView);
-  app.post('/course/create', course.create);
-  app.get('/course/import', course.importView);
-  app.post('/course/import', course.import);
+  app.get('/page/create', page.createView);
+  app.post('/page/create', page.create);
+  app.get('/page/import', page.importView);
+  app.post('/page/import', page.import);
 
-  app.get('/course/:courseId', validCoursePermission('course', 'read'), course.show);
-  app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
-  app.put('/course/:courseId', validCoursePermission('course', 'edit'), course.update);
-  app.get('/course/:courseId/remove', validCoursePermission('course', 'delete'), course.remove);
-
-
-  // Chapter
-  app.get('/chapter/create/:courseId', chapter.createView);
-  app.post('/chapter/create/:courseId', chapter.create);
-  app.get('/chapter/:chapterId', chapter.show);
-  app.get('/chapter/:chapterId/edit', chapter.editView);
-  app.post('/chapter/:chapterId/edit', chapter.edit);
-  app.get('/chapter/:chapterId/remove', chapter.remove);
-  app.get('/chapter/:chapterId/publish', chapter.publish);
-  app.get('/chapter/:chapterId/unpublish', chapter.unpublish);
-
-
-  // Lesson
-  app.get('/lesson/create/:chapterId', lesson.createView);
-  app.post('/lesson/create/:chapterId', lesson.create);
-
-
-  // Quiz
-  app.get('/quiz/edit', quiz.edit);
-  app.post('/quiz/import', quiz.importJson);
-  app.get('/quiz/:id/:unit/:lesson', quiz.view);
-  app.post('/quiz/:id/:unit/:lesson', quiz.test);
-
-
+  app.get('/page/:pageId', validCoursePermission('page', 'read'), page.show);
+  app.get('/page/:pageId/edit', validCoursePermission('page', 'edit'), page.updateView);
+  app.put('/page/:pageId', validCoursePermission('page', 'edit'), page.update);
+  app.get('/page/:pageId/remove', validCoursePermission('page', 'delete'), page.remove);
+*/
   // Admin
   app.get('/admin', admin.show);
   // TODO: Temporary admin path to make a user admin
   app.get('/admin/:userId/:roleId', admin.assignRole);
 
 
-
-  // TODO: Organize
-  app.post('/submitCode', function(req, res, next){
-    log.info('in app.js::submitCode');
-    var source = req.param('sourcecode', '');
-    log.info('source=',source);
-    var compile_res, compile_err = submitCode(source);
-    log.info('re-rendering ide');
-    res.render('ide', {
-      title: 'submitCode',
-      course: req.params.id,
-      unit_id: req.params.unit,
-      lesson_id: req.params.lesson,
-      code: source, 
-      compile_results: compile_res,
-      compile_errors: compile_err,
-      loggedInUser: req.user
-    });
-
-  });
 
   // Handles 404 errors. This should be the last route.
   app.get('/*', function(req, res, next) {
@@ -169,7 +83,7 @@ module.exports = function(app) {
   // Middleware
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'userId'], function(req, res, next, num, name){ 
+  app.param(['pageId', 'pageId', 'userId'], function(req, res, next, num, name){ 
     req.params[name] = num = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('failed to parseInt ' + num));
