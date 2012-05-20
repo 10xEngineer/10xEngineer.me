@@ -1,0 +1,17 @@
+include _header
+.container-fluid.course-index.inner-index
+  .row-fluid
+    .span10
+      - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
+        iframe(width="800", height="480", src="http://www.youtube.com/embed/#{lesson.video.content}", frameborder="0", allowfullscreen="true")
+
+      - else
+        include _player
+    .span2
+      include _sidebar
+  .row-fluid
+    p
+  .row-fluid
+    .span10
+      include _footer
+

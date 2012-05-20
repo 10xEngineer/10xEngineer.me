@@ -122,6 +122,7 @@ module.exports = function(app) {
   // Lesson
   app.get('/lesson/create/:chapterId', lesson.createView);
   app.post('/lesson/create/:chapterId', lesson.create);
+  app.get('/lesson/:lessonId', lesson.show);
 
 
   // Quiz

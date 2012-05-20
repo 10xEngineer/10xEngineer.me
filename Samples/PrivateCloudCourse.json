@@ -2,24 +2,33 @@
     "title": "Private Cloud",
     "content": "\"Private cloud\" is infrastructure operated solely for a single organization, whether managed internally or by a third-party and hosted internally or externally. They have attracted criticism because users \"still have to buy, build, and manage them\" and thus do not benefit from less hands-on management, essentially lacking the economic model that makes cloud computing such an intriguing concept.",
     "image": "https://encrypted-tbn3.google.com/images?q=tbn:ANd9GcQgQKWeGhCh4nL_dOwc5nbbMcbv5hMFOI26Sx0gHnZ5wTfO4q3u",
-    "units": [
+    "chapters": [
         {
-            "title": "INTRODUCTION",
-            "video": "BQHMLD9bwq4",
-            "videoType": "youtube",
-            "notes": "Introduction\nHi! I'm your Instructor, Steve. I'll be giving you tips and hints below the lecture videos and quizzes. Here's our first tip:\nTo navigate through the unit click look to the side-bar to the right of the video.\nAlso check out the official Course Forums if you have any questions!"
+            "title": "Introduction",
+            "desc": "Introduction\nHi! I'm your Instructor, Steve. I'll be giving you tips and hints below the lecture videos and quizzes. Here's our first tip:\nTo navigate through the unit click look to the side-bar to the right of the video.\nAlso check out the official Course Forums if you have any questions!",
+            "lessons": [
+                {
+                    "title": "Introduction to Private Cloud",
+                    "desc": "A bit of an introduction about this course.",
+                    "type": "video",
+                    "video": "BQHMLD9bwq4",
+                    "videoType": "youtube"
+                }
+            ]
         },
         {
-            "title": "UNIT 1",
+            "title": "Unit 1",
             "lessons": [
                 {
                     "title": "Private vs Public cloud",
+                    "type": "video",
                     "video": "hY08uML",
                     "videoType": "youtube",
-                    "notes": "some notes"
+                    "desc": "some notes"
                 },
                 {
                     "title": "Cloud offerings",
+                    "type": "quiz",
                     "question": {
                         "type": "multiple-choice",
                         "quiz-parameters": {
@@ -50,16 +59,18 @@
             ]
         },
         {
-            "title": "HOMEWORK 1",
+            "title": "Homework 1",
             "lessons": [
                 {
                     "title": "Your first puppet script",
+                    "type": "video",
                     "video": "hY08uML",
                     "videoType": "youtube",
                     "notes": "Change the permissions on the install.sh file to make it executable"
                 },
                 {
                     "title": "Standing up a LAMP system on EC2",
+                    "type": "quiz",
                     "question": {
                         "type": "programming",
                         "programming-parameters": {
@@ -75,9 +86,15 @@
             ]
         },
         {
-            "title": "OFFICE HOURS 1",
-            "video": "PckSUEQu3F8",
-            "videoType": "youtube"
+            "title": "Office Hours 1",
+            "lessons": [
+                {
+                    "title": "Deploy First Personal Cloud",
+                    "type": "video",
+                    "video": "PckSUEQu3F8",
+                    "videoType": "youtube"
+                }
+            ]
         }
     ]
 }

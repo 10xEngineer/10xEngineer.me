@@ -71,7 +71,7 @@ ChapterSchema.methods.publish = function(publish, callback) {
     chapter.status = 'draft';
   }
 
-  saveChapter(chapter, callback);
+  chapter.save(callback);
 };
 
 mongoose.model('Chapter', ChapterSchema);

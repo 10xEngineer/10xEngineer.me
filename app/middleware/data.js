@@ -1,6 +1,7 @@
 var User = load.model('User');
 var Course = load.model('Course');
 var Chapter = load.model('Chapter');
+var Lesson = load.model('Lesson');
 
 module.exports = function(app) {
   // Course
@@ -29,6 +30,7 @@ module.exports = function(app) {
   app.param('chapterId', function(req, res, next, id){
     Chapter.findOne({ id: id })
       .populate('course')
+      .populate('lessons')
       .run(function(error, chapter) {
       if(error) {
         next(error);
@@ -39,6 +41,27 @@ module.exports = function(app) {
         req.chapter = chapter;
         req.app.helpers({
           chapter: chapter
+        });
+      }
+
+      next();
+    });
+  });
+
+  // Lesson
+  app.param('lessonId', function(req, res, next, id){
+    Lesson.findOne({ id: id })
+      .populate('chapter')
+      .run(function(error, lesson) {
+      if(error) {
+        next(error);
+      }
+
+      if(lesson) {
+        lesson.id = parseInt(lesson.id.toString());
+        req.lesson = lesson;
+        req.app.helpers({
+          lesson: lesson
         });
       }
 

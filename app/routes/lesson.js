@@ -31,3 +31,11 @@ module.exports.create = function(req, res) {
     res.redirect('/chapter/' + req.chapter._id);
   });
 };
+
+// Display a lesson
+module.exports.show = function(req, res) {
+  // Render based on the type
+  res.render('lessons/' + req.lesson.type, {
+    title: req.lesson.title
+  });
+};

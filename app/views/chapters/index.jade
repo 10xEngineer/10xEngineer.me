@@ -18,7 +18,8 @@ include _header
         each lesson in chapter.lessons
           li.lesson
             a(href='/lesson/#{lesson.id}/')
-              h3 #{lesson.title}
+              h3 
+                #{lesson.title}
             - if(everyauth.loggedIn && isAdmin)
               - if(lesson.status != 'published')
                 | (Draft)

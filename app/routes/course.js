@@ -6,6 +6,8 @@ var path = require('path')
 var Course = load.model('Course');
 var User = load.model('User');
 
+var importer = load.helper('importer');
+
 
 module.exports = function() {};
 
@@ -81,31 +83,31 @@ module.exports.import = function(req, res, next) {
     //res.redirect('/course/import', {error: e});
   }
 
-  // Check whether the uploaded course already exists
-  course.findOne({name: parsedCourse.title}, function(error, dbCourse) {
-    if(error) {
-      log.error(error);
-      res.render('content_manager', {
-        title: '10xEngineer.me Course Creator',
-        contentfile: req.param('coursefile', ''),
-        error: error
+  // Create a new course based on the parsed file
+  importer.course(parsedCourse, function(error, course) {
+
+    // Add chapters
+    var chapters = parsedCourse.chapters;
+    if(!chapters.length || chapters.length === 0) {
+      res.redirect('/courses');
+    }
+
+    var chapterLength = chapters.length;
+    for(var index = 0; index < chapterLength; index++) {
+      var chapterData = chapters[index];
+
+      importer.chapter(chapterData, course._id, function(error, chapter, lessons) {
+
+        var lessonLength = lessons.length;
+        for(var index2 = 0; index2 < lessonLength; index2++) {
+          var lessonData = lessons[index2];
+          importer.lesson(lessonData, chapter._id);          
+        }
       });
     }
 
-    if(dbCourse) {
-      log.error('Course already exists: ' + parsedCourse.title);
-      res.render('content_manager', {
-        title: '10xEngineer.me Course Creator',
-        contentfile: req.param('coursefile', ''),
-        error: "Course named " + parsedCourse.title + " already exists in the database. Please delete and re-upload."
-      });
-    } else {
-      parsedCourse['created_by'] = req.user.id;
-      course.createNew(parsedCourse, function(error) {
-        log.info('new course created.');
-        res.redirect('/course/import?success=true');
-      });
-    }
+    // Success
+    res.redirect('/courses');
   });
 };
 

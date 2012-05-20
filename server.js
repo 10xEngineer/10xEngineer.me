@@ -48,6 +48,7 @@ load.model_init('role');
 load.model_init('user');
 load.model_init('course');
 load.model_init('chapter');
+load.model_init('lesson');
 
 // Migrate database schema
 // TODO: Find a way to wait before this finishes executing
@@ -67,7 +68,7 @@ var app = module.exports = express.createServer();
 app.configure(function(){
   app.set('views', __dirname + '/app/views');
   app.set('view engine', 'jade');
-  app.use(express.bodyParser({uploadDir: __dirname + '/upload', keepExtensions: true }));
+  app.use(express.bodyParser({uploadDir: __dirname + '/app/upload', keepExtensions: true }));
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({

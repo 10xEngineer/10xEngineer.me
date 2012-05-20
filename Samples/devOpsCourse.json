@@ -1,26 +1,35 @@
 {
     "title": "Devops",
-    "content": "\"DevOps\" is an emerging set of principles, methods and practices for communication, collaboration and integration between software development (application/software engineering) and IT operations (systems administration/infrastructure) professionals. It has developed in response to the emerging understanding of the interdependence and importance of both the development and operations disciplines in meeting an organization's goal of rapidly producing software products and services",
+    "desc": "\"DevOps\" is an emerging set of principles, methods and practices for communication, collaboration and integration between software development (application/software engineering) and IT operations (systems administration/infrastructure) professionals. It has developed in response to the emerging understanding of the interdependence and importance of both the development and operations disciplines in meeting an organization's goal of rapidly producing software products and services",
     "image": "https://encrypted-tbn0.google.com/images?q=tbn:ANd9GcSYlEdiwQRZJSJyJVS8gkL6fQyNh9_GWqPiVtWfLiSUAR5fpYEs",
-    "units": [
+    "chapters": [
         {
-            "title": "INTRODUCTION",
-            "video": "BQHMLD9bwq4",
-            "videoType": "youtube",
-            "notes": "Introduction\nHi! I'm your Instructor, Steve. I'll be giving you tips and hints below the lecture videos and quizzes. Here's our first tip:\nTo navigate through the unit click look to the side-bar to the right of the video.\nAlso check out the official Course Forums if you have any questions!"
+            "title": "Introduction to DevOps",
+            "desc": "Introduction\nHi! I'm your Instructor, Steve. I'll be giving you tips and hints below the lecture videos and quizzes. Here's our first tip:\nTo navigate through the unit click look to the side-bar to the right of the video.\nAlso check out the official Course Forums if you have any questions!",
+            "lessons": [
+                {
+                    "title": "Introduction to DevOps",
+                    "desc": "A bit of an introduction about this course.",
+                    "type": "video",
+                    "video": "BQHMLD9bwq4",
+                    "videoType": "youtube"
+                }
+            ]
         },
         {
-            "title": "UNIT 1",
+            "title": "Unit 1",
             "lessons": [
                 {
                     "title": "Defining Devops",
+                    "desc": "some notes",
+                    "type": "video",
                     "video": "hY08uML",
-                    "videoType": "youtube",
-                    "notes": "some notes"
+                    "videoType": "youtube"
                 },
                 {
                     "title": "Devops Community",
-                    "question": {
+                    "type": "quiz",
+                    "questions": {
                         "type": "multiple-choice",
                         "quiz-parameters": {
                             "background-image": "https://encrypted-tbn1.google.com/images?q=tbn:ANd9GcQDT_Ojsoe7WKtSteVGgn7rP7MbUhNO1C3JcO_5Yips5W0I0XUkgA",
@@ -50,16 +59,18 @@
             ]
         },
         {
-            "title": "HOMEWORK 1",
+            "title": "Homework 1",
             "lessons": [
                 {
                     "title": "Your first puppet script",
+                    "type": "video",
                     "video": "hY08uML",
                     "videoType": "youtube",
-                    "notes": "Change the permissions on the install.sh file to make it executable"
+                    "desc": "Change the permissions on the install.sh file to make it executable"
                 },
                 {
-                    "title": "Devops Community",
+                    "title": "Devops Community 2",
+                    "type": "quiz",
                     "question": {
                         "type": "programming",
                         "programming-parameters": {
@@ -75,9 +86,15 @@
             ]
         },
         {
-            "title": "OFFICE HOURS 1",
-            "video": "PckSUEQu3F8",
-            "videoType": "youtube"
+            "title": "Office Hours 1",
+            "lessons": [
+                {
+                    "title": "Deploy a simple app using puppet script",
+                    "type": "video",
+                    "video": "PckSUEQu3F8",
+                    "videoType": "youtube"
+                }
+            ]
         }
     ]
 }
