@@ -3,7 +3,7 @@ var mongoose = require('mongoose')
   , ObjectId = Schema.ObjectId;
 
 var Count = mongoose.model('Count');
-var imageHelper = load.helper('image');
+var cdn = load.helper('cdn');
 
 var CourseSchema = new Schema({
   _id: { type: ObjectId },
@@ -26,8 +26,16 @@ CourseSchema.pre('save', function(next) {
   if(!course.id) {
     Count.getNext('course', function(error, id) {
       course.id = id;
-      next();
-    })
+
+      // Save image
+      saveCourse(course, function(error) {
+        if(error) {
+          next(error);
+        }
+
+        next();
+      });
+    });
   } else {
     next();
   }
@@ -51,18 +59,17 @@ mongoose.model('Course', CourseSchema);
 
 var saveCourse = function (course, callback) {
   var now = new Date();
-  var fileName = 'courseImage_' + course._id;
+  var fileName = 'courseImage_' + course.id;
 
   // Process image
-  imageHelper.save(course.image, fileName, function(error) {
-    course.modified_at = now.getTime();
-    course.users = [];
+  cdn.save(course.image, fileName, function(error, newUrl) {
+    course.image = newUrl;
     course.save(function(error) {
       if(error) {
         callback(error);
       }
 
-      callback(null, course);
+      callback(null);
     });
   });
 };
