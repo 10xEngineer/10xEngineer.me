@@ -20,7 +20,18 @@ script
   filepicker.setKey('462_D0Z1RnO8iMRHhSZb');
   $("#selectImage").click(function(){
     filepicker.getFile(filepicker.MIMETYPES.IMAGES, {'multiple':false}, function(url, token, data) {
-      $('.previewPane > img').attr("src", url);
-      $('.previewPane > input[type=hidden]').val(url);
+      var $previewPane = $('.previewPane');
+
+      $previewPane.empty();
+      $('<img/>', {
+        src: url
+      }).appendTo($previewPane);
+
+      $('<input/>', {
+        type: 'hidden',
+        name: 'image',
+        value: url
+      }).appendTo($previewPane);
     });
   });
+  
