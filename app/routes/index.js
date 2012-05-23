@@ -4,6 +4,7 @@ var chapter = load.controller('chapter');
 var lesson = load.controller('lesson');
 var quiz = load.controller('quiz');
 var admin = load.controller('admin');
+var cdn = load.controller('cdn');
 
 var ability = load.helper('ability');
 
@@ -124,6 +125,8 @@ module.exports = function(app) {
   app.post('/lesson/create/:chapterId', lesson.create);
   app.get('/lesson/:lessonId', lesson.show);
 
+  // CDN
+  app.get('/cdn/:fileName', cdn.load);
 
   // Quiz
   app.get('/quiz/edit', quiz.edit);
