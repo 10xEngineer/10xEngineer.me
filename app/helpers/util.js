@@ -6,13 +6,11 @@ module.exports.dateToEpoch = function(date) {
   return new Date(date).getTime();
 }
 
-module.exports.findFirst = function( key, jsonObj ) {
-	var firstProp;
-	for(var key in jsonObj) {
-	    if(jsonObj.hasOwnProperty(key)) {
-	        firstProp = jsonObj[key];
-	        break;
-	    }
+module.exports.getLessonFromObjId = function(objectId) {
+  Lesson.findById( objectId, function(err, doc) {
+	if(err) {
+		log.error('Lesson not found: '+objectId+' \n '+ err);
 	}
-	return firstProp;
+	return doc;
+  }
 }

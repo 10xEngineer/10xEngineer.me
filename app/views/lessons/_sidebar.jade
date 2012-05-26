@@ -10,7 +10,11 @@
 					li
 						li.nav-header 
 							a(href='/chapter/#{chapter.id}/') #{chapter.title}
-				
+							- var lessons = chapter.lessons || []
+							each lesson in lessons
+								li
+									li.nav-header
+										a(href='/lesson/#{lesson.id}/') #{lesson.title}
 				li.divider
 				li.nav-header 
 						i.icon-pencil
