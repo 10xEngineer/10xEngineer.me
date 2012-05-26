@@ -103,6 +103,7 @@ module.exports = function(app) {
   app.get('/course/import', course.importView);
   app.post('/course/import', course.import);
 
+  app.get('/course/:courseId/start', validCoursePermission('course', 'read'), course.start);
   app.get('/course/:courseId', validCoursePermission('course', 'read'), course.show);
   app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
   app.put('/course/:courseId', validCoursePermission('course', 'edit'), course.update);

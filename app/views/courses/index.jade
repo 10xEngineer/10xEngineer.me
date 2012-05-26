@@ -25,10 +25,13 @@
                   h3 #{course.title}
                   p Taught by Steve M.
                     span.pull-right
-                      - if (registered_courses != undefined && registered_courses[course.id] && user != undefined)
-                        a.btn.btn-primary.btn-large(href='/course/#{course.id}/') GO TO YOUR COURSE
-                      - else
-                        a.btn.btn-large.btn-info(href='/course/#{course.id}') LEARN MORE
+                      - if (registered_courses != undefined && user != undefined)
+                          - if ( registered_courses[course.id] )
+                               a.btn.btn-primary.btn-large(href='/course/#{course.id}/start') GO TO YOUR COURSE
+                          - else
+                               a.btn.btn-primary.btn-large(href='/course/#{course.id}/start') START THIS COURSE
+                        - else
+                          a.btn.btn-large.btn-info(href='/course/#{course.id}') LEARN MORE
 
           // carousel-nav
           a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
