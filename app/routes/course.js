@@ -119,9 +119,6 @@ module.exports.import = function(req, res, next) {
 //TODO : Also add this course to the users registered courses
 // Register for a course (if not already registered, and Go to the last viewed or first lesson. 
 module.exports.start = function(req, res){
-  //log.debug('course: ' + req.course);
-  //log.debug('chapters: ' + req.course.chapters[0]); 
-  //log.debug('lessons: ' + req.course.chapters[0].lessons);
   var course = req.course;
   if (course.chapters.length > 0) {
 	  var chapter = course.chapters[0];
@@ -133,6 +130,9 @@ module.exports.start = function(req, res){
 		  });
 
       }
+  } else {
+	log.error('No chapters or lessons defined for course: '+course);
+	res.redirect('/courses/');
   }
 };
 
