@@ -52,7 +52,13 @@ exports.getAuthConfigLocal = function() {
 			appId: '321944991192647',
 			appSecret: 'ed46675a72f71e846213f25c3d2aa60c'
 		},
+		// https://10xengineer.me:3000
 		google: {
+			clientId: '191416639512.apps.googleusercontent.com'
+			clientSecret: 'pBYX_xjilWANHCshBFTUeSQf'
+		},
+		// https://10xengineer.me
+		google80: {
 			clientId: '1041276452869.apps.googleusercontent.com',
 			clientSecret: '7fMR8QidXiToK0IauOyL2Jgj'
 		}
