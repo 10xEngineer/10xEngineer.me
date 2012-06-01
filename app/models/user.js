@@ -125,15 +125,6 @@ var createNew = function(source, userData, callback) {
     newUser.email = userData.email;
   }
 
-  // check against the default site admin list from console
-  if(config.admin[source] == userData.email) {
-    log.info('New user is an admin: ', config.admin[source]);
-
-    //going to be deprecated
-    newUser['role'] = 'admin';
-    newUser.abilities.role = 'admin';
-  } 
-
   newUser[source] = userData;
   newUser.save(function(error) {
     if(error) {
