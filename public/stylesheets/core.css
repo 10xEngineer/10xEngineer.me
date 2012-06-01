@@ -153,6 +153,15 @@ ul.lessons li a, ul.lessons li a h3 {
 
 /* Chapters End */
 
+/*****************/
+/* USERS PROFILE */
+/*****************/
+
+.img{
+  filter: url(filters.svg#grayscale); /* Firefox */
+  filter: gray; /* IE */
+  -webkit-filter: grayscale(1); /* Webkit */
+}
 
 @media screen and (max-width:480px) {
 	p{	
