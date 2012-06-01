@@ -4,9 +4,11 @@ var chapter = load.controller('chapter');
 var lesson = load.controller('lesson');
 var quiz = load.controller('quiz');
 var admin = load.controller('admin');
+var user = load.controller('user');
 var cdn = load.controller('cdn');
 
 var ability = load.helper('ability');
+
 
 
 // ---------------------
@@ -95,6 +97,8 @@ module.exports = function(app) {
   // Note: All the actual authentication routes are handled by auth middleware (everyauth). Refer Auth helper for more.
 
 
+  
+
   // Course
   app.get('/courses', course.list);
 
@@ -135,12 +139,17 @@ module.exports = function(app) {
   app.get('/quiz/:id/:unit/:lesson', quiz.view);
   app.post('/quiz/:id/:unit/:lesson', quiz.test);
 
+  //app.get('/user/:userId', user.load);
+
 
   // Admin
   app.get('/admin', admin.show);
   // TODO: Temporary admin path to make a user admin
   app.get('/admin/:userId/:roleId', admin.assignRole);
 
+
+  // Testing View
+  app.get('/user/profile',user.profile);
 
 
   // TODO: Organize
