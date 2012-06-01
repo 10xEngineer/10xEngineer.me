@@ -10,14 +10,16 @@ everyauth.debug = true;
 module.exports = function () {
   var redirectAction = function(res, data){
     var session = data.session;
-	var redirectTo = session.redirectTo;
-	delete session.redirectTo;
-	if(redirectTo)
-		res.redirect(redirectTo);
-	else
-		res.redirect('/');
+    var redirectTo = session.redirectTo;
+    delete session.redirectTo;
+    log.info(redirectTo);
+    if(redirectTo && typeof(redirectTo) == 'string') {
+      res.redirect(redirectTo);
+    } else {
+      res.redirect('/');
+    }
   };
-	
+  
   // Google
   everyauth.google
     .appId(config.google.clientId)
@@ -30,8 +32,27 @@ module.exports = function () {
       googleUser.expiresIn = extra.expires_in;
 
       var promise = this.Promise();
-      User.findOrCreate('google', googleUser, promise);
 
+      log.info("Session :",sess);
+       log.info("Session :",session);
+     
+      if(session.auth.loggedIn) {
+        log.info("Inside Google");
+        User.findById(session.auth.userId, function(error, dbUser) {
+
+          dbUser.google = googleUser;
+          dbUser.markModified('google');
+          
+          dbUser.save(function(error) {
+            if(error) {
+              promise.fail(error);
+            }
+          promise.fulfill(dbUser);
+          });
+        });
+      } else {
+        User.findOrCreate('google', googleUser, promise);
+      }
       return promise;
     })
     .sendResponse(redirectAction);
@@ -42,11 +63,28 @@ module.exports = function () {
     .consumerSecret(config.twitter.consumerSecret)
     .entryPath('/auth/twitter')
     .callbackPath('/auth/twitter/callback')
-    .findOrCreateUser( function (sess, accessToken, accessSecret, twitUser) {
+    .findOrCreateUser( function (session, accessToken, accessSecret, twitUser) {
       var promise = this.Promise();
       
-      User.findOrCreate('twitter', twitUser, promise);
+      log.info("Session :",session);
+      if(session.auth.loggedIn) {
+        log.info("Inside Twitter");
+        User.findById(session.auth.userId, function(error, dbUser) {
 
+          dbUser.twitter = twitUser;
+          dbUser.markModified('twitter');
+          
+          dbUser.save(function(error) {
+            if(error) {
+              promise.fail(error);
+            }
+          promise.fulfill(dbUser);
+          });
+        });
+      } else {
+         User.findOrCreate('twitter', twitUser, promise);
+      }
+     
       return promise;
     })
     .sendResponse(redirectAction);
@@ -61,8 +99,24 @@ module.exports = function () {
     .findOrCreateUser( function (session, accessToken, accessTokenExtra, fbUserMetadata) {
       var promise = this.Promise();
       
-      User.findOrCreate('facebook', fbUserMetadata, promise);
+      log.info("Session :",session);
+      if(session.auth.loggedIn) {
+        log.info("Inside Facebook");
+        User.findById(session.auth.userId, function(error, dbUser) {
 
+          dbUser.facebook = fbUserMetadata;
+          dbUser.markModified('facebook');
+          
+          dbUser.save(function(error) {
+            if(error) {
+              promise.fail(error);
+            }
+          promise.fulfill(dbUser);
+          });
+        });
+      } else {
+       User.findOrCreate('facebook', fbUserMetadata, promise);
+     }
       return promise;
     })
     .redirectPath(redirectAction);
