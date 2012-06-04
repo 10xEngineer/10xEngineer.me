@@ -27,13 +27,13 @@ module.exports = function () {
     .scope('https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email')
     .entryPath('/auth/google')
     .callbackPath('/auth/google/callback')
-    .findOrCreateUser( function (sess, accessToken, extra, googleUser) {
+    .findOrCreateUser( function (session, accessToken, extra, googleUser) {
       googleUser.refreshToken = extra.refresh_token;
       googleUser.expiresIn = extra.expires_in;
 
       var promise = this.Promise();
 
-      log.info("Session :",sess);
+      
        log.info("Session :",session);
      
       if(session.auth.loggedIn) {
