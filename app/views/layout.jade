@@ -22,12 +22,21 @@ html(lang="en")
 				section#navbar
 					include _header
 			.container
-					section#content!= body
-					section#sidebar
-					footer
-						p 
-						strong &copy;2012 10xEngineer.me. 
-						| All rights reserved.
+				-if(typeof(error) != 'undefined') 
+					div.alert.alert-block
+						a.close(data-dismiss='alert',href='#') x
+						h4.alert-heading Warning
+						#{error}
+					div.alert.alert-info
+						a.close(data-dismiss='alert',href='#') x
+						h4.alert-heading Information 
+						#{message}
+				section#content!= body
+				section#sidebar
+				footer
+					p 
+					strong &copy;2012 10xEngineer.me. 
+					| All rights reserved.
 
 			#pageslide(style='display:none')
 //- note: subject to move to individe page
