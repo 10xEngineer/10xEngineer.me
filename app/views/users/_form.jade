@@ -25,4 +25,4 @@ form(method='POST', action='/user/submit/#{user._id}', id='userForm')
     input(type='submit', value='Save')
 -if ((loggedInUser.is_root || loggedInUser.is_admin || loggedInUser._id === user._id) && user._id > 0)
   p
-    a(href='/user/#{user._id}/remove') Delete Account 
+    a(href='/user/#{user._id}/remove') Delete Account

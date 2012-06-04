@@ -74,6 +74,20 @@ ChapterSchema.methods.publish = function(publish, callback) {
   chapter.save(callback);
 };
 
+ChapterSchema.methods.removeChapter= function(callback) {
+  // TODO: Remove all child 
+  var chapter = this;
+
+  chapter.remove(function(error) {
+    if(error) {
+      callback(error);
+    }
+
+    callback();
+  });
+};
+
+
 mongoose.model('Chapter', ChapterSchema);
 
 

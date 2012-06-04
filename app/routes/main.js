@@ -3,7 +3,6 @@ module.exports = function() {};
 
 // Miscellaneous routes
 module.exports.home = function(req, res){
-  log.info(req.user);
   res.render('main', {
     title: '10xEngineer.me Home', 
     coursenav: "N",

@@ -38,6 +38,19 @@ LessonSchema.pre('save', function(next) {
   }
 });
 
+LessonSchema.methods.removeLesson= function(callback) {
+  // TODO: Remove all child 
+  var lesson = this;
+
+  lesson.remove(function(error) {
+    if(error) {
+      callback(error);
+    }
+
+    callback();
+  });
+};
+
 LessonSchema.post('save', function() {
   var lesson = this;
   var id = parseInt(lesson.id.toString());
