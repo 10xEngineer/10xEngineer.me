@@ -36,7 +36,7 @@ module.exports = function () {
       
        log.info("Session :",session);
      
-      if(session.auth.loggedIn) {
+      if(session.auth && session.auth.loggedIn) {
         log.info("Inside Google");
         User.findById(session.auth.userId, function(error, dbUser) {
 
@@ -67,7 +67,7 @@ module.exports = function () {
       var promise = this.Promise();
       
       log.info("Session :",session);
-      if(session.auth.loggedIn) {
+      if(session.auth && session.auth.loggedIn) {
         log.info("Inside Twitter");
         User.findById(session.auth.userId, function(error, dbUser) {
 
@@ -100,7 +100,7 @@ module.exports = function () {
       var promise = this.Promise();
       
       log.info("Session :",session);
-      if(session.auth.loggedIn) {
+      if(session.auth && session.auth.loggedIn) {
         log.info("Inside Facebook");
         User.findById(session.auth.userId, function(error, dbUser) {
 
