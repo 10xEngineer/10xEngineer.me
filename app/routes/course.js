@@ -5,12 +5,11 @@ var path = require('path')
 // Load models
 var Course = load.model('Course');
 var User = load.model('User');
-
 var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
+var Progress = load.model('Progress');
 
 var importer = load.helper('importer');
-var util = load.helper('util');
 
 module.exports = function() {};
 
@@ -122,26 +121,23 @@ module.exports.import = function(req, res, next) {
 //TODO : Go to the last lesson if course already started
 //TODO : Also add this course to the users registered courses
 // Register for a course (if not already registered, and Go to the last viewed or first lesson. 
-module.exports.start = function(req, res){
-  //log.debug('course: ' + req.course);
-  //log.debug('chapters: ' + req.course.chapters[0]); 
-  //log.debug('lessons: ' + req.course.chapters[0].lessons);
-  var course = req.course;
-  if (course.chapters.length > 0) {
-	  var chapter = course.chapters[0];
-	  if (chapter.lessons.length > 0) {
-		  //log.debug('lesson from chapter: '+ chapter.lessons[0]);
-		  Lesson.findById( chapter.lessons[0].__id, function(err, doc) {
-			//log.debug('found lesson: '+doc);
-			res.redirect('/lesson/' + doc.id+'/');
-		  });
+module.exports.start = function(req, res, next){
+  // Check if user has already started the course
+  Progress.startOrContinue(req.user, req.course, function(error, progress) {
+    if(error) {
+      log.error(error);
+      next(error);
+    }
 
-      }
-  }
+    // Redirect the user to first unfinished lesson
+    progress.getNextLesson(function(error, nextLesson) {
+      res.redirect('/lesson/' + nextLesson);
+    });
+  });
 };
 
 // Load specific course and display chapter index
-module.exports.show = function(req, res){
+module.exports.show = function(req, res, next){
   res.render('courses/chapters', {
     title: req.course.title,
     chapter: undefined,

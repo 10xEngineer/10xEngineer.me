@@ -10,12 +10,13 @@ var LessonSchema = new Schema({
   id: { type: Number, unique: true, index: true },
   title: { type: String, index: true, trim: true, required: true },
   desc: { type: String, trim: true },
-  type: { type: String, enum: ['video', 'quiz', 'excercise'], required: true },
+  type: { type: String, enum: ['video', 'quiz', 'programming', 'config-lab'], required: true },
   video: {
     content: { type: String, trim: true },
     type: { type: String, enum: ['youtube'] }
   },
-  status: { type: String, default: 'draft', enum: ['draft', 'punlished'], required: true },
+  quiz: { type: Number },
+  status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   chapter: { type: ObjectId, ref: 'Chapter', required: true },
   created_at: { type: Date, default: Date.now },
   modified_at: { type: Date, default: Date.now }
