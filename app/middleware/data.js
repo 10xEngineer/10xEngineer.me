@@ -4,6 +4,7 @@ var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
 
 module.exports = function(app) {
+
   // Course
   app.param('courseId', function(req, res, next, id){
     Course.findOne({ id: id })
@@ -39,8 +40,10 @@ module.exports = function(app) {
       if(chapter) {
         chapter.id = parseInt(chapter.id.toString());
         req.chapter = chapter;
+        req.course = chapter.course;
         req.app.helpers({
-          chapter: chapter
+          chapter: chapter,
+          course: chapter.course
         });
       }
 
@@ -58,14 +61,19 @@ module.exports = function(app) {
       }
 
       if(lesson) {
-        lesson.id = parseInt(lesson.id.toString());
-        req.lesson = lesson;
-        req.app.helpers({
-          lesson: lesson
+        Course.findById(lesson.chapter.course, function(error, course) {
+          lesson.id = parseInt(lesson.id.toString());
+          req.lesson = lesson;
+          req.chapter = lesson.chapter;
+          req.course = course;
+          req.app.helpers({
+            lesson: lesson,
+            chapter: lesson.chapter,
+            course: course
+          });
+          next();
         });
       }
-
-      next();
     });
   });
 
