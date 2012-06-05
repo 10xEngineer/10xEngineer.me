@@ -184,3 +184,47 @@ ul.lessons li a, ul.lessons li a h3 {
 	font-size: 1em;
 	}
 }
+
+
+/* User PRofile  End */
+
+/*****************/
+/* Chaper Moves */
+/*****************/
+
+.chapter:first-child .moveBox a:first-child, .lesson:first-child .moveBox a:first-child {
+  display: none;
+}
+
+.chapter:last-child .moveBox a:last-child, .lesson:last-child .moveBox a:last-child {
+  display: none;
+}
+
+.chapter:first-child .moveBox a:last-child, .lesson:first-child .moveBox a:last-child {
+  top: 25px;
+}
+
+.chapter:hover .moveBox, .lesson:hover .moveBox {
+  display: block;
+}
+
+
+.moveBox {
+display:none;
+float: left;
+width:30px;
+height:25px;
+position: relative;
+left: -30px;
+top: -60px;
+}
+
+ul.chapters li .moveBox a , ul.lessons li .moveBox a {
+  display: block;
+}
+
+.downArrow
+{
+position: relative;
+top: 8px;
+}

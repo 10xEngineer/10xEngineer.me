@@ -31,3 +31,8 @@ include _header
               button.btn.pull-right(type='button', style='margin-right: 5px;') Edit
             .progress(style='margin: 10px 0;')
               .bar(style="width: 0%;")
+            div.moveBox
+                a.upArrow(href="/lesson/#{lesson.id}/up")
+                  i.icon-chevron-up
+                a.downArrow(href="/lesson/#{lesson.id}/down")
+                  i.icon-chevron-down

@@ -26,8 +26,9 @@ module.exports.create = function(req, res) {
   Lesson.save(function(error) {
     if(error) {
       log.error(error);
+      error = "Can not create lesson.";
     }
-
+    message = "Sucessfully create lesson.";
     res.redirect('/chapter/' + req.chapter._id);
   });
 };
@@ -37,5 +38,51 @@ module.exports.show = function(req, res) {
   // Render based on the type
   res.render('lessons/' + req.lesson.type, {
     title: req.lesson.title
+  });
+};
+
+// Remove entire lesson
+module.exports.remove = function(req, res, next){
+  log.info('Removing lesson...');
+
+  var lesson = req.course;
+
+  course.removeLesson(function(error){
+    if (error) {
+      log.error(error);
+      error = "Can not remove lesson.";
+    }
+    message = "Sucessfully lesson removed.";
+    res.redirect('/courses/');
+  });
+};
+
+// For Move up & Down Chapters
+
+module.exports.up = function(req, res, next){
+  
+  var lesson = req.lesson;
+
+  lesson.move(0, function(error) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved lesson.";
+    }
+    message = "Lesson moved sucessfully.";
+    res.redirect('/chapter/' + lesson.chapter.id);
+  });
+};
+
+module.exports.down = function(req, res, next){
+  
+  var lesson = req.lesson;
+
+  lesson.move(1, function(error) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved lesson.";
+    }
+    message = "Lesson moved sucessfully.";
+    res.redirect('/chapter/' + lesson.chapter.id);
   });
 };

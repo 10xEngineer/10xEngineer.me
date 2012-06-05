@@ -33,7 +33,7 @@ module.exports = function () {
 
       var promise = this.Promise();
      
-      if(session.auth.loggedIn) {
+      if(session.auth && session.auth.loggedIn) {
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.google = googleUser;
@@ -62,7 +62,7 @@ module.exports = function () {
     .findOrCreateUser( function (session, accessToken, accessSecret, twitUser) {
       var promise = this.Promise();
       
-      if(session.auth.loggedIn) {
+      if(session.auth && session.auth.loggedIn) {
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.twitter = twitUser;
@@ -93,7 +93,7 @@ module.exports = function () {
     .findOrCreateUser( function (session, accessToken, accessTokenExtra, fbUserMetadata) {
       var promise = this.Promise();
       
-      if(session.auth.loggedIn) {
+      if(session.auth && session.auth.loggedIn) {
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.facebook = fbUserMetadata;
