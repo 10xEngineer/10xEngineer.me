@@ -40,7 +40,7 @@ LessonSchema.pre('save', function(next) {
 });
 
 LessonSchema.methods.removeLesson= function(callback) {
-  // TODO: Remove all child 
+ 
   var lesson = this;
 
   lesson.remove(function(error) {
@@ -83,12 +83,11 @@ LessonSchema.post('save', function() {
 LessonSchema.methods.publish = function(publish, callback) {
   var lesson = this;
   
-  if(lesson.publish) {
+  if(publish) {
     lesson.status = 'published';
   } else {
     lesson.status = 'draft';
   }
-
   lesson.save(callback);
 };
 

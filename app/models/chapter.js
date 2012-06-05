@@ -10,7 +10,7 @@ var ChapterSchema = new Schema({
   id: { type: Number, unique: true, index: true },
   title: { type: String, index: true, trim: true, required: true },
   desc: { type: String, trim: true },
-  status: { type: String, default: 'draft', enum: ['draft', 'punlished'], required: true },
+  status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   course: { type: ObjectId, ref: 'Course', required: true },
   lessons: [{ type: ObjectId, ref: 'Lesson' }],
   created_at: { type: Date, default: Date.now },
@@ -64,13 +64,11 @@ ChapterSchema.post('save', function() {
 
 ChapterSchema.methods.publish = function(publish, callback) {
   var chapter = this;
-  
-  if(chapter.publish) {
+  if(publish) {
     chapter.status = 'published';
   } else {
     chapter.status = 'draft';
   }
-
   chapter.save(callback);
 };
 

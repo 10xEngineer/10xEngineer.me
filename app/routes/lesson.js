@@ -45,15 +45,17 @@ module.exports.show = function(req, res) {
 module.exports.remove = function(req, res, next){
   log.info('Removing lesson...');
 
-  var lesson = req.course;
-
-  course.removeLesson(function(error){
+  var lesson = req.lesson;
+  var chapterId =lesson.chapter.id;
+  
+  lesson.removeLesson(function(error){
     if (error) {
       log.error(error);
       error = "Can not remove lesson.";
+      res.redirect('/chapter/:id');
     }
     message = "Sucessfully lesson removed.";
-    res.redirect('/courses/');
+    res.redirect('/chapter/'+ chapterId);
   });
 };
 
@@ -69,6 +71,38 @@ module.exports.up = function(req, res, next){
       error = "Can not moved lesson.";
     }
     message = "Lesson moved sucessfully.";
+    res.redirect('/chapter/' + lesson.chapter.id);
+  });
+};
+
+
+
+// Publish a lesson
+module.exports.publish = function(req, res) {
+  
+  var lesson = req.lesson;
+
+  lesson.publish(true, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not published lesson.";
+    }
+    req.session.message = "Lesson published sucessfully.";
+    res.redirect('/chapter/' + lesson.chapter.id);
+  });
+};
+
+// unpublish a lesson
+module.exports.unpublish = function(req, res) {
+  
+  var lesson = req.lesson;
+  
+  lesson.publish(false, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not unpublished lesson.";
+    }
+    req.session.message = "Lesson unpublished sucessfully.";
     res.redirect('/chapter/' + lesson.chapter.id);
   });
 };
