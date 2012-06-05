@@ -88,6 +88,39 @@ ChapterSchema.methods.removeChapter= function(callback) {
 };
 
 
+// For Move Up & Down Chapter
+ChapterSchema.methods.move = function(index,callback){
+
+  var chapter = this ;
+  var temp;
+  var course = chapter.course;
+  for (var i = 0 ; i < course.chapters.length; i++) {
+    if(course.chapters[i].toString() == chapter._id.toString()) {
+      if(index == 0) {
+        if(i-1 >= 0) {
+            temp = course.chapters[i];
+            course.chapters[i] = course.chapters[i-1];
+            course.chapters[i-1] = temp;
+            break;
+          }
+      }  
+      else if(index == 1) {
+      
+        if(i+1 <= course.chapters.length) {
+            temp = course.chapters[i];
+            course.chapters[i] = course.chapters[i+1];
+            course.chapters[i+1] = temp;
+        break;
+          }
+      }      
+    }
+  }
+  course.markModified('chapters');
+  course.save(callback);
+
+
+};
+
 mongoose.model('Chapter', ChapterSchema);
 
 

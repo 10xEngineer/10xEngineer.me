@@ -105,3 +105,32 @@ module.exports.unpublish = function(req, res) {
     res.redirect('/course/' + chapter.course.id);
   });
 };
+
+
+// For Move up & Down Chapters
+
+module.exports.up = function(req, res, next){
+  var chapter = req.chapter;
+
+  chapter.move(0, function(error) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved chapter.";
+    }
+    message = "Chaper moved sucessfully.";
+    res.redirect('/course/' + chapter.course.id);
+  });
+};
+
+module.exports.down = function(req, res, next){
+   var chapter = req.chapter;
+
+  chapter.move(1, function(error) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved chapter.";
+    }
+    message = "Chaper moved sucessfully.";
+    res.redirect('/course/' + chapter.course.id);
+  });
+};

@@ -113,7 +113,7 @@ module.exports.import = function(req, res, next) {
     }
 
     // Success
-    message = "Import Sucessfully COurse.";
+    message = "Import Sucessfully Course.";
     res.redirect('/courses');
   });
 };

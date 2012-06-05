@@ -91,6 +91,40 @@ LessonSchema.methods.publish = function(publish, callback) {
   lesson.save(callback);
 };
 
+// For Move Up & Down Lesson
+LessonSchema.methods.move = function(index,callback){
+
+  var lesson = this ;
+  var temp;
+  var chapter = lesson.chapter;
+  for (var i = 0 ; i < chapter.lessons.length; i++) {
+    if(chapter.lessons[i].toString() == lesson._id.toString()) {
+      if(index == 0) {
+        if(i-1 >= 0) {
+            temp = chapter.lessons[i];
+            chapter.lessons[i] = chapter.lessons[i-1];
+            chapter.lessons[i-1] = temp;
+            break;
+          }
+      }  
+      else if(index == 1) {
+      
+        if(i+1 <= chapter.lessons.length) {
+            temp = chapter.lessons[i];
+            chapter.lessons[i] = chapter.lessons[i+1];
+            chapter.lessons[i+1] = temp;
+        break;
+          }
+      }      
+    }
+  }
+  chapter.markModified('lessons');
+  chapter.save(callback);
+
+
+};
+
+
 mongoose.model('Lesson', LessonSchema);
 
 
