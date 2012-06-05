@@ -40,7 +40,7 @@ LessonSchema.pre('save', function(next) {
 });
 
 LessonSchema.methods.removeLesson= function(callback) {
-  // TODO: Remove all child 
+ 
   var lesson = this;
 
   lesson.remove(function(error) {

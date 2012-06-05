@@ -45,15 +45,17 @@ module.exports.show = function(req, res) {
 module.exports.remove = function(req, res, next){
   log.info('Removing lesson...');
 
-  var lesson = req.course;
-
-  course.removeLesson(function(error){
+  var lesson = req.lesson;
+  var chapterId =lesson.chapter.id;
+  
+  lesson.removeLesson(function(error){
     if (error) {
       log.error(error);
       error = "Can not remove lesson.";
+      res.redirect('/chapter/:id');
     }
     message = "Sucessfully lesson removed.";
-    res.redirect('/courses/');
+    res.redirect('/chapter/'+ chapterId);
   });
 };
 
