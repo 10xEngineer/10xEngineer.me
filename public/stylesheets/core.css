@@ -134,7 +134,7 @@ div.chapter-header .chapter-content .btn-strip .btn {
 	margin-right: 10px;
 }
 
-ul.chaptersul.chapters li,
+ul.chapters li,
 ul.lessons li {
 	margin: 5px 0;
 	background: white;
@@ -192,19 +192,19 @@ ul.lessons li a, ul.lessons li a h3 {
 /* Chaper Moves */
 /*****************/
 
-.chapter:first-child,.lesson:first-child .moveBox a:first-child {
+.chapter:first-child .moveBox a:first-child, .lesson:first-child .moveBox a:first-child {
   display: none;
 }
 
-.chapter:last-child,.lesson:last-child .moveBox a:last-child {
+.chapter:last-child .moveBox a:last-child, .lesson:last-child .moveBox a:last-child {
   display: none;
 }
 
-.chapter:first-child,.lesson:first-child .moveBox a:last-child {
+.chapter:first-child .moveBox a:last-child, .lesson:first-child .moveBox a:last-child {
   top: 25px;
 }
 
-.chapter:hover,.lesson:hover .moveBox {
+.chapter:hover .moveBox, .lesson:hover .moveBox {
   display: block;
 }
 
@@ -219,7 +219,7 @@ left: -30px;
 top: -60px;
 }
 
-ul.chapters,ul.lessons li .moveBox a {
+ul.chapters li .moveBox a , ul.lessons li .moveBox a {
   display: block;
 }
 
