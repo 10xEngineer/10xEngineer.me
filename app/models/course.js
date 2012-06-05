@@ -12,7 +12,7 @@ var CourseSchema = new Schema({
   desc: { type: String },
   image: { type: String },
   created_by: { type: ObjectId, ref: 'User' },
-  status: { type: String, default: 'draft', enum: ['draft', 'punlished'], required: true },
+  status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   chapters: [{ type: ObjectId, ref: 'Chapter'}],
   created_at: { type: Date, default: Date.now, select: false },
   modified_at: { type: Date, default: Date.now, select: false }
@@ -42,7 +42,8 @@ CourseSchema.pre('save', function(next) {
 });
 
 CourseSchema.methods.removeCourse = function(callback) {
-  // TODO: Remove all child chapters and lessons
+  // TODO: Remove all child chapters and lessons. Also remove any progress associated with it.
+  
   var course = this;
 
   course.remove(function(error) {

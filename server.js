@@ -49,6 +49,7 @@ load.model_init('user');
 load.model_init('course');
 load.model_init('chapter');
 load.model_init('lesson');
+load.model_init('progress');
 
 // Migrate database schema
 // TODO: Find a way to wait before this finishes executing
