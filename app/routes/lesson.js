@@ -75,6 +75,38 @@ module.exports.up = function(req, res, next){
   });
 };
 
+
+
+// Publish a lesson
+module.exports.publish = function(req, res) {
+  
+  var lesson = req.lesson;
+
+  lesson.publish(true, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not published lesson.";
+    }
+    req.session.message = "Lesson published sucessfully.";
+    res.redirect('/chapter/' + lesson.chapter.id);
+  });
+};
+
+// unpublish a lesson
+module.exports.unpublish = function(req, res) {
+  
+  var lesson = req.lesson;
+  
+  lesson.publish(false, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not unpublished lesson.";
+    }
+    req.session.message = "Lesson unpublished sucessfully.";
+    res.redirect('/chapter/' + lesson.chapter.id);
+  });
+};
+
 module.exports.down = function(req, res, next){
   
   var lesson = req.lesson;

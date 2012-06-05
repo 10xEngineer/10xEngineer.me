@@ -133,8 +133,10 @@ module.exports = function(app) {
   app.post('/lesson/create/:chapterId', lesson.create);
   app.get('/lesson/:lessonId', lesson.show);
   app.get('/lesson/:lessonId/remove', lesson.remove);
-   app.get('/lesson/:lessonId/up',lesson.up);
+  app.get('/lesson/:lessonId/up',lesson.up);
   app.get('/lesson/:lessonId/down',lesson.down);
+  app.get('/lesson/:lessonId/publish', lesson.publish);
+  app.get('/lesson/:lessonId/unpublish', lesson.unpublish);
 
   // CDN
   app.get('/cdn/:fileName', cdn.load);

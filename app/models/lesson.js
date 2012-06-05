@@ -15,7 +15,7 @@ var LessonSchema = new Schema({
     content: { type: String, trim: true },
     type: { type: String, enum: ['youtube'] }
   },
-  status: { type: String, default: 'draft', enum: ['draft', 'punlished'], required: true },
+  status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   chapter: { type: ObjectId, ref: 'Chapter', required: true },
   created_at: { type: Date, default: Date.now },
   modified_at: { type: Date, default: Date.now }
@@ -82,12 +82,11 @@ LessonSchema.post('save', function() {
 LessonSchema.methods.publish = function(publish, callback) {
   var lesson = this;
   
-  if(lesson.publish) {
+  if(publish) {
     lesson.status = 'published';
   } else {
     lesson.status = 'draft';
   }
-
   lesson.save(callback);
 };
 

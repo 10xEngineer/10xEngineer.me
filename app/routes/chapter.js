@@ -21,10 +21,11 @@ module.exports.create = function(req, res){
   chapter.save(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not create chapter.";
+      req.session.error = "Can not create chapter.";
     }
 
-    message = "Chaper created sucessfully.";
+    req.session.message = "Chaper created sucessfully.";
+    log.info('Chapter Created :',req.session.message);
     res.redirect('/course/' + req.course.id);
   });
 };
@@ -53,9 +54,9 @@ module.exports.edit = function(req, res){
   chapter.save(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not updated chapter.";
+      req.session.error = "Can not updated chapter.";
     }
-    message = "Chaper updated sucessfully.";
+    req.session.message = "Chaper updated sucessfully.";
     res.redirect('/chapter/' + chapter.id);
   });
 };
@@ -70,10 +71,10 @@ module.exports.remove = function(req, res) {
   chapter.removeChapter(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not delete chapter.";
+      req.session.error = "Can not delete chapter.";
       res.redirect('/chapter/:id');
     }
-    message = "Chaper deleted sucessfully.";
+    req.session.message = "Chaper deleted sucessfully.";
     res.redirect('/course/'+ courseId);
   });
 };
@@ -85,9 +86,9 @@ module.exports.publish = function(req, res) {
   chapter.publish(true, function(error) {
     if(error) {
       log.error(error);
-      error = "Can not published chapter.";
+      req.session.error = "Can not published chapter.";
     }
-    message = "Chaper published sucessfully.";
+    req.session.message = "Chapter published sucessfully.";
     res.redirect('/course/' + chapter.course.id);
   });
 };
@@ -95,13 +96,12 @@ module.exports.publish = function(req, res) {
 // unpublish a chapter
 module.exports.unpublish = function(req, res) {
   var chapter = req.chapter;
-
-  chapter.publish(false, function(error, chapter) {
+  chapter.publish(false, function(error) {
     if(error) {
       log.error(error);
-      error = "Can not unpublished chapter.";
+      req.session.error = "Can not unpublished chapter.";
     }
-    message = "Chaper unpublished sucessfully.";
+    req.session.message = "Chapter unpublished sucessfully.";
     res.redirect('/course/' + chapter.course.id);
   });
 };
@@ -115,9 +115,9 @@ module.exports.up = function(req, res, next){
   chapter.move(0, function(error) {
     if(error) {
       log.error(error);
-      error = "Can not moved chapter.";
+      req.session.error = "Can not moved chapter.";
     }
-    message = "Chaper moved sucessfully.";
+    req.session.message = "Chaper moved sucessfully.";
     res.redirect('/course/' + chapter.course.id);
   });
 };
@@ -128,9 +128,9 @@ module.exports.down = function(req, res, next){
   chapter.move(1, function(error) {
     if(error) {
       log.error(error);
-      error = "Can not moved chapter.";
+      req.session.error = "Can not moved chapter.";
     }
-    message = "Chaper moved sucessfully.";
+    req.session.message = "Chaper moved sucessfully.";
     res.redirect('/course/' + chapter.course.id);
   });
 };
