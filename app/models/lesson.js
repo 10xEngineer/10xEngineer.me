@@ -83,12 +83,11 @@ LessonSchema.post('save', function() {
 LessonSchema.methods.publish = function(publish, callback) {
   var lesson = this;
   
-  if(lesson.publish) {
+  if(publish) {
     lesson.status = 'published';
   } else {
     lesson.status = 'draft';
   }
-
   lesson.save(callback);
 };
 
