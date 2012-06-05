@@ -32,12 +32,8 @@ module.exports = function () {
       googleUser.expiresIn = extra.expires_in;
 
       var promise = this.Promise();
-
-      
-       log.info("Session :",session);
      
       if(session.auth && session.auth.loggedIn) {
-        log.info("Inside Google");
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.google = googleUser;
@@ -66,9 +62,7 @@ module.exports = function () {
     .findOrCreateUser( function (session, accessToken, accessSecret, twitUser) {
       var promise = this.Promise();
       
-      log.info("Session :",session);
       if(session.auth && session.auth.loggedIn) {
-        log.info("Inside Twitter");
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.twitter = twitUser;
@@ -99,9 +93,7 @@ module.exports = function () {
     .findOrCreateUser( function (session, accessToken, accessTokenExtra, fbUserMetadata) {
       var promise = this.Promise();
       
-      log.info("Session :",session);
       if(session.auth && session.auth.loggedIn) {
-        log.info("Inside Facebook");
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.facebook = fbUserMetadata;
