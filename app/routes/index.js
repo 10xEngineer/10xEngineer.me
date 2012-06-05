@@ -124,6 +124,8 @@ module.exports = function(app) {
   app.get('/chapter/:chapterId/publish', chapter.publish);
   app.get('/chapter/:chapterId/unpublish', chapter.unpublish);
   app.get('/chapter/:chapterId/remove', chapter.remove);
+  app.get('/chapter/:chapterId/up',chapter.up);
+  app.get('/chapter/:chapterId/down',chapter.down);
 
 
   // Lesson
@@ -131,6 +133,8 @@ module.exports = function(app) {
   app.post('/lesson/create/:chapterId', lesson.create);
   app.get('/lesson/:lessonId', lesson.show);
   app.get('/lesson/:lessonId/remove', lesson.remove);
+   app.get('/lesson/:lessonId/up',lesson.up);
+  app.get('/lesson/:lessonId/down',lesson.down);
 
   // CDN
   app.get('/cdn/:fileName', cdn.load);

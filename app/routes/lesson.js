@@ -56,3 +56,33 @@ module.exports.remove = function(req, res, next){
     res.redirect('/courses/');
   });
 };
+
+// For Move up & Down Chapters
+
+module.exports.up = function(req, res, next){
+  
+  var lesson = req.lesson;
+
+  lesson.move(0, function(error) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved lesson.";
+    }
+    message = "Lesson moved sucessfully.";
+    res.redirect('/chapter/' + lesson.chapter.id);
+  });
+};
+
+module.exports.down = function(req, res, next){
+  
+  var lesson = req.lesson;
+
+  lesson.move(1, function(error) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved lesson.";
+    }
+    message = "Lesson moved sucessfully.";
+    res.redirect('/chapter/' + lesson.chapter.id);
+  });
+};
