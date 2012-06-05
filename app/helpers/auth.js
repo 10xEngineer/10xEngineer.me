@@ -27,17 +27,13 @@ module.exports = function () {
     .scope('https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email')
     .entryPath('/auth/google')
     .callbackPath('/auth/google/callback')
-    .findOrCreateUser( function (sess, accessToken, extra, googleUser) {
+    .findOrCreateUser( function (session, accessToken, extra, googleUser) {
       googleUser.refreshToken = extra.refresh_token;
       googleUser.expiresIn = extra.expires_in;
 
       var promise = this.Promise();
-
-      log.info("Session :",sess);
-       log.info("Session :",session);
      
       if(session.auth.loggedIn) {
-        log.info("Inside Google");
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.google = googleUser;
@@ -66,9 +62,7 @@ module.exports = function () {
     .findOrCreateUser( function (session, accessToken, accessSecret, twitUser) {
       var promise = this.Promise();
       
-      log.info("Session :",session);
       if(session.auth.loggedIn) {
-        log.info("Inside Twitter");
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.twitter = twitUser;
@@ -99,9 +93,7 @@ module.exports = function () {
     .findOrCreateUser( function (session, accessToken, accessTokenExtra, fbUserMetadata) {
       var promise = this.Promise();
       
-      log.info("Session :",session);
       if(session.auth.loggedIn) {
-        log.info("Inside Facebook");
         User.findById(session.auth.userId, function(error, dbUser) {
 
           dbUser.facebook = fbUserMetadata;
