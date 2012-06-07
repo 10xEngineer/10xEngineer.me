@@ -5,6 +5,9 @@ var mongoose = require('mongoose')
 var Count = mongoose.model('Count');
 var Chapter = mongoose.model('Chapter');
 
+var Chapter = load.model('Chapter');
+
+
 var LessonSchema = new Schema({
   _id: { type: ObjectId },
   id: { type: Number, unique: true, index: true },
@@ -42,12 +45,30 @@ LessonSchema.pre('save', function(next) {
 LessonSchema.methods.removeLesson= function(callback) {
  
   var lesson = this;
+  var chapter = lesson.chapter;
+  
+  log.info("Before Delete :",chapter.lessons);
+  // For Remove Lession _Id from Chapter Table
+  for (var i = 0 ; i < chapter.lessons.length; i++) {
+    if(chapter.lessons[i].toString() == lesson._id.toString()) {
+      
+      chapter.lessons.splice(i,1);
+      
+      chapter.markModified('lessons');
+      chapter.save(function(error) {
+        if(error) {
+          log.error(error);
+        }
+      });
+    }
+  }
+
+  log.info('Chapter Lessons :',chapter.lessons);
 
   lesson.remove(function(error) {
     if(error) {
       callback(error);
     }
-
     callback();
   });
 };
@@ -121,10 +142,87 @@ LessonSchema.methods.move = function(index,callback){
   chapter.markModified('lessons');
   chapter.save(callback);
 
-
 };
 
 
+// For getNext Lesson
+LessonSchema.methods.getNext = function(callback){
+
+  var nextLessonId ='';
+  var lesson = this;
+  var chapterId = lesson.chapter;
+
+  Chapter.findById(chapterId, function(error, chapter) {
+    if(error) {
+      log.error(error);
+    }
+    for (var i = 0; i < chapter.lessons.length; i++) {
+      if(chapter.lessons[i].toString() == lesson._id.toString()) {
+
+        // For last Lesson 
+        if(i == (chapter.lessons.length-1)) {
+
+        } else { 
+          nextLessonId= chapter.lessons[i+1];
+          
+        }
+        break;
+      }
+    }
+    getLessonContent(nextLessonId,function(error ,nextLesson){
+      if(error) {
+        log.error(error);
+      }
+      callback(error, nextLesson.id); 
+    }); 
+  });
+
+};
+
+// For getPrevious Lesson
+LessonSchema.methods.getPrevious = function(callback){
+
+  var preLessonId ='';
+  var lesson = this;
+  var chapterId = lesson.chapter;
+
+  Chapter.findById(chapterId, function(error, chapter) {
+    if(error) {
+      log.error(error);
+    }
+    for (var i = 0; i < chapter.lessons.length; i++) {
+      if(chapter.lessons[i].toString() == lesson._id.toString()) {
+
+        // For First Lesson 
+        if(i == 0) {
+
+        } else { 
+          preLessonId= chapter.lessons[i-1];
+               
+        }
+        break;
+      }
+    }
+    getLessonContent(preLessonId,function(error ,preLesson){
+      if(error) {
+        log.error(error);
+      }
+      callback(error, preLesson.id); 
+    });  
+  });
+
+};
+  
+
 mongoose.model('Lesson', LessonSchema);
 
+var Lesson = load.model('Lesson');
 
+var getLessonContent =function(LessonId,callback){
+  Lesson.findById(LessonId, function(error, lessonContent) {
+    if(error) {
+      log.error(error);
+    }
+    callback(null, lessonContent);          
+  });
+};
