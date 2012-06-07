@@ -137,6 +137,8 @@ module.exports = function(app) {
   app.get('/lesson/:lessonId/down',lesson.down);
   app.get('/lesson/:lessonId/publish', lesson.publish);
   app.get('/lesson/:lessonId/unpublish', lesson.unpublish);
+  app.get('/lesson/:lessonId/next',lesson.next);
+  app.get('/lesson/:lessonId/previous',lesson.previous);
 
   // CDN
   app.get('/cdn/:fileName', cdn.load);
