@@ -62,6 +62,10 @@ module.exports.save = function(imgUrl, fileName, callback) {
   }
 };
 
+module.exports.saveFile = function(path, callback) {
+
+};
+
 // Load file
 module.exports.load = function(fileName, callback) {
   var db = mongoose.connection.db;

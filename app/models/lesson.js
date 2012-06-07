@@ -13,7 +13,7 @@ var LessonSchema = new Schema({
   type: { type: String, enum: ['video', 'quiz', 'programming', 'config-lab'], required: true },
   video: {
     content: { type: String, trim: true },
-    type: { type: String, enum: ['youtube'] }
+    type: { type: String, enum: ['youtube', 'upload'] }
   },
   quiz: { type: Number },
   status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
