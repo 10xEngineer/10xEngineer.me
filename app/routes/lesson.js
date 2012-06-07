@@ -1,4 +1,5 @@
-var fs = requirE('fs');
+var fs = require('fs');
+var cdn = load.helper('cdn');
 
 module.exports = function() {};
 
@@ -16,8 +17,7 @@ module.exports.createView = function(req, res) {
 };
 
 // Create a lesson
-module.exports.create = function(req, res) {
-  log.info("INside Lesson Create :: :: ------",req.body);
+module.exports.create = function(req, res, next) {
   var lesson = new Lesson();
   lesson.chapter = req.chapter._id;
   lesson.title = req.body.title;
@@ -26,28 +26,44 @@ module.exports.create = function(req, res) {
   lesson.video.content = req.body.videoContent;
   lesson.type = 'video';
 
-  var video = req.body.videofile;
+  var f = req.files['videofile'];
 
-  var f = req.files['<name>'];
-  var readStream = fs.createReadStream(f.path);
-  readStream.on('open', function() {
-    log.info('Video stream opened');
-  });
-
-  
-
-   
   lesson.save(function(error) {
     if(error) {
       log.error(error);
       error = "Can not create lesson.";
     }
-    
     var id = lesson.id;
+    if(lesson.video.type == 'upload')  {  
+      
+      var fileName = 'lessonVideo_' + id;
 
+      cdn.saveFile(fileName, f, function(error, fileName) {
+        if(error) {
+          log.error(error);
+          next(error);
+        }
+
+        Lesson.findOne({ id: id }, function(error, lesson) {
+          // Save the CDN URL if available
+          lesson.video.content = fileName;
+          lesson.save(function(error) {
+            if(error) {
+              log.error(error);
+              next(error);
+            }
+
+            req.session.newLesson = {title: lesson.title, _id: lesson._id};
+            message = "Lesson created successfully.";
+            res.redirect('/lesson/' + id);
+          });
+        });
+      });
+    } else {
     req.session.newLesson = {title: lesson.title, _id: lesson._id};
     message = "Lesson created successfully.";
     res.redirect('/lesson/' + id);
+    }
   });
 };
 

@@ -124,7 +124,4 @@ LessonSchema.methods.move = function(index,callback){
 
 };
 
-
 mongoose.model('Lesson', LessonSchema);
-
-

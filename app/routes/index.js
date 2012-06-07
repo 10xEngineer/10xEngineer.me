@@ -141,6 +141,9 @@ module.exports = function(app) {
   // CDN
   app.get('/cdn/:fileName', cdn.load);
 
+  // User
+  app.get('/user/profile', user.profile);
+
   // Quiz
   app.get('/quiz/edit', quiz.edit);
   app.post('/quiz/import', quiz.importJson);
@@ -156,8 +159,6 @@ module.exports = function(app) {
   app.get('/admin/:userId/:roleId', admin.assignRole);
 
 
-  // Testing View
-  app.get('/user/profile',user.profile);
 
 
   // TODO: Organize
