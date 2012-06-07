@@ -17,8 +17,22 @@ form(method='POST', id='lessonForm')
 
   .tab-content
     #video.tab-pane.active
-      h3 Video
-      p Some text
+      input#videoContent(name='videoContent' ,type='hidden')
+      input#type(name='videoType' ,type='hidden')
+      h3 Upload Video
+      
+      select#videoType 
+        option(value='Upload') Upload
+        option(value='Youtube') Youtube
+
+      div#upload
+             p Upload Video File :
+             input#video.input-large(name='videofile', type='file', placeholder='Video File')
+      div#youtube    
+            p Youtube URL :
+            input#videoLink.input-large(name='videofile', type='text', placeholder='Video File')
+            input#showYoutubePreview(type="button", value="Preview")
+      div#videoPreview  
     #quiz.tab-pane
       h3 Quiz
       p Questions
@@ -31,6 +45,65 @@ form(method='POST', id='lessonForm')
     input.btn.btn-primary(type='submit', value='Submit')
 
 script(type='text/javascript')
-  $(function() {
+  
+  $(document).ready(function() {
+    
+    // For Tabs
     $('.tabs a:last').tab('show');
+
+    // For Choose Upload or Youtube
+    if($('#videoType').val()=="Upload"){
+        $('#youtube').hide();
+        $('#upload').show();
+      }
+    $('#videoType').change(function(){
+      if($('#videoType').val()=="Upload"){
+        $('#youtube').hide();
+        $('#upload').show();
+        $('#type').val('upload');
+      }
+      if($('#videoType').val()=="Youtube"){
+        $('#youtube').show();
+        $('#upload').hide();
+        $('#type').val('youtube');
+      }
+    });
+
+    // FOr Preview of YOutube Video
+    $('#showYoutubePreview').click(function(){
+      $('#videoPreview').html('');
+      var url = getYoutubeID($('#videoLink').val());
+      
+      $('<iframe/>',{
+        width: 300,
+        height: 300,
+        src: url,
+        frameborder: 0,
+        allowfullscreen: true
+      }).appendTo('#videoPreview'); 
+    });
+
+    function getYoutubeID(url)
+    {
+      // For Youtube  Video Verification
+      if(/http:\\/\\/youtu.be\\/(\\w+)/.test(url)) {
+        var youtubeParse = /http:\\/\\/youtu.be\\/(\\w+)/.exec(url);
+        url = "http://www.youtube.com/embed/"+youtubeParse[1];
+        $('#videoContent').val(youtubeParse[1]);
+        alert(youtubeParse[1]);
+        return url;
+      }
+
+      //FOr Facebook Video Verification
+      if(/https:\\/\\/www.facebook.com\\/sharer\\/sharer.php\\?u=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D(\\w+)/.test(url)) {
+        var youtubeParse = /https:\\/\\/www.facebook.com\\/sharer\\/sharer.php\\?u=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D(\\w+)/.exec(url);
+        url = "http://www.youtube.com/embed/"+youtubeParse[1];
+        alert(youtubeParse[1]);
+        $('#videoContent').val(youtubeParse[1]);
+        return url;
+      }
+      
+    }
+
   });
+  

@@ -1,5 +1,11 @@
+var fs = requirE('fs');
 
 module.exports = function() {};
+
+// Load Model
+var Chapter = load.model('Chapter');
+var Lesson = load.model('Lesson');
+
 
 // Display create lesson page
 module.exports.createView = function(req, res) {
@@ -11,25 +17,37 @@ module.exports.createView = function(req, res) {
 
 // Create a lesson
 module.exports.create = function(req, res) {
+  log.info("INside Lesson Create :: :: ------",req.body);
+  var lesson = new Lesson();
+  lesson.chapter = req.chapter._id;
+  lesson.title = req.body.title;
+  lesson.description = req.body.description;
+  lesson.video.type = req.body.videoType;
+  lesson.video.content = req.body.videoContent;
+  lesson.type = 'video';
 
-  var data = {
-    chapter: req.chapter._id,
-    title: req.body.title,
-    description: req.body.description
-  };
+  var video = req.body.videofile;
 
-  if (!data.created_by) {
-    data.created_by = req.user.id;
-  }
+  var f = req.files['<name>'];
+  var readStream = fs.createReadStream(f.path);
+  readStream.on('open', function() {
+    log.info('Video stream opened');
+  });
 
-  var lesson = new Lesson(data);
-  Lesson.save(function(error) {
+  
+
+   
+  lesson.save(function(error) {
     if(error) {
       log.error(error);
       error = "Can not create lesson.";
     }
-    message = "Sucessfully create lesson.";
-    res.redirect('/chapter/' + req.chapter._id);
+    
+    var id = lesson.id;
+
+    req.session.newLesson = {title: lesson.title, _id: lesson._id};
+    message = "Lesson created successfully.";
+    res.redirect('/lesson/' + id);
   });
 };
 
