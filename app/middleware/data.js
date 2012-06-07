@@ -61,18 +61,26 @@ module.exports = function(app) {
       }
 
       if(lesson) {
-        Course.findById(lesson.chapter.course, function(error, course) {
-          lesson.id = parseInt(lesson.id.toString());
-          req.lesson = lesson;
-          req.chapter = lesson.chapter;
-          req.course = course;
-          req.app.helpers({
-            lesson: lesson,
-            chapter: lesson.chapter,
-            course: course
-          });
-          next();
+        Course.findById(lesson.chapter.course)
+          .populate('chapters')
+          .run(function(error, course) {
+          Chapter.findById(lesson.chapter._id)
+          .populate('lessons')
+          .run(function(error, chapter) {
+            lesson.id = parseInt(lesson.id.toString());
+            req.lesson = lesson;
+            req.chapter = chapter;
+            req.course = course;
+            req.app.helpers({
+              lesson: lesson,
+              chapter: chapter,
+              course: course
+            });
+            next();
+          });          
         });
+      } else {
+        next();
       }
     });
   });
