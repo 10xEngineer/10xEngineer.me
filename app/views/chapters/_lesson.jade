@@ -1,4 +1,4 @@
-form(method='POST', id='lessonForm')
+form(method='POST', id='lessonForm', enctype='multipart/form-data')
   p
     label(for="title") Title:
     input.required(value='#{lesson.title}', id='title', name='title')
@@ -55,6 +55,7 @@ script(type='text/javascript')
     if($('#videoType').val()=="Upload"){
         $('#youtube').hide();
         $('#upload').show();
+        $('#type').val('upload');
       }
     $('#videoType').change(function(){
       if($('#videoType').val()=="Upload"){
@@ -90,7 +91,6 @@ script(type='text/javascript')
         var youtubeParse = /http:\\/\\/youtu.be\\/(\\w+)/.exec(url);
         url = "http://www.youtube.com/embed/"+youtubeParse[1];
         $('#videoContent').val(youtubeParse[1]);
-        alert(youtubeParse[1]);
         return url;
       }
 
@@ -98,7 +98,6 @@ script(type='text/javascript')
       if(/https:\\/\\/www.facebook.com\\/sharer\\/sharer.php\\?u=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D(\\w+)/.test(url)) {
         var youtubeParse = /https:\\/\\/www.facebook.com\\/sharer\\/sharer.php\\?u=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D(\\w+)/.exec(url);
         url = "http://www.youtube.com/embed/"+youtubeParse[1];
-        alert(youtubeParse[1]);
         $('#videoContent').val(youtubeParse[1]);
         return url;
       }
