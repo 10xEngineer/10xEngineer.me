@@ -1,4 +1,4 @@
-var fs = requirE('fs');
+var fs = require('fs');
 
 module.exports = function() {};
 
