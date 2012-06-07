@@ -141,6 +141,7 @@ module.exports.unpublish = function(req, res) {
   });
 };
 
+// for up or down lesson
 module.exports.down = function(req, res, next){
   
   var lesson = req.lesson;
@@ -153,4 +154,33 @@ module.exports.down = function(req, res, next){
     message = "Lesson moved sucessfully.";
     res.redirect('/chapter/' + lesson.chapter.id);
   });
+};
+
+// For Next Or Previous Lesson
+module.exports.next = function(req,res){
+
+  var lesson = req.lesson;
+
+  lesson.getNext(function(error,nextLessonID) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved to next lesson.";
+    }  
+    res.redirect('/lesson/' + nextLessonID);
+  });
+  
+};
+
+module.exports.previous = function(req,res){
+
+  var lesson = req.lesson;
+
+  lesson.getPrevious(function(error,preLessonID) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved to previous lesson.";
+    }  
+    res.redirect('/lesson/' + preLessonID);
+  });
+  
 };
