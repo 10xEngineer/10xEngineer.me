@@ -38,25 +38,54 @@ module.exports.createView = function(req, res){
 };
 
 // Create a new course
-module.exports.create = function(req, res){
+module.exports.create = function(req, res, next){
   var course = new Course();
+  var util = load.helper('util');
   course.title = req.body.title;
   course.desc = req.body.description;
   course.image = req.body.image;
+  course.cropImgInfo = req.body.cropImgInfo;
   course.created_by = req.user._id;
 
-  course.save(function(error) {
-    if(error) {
+  util.saveToDisk(req.body.image, function(error, filePath){
+    if(error){
       log.error(error);
-      error = "Can not create course.";
+      next(error);
     }
 
-    var id = course.id;
+    util.imageCrop(filePath, course.cropImgInfo, function(error, filePath, oldFilePath) {
+      if(error) {
+        log.error("Image crop opration", error);
+        next(error);
+      }
 
-    //Set the course info in the session to let socket.io know about it.
-    req.session.newCourse = {title: course.title, _id: course._id};
-    message = "Course created successfully.";
-    res.redirect('/course/' + id);
+      // deletes old original file aftred crops
+      fs.unlink(oldFilePath, function (error) {
+        if (error) {
+          log.error(error);
+          next(error);
+        }
+      });
+
+      // resize croped file
+      util.imageResize(filePath, function(error, filePath, oldFilePath){
+        if(error){
+          log.error("Image Resize opration", error);
+          next(error);
+        }
+  
+        // deletes old croped file after resize
+        fs.unlink(oldFilePath, function (error) {
+          if (error) {
+            log.error(error);
+            next(error);
+          }
+        });
+
+        res.redirect('/courses');
+      });
+    });
+
   });
 };
 
@@ -174,5 +203,3 @@ module.exports.remove = function(req, res, next){
     res.redirect('/courses/');
   });
 };
-
-
