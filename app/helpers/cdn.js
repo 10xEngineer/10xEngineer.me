@@ -144,7 +144,7 @@ var readFile = function(fd, gs, offset, size, callback) {
       } else {
         process.nextTick(function() {
           readFile(fd, gs, offset, size, callback);
-        })
+        });
       }
     });
 

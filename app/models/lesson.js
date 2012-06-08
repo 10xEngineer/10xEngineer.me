@@ -4,8 +4,10 @@ var mongoose = require('mongoose')
 
 var Count = mongoose.model('Count');
 var Chapter = mongoose.model('Chapter');
+var Course = mongoose.model('Course');
 
 var Chapter = load.model('Chapter');
+var Course = load.model('Course');
 
 
 var LessonSchema = new Schema({
@@ -42,37 +44,6 @@ LessonSchema.pre('save', function(next) {
   }
 });
 
-LessonSchema.methods.removeLesson= function(callback) {
- 
-  var lesson = this;
-  var chapter = lesson.chapter;
-  
-  log.info("Before Delete :",chapter.lessons);
-  // For Remove Lession _Id from Chapter Table
-  for (var i = 0 ; i < chapter.lessons.length; i++) {
-    if(chapter.lessons[i].toString() == lesson._id.toString()) {
-      
-      chapter.lessons.splice(i,1);
-      
-      chapter.markModified('lessons');
-      chapter.save(function(error) {
-        if(error) {
-          log.error(error);
-        }
-      });
-    }
-  }
-
-  log.info('Chapter Lessons :',chapter.lessons);
-
-  lesson.remove(function(error) {
-    if(error) {
-      callback(error);
-    }
-    callback();
-  });
-};
-
 LessonSchema.post('save', function() {
   var lesson = this;
   var id = parseInt(lesson.id.toString());
@@ -100,6 +71,35 @@ LessonSchema.post('save', function() {
     });
   }
 });
+
+LessonSchema.methods.removeLesson= function(callback) {
+ 
+  var lesson = this;
+  var chapter = lesson.chapter;
+  
+ 
+  // For Remove Lession _Id from Chapter Table
+  for (var i = 0 ; i < chapter.lessons.length; i++) {
+    if(chapter.lessons[i].toString() == lesson._id.toString()) {
+      
+      chapter.lessons.splice(i,1);
+      
+      chapter.markModified('lessons');
+      chapter.save(function(error) {
+        if(error) {
+          log.error(error);
+        }
+      });
+    }
+  }
+
+  lesson.remove(function(error) {
+    if(error) {
+      callback(error);
+    }
+    callback();
+  });
+};
 
 LessonSchema.methods.publish = function(publish, callback) {
   var lesson = this;
@@ -148,9 +148,10 @@ LessonSchema.methods.move = function(index,callback){
 // For getNext Lesson
 LessonSchema.methods.getNext = function(callback){
 
-  var nextLessonId ='';
-  var lesson = this;
-  var chapterId = lesson.chapter;
+  var nextLessonId = '';
+  var flag         = true;
+  var lesson       = this;
+  var chapterId    = lesson.chapter;
 
   Chapter.findById(chapterId, function(error, chapter) {
     if(error) {
@@ -161,20 +162,28 @@ LessonSchema.methods.getNext = function(callback){
 
         // For last Lesson 
         if(i == (chapter.lessons.length-1)) {
-
+          flag = false;
         } else { 
-          nextLessonId= chapter.lessons[i+1];
-          
+          nextLessonId = chapter.lessons[i+1]; 
+          flag = true;       
         }
         break;
       }
     }
-    getLessonContent(nextLessonId,function(error ,nextLesson){
-      if(error) {
-        log.error(error);
-      }
-      callback(error, nextLesson.id); 
-    }); 
+    if(flag == false) {
+      getChapterContent('next',chapter, function(error, nextChapterId) {
+        callbackFunction('next',error, nextChapterId, function(error, nextLessonID) {
+          callback(error, nextLessonID); 
+        });
+      });
+    } else {
+      getLessonContent(nextLessonId,function(error ,nextLesson){
+        if(error) {
+          log.error(error);
+        }
+        callback(error, nextLesson.id); 
+      }); 
+    }
   });
 
 };
@@ -182,9 +191,10 @@ LessonSchema.methods.getNext = function(callback){
 // For getPrevious Lesson
 LessonSchema.methods.getPrevious = function(callback){
 
-  var preLessonId ='';
-  var lesson = this;
-  var chapterId = lesson.chapter;
+  var preLessonId  = '';
+  var flag         = true;
+  var lesson       = this;
+  var chapterId    = lesson.chapter;
 
   Chapter.findById(chapterId, function(error, chapter) {
     if(error) {
@@ -195,20 +205,28 @@ LessonSchema.methods.getPrevious = function(callback){
 
         // For First Lesson 
         if(i == 0) {
-
+          flag = false;
         } else { 
           preLessonId= chapter.lessons[i-1];
-               
+          flag = true;  
         }
         break;
       }
     }
-    getLessonContent(preLessonId,function(error ,preLesson){
-      if(error) {
-        log.error(error);
+    if(flag == false) {
+      getChapterContent('previous',chapter, function(error, preChapterId) {
+        callbackFunction('previous',error, preChapterId, function(error, preLessonID) {
+          callback(error, preLessonID); 
+        });
+      });
+    } else {
+      getLessonContent(preLessonId,function(error ,preLesson){
+        if(error) {
+          log.error(error);
+        }
+        callback(error, preLesson.id); 
+      });  
       }
-      callback(error, preLesson.id); 
-    });  
   });
 
 };
@@ -218,11 +236,103 @@ mongoose.model('Lesson', LessonSchema);
 
 var Lesson = load.model('Lesson');
 
-var getLessonContent =function(LessonId,callback){
-  Lesson.findById(LessonId, function(error, lessonContent) {
+var getLessonContent =function(lessonId,callback){
+  Lesson.findById(lessonId, function(error, lessonContent) {
     if(error) {
       log.error(error);
     }
     callback(null, lessonContent);          
   });
+};
+
+var getChapterContent = function(index,chapter,callback) {
+  
+  var courseId = chapter.course;
+  var nextCourse = '';
+  var preCourse = '';
+  var flag= true;
+  
+  Course.findById(courseId, function(error, courseContent) {
+    if(error) {
+      log.error(error);
+    }
+    for (var i = 0; i < courseContent.chapters.length; i++) {
+      if(courseContent.chapters[i].toString() == chapter._id.toString()) {
+
+        if(index == 'next') {
+      
+            // For last chapter 
+            if(i == (courseContent.chapters.length-1)) {
+              moveChapterId= null; 
+              flag = false;
+            } else { 
+              moveChapterId= courseContent.chapters[i+1]; 
+              flag = true;       
+            }
+            break;
+      
+        } else if(index == 'previous') {
+
+             // For first chapter 
+            if(i == 0){
+              moveChapterId= null; 
+              flag = false;
+            } else { 
+              moveChapterId= courseContent.chapters[i-1]; 
+              flag = true;       
+            }
+            break;
+
+        }
+
+      }
+    } //end For 
+    if(flag == false) {
+      callback(null ,moveChapterId);
+    } else if (flag == true) {
+      callback(null ,moveChapterId);
+    }
+           
+  });
+
+};
+
+var callbackFunction = function(index,error, moveChapterId,callback){
+  if(error) {
+    log.error(error);
+  }
+
+  if(moveChapterId == null) {
+      callback(error, null);
+  } else {
+    
+    Chapter.findById(moveChapterId, function(error, moveChapter) {
+      
+      if(error) {
+        log.error(error);
+      }
+     
+      moveLessonId = (moveChapter.lessons.length>0) ? moveChapter.lessons[0] : null ;
+
+      if(moveLessonId == null) {
+         
+        getChapterContent(index,moveChapter, function(error, moveChapterId) {
+          process.nextTick(function() {
+            callbackFunction(index,error, moveChapterId, function(error, moveLessonID) {
+               callback(error, moveLessonID); 
+            });
+          });
+       });
+
+      } else {
+        
+        getLessonContent(moveLessonId,function(error ,moveLesson){
+          if(error) {
+            log.error(error);
+          }
+          callback(error, moveLesson.id); 
+        });
+      }
+    });
+  }
 };
