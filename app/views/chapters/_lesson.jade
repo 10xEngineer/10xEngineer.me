@@ -1,4 +1,5 @@
 form(method='POST', id='lessonForm', enctype='multipart/form-data')
+  input#lessonType(name='type' ,type='hidden' ,value='video')
   p
     label(for="title") Title:
     input.required(value='#{lesson.title}', id='title', name='title')
@@ -7,13 +8,15 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
     textarea.required(name='description', id='description')
       #{lesson.description}
 
-  ul.nav.nav-tabs
+  ul#myTab.nav.nav-tabs
     li.active
       a(href='#video', data-toggle='tab') Video
     li
       a(href='#quiz', data-toggle='tab') Quiz
     li
-      a(href='#excercise', data-toggle='tab') Hands-on Exercise
+      a(href='#programming', data-toggle='tab') Programming
+    li
+      a(href='#sysAdmin', data-toggle='tab') SysAdmin
 
   .tab-content
     #video.tab-pane.active
@@ -36,11 +39,23 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
     #quiz.tab-pane
       h3 Quiz
       p Questions
-    #exercise.tab-pane
-      h3 Exercise
-      p Code
+    #programming.tab-pane
+      h3 Programming
+      select#language(name='language')
+        option(value='c_cpp') C
+        option(value='c_cpp') C++
+        option(value='css') CSS
+        option(value='Java') Java
+      p Code :
+      textarea#code(name='code')
+      p Enter Input :
+      textarea#input(name='input')
+      p Enter Output :
+      textarea#output(name='output')
+    #sysAdmin.tab-pane
+      h3 SysAdmin
+      something
 
-  p
   p
     input.btn.btn-primary(type='submit', value='Submit')
 
@@ -103,6 +118,25 @@ script(type='text/javascript')
       }
       
     }
+
+    $('#myTab a').click(function (e) {
+      var str = e.target;
+      var element = str.toString().split("#"); 
+      var index = element[1].toString();
+      if(index == 'video') {
+        
+        $('#code').val('');
+        $('#input').val('');
+        $('#output').val('');
+        $('#lessonType').val('video');
+      
+      } else if(index == 'programming') {
+
+        $('#video').val('');
+        $('#videoLink').val('');
+        $('#lessonType').val('programming');
+      }
+    });
 
   });
   

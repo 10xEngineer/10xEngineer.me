@@ -24,8 +24,13 @@ module.exports.create = function(req, res, next) {
   lesson.description = req.body.description;
   lesson.video.type = req.body.videoType;
   lesson.video.content = req.body.videoContent;
-  lesson.type = 'video';
+  lesson.type = req.body.type;
+  lesson.programming.language = req.body.language ;
+  lesson.programming.skeletonCode = req.body.code ;
+  lesson.programming.input = req.body.input ;
+  lesson.programming.output = req.body.output ;
 
+  log.info('Lesson POST',req.body);
   var f = req.files['videofile'];
 
   lesson.save(function(error) {
@@ -34,35 +39,42 @@ module.exports.create = function(req, res, next) {
       error = "Can not create lesson.";
     }
     var id = lesson.id;
-    if(lesson.video.type == 'upload')  {  
-      
-      var fileName = 'lessonVideo_' + id;
+    if(lesson.type == 'video')
+    {
+      if(lesson.video.type == 'upload')  {  
+        
+        var fileName = 'lessonVideo_' + id;
 
-      cdn.saveFile(fileName, f, function(error, fileName) {
-        if(error) {
-          log.error(error);
-          next(error);
-        }
+        cdn.saveFile(fileName, f, function(error, fileName) {
+          if(error) {
+            log.error(error);
+            next(error);
+          }
 
-        Lesson.findOne({ id: id }, function(error, lesson) {
-          // Save the CDN URL if available
-          lesson.video.content = fileName;
-          lesson.save(function(error) {
-            if(error) {
-              log.error(error);
-              next(error);
-            }
+          Lesson.findOne({ id: id }, function(error, lesson) {
+            // Save the CDN URL if available
+            lesson.video.content = fileName;
+            lesson.save(function(error) {
+              if(error) {
+                log.error(error);
+                next(error);
+              }
 
-            req.session.newLesson = {title: lesson.title, _id: lesson._id};
-            message = "Lesson created successfully.";
-            res.redirect('/lesson/' + id);
+              req.session.newLesson = {title: lesson.title, _id: lesson._id};
+              message = "Lesson created successfully.";
+              res.redirect('/lesson/' + id);
+            });
           });
         });
-      });
+      } else {
+        req.session.newLesson = {title: lesson.title, _id: lesson._id};
+        message = "Lesson created successfully.";
+        res.redirect('/lesson/' + id);
+      }
     } else {
-    req.session.newLesson = {title: lesson.title, _id: lesson._id};
-    message = "Lesson created successfully.";
-    res.redirect('/lesson/' + id);
+      req.session.newLesson = {title: lesson.title, _id: lesson._id};
+      message = "Lesson created successfully.";
+      res.redirect('/lesson/' + id);
     }
   });
 };
