@@ -166,7 +166,11 @@ module.exports.next = function(req,res){
       log.error(error);
       error = "Can not moved to next lesson.";
     }  
-    res.redirect('/lesson/' + nextLessonID);
+    if(nextLessonID == null) {
+      res.redirect('/course/' + req.course.id);
+    } else {
+      res.redirect('/lesson/' + nextLessonID);
+    }
   });
   
 };
@@ -179,8 +183,12 @@ module.exports.previous = function(req,res){
     if(error) {
       log.error(error);
       error = "Can not moved to previous lesson.";
-    }  
-    res.redirect('/lesson/' + preLessonID);
+    }
+    if(preLessonID == null) {
+      res.redirect('/course/' + req.course.id);
+    } else {
+      res.redirect('/lesson/' + preLessonID);
+    }
   });
   
 };
