@@ -47,46 +47,20 @@ module.exports.create = function(req, res, next){
   course.cropImgInfo = req.body.cropImgInfo;
   course.created_by = req.user._id;
 
-  util.saveToDisk(req.body.image, function(error, filePath){
-    if(error){
+  course.save(function(error) {
+    if(error) {
       log.error(error);
-      next(error);
+      error = "Can not create course.";
     }
 
-    util.imageCrop(filePath, course.cropImgInfo, function(error, filePath, oldFilePath) {
-      if(error) {
-        log.error("Image crop opration", error);
-        next(error);
-      }
+    var id = course.id;
 
-      // deletes old original file aftred crops
-      fs.unlink(oldFilePath, function (error) {
-        if (error) {
-          log.error(error);
-          next(error);
-        }
-      });
-
-      // resize croped file
-      util.imageResize(filePath, function(error, filePath, oldFilePath){
-        if(error){
-          log.error("Image Resize opration", error);
-          next(error);
-        }
-  
-        // deletes old croped file after resize
-        fs.unlink(oldFilePath, function (error) {
-          if (error) {
-            log.error(error);
-            next(error);
-          }
-        });
-
-        res.redirect('/courses');
-      });
-    });
-
+    //Set the course info in the session to let socket.io know about it.
+    req.session.newCourse = {title: course.title, _id: course._id};
+    message = "Course created successfully.";
+    res.redirect('/course/' + id);
   });
+
 };
 
 // TODO: Quick course import tool. Modify to support the new course format
