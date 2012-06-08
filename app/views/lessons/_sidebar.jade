@@ -1,26 +1,33 @@
 //=require bootstrap-tabs bootstrap-scrollspy
 .row-fluid
-		.sidebar.well
-			ul.nav.nav-list( data-spy="scroll" )
-				li.nav-header 
-					i.icon-book
-					| Course Content
-				- var chapters = course.chapters || []
-				each chapter in chapters
-					li
-						li.nav-header 
-							a(href='/chapter/#{chapter.id}/') #{chapter.title}
-				
-				li.divider
-				li.nav-header 
-						i.icon-pencil
-						| Tool
-					li
-						a(href='/program/#{course.id}/1/1') 
-							| Example IDE
-					li
-						a(href='/quiz/#{course.id}/1/2') 
-							| Example QUIZ
+    .sidebar.well
+      ul.nav.nav-list( data-spy="scroll" )
+        li.nav-header 
+          i.icon-book
+          | Course Content
+        - var chapters = course.chapters || []
+        each innerChapter in chapters
+          li
+            li.nav-header 
+              a(href='/chapter/#{innerChapter.id}/') #{innerChapter.title}
+              - if (innerChapter._id.toString() == lesson.chapter._id.toString())
+                each innerLesson in chapter.lessons
+                  - if (innerLesson.id.toString() == lesson.id.toString())
+                      li
+                        #{innerLesson.title}
+                  - else
+                      li 
+                        a(href='/lesson/#{innerLesson.id}') #{innerLesson.title}
+        li.divider
+          li.nav-header 
+              i.icon-pencil
+              | Tool
+            li
+              a(href='/program/#{course.id}/1/1') 
+                | Example IDE
+            li
+              a(href='/quiz/#{course.id}/1/2') 
+                | Example QUIZ
 
 //.row-fluid
-//	a.btn.btn-primary.btn-large NEXT
+//  a.btn.btn-primary.btn-large NEXT
