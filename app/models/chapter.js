@@ -75,6 +75,22 @@ ChapterSchema.methods.publish = function(publish, callback) {
 ChapterSchema.methods.removeChapter= function(callback) {
   // TODO: Remove all child 
   var chapter = this;
+  var course = chapter.course;
+  
+  // For Remove Chapter _Id from Course Table
+  for (var i = 0 ; i < course.chapters.length; i++) {
+    if(course.chapters[i].toString() == chapter._id.toString()) {
+      
+      course.chapters.splice(i,1);
+      
+      course.markModified('chapters');
+      course.save(function(error) {
+        if(error) {
+          log.error(error);
+        }
+      });
+    }
+  }
 
   chapter.remove(function(error) {
     if(error) {

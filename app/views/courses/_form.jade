@@ -1,4 +1,4 @@
-form(method='POST', id='courseForm')
+form(method='POST', id='courseForm' ,enctype='multipart/form-data')
   p
     label(for="title") Title:
     input.required(value='#{course.title}', id='title', name='title')

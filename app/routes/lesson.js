@@ -1,5 +1,12 @@
+var fs = require('fs');
+var cdn = load.helper('cdn');
 
 module.exports = function() {};
+
+// Load Model
+var Chapter = load.model('Chapter');
+var Lesson = load.model('Lesson');
+
 
 // Display create lesson page
 module.exports.createView = function(req, res) {
@@ -10,26 +17,53 @@ module.exports.createView = function(req, res) {
 };
 
 // Create a lesson
-module.exports.create = function(req, res) {
+module.exports.create = function(req, res, next) {
+  var lesson = new Lesson();
+  lesson.chapter = req.chapter._id;
+  lesson.title = req.body.title;
+  lesson.description = req.body.description;
+  lesson.video.type = req.body.videoType;
+  lesson.video.content = req.body.videoContent;
+  lesson.type = 'video';
 
-  var data = {
-    chapter: req.chapter._id,
-    title: req.body.title,
-    description: req.body.description
-  };
+  var f = req.files['videofile'];
 
-  if (!data.created_by) {
-    data.created_by = req.user.id;
-  }
-
-  var lesson = new Lesson(data);
-  Lesson.save(function(error) {
+  lesson.save(function(error) {
     if(error) {
       log.error(error);
       error = "Can not create lesson.";
     }
-    message = "Sucessfully create lesson.";
-    res.redirect('/chapter/' + req.chapter._id);
+    var id = lesson.id;
+    if(lesson.video.type == 'upload')  {  
+      
+      var fileName = 'lessonVideo_' + id;
+
+      cdn.saveFile(fileName, f, function(error, fileName) {
+        if(error) {
+          log.error(error);
+          next(error);
+        }
+
+        Lesson.findOne({ id: id }, function(error, lesson) {
+          // Save the CDN URL if available
+          lesson.video.content = fileName;
+          lesson.save(function(error) {
+            if(error) {
+              log.error(error);
+              next(error);
+            }
+
+            req.session.newLesson = {title: lesson.title, _id: lesson._id};
+            message = "Lesson created successfully.";
+            res.redirect('/lesson/' + id);
+          });
+        });
+      });
+    } else {
+    req.session.newLesson = {title: lesson.title, _id: lesson._id};
+    message = "Lesson created successfully.";
+    res.redirect('/lesson/' + id);
+    }
   });
 };
 
@@ -107,6 +141,7 @@ module.exports.unpublish = function(req, res) {
   });
 };
 
+// for up or down lesson
 module.exports.down = function(req, res, next){
   
   var lesson = req.lesson;
@@ -119,4 +154,41 @@ module.exports.down = function(req, res, next){
     message = "Lesson moved sucessfully.";
     res.redirect('/chapter/' + lesson.chapter.id);
   });
+};
+
+// For Next Or Previous Lesson
+module.exports.next = function(req,res){
+
+  var lesson = req.lesson;
+
+  lesson.getNext(function(error,nextLessonID) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved to next lesson.";
+    }  
+    if(nextLessonID == null) {
+      res.redirect('/course/' + req.course.id);
+    } else {
+      res.redirect('/lesson/' + nextLessonID);
+    }
+  });
+  
+};
+
+module.exports.previous = function(req,res){
+
+  var lesson = req.lesson;
+
+  lesson.getPrevious(function(error,preLessonID) {
+    if(error) {
+      log.error(error);
+      error = "Can not moved to previous lesson.";
+    }
+    if(preLessonID == null) {
+      res.redirect('/course/' + req.course.id);
+    } else {
+      res.redirect('/lesson/' + preLessonID);
+    }
+  });
+  
 };

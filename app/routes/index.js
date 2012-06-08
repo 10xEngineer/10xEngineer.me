@@ -137,9 +137,14 @@ module.exports = function(app) {
   app.get('/lesson/:lessonId/down',lesson.down);
   app.get('/lesson/:lessonId/publish', lesson.publish);
   app.get('/lesson/:lessonId/unpublish', lesson.unpublish);
+  app.get('/lesson/:lessonId/next',lesson.next);
+  app.get('/lesson/:lessonId/previous',lesson.previous);
 
   // CDN
   app.get('/cdn/:fileName', cdn.load);
+
+  // User
+  app.get('/user/profile', user.profile);
 
   // Quiz
   app.get('/quiz/edit', quiz.edit);
@@ -156,8 +161,6 @@ module.exports = function(app) {
   app.get('/admin/:userId/:roleId', admin.assignRole);
 
 
-  // Testing View
-  app.get('/user/profile',user.profile);
 
 
   // TODO: Organize
