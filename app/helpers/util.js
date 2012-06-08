@@ -24,7 +24,7 @@ module.exports.findFirst = function( key, jsonObj ) {
 
 // Save file
 module.exports.saveToDisk = function(imgUrl, callback) {
-	var fileName = '/home/hk/workspace/10xEngineer.me/10xEngineer.me/app/upload/tmpImage.jpg';
+	var fileName = '/Users/parth/workspace/10xEngineer.me/app/upload/tmpImage.jpg';
 
 	var parsedUrl = url.parse(imgUrl, true);
 
@@ -59,7 +59,7 @@ module.exports.saveToDisk = function(imgUrl, callback) {
 
 // Image Crop function
 module.exports.imageCrop = function(fileName, cropDetailStringify, callback) {
-  var fileCroped = '/home/hk/workspace/10xEngineer.me/10xEngineer.me/app/upload/tmpImageCroped.jpg';
+  var fileCroped = '/Users/parth/workspace/10xEngineer.me/app/upload/tmpImageCroped.jpg';
   var cropDetail = JSON.parse(cropDetailStringify);
   var width = cropDetail.w;
   var height = cropDetail.h;
@@ -79,7 +79,7 @@ module.exports.imageCrop = function(fileName, cropDetailStringify, callback) {
 
 // Image Resize function
 module.exports.imageResize = function(fileCroped, callback){
-  var fileResized = '/home/hk/workspace/10xEngineer.me/10xEngineer.me/app/upload/tmpImageResized.jpg';
+  var fileResized = '/Users/parth/workspace/10xEngineer.me/app/upload/tmpImageResized.jpg';
 
   gm(fileCroped)
     .resize(200, 200)

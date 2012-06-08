@@ -21,6 +21,12 @@ var LessonSchema = new Schema({
     type: { type: String, enum: ['youtube', 'upload'] }
   },
   quiz: { type: Number },
+  programming:{
+    language: { type: String, trim: true },
+    skeletonCode: { type: String, trim: true },
+    input: { type: String, trim: true },
+    output: { type: String, trim: true }
+  },
   status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   chapter: { type: ObjectId, ref: 'Chapter', required: true },
   created_at: { type: Date, default: Date.now },

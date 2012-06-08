@@ -10,7 +10,6 @@ include _header
     #pageslide select{
       width:120px;
     }
-
   .row-fluid
     .span10
       .row-fluid
@@ -129,11 +128,9 @@ include _header
                       td
                         input(type="checkbox")#highlight_selected_word.checked
                 a(href="javascript:$.pageslide.close()").btn.btn-info Close
-
             #source-editor 
               .controls
-                - var code = code || ''
-                input(type='hidden', name='sourcecode', id='sourcecode', value='#{code}')
+                input(type='hidden', name='sourcecode', id='sourcecode', value='#{lesson.programming.skeletonCode}')
                 #editor(style='position:relative;width:100%;height:400px;')
               .form-actions
                 span.danger
@@ -275,7 +272,7 @@ include _header
 
         //load default theme and language
         loadTheme("textmate");    
-        loadMode("javascript");
+        loadMode('#{lesson.programming.language}');
       }
 
       $('a#clear').click(function(e){
