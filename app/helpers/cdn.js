@@ -63,17 +63,23 @@ module.exports.save = function(imgUrl, fileName, callback) {
 };
 
 module.exports.saveFile = function(fileName, fileDesc, callback) {
+  var self = this;
+  self.saveFileNew(fileName, fileDesc.path, fileDesc.type, callback);
+};
+
+// file save by hk
+module.exports.saveFileNew = function(fileName, filePath, contentType, callback) {
 
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
 
   var gs = new GridStore(db, fileName, 'w', {
-    'content_type': fileDesc.type
+    'content_type': contentType
   });
 
-  var stats = fs.statSync(fileDesc.path);
+  var stats = fs.statSync(filePath);
 
-  fs.open(fileDesc.path,'r',function(error, fd) {
+  fs.open(filePath,'r',function(error, fd) {
     gs.open(function(error, gs) {
       if (error) {
         log.error(error);
@@ -91,10 +97,6 @@ module.exports.saveFile = function(fileName, fileDesc, callback) {
       });
     });
   });
-
-  
-
-
 };
 
 // Load file

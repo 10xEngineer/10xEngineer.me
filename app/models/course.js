@@ -4,6 +4,12 @@ var mongoose = require('mongoose')
 
 var Count = mongoose.model('Count');
 var cdn = load.helper('cdn');
+var util = load.helper('util');
+var fs = require('fs');
+var path = require('path')
+var gm = require('gm');
+var mime = require('mime');
+
 
 var CourseSchema = new Schema({
   _id: { type: ObjectId },
@@ -63,6 +69,70 @@ var saveCourse = function (course, callback) {
   var fileName = 'courseImage_' + course.id;
 
   // Process image
+  util.saveToDisk(course.image, function(error, imagePath){
+    if(error){
+      log.error("Error comes from util - saveToDisk Function", error);
+      callback(error);
+    }
+    util.imageCrop(imagePath, course.cropImgInfo, function(error, croppedImagePath) {
+      if(error) {
+        log.error("Error from Image crop opration", error);
+        callback(error);
+      }
+
+      // deletes old original file aftred crops
+      fs.unlink(imagePath, function (error) {
+        if (error) {
+          log.error("Error from unlink file", error);
+          callback(error);
+        }
+      });
+
+      // resize croped file
+      util.imageResize(croppedImagePath, function(error, resizedImagePath){
+        if(error){
+          log.error("Image Resize opration", error);
+          callback(error);
+        }
+  
+        var fileType = mime.extension(mime.lookup(resizedImagePath));
+
+        // deletes old croped file after resize
+        fs.unlink(croppedImagePath, function (error) {
+          if (error) {
+            log.error("Error from unlink file", error);
+            callback(error);
+          }
+        });
+
+        // fress resized image stores to database
+        cdn.saveFileNew(fileName, resizedImagePath, fileType, function(error){
+          if (error) {
+            log.error("Error from save file in database", error);
+            callback(error);
+          }
+
+          fs.unlink(resizedImagePath, function (error) {
+            if (error) {
+              log.error("Error from unlink file", error);
+              callback(error);
+            }
+          });
+
+          course.image = '/cdn/' + fileName;
+          course.save(function(error) {
+            if(error) {
+              callback(error);
+            }
+            callback();
+          });
+        });
+      });
+    });
+
+  });
+
+  /*  // old save replaced by new sequence of save
   cdn.save(course.image, fileName, function(error, newUrl) {
     course.image = newUrl;
     course.save(function(error) {
@@ -73,4 +143,5 @@ var saveCourse = function (course, callback) {
       callback(null);
     });
   });
+  */
 };

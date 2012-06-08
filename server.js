@@ -15,6 +15,7 @@ load = require(appRoot + '/app/loader')(appRoot);
 
 // Prototype Utilities (TODO: Use underscore instead?)
 require('./app/utils/prototypeUtils');
+tmpFileUploadDir = __dirname + '/app/upload';
 
 // Read configuration
 var config = load.helper('config');
@@ -69,7 +70,7 @@ var app = module.exports = express.createServer();
 app.configure(function(){
   app.set('views', __dirname + '/app/views');
   app.set('view engine', 'jade');
-  app.use(express.bodyParser({uploadDir: __dirname + '/app/upload', keepExtensions: true }));
+  app.use(express.bodyParser({uploadDir: tmpFileUploadDir, keepExtensions: true }));
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({

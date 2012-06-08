@@ -49,16 +49,19 @@ module.exports.create = function(req, res, next){
 
   course.save(function(error) {
     if(error) {
+      log.error(error);
       error = "Can not create course.";
       next(error);
     }
 
     var id = course.id;
+
     //Set the course info in the session to let socket.io know about it.
     req.session.newCourse = {title: course.title, _id: course._id};
     message = "Course created successfully.";
     res.redirect('/course/' + id);
   });
+
 };
 
 // TODO: Quick course import tool. Modify to support the new course format
