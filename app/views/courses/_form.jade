@@ -7,31 +7,47 @@ form(method='POST', id='courseForm')
     textarea.required(name='description', id='description')
       #{course.desc}
   p
+    input#cropImgInfo(name='cropImgInfo', type='hidden')
+  p
     label(for="selectImage") Image:
     button.btn(type='button', name='selectImage', id='selectImage') Choose
     .previewPane
       - if(course.image)
-        img(src='#{course.image}')
+        img#cropTarget(src='#{course.image}')
         input(type='hidden', name='image', value='#{course.image}')
   p
     input.btn.btn-primary(type='submit', value='Submit')
 
 script
-  filepicker.setKey('462_D0Z1RnO8iMRHhSZb');
-  $("#selectImage").click(function(){
-    filepicker.getFile(filepicker.MIMETYPES.IMAGES, {'multiple':false}, function(url, token, data) {
-      var $previewPane = $('.previewPane');
+  $(document).ready(function() {
+    filepicker.setKey('462_D0Z1RnO8iMRHhSZb');
+    $("#selectImage").click(function(){
+      filepicker.getFile(filepicker.MIMETYPES.IMAGES, {'multiple':false}, function(url, token, data) {
+        var $previewPane = $('.previewPane');
 
-      $previewPane.empty();
-      $('<img/>', {
-        src: url
-      }).appendTo($previewPane);
+        $previewPane.empty();
+        $('<img/>', {
+          src: url,
+          id: 'cropTarget'
+        }).appendTo($previewPane);
 
-      $('<input/>', {
-        type: 'hidden',
-        name: 'image',
-        value: url
-      }).appendTo($previewPane);
+        $('<input/>', {
+          type: 'hidden',
+          name: 'image',
+          value: url
+        }).appendTo($previewPane);
+
+        // Initialize JCrop
+        $('#cropTarget').Jcrop({
+          aspectRatio: 1,
+          minSize: [200, 200],
+          setSelect: [0, 0, 200, 200],
+          bgOpacity: 0.5,
+          onSelect: function(c){
+            $('#cropImgInfo').val(JSON.stringify(c))
+          }
+        });
+
+      });
     });
   });
-  
