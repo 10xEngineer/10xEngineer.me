@@ -3,6 +3,8 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var gm = require('gm');
+var path = require('path');
+var mime = require('mime');
 
 module.exports = function() {};
 
@@ -24,13 +26,14 @@ module.exports.findFirst = function( key, jsonObj ) {
 
 // Save file
 module.exports.saveToDisk = function(imgUrl, callback) {
-	var fileName = '/Users/parth/workspace/10xEngineer.me/app/upload/tmpImage.jpg';
-
 	var parsedUrl = url.parse(imgUrl, true);
 
 
  	var protocol = (parsedUrl.protocol === 'http:' ? http : parsedUrl.protocol === 'https:' ? https : null);
  	protocol.get(parsedUrl, function(res) {
+
+    var fileType = mime.extension(res.headers['content-type']);
+    var filePath = path.join(tmpFileUploadDir,"tmpImage." + fileType);
 
   	var data = '';
 
@@ -41,12 +44,12 @@ module.exports.saveToDisk = function(imgUrl, callback) {
 
   	res.on('end', function() {
 
-			fs.writeFile(fileName, data.toString('binary'), 'binary', function (error) {
+			fs.writeFile(filePath.toString(), data.toString('binary'), 'binary', function (error) {
 				if (error) {
           log.error("File write opration", error);
           callback(error);
         }
-        callback(null, fileName);
+        callback(null, filePath);
 			});
     });
 	}).on('error', function(error) {
@@ -58,36 +61,40 @@ module.exports.saveToDisk = function(imgUrl, callback) {
 };
 
 // Image Crop function
-module.exports.imageCrop = function(fileName, cropDetailStringify, callback) {
-  var fileCroped = '/Users/parth/workspace/10xEngineer.me/app/upload/tmpImageCroped.jpg';
+module.exports.imageCrop = function(filePath, cropDetailStringify, callback) {
+
+  var fileType = mime.extension(mime.lookup(filePath));
+  var fileCropedPath = path.join(tmpFileUploadDir,"tmpCropedImage." + fileType);
   var cropDetail = JSON.parse(cropDetailStringify);
   var width = cropDetail.w;
   var height = cropDetail.h;
   var x = cropDetail.x;
   var y = cropDetail.y;
 
-  gm(fileName)
+  gm(filePath)
     .crop(width,height,x,y)
-    .write(fileCroped, function(error){
+    .write(fileCropedPath, function(error){
     if (error) {
       log.error("Croped write opration", error);
       callback(error);
     } 
-    callback(null, fileCroped, fileName);
+    callback(null, fileCropedPath, filePath);
   });
 }
 
 // Image Resize function
-module.exports.imageResize = function(fileCroped, callback){
-  var fileResized = '/Users/parth/workspace/10xEngineer.me/app/upload/tmpImageResized.jpg';
+module.exports.imageResize = function(filePath, callback){
 
-  gm(fileCroped)
+  var fileType = mime.extension(mime.lookup(filePath));
+  var fileResizedPath = path.join(tmpFileUploadDir,"tmpResizedImage." + fileType);
+
+  gm(filePath)
     .resize(200, 200)
-    .write(fileResized, function(error){
+    .write(fileResizedPath, function(error){
     if(error){
       callback(error);
     }
 
-    callback(null, fileResized, fileCroped);
+    callback(null, fileResizedPath, filePath);
   });
 }
