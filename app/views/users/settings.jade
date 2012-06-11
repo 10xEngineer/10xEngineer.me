@@ -1,0 +1,29 @@
+h1 #{user.name} 's Profile
+br
+form(method='POST', action='', id='profileForm')
+  
+  p
+      h5 User Name :
+      input.required(value='#{user.name}', id='name', name='name')   
+  p 
+      h5 Email :
+      input.required(value='#{user.email}', id='email', name='email')  
+  p
+      h5 Account Type:
+      - if (user.facebook.name)
+          img(src="/images/facebook.png")
+      - else
+          a(href='/auth/fb')
+            img(src="/images/facebook.png",class="img")
+      - if (user.google.name)
+          img(src="/images/google.png")
+      - else
+          a(href='/auth/google')
+            img(src="/images/google.png",class="img")
+      - if (user.twitter.name)
+          img(src="/images/twitter.png")
+      - else
+          a(href='/auth/twitter') 
+            img(src="/images/twitter.png",class="img")
+  br
+  input(type='submit' ,name='submit',value='Update')
