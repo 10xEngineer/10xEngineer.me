@@ -145,6 +145,8 @@ module.exports = function(app) {
 
   // User
   app.get('/user/profile', user.profile);
+  app.get('/user/settings',user.settingsView);
+  app.post('/user/settings',user.settings);
 
   // Quiz
   app.get('/quiz/edit', quiz.edit);
