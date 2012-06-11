@@ -6,7 +6,7 @@ var quiz = load.controller('quiz');
 var admin = load.controller('admin');
 var user = load.controller('user');
 var cdn = load.controller('cdn');
-
+var validation = load.middleware('validation');
 var ability = load.helper('ability');
 
 
@@ -116,7 +116,7 @@ module.exports = function(app) {
 
   // Chapter
   app.get('/chapter/create/:courseId', chapter.createView);
-  app.post('/chapter/create/:courseId', chapter.create);
+  app.post('/chapter/create/:courseId', validation.lookUp(), chapter.create);
   app.get('/chapter/:chapterId', chapter.show);
   app.get('/chapter/:chapterId/edit', chapter.editView);
   app.post('/chapter/:chapterId/edit', chapter.edit);
