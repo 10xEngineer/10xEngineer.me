@@ -1,4 +1,3 @@
-
 module.exports = {
 
 	required : function (value , req) {
