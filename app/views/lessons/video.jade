@@ -5,8 +5,12 @@ include _header
       - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
         iframe(width="800", height="480", src="http://www.youtube.com/embed/#{lesson.video.content}", frameborder="0", allowfullscreen="true")
 
-      - else
+      - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
         include _player
+
+      - else
+        p Unsupported Video Type.
+      
       a.btn(href='/lesson/#{lesson.id}/previous/') Previous
       a.btn.btn-success(href="/lesson/#{lesson.id}/next/") Next
     .span2
