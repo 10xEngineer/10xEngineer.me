@@ -1,13 +1,26 @@
 var User = load.model('User');
+var Progress = load.model('Progress');
 
 module.exports = function() {};
 
 
 
 module.exports.profile = function(req, res){
-  res.render('users/profile', {
-  	user: req.user
+  
+  Progress.userChapterProgress(req.user, function(error, progress) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not fetch a progress report of user.";
+    }
+    res.render('users/profile', {
+      user: req.user,
+      progressObject : progress
+    });
+   
   });
+
+
+  
 };
 
 module.exports.settingsView = function(req, res){

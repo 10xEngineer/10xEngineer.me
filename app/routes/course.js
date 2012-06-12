@@ -142,10 +142,20 @@ module.exports.start = function(req, res, next){
 
 // Load specific course and display chapter index
 module.exports.show = function(req, res, next){
-  res.render('courses/chapters', {
-    title: req.course.title,
-    chapter: undefined,
-    index :0
+
+  log.info(req.user._id);
+  log.info(req.course._id);
+  Progress.findOne({ user: req.user._id, course: req.course._id }, function(error, progress) {
+    if(error) {
+      callback(error);
+    }
+    log.info('Progress Info :',progress);
+    res.render('courses/chapters', {
+      title: req.course.title,
+      chapter: undefined,
+      index :0,
+      progressObject : progress
+    });
   });
 };
 

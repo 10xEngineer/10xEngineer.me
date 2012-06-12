@@ -6,6 +6,7 @@ var async = require('async');
 
 var Count = load.model('Count');
 var Course = load.model('Course');
+var Chapter = load.model('Chapter');
 var User = load.model('User');
 var Lesson = load.model('Lesson');
 
@@ -130,13 +131,16 @@ CourseProgressSchema.pre('save', function(next) {
             }
           }, 0);
 
-          log.info('adding')
+          if(pLessons.length > 0) {
+            lessonProgress = lessonProgress / pLessons.length * 100;
+          }
+          
           progress.chapters.push({
             _id: chapter.id,
             id: chapter.id,
             seq: chapterIndex++,
             lessons: lessons,
-            progress: lessonProgress / pLessons.length * 100,
+            progress: lessonProgress,
             status: 'not-started'
           });
 
@@ -163,6 +167,18 @@ CourseProgressSchema.pre('save', function(next) {
   });
 });
 
+CourseProgressSchema.statics.userChapterProgress = function(user, callback) {
+  var Progress = this;
+
+  Progress.find({ user: user._id })
+    .populate('course')
+    .run(function(error, progress) {
+    if(error) {
+      callback(error);
+    }
+    callback(null, progress);
+  });
+};
 
 CourseProgressSchema.statics.startOrContinue = function(user, course, callback) {
   var Progress = this;
