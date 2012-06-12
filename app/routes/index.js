@@ -8,7 +8,7 @@ var user = load.controller('user');
 var cdn = load.controller('cdn');
 var validation = load.middleware('validation');
 var ability = load.helper('ability');
-
+var validationConfig = load.helper('validationConfig');
 
 
 // ---------------------
@@ -103,7 +103,7 @@ module.exports = function(app) {
   app.get('/courses', course.list);
 
   app.get('/course/create', course.createView);
-  app.post('/course/create', course.create);
+  app.post('/course/create', validation.lookUp(validationConfig.course.createCourse), course.create);
   app.get('/course/import', course.importView);
   app.post('/course/import', course.import);
 
@@ -116,10 +116,10 @@ module.exports = function(app) {
 
   // Chapter
   app.get('/chapter/create/:courseId', chapter.createView);
-  app.post('/chapter/create/:courseId', validation.lookUp(), chapter.create);
+  app.post('/chapter/create/:courseId', validation.lookUp(validationConfig.chapter.createChapter), chapter.create);
   app.get('/chapter/:chapterId', chapter.show);
   app.get('/chapter/:chapterId/edit', chapter.editView);
-  app.post('/chapter/:chapterId/edit', chapter.edit);
+  app.post('/chapter/:chapterId/edit', validation.lookUp(validationConfig.chapter.editChapter), chapter.edit);
   app.get('/chapter/:chapterId/remove', chapter.remove);
   app.get('/chapter/:chapterId/publish', chapter.publish);
   app.get('/chapter/:chapterId/unpublish', chapter.unpublish);
@@ -130,7 +130,7 @@ module.exports = function(app) {
 
   // Lesson
   app.get('/lesson/create/:chapterId', lesson.createView);
-  app.post('/lesson/create/:chapterId', lesson.create);
+  app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', lesson.show);
   app.get('/lesson/:lessonId/remove', lesson.remove);
   app.get('/lesson/:lessonId/up',lesson.up);

@@ -1,36 +1,37 @@
 module.exports = {
 
 	required : function (value , req) {
-		if(req == 'true') {
+		if(req == true) {
 			if(value != '') {
-				return true;
+				return "true";
 			} else {
-				return false;
+				return "is required";
 			}
 		}
+		else return "true"
 	},
 
 	regexp : function(value , regExp) {
 		if(regExp.test(value)) {
-			return true ;
+			return "true" ;
 		} else {
-			return false;
+			return "is not in specified formate";
 		}
 	},
 
 	email : function (value , isEmail) {
 		if( /[A-Z0-9a-z._%+-]+@[A-Z0-9a-z.-]+\.[A-Za-z]{2,4}/.test(value) ) {
-			return true;
+			return "true";
 		} else {
-			return false;
+			return "invalid email id";
 		}
 	},
 
 	number : function(value, isNumber) {
 		if( /[0-9]+/.test(value) ) {
-			return true;
+			return "true";
 		} else {
-			return false;
+			return "invalid number";
 		}
 	}
 
