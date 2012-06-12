@@ -19,12 +19,14 @@ var UserSchema = new Schema({
   google: {
     name: String,
     email: String,
-    picture: String
+    picture: String,
+    link: String
   },
   facebook: {
     username: String,
     name: String,
-    email: String
+    email: String,
+    link: String
   },
   twitter: {
     name: String,

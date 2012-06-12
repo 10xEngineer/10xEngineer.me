@@ -34,7 +34,12 @@ include _header
                   a.btn.btn-success.pull-right(href='/chapter/#{chapter.id}/unpublish', style='margin-right: 5px;') Unpublish
                 a.btn.pull-right(href='/chapter/#{chapter.id}/edit', style='margin-right: 5px;') Edit
               .progress(style='margin: 10px 0;')
-                .bar(style="width: 0%;")
+                - if(progressObject)
+                    for pro in progressObject.chapters
+                      if(chapter.id == pro.id)
+                        .bar(style="width: #{pro.progress}%;")
+                - else
+                      .bar(style="width:0%;")
               div.moveBox
                 a.upArrow(href="/chapter/#{chapter.id}/up")
                   i.icon-chevron-up
