@@ -44,6 +44,8 @@
       a(href='http://get.adobe.com/flashplayer/', target='_blank') Flash plugin
       | .
 
+input#testBtn(type='button', value='click me')
+
 script
   yepnope({
     load: '/stylesheets/jplayer.cyan.flag.css'
@@ -58,5 +60,14 @@ script
       },
       swfPath: "/javascripts/jplayer/jplayer.swf",
       supplied: "m4v"
+    });
+
+    $("#jquery_jplayer_1").bind($.jPlayer.event.ended, function(event) { 
+      $.ajax({
+        url: '/lesson/#{lesson.id}/successful/',
+        success: function(data) {
+           console.log(data);
+        }
+      });
     });
   });

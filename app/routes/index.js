@@ -132,6 +132,7 @@ module.exports = function(app) {
   app.get('/lesson/create/:chapterId', lesson.createView);
   app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', lesson.show);
+  app.get('/lesson/:lessonId/successful', lesson.lessonCompleted);
   app.get('/lesson/:lessonId/remove', lesson.remove);
   app.get('/lesson/:lessonId/up',lesson.up);
   app.get('/lesson/:lessonId/down',lesson.down);

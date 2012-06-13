@@ -1,5 +1,7 @@
 var fs = require('fs');
 var cdn = load.helper('cdn');
+var Progress = load.model('Progress');
+
 
 module.exports = function() {};
 
@@ -86,6 +88,28 @@ module.exports.show = function(req, res) {
     title: req.lesson.title
   });
 };
+
+// Lesson Comletes
+module.exports.lessonCompleted = function(req, res) {
+  res.contentType('text/plain');
+  var progress = Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
+    if(error) {
+      log.error(error);
+      res.end("false");
+    }
+    log.info(progress);
+    progress.lessonCompleted(req.chapter.id, req.lesson.id, function(error){
+      if(error) {
+        log.error(error);
+        res.end("false");
+      }
+
+      res.end("true");
+    })
+  
+  });
+
+}
 
 // Remove entire lesson
 module.exports.remove = function(req, res, next){

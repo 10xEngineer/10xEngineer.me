@@ -237,7 +237,31 @@ CourseProgressSchema.methods.getNextLesson = function(callback) {
   callback(null, nextLesson.id);
 };
 
+CourseProgressSchema.methods.lessonCompleted = function(chapterId, lessonId, callback) {
+  var progress = this;
+  log.info(chapterId);
 
+  for (var chapterIndex in progress.chapters) {
+    var chapter = progress.chapters[chapterIndex];
+    log.info(chapter.id, chapterId);
+    if(chapter.id == chapterId){
+      for(var lessonIndex in chapter.lessons) {
+        var lesson = chapter.lessons[lessonIndex];
+        log.info(lesson.id, lessonId);
+        if(lesson.id == lessonId) {
+          lesson.status = 'completed';
+          break;
+        }
+      }
+    }
+  }
+
+  log.info(progress);
+  progress.save(function(error) {
+    log.info("Testing progress ::",progress);
+    callback();
+  });
+}
 
 mongoose.model('Progress', CourseProgressSchema);
 

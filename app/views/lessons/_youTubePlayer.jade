@@ -1,0 +1,33 @@
+iframe#youtubeIframe(width="800", height="480", src="http://www.youtube.com/embed/#{lesson.video.content}", frameborder="0", allowfullscreen="true")
+
+script
+	var tag = document.createElement('script');
+	tag.src = "http://www.youtube.com/player_api";
+	var firstScriptTag = document.getElementsByTagName('script')[0];
+	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+	var player;
+	function onYouTubePlayerAPIReady() {
+		player = new YT.Player('youtubeIframe', {
+			height: '480',
+			width: '800',
+			videoId: '#{lesson.video.content}',
+			events: {
+				'onStateChange': onPlayerStateChange
+			}
+		});
+	}
+
+	function onPlayerStateChange(event) {
+		if (event.data == YT.PlayerState.ENDED) {
+			$.ajax({
+				url: '/lesson/#{lesson.id}/successful/',
+				success: function(data) {
+					alert("Successfully Done.");
+				},
+				error: function(error, status, xhr) {
+					alert(JSON.stringify(error) + "Status: " + status);
+				}
+			});
+		}
+	}
