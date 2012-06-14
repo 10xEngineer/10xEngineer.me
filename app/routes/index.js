@@ -18,6 +18,7 @@ var validationConfig = load.helper('validationConfig');
 
 // IDEONE documentation http://ideone.com/files/ideone-api.pdf
 var submitCode = function(code) {
+  log.info('submitting code');
   request(
     { method: 'GET'
     , uri: wsdlurl
@@ -132,7 +133,6 @@ module.exports = function(app) {
   app.get('/lesson/create/:chapterId', lesson.createView);
   app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', lesson.show);
-  app.get('/lesson/:lessonId/successful', lesson.lessonCompleted);
   app.get('/lesson/:lessonId/remove', lesson.remove);
   app.get('/lesson/:lessonId/up',lesson.up);
   app.get('/lesson/:lessonId/down',lesson.down);
@@ -140,6 +140,7 @@ module.exports = function(app) {
   app.get('/lesson/:lessonId/unpublish', lesson.unpublish);
   app.get('/lesson/:lessonId/next',lesson.next);
   app.get('/lesson/:lessonId/previous',lesson.previous);
+  app.get('/lesson/:lessonId/complete', lesson.complete);
 
   // CDN
   app.get('/cdn/:fileName', cdn.load);

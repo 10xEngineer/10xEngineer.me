@@ -90,20 +90,18 @@ module.exports.show = function(req, res) {
 };
 
 // Lesson Comletes
-module.exports.lessonCompleted = function(req, res) {
+module.exports.complete = function(req, res) {
   res.contentType('text/plain');
   var progress = Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
     if(error) {
       log.error(error);
       res.end("false");
     }
-    log.info(progress);
-    progress.lessonCompleted(req.chapter.id, req.lesson.id, function(error){
+    progress.completeLesson(req.chapter.id, req.lesson.id, function(error){
       if(error) {
         log.error(error);
         res.end("false");
       }
-
       res.end("true");
     })
   

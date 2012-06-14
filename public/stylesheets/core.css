@@ -98,14 +98,6 @@ ul.carousel-inner,  ul.carousel-inner li.item { margin:0; }
 	margin-bottom: 6px;
 }
 
-/** Video player **/
-.jp-video {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	
-}
-
 /* Chapters */
 
 div.course-header,
@@ -152,6 +144,15 @@ ul.lessons li a, ul.lessons li a h3 {
 }
 
 /* Chapters End */
+
+/* Lessons */
+.lesson .lessonBar {
+	margin: 5px;
+}
+.lesson .lessonBar .btn {
+	width: 50px;
+}
+/* Lessons End */
 
 /*****************/
 /* USERS PROFILE */

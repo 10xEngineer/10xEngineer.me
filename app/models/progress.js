@@ -237,7 +237,7 @@ CourseProgressSchema.methods.getNextLesson = function(callback) {
   callback(null, nextLesson.id);
 };
 
-CourseProgressSchema.methods.lessonCompleted = function(chapterId, lessonId, callback) {
+CourseProgressSchema.methods.completeLesson = function(chapterId, lessonId, callback) {
   var progress = this;
   log.info(chapterId);
 
@@ -258,7 +258,6 @@ CourseProgressSchema.methods.lessonCompleted = function(chapterId, lessonId, cal
 
   log.info(progress);
   progress.save(function(error) {
-    log.info("Testing progress ::",progress);
     callback();
   });
 }
