@@ -3,10 +3,9 @@ var mocha = require('mocha')
   , Suite = mocha.Suite
   , Test = mocha.Test;
 
-load = require('../app/loader')('..');
-
+var app = require('../../server.js');
 var assert = require('assert')
-  , validation = require('../app/middleware/validation')  ;
+  , validation = load.middleware('validation')  ;
 
 describe('validation', function() {
 
