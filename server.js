@@ -14,9 +14,8 @@ tmpFileUploadDir = appRoot + '/app/upload';
 // Module loader
 load = require(appRoot + '/app/loader')(appRoot);
 
-
-
 var init = exports.init = function(config) {
+
   // ----------------
   // Redis
   // ----------------
@@ -32,7 +31,7 @@ var init = exports.init = function(config) {
   // MongoDB Config
   // ----------------
   // Intitialize
-  mongoose.connect(config.db.address + config.db.database);
+  mongoose.connect(config.get('db:address') + config.get('db:database'));
 
   mongoose.connection.on('open', function() {
     log.info('Database connection established.');
@@ -47,7 +46,7 @@ var init = exports.init = function(config) {
   load.helper('dbMigrator')();
 
   // Authentication Middleware
-  var authMiddleware = load.helper('auth')();
+  var authMiddleware = load.helper('auth')(config);
 
   // ----------------
   // Express
@@ -112,9 +111,9 @@ var init = exports.init = function(config) {
 
 // Run if not invoked by test suite
 if(!module.parent) {
-  var config = load.helper('config');
+  var config = require('./app/config/config');
   var app = init(config);
-  app.listen(3000);
+  app.listen(config.get('site:port'));
   log.info("Server listening on port %d in %s mode", app.address().port, app.settings.env);
 
 
