@@ -15,18 +15,20 @@ module.exports = function() {};
 
 // List existing courses
 module.exports.list = function(req, res){
-  var registered_courses = [];
-  if( typeof(req.user) != 'undefined' && typeof(req.user.registered_courses) != 'undefined') {
-    registered_courses = req.user.registered_courses;
-  }
-
+  var formatedProgress = {};
   Course.find({}, function(error, courses){
-    res.render('courses', { 
-      title: 'Courses',
-      courses: courses,
-      registered_courses: registered_courses
+    Progress.find({ user: req.user._id }, function(error, progresses){
+      for(var index = 0; index < progresses.length; index++){
+        var progress = progresses[index];
+        formatedProgress[progress.course] = progress.status;
+      }
+      res.render('courses', { 
+        title: 'Courses',
+        courses: courses,
+        progress : formatedProgress
+      });
     });
-  });
+  })
 };
 
 // Create new course form
@@ -149,7 +151,6 @@ module.exports.show = function(req, res, next){
     if(error) {
       callback(error);
     }
-    log.info('Progress Info :',progress);
     res.render('courses/chapters', {
       title: req.course.title,
       chapter: undefined,
