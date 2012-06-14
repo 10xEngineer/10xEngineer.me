@@ -13,9 +13,9 @@
           ul.carousel-inner(style="width:100%; height:600px")
             each course, code in courses
               li.item.ribbon-wrapper
-                - if (registered_courses != undefined && registered_courses[course.id] && user != undefined)
+                - if (progress != undefined && progress[course._id] != undefined && user != undefined)
                   .ribbon-wrapper-green
-                    - if(registered_courses[course.id].status == 'COMPLETED')
+                    - if( progress[course._id] == "completed" )
                       .ribbon-green COMPLETED
                     - else
                       .ribbon-green(style='color: yellow;') IN PROGRESS
@@ -25,8 +25,8 @@
                   h3 #{course.title}
                   p Taught by Steve M.
                     span.pull-right
-                      - if (registered_courses != undefined && user != undefined)
-                          - if ( registered_courses[course.id] )
+                      - if ( progress != undefined && user != undefined)
+                          - if (progress[course._id] == "started" )
                                a.btn.btn-primary.btn-large(href='/course/#{course.id}/start') GO TO YOUR COURSE
                           - else
                                a.btn.btn-primary.btn-large(href='/course/#{course.id}/start') START THIS COURSE
@@ -42,9 +42,9 @@
       each course, code in courses
         li.span3.well
           .ribbon-wrapper
-            - if (registered_courses != undefined && registered_courses[course.id] && user != undefined)
+            - if ( progress != undefined && progress[course._id] != undefined && user != undefined)
               .ribbon-wrapper-green
-                - if(registered_courses[course.id].status == 'COMPLETED')
+                - if( progress[course._id] == "completed")
                   .ribbon-green COMPLETED
                 - else
                   .ribbon-green(style='color: yellow;') IN PROGRESS
