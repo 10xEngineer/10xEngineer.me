@@ -31,8 +31,36 @@ module.exports.create = function(req, res, next) {
   lesson.programming.skeletonCode = req.body.code ;
   lesson.programming.input = req.body.input ;
   lesson.programming.output = req.body.output ;
+  log.info('Lesson Post :',req.body);
+  
+  // For Quiz
+  if(lesson.type == 'quiz') {
 
-  log.info('Lesson POST',req.body);
+    var questionLength = req.body.question.length-1;
+    var lessonInstanceQuestion = lesson.quiz.questions;
+    for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
+      
+      var instanceQuestion = {
+        question : '',
+        options  : [],
+        answers  : []
+      };
+
+      instanceQuestion.question = req.body.question[indexQuestion];
+
+      var optionsLength = req.body.questionOption[indexQuestion].length-1;
+      var answerIndex = 0;
+      for (var indexOption = 0; indexOption < optionsLength; indexOption++) {
+        instanceQuestion.options[indexOption] = req.body.questionOption[indexQuestion][indexOption];
+        if(req.body.questionOptionCheckbox[indexQuestion][indexOption]) {
+          instanceQuestion.answers[answerIndex++] = req.body.questionOption[indexQuestion][indexOption];
+        }
+      }
+      lessonInstanceQuestion.push(instanceQuestion);
+    }
+  }
+
+
   var f = req.files['videofile'];
 
   lesson.save(function(error) {
