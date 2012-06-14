@@ -43,14 +43,7 @@ mongoose.connection.on('open', function() {
 
 log.info('Initializing models');
 // Register models
-load.model_init('count');
-load.model_init('metadata');
-load.model_init('role');
-load.model_init('user');
-load.model_init('course');
-load.model_init('chapter');
-load.model_init('lesson');
-load.model_init('progress');
+require('./app/models')();
 
 // Migrate database schema
 // TODO: Find a way to wait before this finishes executing
