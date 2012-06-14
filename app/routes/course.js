@@ -145,8 +145,6 @@ module.exports.start = function(req, res, next){
 // Load specific course and display chapter index
 module.exports.show = function(req, res, next){
 
-  log.info(req.user._id);
-  log.info(req.course._id);
   Progress.findOne({ user: req.user._id, course: req.course._id }, function(error, progress) {
     if(error) {
       callback(error);
@@ -176,8 +174,7 @@ module.exports.update = function(req, res, next){
 
 // Remove entire course and its chapters
 module.exports.remove = function(req, res, next){
-  log.info('Removing course...');
-
+  
   var course = req.course;
 
   course.removeCourse(function(error){

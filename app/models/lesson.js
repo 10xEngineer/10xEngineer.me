@@ -20,7 +20,9 @@ var LessonSchema = new Schema({
     content: { type: String, trim: true },
     type: { type: String, enum: ['youtube', 'upload'] }
   },
-  quiz: { type: Number },
+  quiz: { 
+    questions : [ OptionSchema ],
+  },
   programming:{
     language: { type: String, trim: true },
     skeletonCode: { type: String, trim: true },
@@ -33,6 +35,12 @@ var LessonSchema = new Schema({
   modified_at: { type: Date, default: Date.now }
 }, {
   collection: 'lessons'
+});
+
+var OptionSchema = new Schema({
+  question: String,
+  options: [ String ],
+  answers: [ String ]
 });
 
 // Set default id
