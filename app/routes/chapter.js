@@ -25,7 +25,6 @@ module.exports.create = function(req, res){
     }
 
     req.session.message = "Chaper created sucessfully.";
-    log.info('Chapter Created :',req.session.message);
     res.redirect('/course/' + req.course.id);
   });
 };
@@ -63,7 +62,6 @@ module.exports.edit = function(req, res){
 
 // Remove a chapter
 module.exports.remove = function(req, res) {
-  log.info('Removing chapter...');
 
   var chapter = req.chapter;
   var courseId =req.chapter.course.id;
