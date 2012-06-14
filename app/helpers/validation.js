@@ -1,37 +1,34 @@
 module.exports = {
 
-	required : function (value , req) {
-		if(req == true) {
-			if(value != '') {
-				return "true";
-			} else {
-				return "is required";
-			}
+	required : function (value ) {
+		if(value != '') {
+			return true;
+		} else {
+			return "is required";
 		}
-		else return "true"
 	},
 
 	regexp : function(value , regExp) {
 		if(regExp.test(value)) {
-			return "true" ;
+			return true;
 		} else {
-			return "is not in specified formate";
+			return "is invalid";
 		}
 	},
 
-	email : function (value , isEmail) {
-		if( /[A-Z0-9a-z._%+-]+@[A-Z0-9a-z.-]+\.[A-Za-z]{2,4}/.test(value) ) {
-			return "true";
+	email : function (value) {
+		if(this.regexp(value, new RegExp('[A-Z0-9a-z._%+-]+@[A-Z0-9a-z.-]+.[A-Za-z]{2,4}')) === true) {
+			return true;
 		} else {
-			return "invalid email id";
+			return "is an invalid email";
 		}
 	},
 
-	number : function(value, isNumber) {
-		if( /[0-9]+/.test(value) ) {
-			return "true";
+	number : function(value) {
+		if(this.regexp(value, new RegExp('[0-9]+')) === true) {
+			return true;
 		} else {
-			return "invalid number";
+			return "is an invalid number";
 		}
 	}
 
