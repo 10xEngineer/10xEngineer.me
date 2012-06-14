@@ -60,7 +60,6 @@ CourseProgressSchema.pre('save', function(next) {
         var pLessons = chapter.lessons;
         var lessonIndex = 0;
 
-        log.info(pLessons.length);
         var lessonProgress = _.reduce(pLessons, function(count, lesson) {
           if(lesson.status == 'completed') {
             return count++;
@@ -104,9 +103,7 @@ CourseProgressSchema.pre('save', function(next) {
         var pLessons = chapter.lessons;
         var lessonIndex = 0;
 
-        log.info(pLessons.length);
         async.forEachSeries(pLessons, function(lesson, lessonCallback) {
-          log.info(lesson)
           Lesson.findById(lesson, function(error, lesson) {
             if(error) {
               next(error);
@@ -119,7 +116,6 @@ CourseProgressSchema.pre('save', function(next) {
               status: 'not-started'
             });
 
-            log.info('lesson: ', lesson._id);
             lessonCallback();
           });
         }, function(error) {
@@ -239,15 +235,12 @@ CourseProgressSchema.methods.getNextLesson = function(callback) {
 
 CourseProgressSchema.methods.completeLesson = function(chapterId, lessonId, callback) {
   var progress = this;
-  log.info(chapterId);
 
   for (var chapterIndex in progress.chapters) {
     var chapter = progress.chapters[chapterIndex];
-    log.info(chapter.id, chapterId);
     if(chapter.id == chapterId){
       for(var lessonIndex in chapter.lessons) {
         var lesson = chapter.lessons[lessonIndex];
-        log.info(lesson.id, lessonId);
         if(lesson.id == lessonId) {
           lesson.status = 'completed';
           break;
@@ -256,7 +249,6 @@ CourseProgressSchema.methods.completeLesson = function(chapterId, lessonId, call
     }
   }
 
-  log.info(progress);
   progress.save(function(error) {
     callback();
   });

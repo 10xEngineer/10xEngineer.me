@@ -1,13 +1,11 @@
 var everyauth = require('everyauth');
 var User = load.model('User');
 
-var config = load.helper('config').auth;
-
 // TODO: Debug flag. Turn off for production use.
 everyauth.debug = true;
 
 
-module.exports = function () {
+module.exports = function (config) {
   var redirectAction = function(res, data){
     var session = data.session;
     var redirectTo = session.redirectTo;
@@ -22,8 +20,8 @@ module.exports = function () {
   
   // Google
   everyauth.google
-    .appId(config.google.clientId)
-    .appSecret(config.google.clientSecret)
+    .appId(config.get('auth:google:clientId'))
+    .appSecret(config.get('auth:google:clientSecret'))
     .scope('https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email')
     .entryPath('/auth/google')
     .callbackPath('/auth/google/callback')
@@ -55,8 +53,8 @@ module.exports = function () {
 
   // Twitter
   everyauth.twitter
-    .consumerKey(config.twitter.consumerKey)
-    .consumerSecret(config.twitter.consumerSecret)
+    .consumerKey(config.get('auth:twitter:consumerKey'))
+    .consumerSecret(config.get('auth:twitter:consumerSecret'))
     .entryPath('/auth/twitter')
     .callbackPath('/auth/twitter/callback')
     .findOrCreateUser( function (session, accessToken, accessSecret, twitUser) {
@@ -85,8 +83,8 @@ module.exports = function () {
 
   // Facebook
   everyauth.facebook
-    .appId(config.facebook.appId)
-    .appSecret(config.facebook.appSecret)
+    .appId(config.get('auth:facebook:appId'))
+    .appSecret(config.get('auth:facebook:appSecret'))
     .scope('email')
     .entryPath('/auth/fb')
     .callbackPath('/auth/fb/callback')
