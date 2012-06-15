@@ -110,12 +110,63 @@ module.exports.create = function(req, res, next) {
 };
 
 // Display a lesson
-module.exports.show = function(req, res) {
+module.exports.showView = function(req, res) {
+ 
+
+  //For random the options
+
+  var randomOption =function (options) {
+    var temp;
+    var optionLength = Math.floor(options.length/2)+1;
+    
+    for (var i = 0; i < optionLength; i++) {
+
+      var n = Math.floor(Math.random() * optionLength);
+      temp = options[i];
+      options[i]= options[n];
+      options[n]=temp;
+
+    }
+  };
+
+  var quizQuestions = req.lesson.quiz.questions;
+  var quizQuestionsLength = req.lesson.quiz.questions.length;
+  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
+    randomOption(quizQuestions[questionsIndex].options);
+  }
+
   // Render based on the type
   res.render('lessons/' + req.lesson.type, {
-    title: req.lesson.title
+    title: req.lesson.title,
+    quiz: req.lesson.quiz
   });
 };
+
+module.exports.show = function(req, res){
+  var lesson = req.lesson;
+
+  log.info(req.body);
+  var quizQuestions = req.lesson.quiz.questions;
+  var attentquizQuestionAnswer = req.body.question;
+  var quizQuestionsLength = req.lesson.quiz.questions.length;
+  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
+    log.info(attentquizQuestionAnswer[questionsIndex]);
+    log.info(quizQuestions[questionsIndex].answers);
+    if (quizQuestions[questionsIndex].answers == attentquizQuestionAnswer[questionsIndex]){
+      message = "Question :"+quizQuestions[questionsIndex].question+" is right.";
+    } else {
+      error = "Question :"+quizQuestions[questionsIndex].question+" is wrong.";
+    }
+  }
+
+
+  res.render('lessons/' + lesson.type, {
+    title: req.lesson.title,
+    quiz: req.lesson.quiz
+  });
+  
+};
+
 
 // Lesson Comletes
 module.exports.complete = function(req, res) {
