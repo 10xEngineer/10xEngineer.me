@@ -2,7 +2,27 @@ include _header
 .container-fluid.course-index.inner-index
   .row-fluid
     .span10
-      h3 [Placeholder page for quiz]
+      form(method='POST', id='lessonForm', enctype='multipart/form-data')
+        each questions,questionIndex in quiz.questions
+          h4 #{questions.question}
+          -if (questions.answers.length == 1) 
+            each options,optionIndex in questions.options
+              -if (optionIndex == 0)
+                input(type='radio',value="#{options}", checked ,name="question[#{questionIndex}]") 
+                #{options}
+                br
+              -else
+                input(type='radio',value="#{options}" ,name="question[#{questionIndex}]") 
+                #{options}
+                br
+          -if (questions.answers.length > 1) 
+            for options in questions.options
+              input(type='checkbox',value="#{options}" ,name="question[#{questionIndex}") 
+              #{options}
+              br
+          br
+        p
+          input.btn.btn-primary(type='submit', value='Submit')
   .row-fluid
     p
   .row-fluid
