@@ -11,27 +11,22 @@ describe('Validation', function() {
 
   describe('required', function() {
     it('should allow string', function(done){
-      var response = validation.required()
       assert.equal(true, validation.required('titleName'));
       done();
     });
     it('should not allow undefined', function(done){
-      var response = validation.required()
       assert.equal("is required", validation.required(undefined));
       done();
     });
     it('should not allow blank string', function(done){
-      var response = validation.required()
       assert.equal("is required", validation.required(''));
       done();
     });
     it('should not allow spaces', function(done){
-      var response = validation.required()
       assert.equal("is required", validation.required('   '));
       done();
     });
     it('should not allow tabs', function(done){
-      var response = validation.required()
       assert.equal("is required", validation.required('			'));
       done();
     });
@@ -39,11 +34,11 @@ describe('Validation', function() {
 
   describe('regex', function() {
     it('should allow alphabetial string', function(done){
-      assert.equal(true, validation.regexp('titleName',new RegExp(/[a-zA-z]+/)));
+      assert.equal(true, validation.regexp('titleName',new RegExp('[a-zA-z]+')));
       done();
     });
     it('should not allow alphanumerical string', function(done){
-      assert.equal('is invalid', validation.regexp('titleName123',new RegExp(/[a-zA-z]+/)));
+      assert.equal('is invalid', validation.regexp('titleName123',new RegExp('^[a-zA-z]+$')));
       done();
     });
   });
@@ -59,6 +54,7 @@ describe('Validation', function() {
     it('should not allow invalid email', function(done) {
       assert.equal('is an invalid email', validation.email('all@inhtml@gmail.com'));
       assert.equal('is an invalid email', validation.email('allinhtml@gmail'));
+      assert.equal('is an invalid email', validation.email('allinhtml@gmail.'));
       done();
     });
   });
