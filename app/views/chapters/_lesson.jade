@@ -1,5 +1,5 @@
 form(method='POST', id='lessonForm', enctype='multipart/form-data')
-  input#lessonType(name='type' ,type='hidden' ,value='videofile')
+  input#lessonType(name='type' ,type='hidden' ,value='video')
   p
     label(for="title") Title:
     input.required(value='#{lesson.title}', id='title', name='title')
@@ -19,7 +19,6 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
       a(href='#sysAdmin', data-toggle='tab') SysAdmin
 
   .tab-content
-    
     #video.tab-pane.active
       input#videoContent(name='videoContent' ,type='hidden')
       input#type(name='videoType' ,type='hidden')
@@ -213,6 +212,44 @@ script(type='text/javascript')
       }
     });
 
+    //For Add Options in Quiz
+
+    var que_div='<div class="addedQuestion"><p>Question:</p><input type="text" class="question"><br><div class="options"><p>Options</p><div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
+    var opt_div='<div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
+
+    $(".question").live("keyup",function(){
+      if($(".question:last").val()!=""){
+        $("#questionBox").append(que_div);
+        assignNamesForQuiz($('#questionBox'));
+      }
+    });
+    $(".questionOption").live("keyup",function(){    
+      var par_que_div=$(this).parents("div").eq(1);
+      if(par_que_div.find(".questionOption:last").val()!=""){
+        par_que_div.append(opt_div);
+        assignNamesForQuiz($('#questionBox'));
+      }
+    });
+    $(".questionOption").live("blur",function(){
+      if($(this).val()=="")
+      {   
+        $(this).parent().remove();
+        if($(this).parents(".options").eq().find(".questionOption:last").val()!="") {
+          $(this).parents(".options").eq(0).append(opt_div);
+          assignNamesForQuiz($('#questionBox'));
+        }
+      }
+    });
+    $(".question").live("blur",function() {
+      if($(this).val()=="")
+      {
+        $(this).parent(".addedQuestion").remove();
+        if($(".question:last").val()!=""){
+          $("#questionBox").append(que_div);
+          assignNamesForQuiz($('#questionBox'));
+        }
+      }
+    });
     var assignNamesForQuiz = function($container) {
       $container.find('.addedQuestion').each(function(i, questionContainer) {
         $(questionContainer).find('.question').attr('name', 'question[' + i + ']');
