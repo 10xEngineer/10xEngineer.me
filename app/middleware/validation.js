@@ -15,7 +15,6 @@ module.exports.lookUp = function(config) {
 */
 	return function(req, res, next){
 		var errors = self.validation(req.body, config) 
-		log.info("errors ::", errors)
 		if(errors == ''){
 			next();
 			return;
@@ -29,29 +28,24 @@ module.exports.validation = function(entity, config) {
 	var self = this;
 	var errors = "";
 	for(key in config){
-		log.info("Key : ",key);
 		configsOfKey = config[key];
 		for(action in configsOfKey){
-			log.info("action : ",action);
 			if(typeof(configsOfKey[action])=='object' && action == 'checkFor'){
 				var subConfig;
 				var itrateter;
 				for (itrateter in configsOfKey[action]){
 					subConfig = configsOfKey[action];
 					if(entity[key]==itrateter){
-						log.info("recursive validation with entity:",entity," and config:", subConfig[itrateter]);
-						errors += self.validation(entity, subConfig[itrateter]);
-						log.info("Errors from recursion :: ",errors);
+						var result = self.validation(entity, subConfig[itrateter]);
+						error += result === true ? '' : result;
 					}
 				}
 			} else {
-				log.info("validation for action:",action,"[key:",key,"] (entity[key]:",entity[key],",configsOfKey[action]:",configsOfKey[action],")");
 				var valid = helper[action](entity[key], configsOfKey[action])
-				if(valid == "true"){
+				if(valid === true){
 				} else {
 					//error += key + valid;
 					errors += key +" "+ valid + " ";
-					log.info("Errors from validation :: ",errors);
 				}
 			}			
 		}
