@@ -27,3 +27,41 @@ include _header
     p
   .row-fluid
     .span10
+      -if(typeof(answersStatus) == 'undefined')
+        form(method='POST', id='lessonForm', enctype='multipart/form-data')
+          each questions,questionIndex in quiz.questions
+            h4 #{questions.question}
+            -if (questions.answers.length == 1) 
+              each options,optionIndex in questions.options
+                -if (optionIndex == 0)
+                  input(type='radio',value="#{options}", checked ,name="question[#{questionIndex}]") 
+                  #{options}
+                  br
+                -else
+                  input(type='radio',value="#{options}" ,name="question[#{questionIndex}]") 
+                  #{options}
+                  br
+            -if (questions.answers.length > 1) 
+              for options in questions.options
+                input(type='checkbox',value="#{options}" ,name="question[#{questionIndex}") 
+                #{options}
+                br
+            br
+          p
+            input.btn.btn-primary(type='submit', value='Submit')
+      -else
+        each answers,queIndex in answersStatus
+          -if(answers.status)
+            p Question #{queIndex} is Correct.
+          -else
+            p Question #{queIndex} is wronge. Correct answer is #{answers.message}
+      .lessonBar
+        a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+        a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
+    .span2
+      include _sidebar
+  .row-fluid
+    p
+  .row-fluid
+    .span10
+      include _footer

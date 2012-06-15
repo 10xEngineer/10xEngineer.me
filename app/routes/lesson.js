@@ -111,7 +111,6 @@ module.exports.create = function(req, res, next) {
 
 // Display a lesson
 module.exports.showView = function(req, res) {
- 
 
   //For random the options
 
@@ -149,6 +148,7 @@ module.exports.show = function(req, res){
   var quizQuestions = req.lesson.quiz.questions;
   var attentquizQuestionAnswer = req.body.question;
   var quizQuestionsLength = req.lesson.quiz.questions.length;
+
   for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
     log.info(attentquizQuestionAnswer[questionsIndex]);
     log.info(quizQuestions[questionsIndex].answers);
@@ -159,10 +159,21 @@ module.exports.show = function(req, res){
     }
   }
 
+  var answersStatus = [];
+  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
+   
+    if (quizQuestions[questionsIndex].answers == attentquizQuestionAnswer[questionsIndex]){
+      answersStatus[questionsIndex] = {status :true};
+    } else {
+      answersStatus[questionsIndex] = {status :false , message :quizQuestions[questionsIndex].answers };
+    }
+  }
+  
 
   res.render('lessons/' + lesson.type, {
     title: req.lesson.title,
-    quiz: req.lesson.quiz
+    quiz: req.lesson.quiz,
+    answersStatus: answersStatus,
   });
   
 };
