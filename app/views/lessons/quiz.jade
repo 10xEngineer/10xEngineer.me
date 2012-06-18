@@ -18,7 +18,7 @@ include _header
                   br
             -if (questions.answers.length > 1) 
               for options in questions.options
-                input(type='checkbox',value="#{options}" ,name="question[#{questionIndex}") 
+                input(type='checkbox',value="#{options}" ,name="question[#{questionIndex}]") 
                 #{options}
                 br
             br

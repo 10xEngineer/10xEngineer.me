@@ -143,21 +143,37 @@ module.exports.showView = function(req, res) {
   });
 };
 
-module.exports.show = function(req, res){
-  var lesson = req.lesson;
+function inArray(needle, haystack) {
+  if(typeof needle == 'object') {
+    if (needle.length != haystack.length) return false;
+    var nlength = needle.length;
+    for(var ni = 0; ni < nlength; ni++) {
+      if (needle[ni] != haystack[ni]) return false;
+    }   
+    return true;
+  } else {       
+    if(haystack == needle) return true;
+    return false;
+  }
+  return false;
+}
 
-  log.info(req.body);
+module.exports.show = function(req, res){
+  
+  var lesson = req.lesson;
   var quizQuestions = req.lesson.quiz.questions;
   var attentquizQuestionAnswer = req.body.question;
   var quizQuestionsLength = req.lesson.quiz.questions.length;
   var answersStatus = [];
+
   for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
-   
-    if (quizQuestions[questionsIndex].answers == attentquizQuestionAnswer[questionsIndex]){
+
+    if(inArray(attentquizQuestionAnswer[questionsIndex],quizQuestions[questionsIndex].answers)) {
       answersStatus[questionsIndex] = {status :true};
     } else {
       answersStatus[questionsIndex] = {status :false , message :quizQuestions[questionsIndex].answers };
     }
+
   }
 
   res.render('lessons/' + lesson.type, {
@@ -166,44 +182,6 @@ module.exports.show = function(req, res){
     answersStatus: answersStatus,
   });
 };
-
-module.exports.show = function(req, res){
-  var lesson = req.lesson;
-
-  log.info(req.body);
-  var quizQuestions = req.lesson.quiz.questions;
-  var attentquizQuestionAnswer = req.body.question;
-  var quizQuestionsLength = req.lesson.quiz.questions.length;
-
-  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
-    log.info(attentquizQuestionAnswer[questionsIndex]);
-    log.info(quizQuestions[questionsIndex].answers);
-    if (quizQuestions[questionsIndex].answers == attentquizQuestionAnswer[questionsIndex]){
-      message = "Question :"+quizQuestions[questionsIndex].question+" is right.";
-    } else {
-      error = "Question :"+quizQuestions[questionsIndex].question+" is wrong.";
-    }
-  }
-
-  var answersStatus = [];
-  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
-   
-    if (quizQuestions[questionsIndex].answers == attentquizQuestionAnswer[questionsIndex]){
-      answersStatus[questionsIndex] = {status :true};
-    } else {
-      answersStatus[questionsIndex] = {status :false , message :quizQuestions[questionsIndex].answers };
-    }
-  }
-  
-
-  res.render('lessons/' + lesson.type, {
-    title: req.lesson.title,
-    quiz: req.lesson.quiz,
-    answersStatus: answersStatus,
-  });
-  
-};
-
 
 // Lesson Comletes
 module.exports.complete = function(req, res) {
