@@ -31,7 +31,6 @@ module.exports.create = function(req, res, next) {
   lesson.programming.skeletonCode = req.body.code ;
   lesson.programming.input = req.body.input ;
   lesson.programming.output = req.body.output ;
-  log.info('Lesson Post :',req.body);
   
   // For Quiz
   if(lesson.type == 'quiz') {
@@ -143,43 +142,48 @@ module.exports.showView = function(req, res) {
   });
 };
 
-function inArray(needle, haystack) {
-  if(typeof needle == 'object') {
-    if (needle.length != haystack.length) return false;
-    var nlength = needle.length;
-    for(var ni = 0; ni < nlength; ni++) {
-      if (needle[ni] != haystack[ni]) return false;
-    }   
-    return true;
-  } else {       
-    if(haystack == needle) return true;
-    return false;
-  }
-  return false;
-}
-
 module.exports.show = function(req, res){
   
   var lesson = req.lesson;
   var quizQuestions = req.lesson.quiz.questions;
-  var attentquizQuestionAnswer = req.body.question;
+  var attemptedAnswers = req.body.question;
   var quizQuestionsLength = req.lesson.quiz.questions.length;
   var answersStatus = [];
+  var answersJSON = {};
 
-  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
+  for(var index = 0; index < quizQuestionsLength; index++) {
+    var answers = quizQuestions[index].answers;
+    for(var indexAnswers = 0; indexAnswers < answers.length; indexAnswers++) {
+      if(!answersJSON[index]) {
+        answersJSON[index] = {};
+      }
 
-    if(inArray(attentquizQuestionAnswer[questionsIndex],quizQuestions[questionsIndex].answers)) {
-      answersStatus[questionsIndex] = {status :true};
-    } else {
-      answersStatus[questionsIndex] = {status :false , message :quizQuestions[questionsIndex].answers };
+      answersJSON[index][answers[indexAnswers]] = 'true';
     }
+  }
 
+  for(var index = 0; index < attemptedAnswers.length; index++){
+    var arrayValue = attemptedAnswers[index];
+    if(typeof(arrayValue) != 'object') {
+      if(_.indexOf(quizQuestions[index].answers, arrayValue) !== -1) {
+        answersJSON[index][arrayValue] = 'correct';
+      } else {
+        answersJSON[index][arrayValue] = 'wrong';
+      }
+    } else {
+      for(indexObject = 0; indexObject < arrayValue.length; indexObject++){
+        if(_.indexOf(quizQuestions[index].answers, arrayValue[indexObject]) !== -1) {
+          answersJSON[index][arrayValue[indexObject]] = 'correct';
+        } else {
+          answersJSON[index][arrayValue[indexObject]] = 'wrong';
+        }
+      }
+    }
   }
 
   res.render('lessons/' + lesson.type, {
     title: req.lesson.title,
-    quiz: req.lesson.quiz,
-    answersStatus: answersStatus,
+    attemptedAnswers: answersJSON
   });
 };
 
