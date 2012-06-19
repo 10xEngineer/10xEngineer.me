@@ -32,8 +32,6 @@ module.exports.settingsView = function(req, res){
 module.exports.settings = function(req, res){
   
 	var user = req.user;
-	log.info("User Changes ", req.body);
-
 	user.name = req.body.name;
 	user.email = req.body.email;
 	user.save(function(error) {
@@ -46,4 +44,3 @@ module.exports.settings = function(req, res){
     res.redirect('/user/settings');
   });
 };
-
