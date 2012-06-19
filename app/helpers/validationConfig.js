@@ -61,3 +61,11 @@ module.exports.lesson = {
 		}
 	}
 }
+
+// User Profile
+module.exports.user = {
+	
+	profileUpdate : {
+		email : {required: true , email : true}
+	}
+}

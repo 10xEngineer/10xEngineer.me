@@ -84,6 +84,14 @@ module.exports = function(app) {
     next();
   });
 
+  app.all('/*', function(req, res, next){
+    if(req.loggedIn && ( typeof(req.user.email) == 'undefined' || req.user.email == '') && req.path != '/user/settings') {
+      res.redirect('/user/settings');
+      return;
+    }
+    next();
+  });
+
 
   // Load Express data middleware
   load.middleware('data')(app);
@@ -149,7 +157,7 @@ module.exports = function(app) {
   // User
   app.get('/user/profile', user.profile);
   app.get('/user/settings',user.settingsView);
-  app.post('/user/settings',user.settings);
+  app.post('/user/settings',validation.lookUp(validationConfig.user.profileUpdate),user.settings);
 
   // Quiz
   app.get('/quiz/edit', quiz.edit);
