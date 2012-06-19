@@ -17,23 +17,22 @@ exports = module.exports = function errorHandler(options) {
     req.session.error = err;
     var app = res.app;
 
-    if(err instanceof exports.NotFound) {
-      res.render('errors/404', { locals: {
-        title: '404 - Not Found'
-      }, status: 404
+    if(err.message && err.message === '404') {
+      res.render('errors/404', {
+        locals: {
+          title: '404 - Not Found',
+          error: '404: The page you are trying to access doesn\'t exist'
+        },
+        status: 404
       });
     } else {
-      res.render('errors/500', { locals: {
-        title: 'The Server Encountered an Error'                 
-         , error: showStack ? err : undefined
-      }, status: 500
+      res.render('errors/500', {
+        locals: {
+          title: 'The Server Encountered an Error',
+          error: showStack ? err : undefined
+        },
+        status: 500
       });
     }
   };
 };
-
-exports.NotFound = function(msg) {
-  this.name = 'NotFound';
-  Error.call(this, msg);
-  Error.captureStackTrace(this, arguments.callee);
-}

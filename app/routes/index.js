@@ -159,12 +159,6 @@ module.exports = function(app) {
   app.get('/user/settings',user.settingsView);
   app.post('/user/settings',validation.lookUp(validationConfig.user.profileUpdate),user.settings);
 
-  // Quiz
-  app.get('/quiz/edit', quiz.edit);
-  app.post('/quiz/import', quiz.importJson);
-  app.get('/quiz/:id/:unit/:lesson', quiz.view);
-  app.post('/quiz/:id/:unit/:lesson', quiz.test);
-
   //app.get('/user/:userId', user.load);
 
 
@@ -197,17 +191,17 @@ module.exports = function(app) {
   });
 
   // Handles 404 errors. This should be the last route.
-  app.get('/*', function(req, res, next) {
+  /*app.get('/*', function(req, res, next) {
     log.info('404');
     next(new Error('Not Found: ' + req.url));
     //throw new load.middleware('errorHandler').NotFound('Page not found');
   });
-
+*/
 
   // Middleware
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'userId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId'], function(req, res, next, num, name){ 
     req.params[name] = num = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('failed to parseInt ' + num));
