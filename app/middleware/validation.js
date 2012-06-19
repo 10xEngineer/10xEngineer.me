@@ -19,7 +19,7 @@ module.exports.lookUp = function(config) {
 			next();
 			return;
 		}
-		error = errors;
+		req.session.error = errors;
 		res.redirect(req.url);
 	};
 };

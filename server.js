@@ -56,10 +56,15 @@ var init = exports.init = function(config) {
 
   // Express Middleware config
   app.configure(function(){
+    // Views
     app.set('views', __dirname + '/app/views');
     app.set('view engine', 'jade');
+
+    // Body parser
     app.use(express.bodyParser({uploadDir: tmpFileUploadDir, keepExtensions: true }));
     app.use(express.methodOverride());
+
+    // Cookies and session
     app.use(express.cookieParser());
     app.use(express.session({
       store: sessionStore,
@@ -68,40 +73,46 @@ var init = exports.init = function(config) {
       cookie: {maxAge: 31557600000 }
     }));
 
+    // Auth and routes
     app.use(authMiddleware.middleware());
-    app.use(express.static(__dirname + '/public'));
+    app.use(function(req, res, next){
+      if(req.method === 'GET') {
+        // expose "error" and "message" to all
+        // views that are rendered.
+        res.local('error', req.session.error || undefined);
+        res.local('message', req.session.message || undefined);
+        // remove them so they're not displayed on subsequent renders
+        delete req.session.error;
+        delete req.session.message;
+      }
+      next();
+    });
     app.use(app.router);
-  });
 
-  // Configure Locals
-  app.use(function(req, res){
-    // expose "error" and "message" to all
-    // views that are rendered.
-    res.locals.error = req.session.error || '';
-    res.locals.message = req.session.message || '';
-    // remove them so they're not displayed on subsequent renders
-    delete req.session.error;
-    delete req.session.message;
-  });
+    // Static files
+    app.use(express.static(__dirname + '/public'));
 
-  // Everyauth view helper
-  authMiddleware.helpExpress(app);
+    // 404 Handler
+    app.use(function(req, res, next) {
+      next(new Error('404'));
+    });
+  });
 
   // Express environment config
-  var errorOptions = { dumpExceptions: true, showStack: true }
   app.configure('development', function(){
     app.use(log4js.connectLogger(log, { level: log4js.levels.INFO }));
     log.setLevel('TRACE');
+    app.use(load.middleware('errorHandler')({ dumpExceptions: true, showStack: true }));
   });
 
   app.configure('production', function(){
     log4js.addAppender(log4js.fileAppender('app.log'), 'app');
     log.setLevel('INFO');
-    errorOptions = {};
+    app.use(load.middleware('errorHandler')({}));
   });
 
-  // Attach custom error handler middleware
-  app.use(load.middleware('errorHandler')(errorOptions));
+  // Everyauth view helper
+  authMiddleware.helpExpress(app);
 
   // Routes
   load.routes()(app);
