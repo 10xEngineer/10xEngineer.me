@@ -11,10 +11,10 @@ var Progress = load.model('Progress');
 
 var importer = load.helper('importer');
 
-module.exports = function() {};
+var CourseRouter = module.exports = function() {};
 
 // List existing courses
-module.exports.list = function(req, res){
+CourseRouter.list = function(req, res){
   var formatedProgress = {};
   Course.find({}, function(error, courses){
     Progress.find({ user: req.user._id }, function(error, progresses){
@@ -32,42 +32,52 @@ module.exports.list = function(req, res){
 };
 
 // Create new course form
-module.exports.createView = function(req, res){
+CourseRouter.createView = function(req, res){
+  var course = res.local('course') || {_id:'',title:'',description:''};
+
   res.render('courses/create', {
     title: 'New Course',
-    course: {_id:'',title:'',description:''},
+    course: course
   });
 };
 
 // Create a new course
-module.exports.create = function(req, res, next){
-  var course = new Course();
-  var util = load.helper('util');
-  course.title = req.body.title;
-  course.desc = req.body.description;
-  course.image = req.body.image;
-  course.cropImgInfo = req.body.cropImgInfo;
-  course.created_by = req.user._id;
+CourseRouter.create = function(req, res, next){
+  if(req.method == 'GET') {
+    CourseRouter.createView(req, res, next);
+  } else if(req.method == 'POST') {
+    if(! req.validated) {
+      res.locals({ 'course': req.body });
+      CourseRouter.createView(req, res, next);
+    } else {
+      var course = new Course();
+      var util = load.helper('util');
+      course.title = req.body.title;
+      course.desc = req.body.description;
+      course.image = req.body.image;
+      course.cropImgInfo = req.body.cropImgInfo;
+      course.created_by = req.user._id;
 
-  course.save(function(error) {
-    if(error) {
-      log.error(error);
-      error = "Can not create course.";
-      next(error);
+      course.save(function(error) {
+        if(error) {
+          log.error(error);
+          error = "Can not create course.";
+          next(error);
+        }
+
+        var id = course.id;
+
+        //Set the course info in the session to let socket.io know about it.
+        req.session.newCourse = {title: course.title, _id: course._id};
+        message = "Course created successfully.";
+        res.redirect('/course/' + id);
+      });
     }
-
-    var id = course.id;
-
-    //Set the course info in the session to let socket.io know about it.
-    req.session.newCourse = {title: course.title, _id: course._id};
-    message = "Course created successfully.";
-    res.redirect('/course/' + id);
-  });
-
+  }
 };
 
 // TODO: Quick course import tool. Modify to support the new course format
-module.exports.importView = function(req, res){
+CourseRouter.importView = function(req, res){
   res.render('content_manager', {
     title: '10xEngineer.me Course Creator',
     description: 'Create courses with its units from JSON file.',
@@ -77,7 +87,7 @@ module.exports.importView = function(req, res){
 };
 
 // Temporary course import using json file upload
-module.exports.import = function(req, res, next) {
+CourseRouter.import = function(req, res, next) {
 
   log.info('Uploading file', req.body); // form is there but not accessible
   var f = req.files['course-file'];
@@ -127,7 +137,7 @@ module.exports.import = function(req, res, next) {
 //TODO : Go to the last lesson if course already started
 //TODO : Also add this course to the users registered courses
 // Register for a course (if not already registered, and Go to the last viewed or first lesson. 
-module.exports.start = function(req, res, next){
+CourseRouter.start = function(req, res, next){
   // Check if user has already started the course
   Progress.startOrContinue(req.user, req.course, function(error, progress) {
     if(error) {
@@ -143,7 +153,7 @@ module.exports.start = function(req, res, next){
 };
 
 // Load specific course and display chapter index
-module.exports.show = function(req, res, next){
+CourseRouter.show = function(req, res, next){
 
   Progress.findOne({ user: req.user._id, course: req.course._id }, function(error, progress) {
     if(error) {
@@ -159,21 +169,42 @@ module.exports.show = function(req, res, next){
 };
 
 // Edit course
-module.exports.updateView = function(req, res, next){
+CourseRouter.updateView = function(req, res, next){
+  var course = res.local('course') || req.course;
   res.render('courses/edit', {
-    title: req.course.title
+    title: req.course.title,
+    course: course
   });
 };
 
 // TODO: Update course
-module.exports.update = function(req, res, next){
-  res.render('courses/edit', {
-    title: req.course.title
-  });
+CourseRouter.update = function(req, res, next){
+  if(req.method == 'GET') {
+    CourseRouter.updateView(req, res, next);
+  } else if(req.method == 'POST') {
+    if(! req.validated) {
+      res.locals({ 'course': req.body });
+      CourseRouter.updateView(req, res, next);
+    } else {
+      var course = req.chapter;
+      course.title = req.body.title;
+      course.desc = req.body.desc;
+      course.image = req.body.image;
+
+      course.save(function(error) {
+        if(error) {
+          log.error(error);
+          req.session.error = "Can not updated course.";
+        }
+        req.session.message = "Course updated sucessfully.";
+        res.redirect('/course/' + course.id);
+      });
+    }
+  }
 };
 
 // Remove entire course and its chapters
-module.exports.remove = function(req, res, next){
+CourseRouter.remove = function(req, res, next){
   
   var course = req.course;
 

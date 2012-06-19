@@ -16,11 +16,12 @@ module.exports.lookUp = function(config) {
 	return function(req, res, next){
 		var errors = self.validation(req.body, config) 
 		if(errors == ''){
-			next();
-			return;
+			req.validated = true;
+		} else {
+			req.session.error = errors;
+			req.validated = false;
 		}
-		req.session.error = errors;
-		res.redirect(req.url);
+		next();
 	};
 };
 
@@ -37,7 +38,7 @@ module.exports.validation = function(entity, config) {
 					subConfig = configsOfKey[action];
 					if(entity[key]==itrateter){
 						var result = self.validation(entity, subConfig[itrateter]);
-						error += result === true ? '' : result;
+						errors += result === true ? '' : result;
 					}
 				}
 			} else {

@@ -4,29 +4,39 @@ module.exports = function() {};
 
 // Create new chapter form
 module.exports.createView = function(req, res){
+  var chapter = res.local('chapter') || {id: '', title: ''};
   res.render('chapters/create', {
     title: 'New Chapter',
-    chapter: {id: '', title: ''}
+    chapter: chapter
   });
 };
 
 // Create a new chapter
-module.exports.create = function(req, res){
-  var chapter = new Chapter();
-  chapter.title = req.body.title;
-  chapter.desc = req.body.description;
-  chapter.course = req.course._id;
-  chapter.created_by = req.user.id;
+module.exports.create = function(req, res, next){
+  if(req.method == 'GET') {
+    module.exports.createView(req, res, next);
+  } else if(req.method == 'POST') {
+    if(! req.validated) {
+      res.locals({ 'chapter': req.body });
+      module.exports.createView(req, res, next);
+    } else {
+      var chapter = new Chapter();
+      chapter.title = req.body.title;
+      chapter.desc = req.body.description;
+      chapter.course = req.course._id;
+      chapter.created_by = req.user.id;
 
-  chapter.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not create chapter.";
+      chapter.save(function(error) {
+        if(error) {
+          log.error(error);
+          req.session.error = "Can not create chapter.";
+        }
+
+        req.session.message = "Chaper created sucessfully.";
+        res.redirect('/course/' + req.course.id);
+      });
     }
-
-    req.session.message = "Chaper created sucessfully.";
-    res.redirect('/course/' + req.course.id);
-  });
+  }
 };
 
 // Load a chapter
@@ -38,26 +48,37 @@ module.exports.show = function(req, res) {
 
 // Edit chapter information
 module.exports.editView = function(req, res) {
+  var chapter = res.local('chapter') || req.chapter;
   res.render('chapters/edit', {
-    title: req.chapter.title
+    title: req.chapter.title,
+    chapter: chapter
   });
 };
 
 // Save edited chapter
-module.exports.edit = function(req, res){
-  var chapter = req.chapter;
+module.exports.edit = function(req, res, next){
+  if(req.method == 'GET') {
+    module.exports.editView(req, res, next);
+  } else if(req.method == 'POST') {
+    if(! req.validated) {
+      res.locals({ 'chapter': req.body });
+      module.exports.editView(req, res, next);
+    } else {
+      var chapter = req.chapter;
 
-  chapter.title = req.body.title;
-  chapter.desc = req.body.description;
+      chapter.title = req.body.title;
+      chapter.desc = req.body.desc;
 
-  chapter.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not updated chapter.";
+      chapter.save(function(error) {
+        if(error) {
+          log.error(error);
+          req.session.error = "Can not updated chapter.";
+        }
+        req.session.message = "Chaper updated sucessfully.";
+        res.redirect('/chapter/' + chapter.id);
+      });
     }
-    req.session.message = "Chaper updated sucessfully.";
-    res.redirect('/chapter/' + chapter.id);
-  });
+  }
 };
 
 // Remove a chapter
