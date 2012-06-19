@@ -12,100 +12,110 @@ var Lesson = load.model('Lesson');
 
 // Display create lesson page
 module.exports.createView = function(req, res) {
+  var lesson = res.local('lesson') || {title: '', description: ''};
   res.render('chapters/lesson_create', {
     title: req.chapter.title,
-    lesson: {title: '', description: ''}
+    lesson: lesson
   });
 };
 
 // Create a lesson
 module.exports.create = function(req, res, next) {
-  var lesson = new Lesson();
-  lesson.chapter = req.chapter._id;
-  lesson.title = req.body.title;
-  lesson.description = req.body.description;
-  lesson.video.type = req.body.videoType;
-  lesson.video.content = req.body.videoContent;
-  lesson.type = req.body.type;
-  lesson.programming.language = req.body.language ;
-  lesson.programming.skeletonCode = req.body.code ;
-  lesson.programming.input = req.body.input ;
-  lesson.programming.output = req.body.output ;
-  
-  // For Quiz
-  if(lesson.type == 'quiz') {
-
-    var questionLength = req.body.question.length-1;
-    var lessonInstanceQuestion = lesson.quiz.questions;
-    for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
+  if(req.method == 'GET') {
+    module.exports.createView(req, res, next);
+  } else if(req.method == 'POST') {
+    if(! req.validated) {
+      res.locals({ 'lesson': req.body });
+      module.exports.createView(req, res, next);
+    } else {
+      var lesson = new Lesson();
+      lesson.chapter = req.chapter._id;
+      lesson.title = req.body.title;
+      lesson.description = req.body.description;
+      lesson.video.type = req.body.videoType;
+      lesson.video.content = req.body.videoContent;
+      lesson.type = req.body.type;
+      lesson.programming.language = req.body.language ;
+      lesson.programming.skeletonCode = req.body.code ;
+      lesson.programming.input = req.body.input ;
+      lesson.programming.output = req.body.output ;
       
-      var instanceQuestion = {
-        question : '',
-        options  : [],
-        answers  : []
-      };
+      // For Quiz
+      if(lesson.type == 'quiz') {
 
-      instanceQuestion.question = req.body.question[indexQuestion];
+        var questionLength = req.body.question.length-1;
+        var lessonInstanceQuestion = lesson.quiz.questions;
+        for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
+          
+          var instanceQuestion = {
+            question : '',
+            options  : [],
+            answers  : []
+          };
 
-      var optionsLength = req.body.questionOption[indexQuestion].length-1;
-      var answerIndex = 0;
-      for (var indexOption = 0; indexOption < optionsLength; indexOption++) {
-        instanceQuestion.options[indexOption] = req.body.questionOption[indexQuestion][indexOption];
-        if(req.body.questionOptionCheckbox[indexQuestion][indexOption]) {
-          instanceQuestion.answers[answerIndex++] = req.body.questionOption[indexQuestion][indexOption];
+          instanceQuestion.question = req.body.question[indexQuestion];
+
+          var optionsLength = req.body.questionOption[indexQuestion].length-1;
+          var answerIndex = 0;
+          for (var indexOption = 0; indexOption < optionsLength; indexOption++) {
+            instanceQuestion.options[indexOption] = req.body.questionOption[indexQuestion][indexOption];
+            if(req.body.questionOptionCheckbox[indexQuestion][indexOption]) {
+              instanceQuestion.answers[answerIndex++] = req.body.questionOption[indexQuestion][indexOption];
+            }
+          }
+          lessonInstanceQuestion.push(instanceQuestion);
         }
       }
-      lessonInstanceQuestion.push(instanceQuestion);
-    }
-  }
 
 
-  var f = req.files['videofile'];
+      var f = req.files['videofile'];
 
-  lesson.save(function(error) {
-    if(error) {
-      log.error(error);
-      error = "Can not create lesson.";
-    }
-    var id = lesson.id;
-    if(lesson.type == 'video')
-    {
-      if(lesson.video.type == 'upload')  {  
-        
-        var fileName = 'lessonVideo_' + id;
+      lesson.save(function(error) {
+        if(error) {
+          log.error(error);
+          error = "Can not create lesson.";
+        }
+        var id = lesson.id;
+        if(lesson.type == 'video')
+        {
+          if(lesson.video.type == 'upload')  {  
+            
+            var fileName = 'lessonVideo_' + id;
 
-        cdn.saveFile(fileName, f, function(error, fileName) {
-          if(error) {
-            log.error(error);
-            next(error);
-          }
-
-          Lesson.findOne({ id: id }, function(error, lesson) {
-            // Save the CDN URL if available
-            lesson.video.content = fileName;
-            lesson.save(function(error) {
+            cdn.saveFile(fileName, f, function(error, fileName) {
               if(error) {
                 log.error(error);
                 next(error);
               }
 
-              req.session.newLesson = {title: lesson.title, _id: lesson._id};
-              message = "Lesson created successfully.";
-              res.redirect('/lesson/' + id);
+              Lesson.findOne({ id: id }, function(error, lesson) {
+                // Save the CDN URL if available
+                lesson.video.content = fileName;
+                lesson.save(function(error) {
+                  if(error) {
+                    log.error(error);
+                    next(error);
+                  }
+
+                  req.session.newLesson = {title: lesson.title, _id: lesson._id};
+                  message = "Lesson created successfully.";
+                  res.redirect('/lesson/' + id);
+                });
+              });
             });
-          });
-        });
-      } else {
-        req.session.newLesson = {title: lesson.title, _id: lesson._id};
-        message = "Lesson created successfully.";
-        res.redirect('/lesson/' + id);
-      }
-    } else {
-      req.session.newLesson = {title: lesson.title, _id: lesson._id};
-      message = "Lesson created successfully.";
-      res.redirect('/lesson/' + id);
+          } else {
+            req.session.newLesson = {title: lesson.title, _id: lesson._id};
+            message = "Lesson created successfully.";
+            res.redirect('/lesson/' + id);
+          }
+        } else {
+          req.session.newLesson = {title: lesson.title, _id: lesson._id};
+          message = "Lesson created successfully.";
+          res.redirect('/lesson/' + id);
+        }
+      });
     }
-  });
+  }
 };
 
 // Display a lesson
@@ -209,7 +219,6 @@ module.exports.complete = function(req, res) {
 
 // Remove entire lesson
 module.exports.remove = function(req, res, next){
-  log.info('Removing lesson...');
 
   var lesson = req.lesson;
   var chapterId =lesson.chapter.id;

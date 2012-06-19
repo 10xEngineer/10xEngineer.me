@@ -11,6 +11,10 @@ module.exports.course = function(data, callback) {
   course.desc = data.desc;
   course.image = data.image;
 
+  // TODO: Hack. Remove/Refactor it.
+  course.cropImgInfo = '{"x": 0, "y": 0, "x1": 200, "y1": 200, "h": 200, "w": 200}'
+
+
   course.save(function(error) {
     if(error) {
       log.error(error);
