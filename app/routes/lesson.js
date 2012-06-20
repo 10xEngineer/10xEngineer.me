@@ -142,7 +142,7 @@ module.exports.showView = function(req, res) {
   });
 };
 
-module.exports.show = function(req, res){
+module.exports.show = function(req, res, next){
   
   var lesson = req.lesson;
   var quizQuestions = req.lesson.quiz.questions;
@@ -181,27 +181,46 @@ module.exports.show = function(req, res){
     }
   }
 
-  res.render('lessons/' + lesson.type, {
-    title: req.lesson.title,
-    attemptedAnswers: answersJSON
+  Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
+    if(error) {
+      log.error(error);
+      next(error);
+    }
+    var lessonQuiz = {};
+    lessonQuiz.chapter = req.chapter.id;
+    lessonQuiz.lesson  = req.lesson.id;
+    lessonQuiz.quiz    = answersJSON;
+    progress.completeLesson(lessonQuiz, function(error, next){
+      if(error) {
+        log.error(error);
+        next(error);
+      }
+      res.render('lessons/' + lesson.type, {
+        title: req.lesson.title,
+        attemptedAnswers: answersJSON
+      });
+    });
   });
 };
 
-// Lesson Comletes
+// Lesson Complete
 module.exports.complete = function(req, res) {
   res.contentType('text/plain');
-  var progress = Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
+  Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
     if(error) {
       log.error(error);
       res.end("false");
     }
-    progress.completeLesson(req.chapter.id, req.lesson.id, function(error){
+    var lessonVideo = {};
+    lessonVideo.chapter = req.chapter.id;
+    lessonVideo.lesson  = req.lesson.id;
+    progress.completeLesson(lessonVideo, function(error){
       if(error) {
         log.error(error);
         res.end("false");
       }
       res.end("true");
-    })
+    });
   
   });
 

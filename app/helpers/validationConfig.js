@@ -3,7 +3,7 @@ module.exports.course = {
 	
 	createCourse : {
 		title : {required: true},
-		description : {required : true},
+		desc : {required : true},
 		image : {required:true}
 	},
 
@@ -20,7 +20,7 @@ module.exports.chapter = {
 
 	createChapter : {
 		title : {required:true},
-		description : {required: true}
+		desc : {required: true}
 	},
 
 	editChapter : {

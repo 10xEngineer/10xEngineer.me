@@ -14,7 +14,7 @@ module.exports.lookUp = function(config) {
 	};
 */
 	return function(req, res, next){
-		var errors = self.validation(req.body, config) 
+		var errors = self.validation(req.body, config);
 		if(errors == ''){
 			next();
 			return;
