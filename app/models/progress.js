@@ -236,6 +236,31 @@ CourseProgressSchema.methods.getNextLesson = function(callback) {
   callback(null, nextLesson.id);
 };
 
+CourseProgressSchema.methods.startLesson = function(lessonJSON, callback) {
+  var progress = this;
+  chapterId = lessonJSON.chapter;
+  lessonId  = lessonJSON.lesson;
+  for (var chapterIndex in progress.chapters) {
+    var chapter = progress.chapters[chapterIndex];
+    if(chapter.id == chapterId){
+      for(var lessonIndex in chapter.lessons) {
+        var lesson = chapter.lessons[lessonIndex];
+        if(lesson.id == lessonId) {
+          lesson.status = 'started';
+          break;
+        }
+      }
+    }
+  }
+  progress.markModified('chapters');
+  progress.save(function(error) {
+    if(error) {
+      callback(error);
+    }
+    callback();
+  });
+}
+
 CourseProgressSchema.methods.completeLesson = function(lessonJSON, callback) {
   var progress = this;
   chapterId = lessonJSON.chapter;
