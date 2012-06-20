@@ -9,7 +9,7 @@ module.exports.course = {
 
 	editCourse : {
 		title : {required: true},
-		desc : {required : true},
+		description : {required : true},
 		image : {required:true}
 	}
 
@@ -25,7 +25,7 @@ module.exports.chapter = {
 
 	editChapter : {
 		title : {required:true},
-		desc : {required: true}
+		description : {required: true}
 	}
 }
 
@@ -43,10 +43,10 @@ module.exports.lesson = {
 						required: true,
 						checkFor: {
 							upload:{
-								videofile : {required:true}
+								file : {required:true}
 							},
-							youtube:{
-								videofile: {required: true}
+							facebook:{
+								url: {required: true}
 							}
 						}
 					}
@@ -66,7 +66,6 @@ module.exports.lesson = {
 module.exports.user = {
 	
 	profileUpdate : {
-		name : {required: true},
 		email : {required: true , email : true}
 	}
 }

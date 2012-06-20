@@ -24,32 +24,23 @@ module.exports.profile = function(req, res){
 };
 
 module.exports.settingsView = function(req, res){
-  var user = res.local('user') || req.user;
   res.render('users/settings', {
-  	user: user
+  	user: req.user
   });
 };
 
-module.exports.settings = function(req, res, next){
-  if(req.method == 'GET') {
-    module.exports.settingsView(req, res, next);
-  } else if(req.method == 'POST') {
-    if(! req.validated) {
-      res.locals({ 'user': req.body });
-      module.exports.settingsView(req, res, next);
-    } else {
-    	var user = req.user;
-    	user.name = req.body.name;
-    	user.email = req.body.email;
-    	user.save(function(error) {
-        if(error) {
-          log.error(error);
-          req.session.error = "Can not save Changes of profile.";
-        }
-
-        req.session.message = "Profile updated sucessfully.";
-        res.redirect('/user/settings');
-      });
+module.exports.settings = function(req, res){
+  
+	var user = req.user;
+	user.name = req.body.name;
+	user.email = req.body.email;
+	user.save(function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not save Changes of profile.";
     }
-  }
+
+    req.session.message = "Profile updated sucessfully.";
+    res.redirect('/user/settings');
+  });
 };
