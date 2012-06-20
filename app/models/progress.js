@@ -65,7 +65,7 @@ CourseProgressSchema.pre('save', function(next) {
 
         var lessonProgress = _.reduce(pLessons, function(count, lesson) {
           if(lesson.status == 'completed') {
-            return count++;
+            return ++count;
           } else {
             return count;
           }
@@ -81,7 +81,7 @@ CourseProgressSchema.pre('save', function(next) {
       function(error) {
         var chapterProgress = _.reduce(progress.chapters, function(count, chapter) {
           if(chapter.status == 'completed') {
-            return count++;
+            return ++count;
           } else {
             return count + (chapter.progress/100);
           }
@@ -124,7 +124,7 @@ CourseProgressSchema.pre('save', function(next) {
         }, function(error) {
           var lessonProgress = _.reduce(pLessons, function(count, lesson) {
             if(lesson.status == 'completed') {
-              return count++;
+              return ++count;
             } else {
               return count;
             }
@@ -151,7 +151,7 @@ CourseProgressSchema.pre('save', function(next) {
       function(error) {
         var chapterProgress = _.reduce(progress.chapters, function(count, chapter) {
           if(chapter.status == 'completed') {
-            return count++;
+            return ++count;
           } else {
             return count + (chapter.progress/100);
           }
