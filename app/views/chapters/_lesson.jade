@@ -218,36 +218,36 @@ script(type='text/javascript')
     var opt_div='<div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
 
     $(".question").live("keyup",function(){
-      if($(".question:last").val()!=""){
+      if($(".question:last").val()!="") {
         $("#questionBox").append(que_div);
         assignNamesForQuiz($('#questionBox'));
       }
     });
-    $(".questionOption").live("keyup",function(){    
+    $(".questionOption").live("keyup",function() {    
       var par_que_div=$(this).parents("div").eq(1);
-      if(par_que_div.find(".questionOption:last").val()!=""){
+      if(par_que_div.find(".questionOption:last").val()!="") {
         par_que_div.append(opt_div);
         assignNamesForQuiz($('#questionBox'));
       }
     });
-    $(".questionOption").live("blur",function(){
-      if($(this).val()=="")
-      {   
-        $(this).parent().remove();
-        if($(this).parents(".options").eq().find(".questionOption:last").val()!="") {
+    $(".questionOption").live("blur",function() {
+        if($(this).val()=="") {                         
+          if($(this).parents(".options").find(".questionOption:last").attr('name') != $(this).attr('name')) {
+            $(this).parent().remove();
+          }
+        }
+        if($(this).parents(".options").find(".questionOption:last").val()!="") {
           $(this).parents(".options").eq(0).append(opt_div);
           assignNamesForQuiz($('#questionBox'));
         }
-      }
     });
     $(".question").live("blur",function() {
-      if($(this).val()=="")
-      {
+      if($(this).val()=="") {
         $(this).parent(".addedQuestion").remove();
-        if($(".question:last").val()!=""){
-          $("#questionBox").append(que_div);
-          assignNamesForQuiz($('#questionBox'));
-        }
+      }
+      if($(".question:last").val()!="") {
+        $("#questionBox").append(que_div);
+        assignNamesForQuiz($('#questionBox'));
       }
     });
     var assignNamesForQuiz = function($container) {
