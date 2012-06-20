@@ -111,23 +111,23 @@ module.exports = function(app) {
   // Course
   app.get('/courses', course.list);
 
-  app.get('/course/create', course.createView);
+  app.get('/course/create', course.create);
   app.post('/course/create', validation.lookUp(validationConfig.course.createCourse), course.create);
   app.get('/course/import', course.importView);
   app.post('/course/import', course.import);
 
   app.get('/course/:courseId/start', validCoursePermission('course', 'read'), course.start);
   app.get('/course/:courseId', validCoursePermission('course', 'read'), course.show);
-  app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
-  app.put('/course/:courseId', validCoursePermission('course', 'edit'), course.update);
+  app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.update);
+  app.post('/course/:courseId/edit', validCoursePermission('course', 'edit'), validation.lookUp(validationConfig.course.editCourse), course.update);
   app.get('/course/:courseId/remove', validCoursePermission('course', 'delete'), course.remove);
 
 
   // Chapter
-  app.get('/chapter/create/:courseId', chapter.createView);
+  app.get('/chapter/create/:courseId', chapter.create);
   app.post('/chapter/create/:courseId', validation.lookUp(validationConfig.chapter.createChapter), chapter.create);
   app.get('/chapter/:chapterId', chapter.show);
-  app.get('/chapter/:chapterId/edit', chapter.editView);
+  app.get('/chapter/:chapterId/edit', chapter.edit);
   app.post('/chapter/:chapterId/edit', validation.lookUp(validationConfig.chapter.editChapter), chapter.edit);
   app.get('/chapter/:chapterId/remove', chapter.remove);
   app.get('/chapter/:chapterId/publish', chapter.publish);
@@ -138,9 +138,9 @@ module.exports = function(app) {
 
 
   // Lesson
-  app.get('/lesson/create/:chapterId', lesson.createView);
+  app.get('/lesson/create/:chapterId', lesson.create);
   app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
-  app.get('/lesson/:lessonId', lesson.showView);
+  app.get('/lesson/:lessonId', lesson.show);
   app.post('/lesson/:lessonId', lesson.show);
   app.get('/lesson/:lessonId/remove', lesson.remove);
   app.get('/lesson/:lessonId/up',lesson.up);
@@ -156,7 +156,7 @@ module.exports = function(app) {
 
   // User
   app.get('/user/profile', user.profile);
-  app.get('/user/settings',user.settingsView);
+  app.get('/user/settings',user.settings);
   app.post('/user/settings',validation.lookUp(validationConfig.user.profileUpdate),user.settings);
 
   //app.get('/user/:userId', user.load);
