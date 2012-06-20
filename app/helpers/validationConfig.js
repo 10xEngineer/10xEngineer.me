@@ -3,7 +3,7 @@ module.exports.course = {
 	
 	createCourse : {
 		title : {required: true},
-		desc : {required : true},
+		description : {required : true},
 		image : {required:true}
 	},
 
@@ -20,7 +20,7 @@ module.exports.chapter = {
 
 	createChapter : {
 		title : {required:true},
-		desc : {required: true}
+		description : {required: true}
 	},
 
 	editChapter : {
@@ -42,11 +42,8 @@ module.exports.lesson = {
 					videoType : {
 						required: true,
 						checkFor: {
-							upload:{
-								file : {required:true}
-							},
-							facebook:{
-								url: {required: true}
+							youtube:{
+                                videofile : {required: true}
 							}
 						}
 					}
@@ -66,6 +63,7 @@ module.exports.lesson = {
 module.exports.user = {
 	
 	profileUpdate : {
+		name : {required: true},
 		email : {required: true , email : true}
 	}
 }

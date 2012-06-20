@@ -167,8 +167,18 @@ module.exports.updateView = function(req, res, next){
 
 // TODO: Update course
 module.exports.update = function(req, res, next){
-  res.render('courses/edit', {
-    title: req.course.title
+  var course = req.course;
+  course.title = req.body.title;
+  course.desc = req.body.description;
+  course.image = req.body.image;
+
+  course.save(function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not updated course.";
+    }
+    req.session.message = "Course updated sucessfully.";
+    res.redirect('/course/' + course.id);
   });
 };
 
