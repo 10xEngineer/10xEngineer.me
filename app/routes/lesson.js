@@ -144,12 +144,29 @@ module.exports.showView = function(req, res) {
     randomOption(quizQuestions[questionsIndex].options);
   }
 
-  // Render based on the type
-  res.render('lessons/' + req.lesson.type, {
-    title: req.lesson.title,
-    quiz: req.lesson.quiz
+  Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
+    if(error) {
+      log.error(error);
+      next(error);
+    }
+    var lessonQuiz = {};
+    lessonQuiz.chapter = req.chapter.id;
+    lessonQuiz.lesson  = req.lesson.id;
+    progress.startLesson(lessonQuiz, function(error, next){
+      if(error) {
+        log.error(error);
+        next(error);
+      }
+      // Render based on the type
+      res.render('lessons/' + req.lesson.type, {
+        title: req.lesson.title,
+        quiz: req.lesson.quiz
 
+      });
+    });
   });
+
+  
 };
 
 module.exports.show = function(req, res, next){
