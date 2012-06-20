@@ -35,6 +35,9 @@ var LessonProgressSchema = new Schema({
   _id: Number,
   id: Number,
   status: { type: String, enum: ['not-started', 'started', 'completed'], default: 'not-started'},
+  quiz: {
+    answers :{ type: {} }
+  }
 });
 
 
@@ -233,23 +236,33 @@ CourseProgressSchema.methods.getNextLesson = function(callback) {
   callback(null, nextLesson.id);
 };
 
-CourseProgressSchema.methods.completeLesson = function(chapterId, lessonId, callback) {
+CourseProgressSchema.methods.completeLesson = function(lessonJSON, callback) {
   var progress = this;
-
+  chapterId = lessonJSON.chapter;
+  lessonId  = lessonJSON.lesson;
   for (var chapterIndex in progress.chapters) {
     var chapter = progress.chapters[chapterIndex];
     if(chapter.id == chapterId){
       for(var lessonIndex in chapter.lessons) {
         var lesson = chapter.lessons[lessonIndex];
         if(lesson.id == lessonId) {
+          if(lessonJSON.quiz) {
+            if(!lesson.quiz) {
+              lesson.quiz = {};
+            }
+            lesson.quiz.answers = lessonJSON.quiz;
+          }
           lesson.status = 'completed';
           break;
         }
       }
     }
   }
-
+  progress.markModified('chapters');
   progress.save(function(error) {
+    if(error) {
+      callback(error);
+    }
     callback();
   });
 }
