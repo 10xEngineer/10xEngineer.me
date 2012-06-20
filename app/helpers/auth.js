@@ -109,7 +109,7 @@ module.exports = function (config) {
      }
       return promise;
     })
-    .redirectPath(redirectAction);
+    .sendResponse(redirectAction);
 
   // To inject user object through express middleware
   everyauth.everymodule.findUserById( function (userId, callback) {
