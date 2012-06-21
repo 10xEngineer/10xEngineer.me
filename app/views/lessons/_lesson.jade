@@ -59,7 +59,7 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
       #sysAdmin.tab-pane
         h3 SysAdmin
         something
-  -if (lesson.type == 'video')
+  -if(lesson.type == 'video')
     input#videoContent(name='videoContent' ,type='hidden')
     input#type(name='videoType' ,type='hidden')
     h3 Upload Video
@@ -83,6 +83,39 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
           source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
         - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
           source(type='video/mp4', src='#{lesson.video.content}')
+  -else if(lesson.type == 'quiz')
+    h3 Quiz
+    br
+    div#questionBox
+      -var questionIndex = 0;
+      each questionContent,questionIndex in lesson.quiz.questions
+        div.addedQuestion
+          p Question #{questionIndex}:
+          input.question(type="text", value="#{questionContent.question}", name="question[#{questionIndex}]")
+          br
+          div.options
+            p Options
+            -var optionnameIndex = 0;
+            each option,optionIndex in answersJSON[questionIndex]
+              div.addedOption
+                -if(option)
+                  input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]", checked)
+                -else
+                  input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
+                input.questionOption(type="text", value="#{optionIndex}", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
+                -optionnameIndex = optionnameIndex + 1;
+            div.addedOption
+              input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
+              input.questionOption(type="text", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
+      div.addedQuestion
+        p Question #{questionIndex}:
+        input.question(type="text", name="question[#{questionIndex}]")
+        br
+        div.options
+          p Options
+          div.addedOption
+            input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][0]")
+            input.questionOption(type="text", name="questionOption[#{questionIndex}][0]")
   br
   p
     input.btn.btn-primary(type='submit', value='Submit')
@@ -190,7 +223,7 @@ script(type='text/javascript')
     //  For  Quiz : Add & Remove Question and their Options  //
     //-------------------------------------------------------//
 
-    var queDiv='<div class="addedQuestion"><p>Question:</p><input type="text" class="question"><br><div class="options"><p>Options</p><div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
+    var queDiv='<div class="addedQuestion"><p>Question:</p><input type="text" class="question"><br><div class="options"><p>Options</p><div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div></div></div>';
     var optDiv='<div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
 
     var addQuiz = function() {

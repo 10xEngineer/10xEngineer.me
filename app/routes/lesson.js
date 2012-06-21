@@ -148,7 +148,6 @@ module.exports.show = function(req, res){
   var quizQuestions = req.lesson.quiz.questions;
   var attemptedAnswers = req.body.question;
   var quizQuestionsLength = req.lesson.quiz.questions.length;
-  var answersStatus = [];
   var answersJSON = {};
 
   for(var index = 0; index < quizQuestionsLength; index++) {
@@ -190,9 +189,34 @@ module.exports.show = function(req, res){
 
 // Lesson Edit
 module.exports.editView = function(req, res) {
+  
+  var lesson = req.lesson;
+  var answersJSON = {};
+  if(lesson.type == 'quiz') {
+    
+    var quizQuestions = lesson.quiz.questions;
+    var quizQuestionsLength = lesson.quiz.questions.length;
+
+    for(var index = 0; index < quizQuestionsLength; index++) {
+      if(!answersJSON[index]) {
+        answersJSON[index] = {};
+      }
+      var answers = quizQuestions[index].answers;
+      var options = quizQuestions[index].options;
+      for (var indexOption = 0; indexOption < options.length; indexOption++) {
+       if(_.indexOf(answers, options[indexOption]) !== -1) {
+          answersJSON[index][options[indexOption]] = true;
+        } else {
+          answersJSON[index][options[indexOption]] = false;
+        }
+      }
+    }
+  }
+
   res.render('lessons/edit', {
     title: req.lesson.title,
     description: req.lesson.desc,
+    answersJSON: answersJSON,
     edit: true
   });
 }
@@ -203,13 +227,15 @@ module.exports.edit = function(req, res){
   var lesson = req.lesson;
   lesson.title   = req.body.title;
   lesson.desc    = req.body.description;
-  lesson.type    = req.body.type;
   
   // For Video Lesson
   if(lesson.type == 'video') {
     lesson.video.type    = req.body.videoType;
-    if (req.body.videoContent !== '') {
+    if(req.body.videoContent !== '') {
       lesson.video.content = req.body.videoContent;
+    }
+    if(req.files.videofile.name !== '' ) {
+      var f = req.files['videofile'];
     }
   }
 
@@ -223,8 +249,8 @@ module.exports.edit = function(req, res){
   // For Quiz Lesson
   if(lesson.type == 'quiz') {
 
-    var questionLength = req.body.question.length-1;
-    var lessonInstanceQuestion = lesson.quiz.questions;
+    var questionLength = req.body.question.length - 1;
+    var lessonInstanceQuestion = [];
     for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
       
       var instanceQuestion = {
@@ -245,11 +271,8 @@ module.exports.edit = function(req, res){
       }
       lessonInstanceQuestion.push(instanceQuestion);
     }
+    lesson.quiz.questions = lessonInstanceQuestion;
   }
-  if(req.files.videofile.name !== '') {
-    var f = req.files['videofile'];
-  }
-
   lesson.save(function(error) {
     if(error) {
       log.error(error);
