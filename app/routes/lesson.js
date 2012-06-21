@@ -190,7 +190,6 @@ module.exports.show = function(req, res){
 
 // Lesson Edit
 module.exports.editView = function(req, res) {
-  log.info('Lesson Info ::',req.lesson);
   res.render('lessons/edit', {
     title: req.lesson.title,
     description: req.lesson.desc,
@@ -209,7 +208,9 @@ module.exports.edit = function(req, res){
   // For Video Lesson
   if(lesson.type == 'video') {
     lesson.video.type    = req.body.videoType;
-    lesson.video.content = req.body.videoContent;
+    if (req.body.videoContent !== '') {
+      lesson.video.content = req.body.videoContent;
+    }
   }
 
   // For Programming Lesson
@@ -245,8 +246,7 @@ module.exports.edit = function(req, res){
       lessonInstanceQuestion.push(instanceQuestion);
     }
   }
-  log.info('At Edit Time ->File :------',req.files);
-  if(req.files) {
+  if(req.files.videofile.name !== '') {
     var f = req.files['videofile'];
   }
 
@@ -256,7 +256,7 @@ module.exports.edit = function(req, res){
       error = "Can not create lesson.";
     }
     var id = lesson.id;
-    if(lesson.type == 'video' && lesson.video.type == 'upload' && req.files.videofile.size !== '0') {
+    if(lesson.type == 'video' && lesson.video.type == 'upload' && req.files.videofile.name !== '') {
       var fileName = 'lessonVideo_' + id;
       cdn.saveFile(fileName, f, function(error, fileName) {
         if(error) {
@@ -307,7 +307,6 @@ module.exports.complete = function(req, res) {
 
 // Remove entire lesson
 module.exports.remove = function(req, res, next){
-  log.info('Removing lesson...');
 
   var lesson = req.lesson;
   var chapterId =lesson.chapter.id;
