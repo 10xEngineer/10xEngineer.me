@@ -37,7 +37,7 @@ module.exports.validation = function(entity, config) {
 					subConfig = configsOfKey[action];
 					if(entity[key]==itrateter){
 						var result = self.validation(entity, subConfig[itrateter]);
-						error += result === true ? '' : result;
+						errors += result === true ? '' : result;
 					}
 				}
 			} else {

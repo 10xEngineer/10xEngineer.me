@@ -12,9 +12,10 @@ var Lesson = load.model('Lesson');
 
 // Display create lesson page
 module.exports.createView = function(req, res) {
-  res.render('chapters/lesson_create', {
+  res.render('lessons/lesson_create', {
     title: req.chapter.title,
-    lesson: {title: '', description: ''}
+    lesson: {title: '', desc: ''},
+    edit: false
   });
 };
 
@@ -22,17 +23,24 @@ module.exports.createView = function(req, res) {
 module.exports.create = function(req, res, next) {
   var lesson = new Lesson();
   lesson.chapter = req.chapter._id;
-  lesson.title = req.body.title;
-  lesson.description = req.body.description;
-  lesson.video.type = req.body.videoType;
-  lesson.video.content = req.body.videoContent;
-  lesson.type = req.body.type;
-  lesson.programming.language = req.body.language ;
-  lesson.programming.skeletonCode = req.body.code ;
-  lesson.programming.input = req.body.input ;
-  lesson.programming.output = req.body.output ;
+  lesson.title   = req.body.title;
+  lesson.desc    = req.body.description;
+  lesson.type    = req.body.type;
   
-  // For Quiz
+  // For Video Lesson
+  if(lesson.type == 'video') {
+    lesson.video.type    = req.body.videoType;
+    lesson.video.content = req.body.videoContent;
+  }
+
+  // For Programming Lesson
+  if(lesson.type == 'programming') {
+    lesson.programming.language = req.body.language ;
+    lesson.programming.skeletonCode = req.body.code ;
+    lesson.programming.input = req.body.input ;
+    lesson.programming.output = req.body.output ;
+  }
+  // For Quiz Lesson
   if(lesson.type == 'quiz') {
 
     var questionLength = req.body.question.length-1;
@@ -59,7 +67,6 @@ module.exports.create = function(req, res, next) {
     }
   }
 
-
   var f = req.files['videofile'];
 
   lesson.save(function(error) {
@@ -68,38 +75,31 @@ module.exports.create = function(req, res, next) {
       error = "Can not create lesson.";
     }
     var id = lesson.id;
-    if(lesson.type == 'video')
+    if(lesson.type == 'video' && lesson.video.type == 'upload')
     {
-      if(lesson.video.type == 'upload')  {  
-        
-        var fileName = 'lessonVideo_' + id;
+      var fileName = 'lessonVideo_' + id;
 
-        cdn.saveFile(fileName, f, function(error, fileName) {
-          if(error) {
-            log.error(error);
-            next(error);
-          }
+      cdn.saveFile(fileName, f, function(error, fileName) {
+        if(error) {
+          log.error(error);
+          next(error);
+        }
 
-          Lesson.findOne({ id: id }, function(error, lesson) {
-            // Save the CDN URL if available
-            lesson.video.content = fileName;
-            lesson.save(function(error) {
-              if(error) {
-                log.error(error);
-                next(error);
-              }
+        Lesson.findOne({ id: id }, function(error, lesson) {
+          // Save the CDN URL if available
+          lesson.video.content = fileName;
+          lesson.save(function(error) {
+            if(error) {
+              log.error(error);
+              next(error);
+            }
 
-              req.session.newLesson = {title: lesson.title, _id: lesson._id};
-              message = "Lesson created successfully.";
-              res.redirect('/lesson/' + id);
-            });
+            req.session.newLesson = {title: lesson.title, _id: lesson._id};
+            message = "Lesson created successfully.";
+            res.redirect('/lesson/' + id);
           });
         });
-      } else {
-        req.session.newLesson = {title: lesson.title, _id: lesson._id};
-        message = "Lesson created successfully.";
-        res.redirect('/lesson/' + id);
-      }
+      });
     } else {
       req.session.newLesson = {title: lesson.title, _id: lesson._id};
       message = "Lesson created successfully.";
@@ -186,6 +186,104 @@ module.exports.show = function(req, res){
     attemptedAnswers: answersJSON
   });
 };
+
+
+// Lesson Edit
+module.exports.editView = function(req, res) {
+  log.info('Lesson Info ::',req.lesson);
+  res.render('lessons/edit', {
+    title: req.lesson.title,
+    description: req.lesson.desc,
+    edit: true
+  });
+}
+
+// Save edited chapter
+module.exports.edit = function(req, res){
+  
+  var lesson = req.lesson;
+  lesson.title   = req.body.title;
+  lesson.desc    = req.body.description;
+  lesson.type    = req.body.type;
+  
+  // For Video Lesson
+  if(lesson.type == 'video') {
+    lesson.video.type    = req.body.videoType;
+    lesson.video.content = req.body.videoContent;
+  }
+
+  // For Programming Lesson
+  if(lesson.type == 'programming') {
+    lesson.programming.language = req.body.language ;
+    lesson.programming.skeletonCode = req.body.code ;
+    lesson.programming.input = req.body.input ;
+    lesson.programming.output = req.body.output ;
+  }
+  // For Quiz Lesson
+  if(lesson.type == 'quiz') {
+
+    var questionLength = req.body.question.length-1;
+    var lessonInstanceQuestion = lesson.quiz.questions;
+    for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
+      
+      var instanceQuestion = {
+        question : '',
+        options  : [],
+        answers  : []
+      };
+
+      instanceQuestion.question = req.body.question[indexQuestion];
+
+      var optionsLength = req.body.questionOption[indexQuestion].length-1;
+      var answerIndex = 0;
+      for (var indexOption = 0; indexOption < optionsLength; indexOption++) {
+        instanceQuestion.options[indexOption] = req.body.questionOption[indexQuestion][indexOption];
+        if(req.body.questionOptionCheckbox[indexQuestion][indexOption]) {
+          instanceQuestion.answers[answerIndex++] = req.body.questionOption[indexQuestion][indexOption];
+        }
+      }
+      lessonInstanceQuestion.push(instanceQuestion);
+    }
+  }
+  log.info('At Edit Time ->File :------',req.files);
+  if(req.files) {
+    var f = req.files['videofile'];
+  }
+
+  lesson.save(function(error) {
+    if(error) {
+      log.error(error);
+      error = "Can not create lesson.";
+    }
+    var id = lesson.id;
+    if(lesson.type == 'video' && lesson.video.type == 'upload' && req.files.videofile.size !== '0') {
+      var fileName = 'lessonVideo_' + id;
+      cdn.saveFile(fileName, f, function(error, fileName) {
+        if(error) {
+          log.error(error);
+          next(error);
+        }
+        Lesson.findOne({ id: id }, function(error, lesson) {
+          // Save the CDN URL if available
+          lesson.video.content = fileName;
+          lesson.save(function(error) {
+            if(error) {
+              log.error(error);
+              next(error);
+            }
+
+            message = "Lesson edited successfully.";
+            res.redirect('/lesson/' + id);
+          });
+        });
+      });
+    } else {
+      message = "Lesson edited successfully.";
+      res.redirect('/lesson/' + id);
+    }
+  });
+};
+
 
 // Lesson Comletes
 module.exports.complete = function(req, res) {

@@ -142,6 +142,8 @@ module.exports = function(app) {
   app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', lesson.showView);
   app.post('/lesson/:lessonId', lesson.show);
+  app.get('/lesson/:lessonId/edit',lesson.editView);
+  app.post('/lesson/:lessonId/edit',lesson.edit);
   app.get('/lesson/:lessonId/remove', lesson.remove);
   app.get('/lesson/:lessonId/up',lesson.up);
   app.get('/lesson/:lessonId/down',lesson.down);

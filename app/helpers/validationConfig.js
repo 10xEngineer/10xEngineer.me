@@ -42,9 +42,6 @@ module.exports.lesson = {
 					videoType : {
 						required: true,
 						checkFor: {
-							upload:{
-								file : {required:true}
-							},
 							facebook:{
 								url: {required: true}
 							}

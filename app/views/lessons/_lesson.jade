@@ -6,59 +6,84 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
   p
     label(for="description") Description:
     textarea.required(name='description', id='description')
-      #{lesson.description}
+      #{lesson.desc}
+  -if (!edit)
+    ul#myTab.nav.nav-tabs
+      li.active
+        a(href='#video', data-toggle='tab') Video
+      li
+        a(href='#quiz', data-toggle='tab') Quiz
+      li
+        a(href='#programming', data-toggle='tab') Programming
+      li
+        a(href='#sysAdmin', data-toggle='tab') SysAdmin
 
-  ul#myTab.nav.nav-tabs
-    li.active
-      a(href='#video', data-toggle='tab') Video
-    li
-      a(href='#quiz', data-toggle='tab') Quiz
-    li
-      a(href='#programming', data-toggle='tab') Programming
-    li
-      a(href='#sysAdmin', data-toggle='tab') SysAdmin
+    .tab-content
+      #video.tab-pane.active
+        input#videoContent(name='videoContent' ,type='hidden')
+        input#type(name='videoType' ,type='hidden')
+        h3 Upload Video
+        
+        select#videoType 
+          option(value='Upload') Upload
+          option(value='Youtube') Youtube
 
-  .tab-content
-    #video.tab-pane.active
-      input#videoContent(name='videoContent' ,type='hidden')
-      input#type(name='videoType' ,type='hidden')
-      h3 Upload Video
+        div#upload
+          p Upload Video File :
+          input#video.input-large(name='videofile', type='file', placeholder='Video File')
+        div#youtube    
+          p Youtube URL :
+          input#videoLink.input-large(name='videofile', type='text', placeholder='Video File')
+          input#showYoutubePreview(type="button", value="Preview")
+        div#videoPreview  
       
-      select#videoType 
-        option(value='Upload') Upload
-        option(value='Youtube') Youtube
+      #quiz.tab-pane
+        h3 Quiz
+        br
+        div#questionBox
 
-      div#upload
-        p Upload Video File :
-        input#video.input-large(name='videofile', type='file', placeholder='Video File')
-      div#youtube    
-        p Youtube URL :
-        input#videoLink.input-large(name='videofile', type='text', placeholder='Video File')
-        input#showYoutubePreview(type="button", value="Preview")
-      div#videoPreview  
+      #programming.tab-pane
+        h3 Programming
+        select#language(name='language')
+          option(value='c_cpp') C
+          option(value='c_cpp') C++
+          option(value='css') CSS
+          option(value='Java') Java
+        p Code :
+        textarea#code(name='code')
+        p Enter Input :
+        textarea#input(name='input')
+        p Enter Output :
+        textarea#output(name='output')
+
+      #sysAdmin.tab-pane
+        h3 SysAdmin
+        something
+  -if (lesson.type == 'video')
+    input#videoContent(name='videoContent' ,type='hidden')
+    input#type(name='videoType' ,type='hidden')
+    h3 Upload Video
+
+    select#videoType 
+      option(value='Upload') Upload
+      option(value='Youtube') Youtube
+
+    div#upload
+      p Upload Video File :
+      input#video.input-large(name='videofile', type='file', placeholder='Video File')
+    div#youtube    
+      p Youtube URL :
+      input#videoLink.input-large(name='videofile', type='text', placeholder='Video File')
+      input#showYoutubePreview(type="button", value="Preview")
     
-    #quiz.tab-pane
-      h3 Quiz
-      br
-      div#questionBox
-
-    #programming.tab-pane
-      h3 Programming
-      select#language(name='language')
-        option(value='c_cpp') C
-        option(value='c_cpp') C++
-        option(value='css') CSS
-        option(value='Java') Java
-      p Code :
-      textarea#code(name='code')
-      p Enter Input :
-      textarea#input(name='input')
-      p Enter Output :
-      textarea#output(name='output')
-    #sysAdmin.tab-pane
-      h3 SysAdmin
-      something
-
+    div#videoPreview
+      p Video Preview :
+      video#player(width='300', height='300', preload="none")
+        - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
+          source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
+        - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
+          source(type='video/mp4', src='#{lesson.video.content}')
+  br
   p
     input.btn.btn-primary(type='submit', value='Submit')
 
@@ -66,9 +91,9 @@ script(type='text/javascript')
   
   $(document).ready(function() {
     
-    //--------------------------------//
-    // Select Upload / Youtube Video  //
-    //--------------------------------//
+    //----------------------------------------------------- //
+    //  Select Upload / Youtube Video                       //
+    //----------------------------------------------------- //
 
     $('.tabs a:last').tab('show');
 
@@ -92,7 +117,7 @@ script(type='text/javascript')
     });
 
     //----------------------------------------------------- //
-    // For Preview of Youtube Video on Video Tabe           //
+    //  For Preview of Youtube Video on Video Tabe          //
     //----------------------------------------------------- //
 
     $('#showYoutubePreview').click(function(){
@@ -129,7 +154,7 @@ script(type='text/javascript')
     }
 
     //----------------------------------------------------- //
-    // For : Set Lesson Type variable on Tab Click          //
+    //  For : Set Lesson Type variable on Tab Click         //
     //----------------------------------------------------- //
 
     $('#myTab a').click(function (e) {
@@ -161,9 +186,9 @@ script(type='text/javascript')
 
     });
 
-    //----------------------------------------------------- //
-    // For  Quiz : Add & Remove Question and their Options  //
-    //----------------------------------------------------- //
+    //-------------------------------------------------------//
+    //  For  Quiz : Add & Remove Question and their Options  //
+    //-------------------------------------------------------//
 
     var queDiv='<div class="addedQuestion"><p>Question:</p><input type="text" class="question"><br><div class="options"><p>Options</p><div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
     var optDiv='<div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
@@ -190,8 +215,7 @@ script(type='text/javascript')
     });
 
     $(".questionOption").live("blur",function(){
-      if($(this).val()=="")
-      {                         
+      if($(this).val()=="") {                         
         if($(this).parents(".options").find(".questionOption:last").attr('name') != $(this).attr('name')) {
           $(this).parent().remove();
         }
@@ -217,7 +241,7 @@ script(type='text/javascript')
     var que_div='<div class="addedQuestion"><p>Question:</p><input type="text" class="question"><br><div class="options"><p>Options</p><div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
     var opt_div='<div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
 
-    $(".question").live("keyup",function(){
+    $(".question").live("keyup",function() {
       if($(".question:last").val()!="") {
         $("#questionBox").append(que_div);
         assignNamesForQuiz($('#questionBox'));
@@ -265,5 +289,21 @@ script(type='text/javascript')
         $(el).attr('name', 'questionOptionCheckbox['+questionId+']['+j+']');
       });
     };
+
+    //----------------------------------------------------- //
+    //  Video Player For Edit Lesson                        //
+    //----------------------------------------------------- //
+
+    $('video').mediaelementplayer({
+      enablePluginDebug: false,
+      defaultVideoWidth: 930,
+      defaultVideoHeight: 525,
+      features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
+      alwaysShowControls: true,
+      pluginPath: '/javascripts/mediaelement/',
+      error: function(err) {
+        console.log(err);
+      }
+    });
 
   });
