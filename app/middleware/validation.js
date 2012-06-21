@@ -27,6 +27,7 @@ module.exports.lookUp = function(config) {
 module.exports.validation = function(entity, config) {
 	var self = this;
 	var errors = "";
+
 	for(key in config){
 		configsOfKey = config[key];
 		for(action in configsOfKey){
@@ -37,7 +38,7 @@ module.exports.validation = function(entity, config) {
 					subConfig = configsOfKey[action];
 					if(entity[key]==itrateter){
 						var result = self.validation(entity, subConfig[itrateter]);
-						error += result === true ? '' : result;
+						errors += result === true ? '' : result;
 					}
 				}
 			} else {

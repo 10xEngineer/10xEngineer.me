@@ -119,7 +119,7 @@ module.exports = function(app) {
   app.get('/course/:courseId/start', validCoursePermission('course', 'read'), course.start);
   app.get('/course/:courseId', validCoursePermission('course', 'read'), course.show);
   app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
-  app.put('/course/:courseId', validCoursePermission('course', 'edit'), course.update);
+  app.post('/course/:courseId/edit', validCoursePermission('course', 'edit'), validation.lookUp(validationConfig.course.editCourse), course.update);
   app.get('/course/:courseId/remove', validCoursePermission('course', 'delete'), course.remove);
 
 
