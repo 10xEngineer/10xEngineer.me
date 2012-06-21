@@ -1,0 +1,72 @@
+-if(lesson.type == 'video')
+  input#videoContent(name='videoContent' ,type='hidden')
+  input#type(name='videoType' ,type='hidden')
+  h3 Upload Video
+
+  select#videoType 
+    option(value='Upload') Upload
+    option(value='Youtube') Youtube
+
+  div#upload
+    p Upload Video File :
+    input#video.input-large(name='videofile', type='file', placeholder='Video File')
+  div#youtube    
+    p Youtube URL :
+    input#videoLink.input-large(name='videofile', type='text', placeholder='Video File')
+    input#showYoutubePreview(type="button", value="Preview")
+  
+  div#videoPreview
+    p Video Preview :
+    video#player(width='300', height='300', preload="none")
+      - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
+        source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
+      - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
+        source(type='video/mp4', src='#{lesson.video.content}')
+
+-else if(lesson.type == 'quiz')
+  h3 Quiz
+  br
+  div#questionBox
+    -var questionIndex = 0;
+    each questionContent,questionIndex in lesson.quiz.questions
+      div.addedQuestion
+        p Question #{questionIndex}:
+        input.question(type="text", value="#{questionContent.question}", name="question[#{questionIndex}]")
+        br
+        div.options
+          p Options
+          -var optionnameIndex = 0;
+          each option,optionIndex in answersJSON[questionIndex]
+            div.addedOption
+              -if(option)
+                input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]", checked)
+              -else
+                input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
+              input.questionOption(type="text", value="#{optionIndex}", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
+              -optionnameIndex = optionnameIndex + 1;
+          div.addedOption
+            input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
+            input.questionOption(type="text", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
+    div.addedQuestion
+      p Question #{questionIndex}:
+      input.question(type="text", name="question[#{questionIndex}]")
+      br
+      div.options
+        p Options
+        div.addedOption
+          input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][0]")
+          input.questionOption(type="text", name="questionOption[#{questionIndex}][0]")
+
+-else if(lesson.type == 'programming')
+  p Programming :
+  select#languagee(name='language')
+    option(value='c_cpp') C
+    option(value='c_cpp') C++
+    option(value='css') CSS
+    option(value='Java') Java
+  p Code :
+  textarea#code(name='code') #{lesson.programming.skeletonCode}
+  p Enter Input :
+  textarea#input(name='input') #{lesson.programming.input}
+  p Enter Output :
+  textarea#output(name='output') #{lesson.programming.output}

@@ -15,7 +15,7 @@ module.exports.createView = function(req, res) {
   res.render('lessons/lesson_create', {
     title: req.chapter.title,
     lesson: {title: '', desc: ''},
-    edit: false
+    edit: 'false'
   });
 };
 
@@ -217,7 +217,7 @@ module.exports.editView = function(req, res) {
     title: req.lesson.title,
     description: req.lesson.desc,
     answersJSON: answersJSON,
-    edit: true
+    edit: 'true'
   });
 }
 
