@@ -7,7 +7,7 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
     label(for="description") Description:
     textarea.required(name='description', id='description')
       #{lesson.desc}
-  if(edit == 'false')
+  - if(!edit)
     ul#myTab.nav.nav-tabs
       li.active
         a(href='#video', data-toggle='tab') Video
@@ -59,11 +59,17 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
       #sysAdmin.tab-pane
         h3 SysAdmin
         something
-  else
+  - else
     != partial('editLesson');
-br
-p
-  input.btn.btn-primary(type='submit', value='Submit')
+  br
+  p
+    input.btn.btn-primary(type='submit', value='Submit')
+
+  - if(edit && typeof(lesson.programming) != 'undefined')
+    script(type='text/javascript')
+  
+      // This should be only executed inside edit
+      $('#editLanguage').val('#{lesson.programming.language}');
 
 script(type='text/javascript')
   

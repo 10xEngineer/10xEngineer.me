@@ -15,7 +15,7 @@ module.exports.createView = function(req, res) {
   res.render('lessons/lesson_create', {
     title: req.chapter.title,
     lesson: {title: '', desc: ''},
-    edit: 'false'
+    edit: false
   });
 };
 
@@ -217,7 +217,7 @@ module.exports.editView = function(req, res) {
     title: req.lesson.title,
     description: req.lesson.desc,
     answersJSON: answersJSON,
-    edit: 'true'
+    edit: true
   });
 }
 
@@ -248,7 +248,6 @@ module.exports.edit = function(req, res){
   }
   // For Quiz Lesson
   if(lesson.type == 'quiz') {
-
     var questionLength = req.body.question.length - 1;
     var lessonInstanceQuestion = [];
     for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
@@ -261,7 +260,7 @@ module.exports.edit = function(req, res){
 
       instanceQuestion.question = req.body.question[indexQuestion];
 
-      var optionsLength = req.body.questionOption[indexQuestion].length-1;
+      var optionsLength = req.body.questionOption[indexQuestion].length - 1;
       var answerIndex = 0;
       for (var indexOption = 0; indexOption < optionsLength; indexOption++) {
         instanceQuestion.options[indexOption] = req.body.questionOption[indexQuestion][indexOption];

@@ -27,7 +27,7 @@
   h3 Quiz
   br
   div#questionBox
-    -var questionIndex = 0;
+    -var questionNo = 0;
     each questionContent,questionIndex in lesson.quiz.questions
       div.addedQuestion
         p Question #{questionIndex}:
@@ -47,19 +47,20 @@
           div.addedOption
             input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
             input.questionOption(type="text", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
+      -questionNo =questionNo + 1;
     div.addedQuestion
-      p Question #{questionIndex}:
-      input.question(type="text", name="question[#{questionIndex}]")
+      p Question #{questionNo}:
+      input.question(type="text", name="question[#{questionNo}]")
       br
       div.options
         p Options
         div.addedOption
-          input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][0]")
-          input.questionOption(type="text", name="questionOption[#{questionIndex}][0]")
+          input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionNo}][0]")
+          input.questionOption(type="text", name="questionOption[#{questionNo}][0]")
 
 -else if(lesson.type == 'programming')
   p Programming :
-  select#languagee(name='language')
+  select#editLanguage(name='language')
     option(value='c_cpp') C
     option(value='c_cpp') C++
     option(value='css') CSS
