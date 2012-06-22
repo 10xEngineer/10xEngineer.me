@@ -52,9 +52,10 @@ var validUser = function(req, res, next) {
   next();
 }
 
-var validCoursePermission = function(entity, action){
+var verifyPermition = function(entity, action){
   return function(req, res, next){
-    if(req.loggedIn && ability.can(req.user.roles, entity, req.course._id, action)){
+    log.info(req);
+    if(req.loggedIn && ability.can(req.user.roles, entity, req[entity]._id, action)){
       next();
       return;
     }
@@ -109,63 +110,62 @@ module.exports = function(app) {
   
 
   // Course
-  app.get('/courses', course.list);
+  app.get('/courses', verifyPermition('course', 'read'), course.list);
 
-  app.get('/course/create', course.createView);
-  app.post('/course/create', validation.lookUp(validationConfig.course.createCourse), course.create);
-  app.get('/course/import', course.importView);
-  app.post('/course/import', course.import);
+  app.get('/course/create', verifyPermition('course', 'edit'), course.createView);
+  app.post('/course/create', verifyPermition('course', 'edit'), validation.lookUp(validationConfig.course.createCourse), course.create);
+  app.get('/course/import', verifyPermition('course', 'edit'), course.importView);
+  app.post('/course/import', verifyPermition('course', 'edit'), course.import);
 
-  app.get('/course/:courseId/start', validCoursePermission('course', 'read'), course.start);
-  app.get('/course/:courseId', validCoursePermission('course', 'read'), course.show);
-  app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
-  app.post('/course/:courseId/edit', validCoursePermission('course', 'edit'), validation.lookUp(validationConfig.course.editCourse), course.update);
-  app.get('/course/:courseId/remove', validCoursePermission('course', 'delete'), course.remove);
+  app.get('/course/:courseId/start', verifyPermition('course', 'read'), course.start);
+  app.get('/course/:courseId', verifyPermition('course', 'read'), course.show);
+  app.get('/course/:courseId/edit', verifyPermition('course', 'edit'), course.updateView);
+  app.post('/course/:courseId/edit', verifyPermition('course', 'edit'), validation.lookUp(validationConfig.course.editCourse), course.update);
+  app.get('/course/:courseId/remove', verifyPermition('course', 'delete'), course.remove);
 
 
   // Chapter
-  app.get('/chapter/create/:courseId', chapter.createView);
-  app.post('/chapter/create/:courseId', validation.lookUp(validationConfig.chapter.createChapter), chapter.create);
-  app.get('/chapter/:chapterId', chapter.show);
-  app.get('/chapter/:chapterId/edit', chapter.editView);
-  app.post('/chapter/:chapterId/edit', validation.lookUp(validationConfig.chapter.editChapter), chapter.edit);
-  app.get('/chapter/:chapterId/remove', chapter.remove);
-  app.get('/chapter/:chapterId/publish', chapter.publish);
-  app.get('/chapter/:chapterId/unpublish', chapter.unpublish);
-  app.get('/chapter/:chapterId/remove', chapter.remove);
-  app.get('/chapter/:chapterId/up',chapter.up);
-  app.get('/chapter/:chapterId/down',chapter.down);
+  app.get('/chapter/create/:courseId', verifyPermition('chapter', 'edit'), chapter.createView);
+  app.post('/chapter/create/:courseId', verifyPermition('chapter', 'edit'), validation.lookUp(validationConfig.chapter.createChapter), chapter.create);
+  app.get('/chapter/:chapterId',verifyPermition('chapter', 'read'), chapter.show);
+  app.get('/chapter/:chapterId/edit', verifyPermition('chapter', 'edit'), chapter.editView);
+  app.post('/chapter/:chapterId/edit', verifyPermition('chapter', 'edit'), validation.lookUp(validationConfig.chapter.editChapter), chapter.edit);
+  app.get('/chapter/:chapterId/remove', verifyPermition('chapter', 'delete'), chapter.remove);
+  app.get('/chapter/:chapterId/publish', verifyPermition('chapter', 'publish'), chapter.publish);
+  app.get('/chapter/:chapterId/unpublish', verifyPermition('chapter', 'publish'), chapter.unpublish);
+  app.get('/chapter/:chapterId/up', verifyPermition('chapter', 'edit'), chapter.up);
+  app.get('/chapter/:chapterId/down', verifyPermition('chapter', 'edit'), chapter.down);
 
 
   // Lesson
-  app.get('/lesson/create/:chapterId', lesson.createView);
-  app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
-  app.get('/lesson/:lessonId', lesson.showView);
-  app.post('/lesson/:lessonId', lesson.show);
-  app.get('/lesson/:lessonId/remove', lesson.remove);
-  app.get('/lesson/:lessonId/up',lesson.up);
-  app.get('/lesson/:lessonId/down',lesson.down);
-  app.get('/lesson/:lessonId/publish', lesson.publish);
-  app.get('/lesson/:lessonId/unpublish', lesson.unpublish);
-  app.get('/lesson/:lessonId/next',lesson.next);
-  app.get('/lesson/:lessonId/previous',lesson.previous);
-  app.get('/lesson/:lessonId/complete', lesson.complete);
+  app.get('/lesson/create/:chapterId', verifyPermition('lesson', 'edit'), lesson.createView);
+  app.post('/lesson/create/:chapterId', verifyPermition('lesson', 'edit'), validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
+  app.get('/lesson/:lessonId', verifyPermition('lesson', 'read'), lesson.showView);
+  app.post('/lesson/:lessonId', verifyPermition('lesson', 'read'), lesson.show);
+  app.get('/lesson/:lessonId/remove', verifyPermition('lesson', 'delete'), lesson.remove);
+  app.get('/lesson/:lessonId/up', verifyPermition('lesson', 'edit'), lesson.up);
+  app.get('/lesson/:lessonId/down', verifyPermition('lesson', 'edit'), lesson.down);
+  app.get('/lesson/:lessonId/publish',verifyPermition('lesson', 'publish'), lesson.publish);
+  app.get('/lesson/:lessonId/unpublish', verifyPermition('lesson', 'publish'), lesson.unpublish);
+  app.get('/lesson/:lessonId/next', verifyPermition('lesson', 'read'),lesson.next);
+  app.get('/lesson/:lessonId/previous', verifyPermition('lesson', 'read'), lesson.previous);
+  app.get('/lesson/:lessonId/complete', verifyPermition('lesson', 'read'), lesson.complete);
 
   // CDN
   app.get('/cdn/:fileName', cdn.load);
 
   // User
-  app.get('/user/profile', user.profile);
-  app.get('/user/settings',user.settingsView);
-  app.post('/user/settings',validation.lookUp(validationConfig.user.profileUpdate),user.settings);
+  app.get('/user/profile', verifyPermition('user', 'read'), user.profile);
+  app.get('/user/settings', verifyPermition('user', 'edit'), user.settingsView);
+  app.post('/user/settings', verifyPermition('user', 'edit'), validation.lookUp(validationConfig.user.profileUpdate),user.settings);
 
   //app.get('/user/:userId', user.load);
 
 
   // Admin
-  app.get('/admin', admin.show);
+  app.get('/admin', verifyPermition('admin', 'read'), admin.show);
   // TODO: Temporary admin path to make a user admin
-  app.get('/admin/:userId/:roleId', admin.assignRole);
+  app.get('/admin/:userId/:roleId', verifyPermition('admin', 'edit'), admin.assignRole);
 
 
 
