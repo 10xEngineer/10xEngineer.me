@@ -121,6 +121,8 @@ module.exports = function(app) {
   app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
   app.put('/course/:courseId', validCoursePermission('course', 'edit'), course.update);
   app.get('/course/:courseId/remove', validCoursePermission('course', 'delete'), course.remove);
+  app.get('/course/:courseId/publish', course.publish);
+  app.get('/course/:courseId/unpublish', course.unpublish);
 
 
   // Chapter
