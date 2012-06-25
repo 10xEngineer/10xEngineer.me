@@ -43,7 +43,7 @@ var init = exports.init = function(config) {
 
   // Migrate database schema
   // TODO: Find a way to wait before this finishes executing
-  load.helper('dbMigrator')();
+  load.helper('dbMigrator')(config);
 
   // Authentication Middleware
   var authMiddleware = load.helper('auth')(config);

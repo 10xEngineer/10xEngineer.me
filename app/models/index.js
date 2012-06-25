@@ -10,7 +10,8 @@ module.exports = function() {
     "course",
     "chapter",
     "lesson",
-    "progress"
+    "progress",
+    "labDef"
   ];
 
   for(var index = 0; index < files.length; index++) {

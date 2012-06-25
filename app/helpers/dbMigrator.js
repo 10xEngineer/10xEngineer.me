@@ -1,12 +1,10 @@
-var config = load.helper('config');
-var dbConfig = config.db;
-
 var Metadata = load.model('Metadata');
 var Count = load.model('Count');
 var User = load.model('User');
 var Role = load.model('Role');
+var LabDef = load.model('LabDef');
 
-module.exports = function() {
+module.exports = function(config) {
   var self = this;
 
   // Check current schema version from database
@@ -14,10 +12,11 @@ module.exports = function() {
     if(error) {
       log.error(error);
     }
+    var codeSchemaVersion = config.get('db:schemaVersion');
 
-    if(currentVersion !== dbConfig.schemaVersion) {
+    if(currentVersion !== codeSchemaVersion) {
       // Schema has changed. Execute migration functions.
-      migrateSchema(currentVersion, dbConfig.schemaVersion, function(version) {
+      migrateSchema(currentVersion, codeSchemaVersion, function(version) {
 
         // Update schemaVersion in the database
         Metadata.setValue('schemaVersion', version);
@@ -101,7 +100,21 @@ var migrate = function(dbVersion, codeVersion, done) {
         });
       });
     });
-  } else if(dbversion == 3) {
+  } else if(dbVersion == 3) {
+    // Defualt LabDef 
+    var labDef = new LabDef();
+    labDef.name = 'Web Server';
+    labDef.type = 'Ubuntu';
+    labDef.cpu = 1;
+    labDef.memory = 768;
+    labDef.storage = 1024;
+
+    labDef.save(function(error){
+      if(error) {
+        log.error(error);
+      }
+      done();
+    });
 
   }
 };
