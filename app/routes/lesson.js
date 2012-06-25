@@ -8,15 +8,23 @@ module.exports = function() {};
 // Load Model
 var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
+var LabDef = load.model('LabDef');
 
 
 // Display create lesson page
 module.exports.createView = function(req, res) {
-  res.render('lessons/lesson_create', {
-    title: req.chapter.title,
-    lesson: {title: '', desc: ''},
-    edit: false
+  
+  LabDef.find(function (error, lab) {
+    res.render('lessons/lesson_create', {
+      title: req.chapter.title,
+      lesson: {title: '', desc: ''},
+      edit: false,
+      lab: lab
+    }); 
   });
+
+
+  
 };
 
 // Create a lesson
