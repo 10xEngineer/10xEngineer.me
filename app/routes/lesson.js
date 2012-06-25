@@ -360,7 +360,7 @@ module.exports.complete = function(req, res) {
   
   });
 
-}
+};
 
 // Remove entire lesson
 module.exports.remove = function(req, res, next){

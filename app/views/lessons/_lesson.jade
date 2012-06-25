@@ -74,7 +74,21 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
         
       #sysAdmin.tab-pane
         h3 SysAdmin
-        something
+        select.serverName(name='serverName', multiple='multiple')
+        a.btn(data-toggle="modal", href="#myModal") Add Server
+        div.modal.hide#myModal
+          div.modal-header
+            button.close(type="button", data-dismiss="modal") x
+            h3 Add Server 
+          div.modal-body
+            p Select Server :
+            select#selectedServer(name='selectedServer')
+              option(value="Web Server ", selected="selected") Web Server
+              option(value="Database Server ") Database Server
+              option(value="HTTP Server ") HTTP Server
+            a.btn#addServerName(data-dismiss="modal") Add
+          div.modal-footer
+            a.btn(data-dismiss="modal") Close
 
   - else
     != partial('editLesson');
@@ -306,5 +320,39 @@ script(type='text/javascript')
         console.log(err);
       }
     });
+
+    //----------------------------------------------------- //
+    //  SysAdmin : Add server name into List                //
+    //----------------------------------------------------- //  
+
+    $('#addServerName').click(function(){
+      checkServerName($('#selectedServer :selected').text());
+    });  
+
+    var checkServerName = function(selectedServerValue) {
+      
+      var serverNameJSON = {};
+      var count=0, temp = 0;
+      var regExp = new RegExp('^([a-zA-z0-9\\\\s]+\\\\()( \\\\d+ )(\\\\))$');
+      $("select.serverName option").each(function () {
+        var tempOptValue= '';
+        var tempOptValue= $(this).val().split('(');
+        var selectedServerVal = selectedServerValue + " ";
+        if(tempOptValue[0] == selectedServerVal && (regExp.test($(this).html()))) {
+          var optNameArray = regExp.exec($(this).html());
+          optNameArray[2] = parseInt(optNameArray[2],10) + 1 ;
+          optNameArray.splice(0,1);
+          optNameArray = optNameArray.join(' ');
+          $(this).text(optNameArray);
+          $(this).val(optNameArray);
+          temp = 1;
+        }
+      });
+
+      if(temp == 0) {
+        $(".serverName").append("<option value='"+selectedServerValue+" ( 1 )'>"+selectedServerValue+" ( 1 )</option>");
+      }
+      
+    };
 
   });
