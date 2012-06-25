@@ -121,6 +121,8 @@ module.exports = function(app) {
   app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
   app.post('/course/:courseId/edit', validCoursePermission('course', 'edit'), validation.lookUp(validationConfig.course.editCourse), course.update);
   app.get('/course/:courseId/remove', validCoursePermission('course', 'delete'), course.remove);
+  app.get('/course/:courseId/publish', course.publish);
+  app.get('/course/:courseId/unpublish', course.unpublish);
 
 
   // Chapter
@@ -142,6 +144,8 @@ module.exports = function(app) {
   app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', lesson.showView);
   app.post('/lesson/:lessonId', lesson.show);
+  app.get('/lesson/:lessonId/edit',lesson.editView);
+  app.post('/lesson/:lessonId/edit',lesson.edit);
   app.get('/lesson/:lessonId/remove', lesson.remove);
   app.get('/lesson/:lessonId/up',lesson.up);
   app.get('/lesson/:lessonId/down',lesson.down);

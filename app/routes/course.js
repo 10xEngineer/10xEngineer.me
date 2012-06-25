@@ -196,3 +196,31 @@ module.exports.remove = function(req, res, next){
     res.redirect('/courses/');
   });
 };
+
+// Publish a course
+module.exports.publish = function(req, res) {
+  var course = req.course;
+
+  course.publish(true, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not published course.";
+    }
+    req.session.message = "Course published sucessfully.";
+    res.redirect('/course/' + course.id);
+  });
+};
+
+// unpublish a chapter
+module.exports.unpublish = function(req, res) {
+  var course = req.course;
+  
+  course.publish(false, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not unpublished course.";
+    }
+    req.session.message = "Course unpublished sucessfully.";
+    res.redirect('/course/' + course.id);
+  });
+};
