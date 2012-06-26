@@ -2,6 +2,7 @@ var User = load.model('User');
 var Course = load.model('Course');
 var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
+var LabDef = load.model('LabDef');
 
 module.exports = function(app) {
 
@@ -96,6 +97,25 @@ module.exports = function(app) {
         req.extUser = user;
         req.app.helpers({
           extUser: user
+        });
+      }
+
+      next();
+    });
+  });
+
+  // LabDef
+  app.param('labDefId', function(req, res, next, id){
+    LabDef.findOne({ id: id })
+    .run(function(error, labDef) {
+      if(error) {
+        next(error);
+      }
+
+      if(labDef) {
+        req.labDef = labDef;
+        req.app.helpers({
+          labDef: labDef
         });
       }
 
