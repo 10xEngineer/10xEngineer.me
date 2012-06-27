@@ -139,12 +139,59 @@ if(!module.parent) {
   });
 
 
+
+
+
   //socket for ideone source code execution
   var request = require('request');
+  var parseCookie = require('connect').utils.parseCookie;
+  var Session = require('connect').middleware.session.Session;
   var wsdlurl = 'http://ideone.com/api/1/service.json';
   var io = require('socket.io').listen(app);
-  io.set('log level', 0);
-  io.sockets.on('connection', function (socket) {
+
+  io.configure(function () {
+    io.set('transports', ['websocket', 'flashsocket', 'xhr-polling']);
+    io.set('authorization', function(data, callback) {
+      // check if there's a cookie header
+      if (data.headers.cookie) {
+          // if there is, parse the cookie
+          //data.cookie = parseJSONCookies(parseCookie(data.headers.cookie));
+          data.cookie = parseCookie(data.headers.cookie);
+          // note that you will need to use the same key to grad the
+          // session id, as you specified in the Express setup.
+          data.sessionID = data.cookie['my.sid'];
+          // save the session store to the data object 
+          // (as required by the Session constructor)
+          data.sessionStore = sessionStore;
+          sessionStore.get(data.sessionID, function (err, session) {
+            if (err) {
+              callback(err, false);
+            } else if(!session) {
+              callback('Session not found');
+            } else {
+              // create a session object, passing data as request and our
+              // just acquired session data
+              data.session = new Session(data, session);
+              callback(null, true);
+            }
+          });
+
+      } else {
+         // if there isn't, turn down the connection with a message
+         // and leave the function.
+         return callback('No cookie transmitted.', false);
+      }
+    });
+  });
+
+  io.configure('development', function () {
+    io.set('transports', ['websocket', 'xhr-polling']);
+    io.enable('log');
+  });
+
+  io
+    .of('/code')
+    .on('connection', function (socket) {
       socket.on('submitcode', function(data){
       log.info(data);
       request(
@@ -167,7 +214,7 @@ if(!module.parent) {
           }
         , function (error, response, body) {
           log.info(body);
-              socket.emit('codesent', body);
+              socket.volatile.emit('codesent', body);
           }
         )
     });
@@ -191,7 +238,7 @@ if(!module.parent) {
           },
           function(error, response, body){
             log.info(body);
-            socket.emit('submissionStatus', body)           
+            socket.volatile.emit('submissionStatus', body)           
           }
           )
     });
@@ -219,7 +266,7 @@ if(!module.parent) {
         },
         function(error, response, body){
           log.info(body);
-          socket.emit('submissionDetails', body)           
+          socket.volatile.emit('submissionDetails', body)           
         }
       )
     }); 

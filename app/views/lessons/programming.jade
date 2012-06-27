@@ -13,7 +13,7 @@ include _header
   .row-fluid
     .span10
       .row-fluid
-        form#editform.well(onsubmit='return submitSourceCode(this)', action="/submitCode", method='POST')
+        form#editform.well(onsubmit='return false')
           .row-fluid.action-bar
             .btn-group.pull-left
               a.btn.btn-primary(onclick='submitSourceCode()') Run
@@ -130,21 +130,13 @@ include _header
                 a(href="javascript:$.pageslide.close()").btn.btn-info Close
             #source-editor 
               .controls
-                input(type='hidden', name='sourcecode', id='sourcecode', value='#{lesson.programming.skeletonCode}')
-                #editor(style='position:relative;width:100%;height:400px;')
+                input#sourcecode(type='hidden', name='sourcecode', value='#{lesson.programming.skeletonCode}')
+                #editor(style='position:relative;width:100%;height:400px;') #{lesson.programming.skeletonCode}
               .form-actions
                 span.danger
                   a#clear.button.btn.btn-danger RESET
                 span.pull-right
-                  a.button.btn.btn-submit SUBMIT
-      .row-fluid
-        .well
-          - if(typeof(compile_result) != 'undefined')
-            p#compile_result #{compile_result} || Run to see results or errors
-          - if(typeof(compile_output) != 'undefined')
-            p(style='white-space: pre;').pre#compile_output #{compile_output}
-      .row-fluid
-          include _footer 
+                  button#submit.button.btn.btn-submit SUBMIT
       .row-fluid
         p.pull-right 10xEngineer.me uses 
           a(href="http://ideone.com") ideone.com 
@@ -154,12 +146,12 @@ include _header
     .span2
       include _sidebar
 
-  script(type='text/javascript', src='/javascripts/ace/ace.js')
+  script(type='text/javascript', src='/javascripts/ace_2/ace.js')
   script(type='text/javascript', src='/socket.io/socket.io.js')
   script(type='text/javascript', src='/javascripts/jquery-ui/jquery-ui-1.8.19.custom.min.js')
   script(type='text/javascript', src='/javascripts/jquery.pageslide.js')
   script(type='text/javascript')
-    var socket=io.connect();
+    var socket=io.connect('/code');
     var editor;
     var themes = {};
     function loadTheme(name) {
@@ -206,7 +198,7 @@ include _header
     }
 
     function init() {
-      editor = ace.edit('editor', {initialContent:'hello world!'});
+      editor = ace.edit('editor');
       $(".open").pageslide({direction: "right", modal: true, iframe:false});
 
       $('#editor').resizable({
@@ -276,7 +268,8 @@ include _header
       }
 
       $('a#clear').click(function(e){
-        editor.getSession().setValue("insert skeleton code here");
+        editor.getSession().setValue($('#sourcecode').val());
+        editor.focus();
       })
     }
 
@@ -318,7 +311,7 @@ include _header
       else {
         socket.emit('getSubmissionStatus', {linkCode:linkCode});
       }
-      });
+    });
 
     //Check the compilation status and get the run result
     var errors = {
@@ -352,3 +345,18 @@ include _header
           out.text(data.result.stderr);
         }
     });
+
+    $('#submit').click(function(e) {
+      var sourceCode = editor.getSession().getValue();
+      var languageCode = $('#pageslide #mode').val();
+      if(!languageCode){
+        languageCode = $('#mode').val();
+      }
+      var data = {'source':sourceCode, 'language':languages[languageCode]};
+      socket.emit('submitcode', data);
+    });
+
+    // Periodically save the code
+    var saveTimer = window.setInterval(function() {
+      socket.emit('saveCurrentStatus', { code: editor.getSession().getValue()})
+    }, 10000);

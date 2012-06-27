@@ -16,41 +16,15 @@ var validationConfig = load.helper('validationConfig');
 // ---------------------
 
 
-// IDEONE documentation http://ideone.com/files/ideone-api.pdf
-var submitCode = function(code) {
-  log.info('submitting code');
-  request(
-    { method: 'GET'
-    , uri: wsdlurl
-    , multipart: 
-      [ { 'Content-type': 'application/json'
-        ,  body: JSON.stringify({"jsonrpc": "2.0", "method": "getLanguages", "params": {"user": "velniukas", "pass": "limehouse"}, "id": 1})
-        }
-      ] 
-    }
-  , function (error, response, body) {
-      if(response.statusCode == 201){
-        log.info('test function called successfully: ' + error +', ' + moreHelp + ', ' + pi + ', ' + answerToLifeAndEverything + ', ' + oOok);
-    return response.statusCode, response.body;
-      } else {
-        log.info('error: '+ response.statusCode)
-        log.info(body);
-    return response.statusCode, response.body;
-      }
-    }
-  )
-  
-}
-
 var validUser = function(req, res, next) { 
-  if(req.user == undefined && req.url != '/courses'){
+  if(req.user === undefined && req.url != '/courses'){
     req.session.redirectTo = req.url;
     res.redirect('/auth');
     return;
   }
   
   next();
-}
+};
 
 var validCoursePermission = function(entity, action){
   return function(req, res, next){
@@ -61,8 +35,8 @@ var validCoursePermission = function(entity, action){
 
     res.write('content is not accessible for your account.');
     res.end();
-  }
-}
+  };
+};
 
 
 module.exports = function(app) {
@@ -85,7 +59,7 @@ module.exports = function(app) {
   });
 
   app.all('/*', function(req, res, next){
-    if(req.loggedIn && ( typeof(req.user.email) == 'undefined' || req.user.email == '') && req.path != '/user/settings') {
+    if(req.loggedIn && ( typeof(req.user.email) == 'undefined' || req.user.email === '') && req.path != '/user/settings') {
       res.redirect('/user/settings');
       return;
     }
@@ -168,36 +142,6 @@ module.exports = function(app) {
   app.get('/admin/:userId/:roleId', admin.assignRole);
 
 
-
-
-  // TODO: Organize
-  app.post('/submitCode', function(req, res, next){
-    log.info('in app.js::submitCode');
-    var source = req.param('sourcecode', '');
-    log.info('source=',source);
-    var compile_res, compile_err = submitCode(source);
-    log.info('re-rendering ide');
-    res.render('ide', {
-      title: 'submitCode',
-      course: req.params.id,
-      unit_id: req.params.unit,
-      lesson_id: req.params.lesson,
-      code: source, 
-      compile_results: compile_res,
-      compile_errors: compile_err,
-      loggedInUser: req.user
-    });
-
-  });
-
-  // Handles 404 errors. This should be the last route.
-  /*app.get('/*', function(req, res, next) {
-    log.info('404');
-    next(new Error('Not Found: ' + req.url));
-    //throw new load.middleware('errorHandler').NotFound('Page not found');
-  });
-*/
-
   // Middleware
 
   // Convert a parameter to integer
@@ -209,4 +153,4 @@ module.exports = function(app) {
       next();
     }
   });
-}
+};
