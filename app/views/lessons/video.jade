@@ -11,7 +11,9 @@ include _header
       .lessonBar
         a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
         a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
- 
+      .time
+        p Time: 
+        span#current-time
     .span2
       include _sidebar
   .row-fluid
@@ -20,6 +22,7 @@ include _header
     .span10
       include _footer
 script
+  var currentVideoTime = 0, LastUpdatedTime = 0;
   $('video').mediaelementplayer({
     enablePluginDebug: false,
     defaultVideoWidth: 930,
@@ -28,9 +31,22 @@ script
     alwaysShowControls: true,
     pluginPath: '/javascripts/mediaelement/',
     success: function(mediaElement, domObject) {
-      mediaElement.addEventListener('timeupdate', function(e) {
-        //document.getElementById('current-time').innerHTML = mediaElement.currentTime;
+
+      mediaElement.addEventListener('playing', function(e) {
+        var videoResumeTime = '#{videoStartTime}';
+        if(typeof(videoResumeTime) != 'number') {
+          videoResumeTime = parseInt(videoResumeTime);
+        }
+        console.log("Vidoe starting Time : " + videoResumeTime);
+        mediaElement.setCurrentTime(videoResumeTime);
       }, false);
+
+
+      mediaElement.addEventListener('timeupdate', function(e) {
+        currentVideoTime = mediaElement.currentTime;
+        document.getElementById('current-time').innerHTML = mediaElement.currentTime;
+      }, false);
+
       mediaElement.addEventListener('ended', function(e) {
         $.ajax({
           url: '/lesson/#{lesson.id}/complete/',
@@ -47,3 +63,19 @@ script
       console.log(err);
     }
   });
+
+  var updateProgress = setInterval(function() {
+    if((currentVideoTime - LastUpdatedTime) >= 5) {
+      LastUpdatedTime = currentVideoTime ;
+      console.log('Update Time :', currentVideoTime);
+      $.ajax({
+        url: '/lesson/#{lesson.id}/updateProgress',
+        data: { seconds: LastUpdatedTime },
+        success: function(data) {
+          $('.lessonBar .btn-success').addClass('btn-large');
+        },
+        error: function(error, status, xhr) {
+        }
+      });
+    }
+  }, 5000);

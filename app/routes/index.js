@@ -154,6 +154,7 @@ module.exports = function(app) {
   app.get('/lesson/:lessonId/next', lesson.next);
   app.get('/lesson/:lessonId/previous', lesson.previous);
   app.get('/lesson/:lessonId/complete', lesson.complete);
+  app.get('/lesson/:lessonId/updateProgress', lesson.updateProgress);
 
   // CDN
   app.get('/cdn/:fileName', cdn.load);
