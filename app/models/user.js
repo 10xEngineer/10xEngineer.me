@@ -111,6 +111,21 @@ UserSchema.statics.findOrCreate = function(source, userData, promise) {
   });
 };
 
+
+UserSchema.methods.updateUserRoles = function(roles, callback){
+  log.info("ROLES :: ",roles);
+  log.info("BEFORE :: ", this);
+  this.roles = roles;
+  log.info("AFTER :: ", this);
+  this.save(function(error){
+    if(error){
+      log.error(error);
+    }
+  })
+  callback();
+}
+
+
 mongoose.model('User', UserSchema);
 
 var User = mongoose.model('User');
@@ -158,56 +173,3 @@ var findBySource = function(source, userData, callback) {
   });
 };
 
-
-// TODO: Migrate later
-
-module.exports.findOrCreateRegisteredCourse = function(user, course_id) {		
-	//initialize the registered course.
-	if(!user.registered_courses)
-		user.registered_courses = {};
-	
-	//if the course hasn't been taken before, put it into the registered course under user.
-	if(!user.registered_courses[course_id]){
-		var setValue = {};
-		setValue["registered_courses."+course_id] = {};
-    	this.update({id:user.id},{"$set":setValue});
-	} 
-	
-	return user.registered_courses[course_id];		
-}
-
-module.exports.findOrCreateLesson = function(user, course_id, chapter_id, lesson_id){
-	var course = this.findOrCreateRegisteredCourse(user, course_id);
-	var query = {};
-	query["registered_courses."+course_id+".chapters."+chapter_id+".lessons."+lesson_id] = {"$exists": true};
-	
-	var lesson_status;
-	//check if the lesson has been taken
-	try{
-		lesson_status = user.registered_courses[course_id].chapters[chapter_id].lessons[lesson_id];
-	}catch(e){
-		
-	}
-	
-	if (!lesson_status)
-	{
-		var setValue = {};
-		setValue["registered_courses."+course_id+".chapters."+chapter_id+".lessons."+lesson_id] = 
-		{
-			status:"In Progress"
-		};
-		console.log(setValue);
-		this.update({id:user.id}, {"$set": setValue});
-		return {status:"In Progress"};
-	}
-	return lesson_status;
-}
-
-module.exports.updateLessonProgress = function(user_id, course_id, chapter_id, lesson_id, status){
-	var setValue = {};
-	setValue["registered_courses."+course_id+".chapters."+chapter_id+".lessons"+lesson_id] = 
-	{
-		status: status
-	}
-	this.update({id:user_id}, {"$set":setValue});
-}

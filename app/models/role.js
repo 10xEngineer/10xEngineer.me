@@ -14,4 +14,33 @@ var RoleSchema = new Schema({
   collection: 'roles'
 });
 
+
+RoleSchema.statics.generateRole = function(request, callback) {
+	var Role = this;
+	var entities = ['admin', 'user', 'course'];
+	var allowes = ['read', 'edit', 'insert', 'delete', 'publish'];
+
+	var curRole = new Role();
+	curRole.name = request.body.name;
+	prmitArr = [];
+
+	for (enttIndx = 0; enttIndx < entities.length; entities++){
+		entity = entities[enttIndx];
+		for(alwIndx = 0; alwIndx < allowes.length; alwIndx++){
+			allow = allowes[alwIndx];
+			param = entity + "_" + allow;
+			chkbox = request.body[param];
+			if(typeof(chkbox)!='undefined')
+				log.info(entity,"_all_",allow);
+		}
+	}
+	/*
+	curRole.save(function(error){
+		if(error){
+			callback(error);
+		}
+	});*/
+	callback(null, curRole);
+}
+
 mongoose.model('Role', RoleSchema);
