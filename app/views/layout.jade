@@ -21,9 +21,8 @@ html(lang="en")
 		script(src="/javascripts/yepnope-1.5.4.min.js")
 		script(src='http://www.filepicker.io/static/js/filepicker.js')
 		body
-			.container
-				section#navbar
-					include _header
+			section#navbar
+				include _header
 			.container
 				-if(typeof(error) != 'undefined') 
 					div.alert.alert-block
@@ -34,13 +33,25 @@ html(lang="en")
 					div.alert.alert-info
 						a.close(data-dismiss='alert',href='#') x
 						h4.alert-heading Information 
-						#{message}
-				section#content!= body
-				section#sidebar
-				footer
-					p 
-					strong &copy;2012 10xEngineer.me. 
-					| All rights reserved.
+						#{message}			
+
+			section#content!= body
+			section#footer.row-fluid(style="background-color: black; color: white; padding: 10px;")
+				.container
+					.span6
+						p Copyright &copy; 2012 - 10xEngineer.me
+					.span6(style="text-align: right")
+						img(src="/img/mail.png", width="32", height="32")
+						img(src="/img/linkedin.png", width="32", height="32")
+						img(src="/img/g+.png", width="32", height="32")
+						img(src="/img/fb.png", width="32", height="32")
+						img(src="/img/github.png", width="32", height="32")
+						img(src="/img/twitter.png", width="32", height="32")
+
+//				footer
+//					p 
+//					strong &copy;2012 10xEngineer.me. 
+//					| All rights reserved.
 
 			#pageslide(style='display:none')
 //- note: subject to move to individe page
