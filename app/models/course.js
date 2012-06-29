@@ -61,6 +61,31 @@ CourseSchema.methods.removeCourse = function(callback) {
   });
 };
 
+CourseSchema.methods.publish = function(publish, callback) {
+  var course = this;
+  if(publish) {
+        var chaptersLength = course.chapters.length;
+        for(var chapterIndex = 0 ; chapterIndex < chaptersLength ; chapterIndex++) {
+          var chapter = course.chapters[chapterIndex];
+          chapter.publish(true, function(error){
+            if(error){
+              log.error(error);
+            }
+          });
+        }
+      course.status = 'published';
+  } else {
+    course.status = 'draft';
+  }
+  course.markModified('chapters');
+  course.save(function(error) {
+    if(error) {
+      log.error(error);
+    }
+    callback();
+  });
+};
+
 mongoose.model('Course', CourseSchema);
 
 
@@ -131,17 +156,4 @@ var saveCourse = function (course, callback) {
     });
 
   });
-
-  /*  // old save replaced by new sequence of save
-  cdn.save(course.image, fileName, function(error, newUrl) {
-    course.image = newUrl;
-    course.save(function(error) {
-      if(error) {
-        callback(error);
-      }
-
-      callback(null);
-    });
-  });
-  */
 };

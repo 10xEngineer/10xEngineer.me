@@ -95,6 +95,8 @@ module.exports = function(app) {
   app.get('/course/:courseId/edit', validCoursePermission('course', 'edit'), course.updateView);
   app.post('/course/:courseId/edit', validCoursePermission('course', 'edit'), validation.lookUp(validationConfig.course.editCourse), course.update);
   app.get('/course/:courseId/remove', validCoursePermission('course', 'delete'), course.remove);
+  app.get('/course/:courseId/publish', course.publish);
+  app.get('/course/:courseId/unpublish', course.unpublish);
 
 
   // Chapter
@@ -116,13 +118,15 @@ module.exports = function(app) {
   app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', lesson.showView);
   app.post('/lesson/:lessonId', lesson.show);
+  app.get('/lesson/:lessonId/edit',lesson.editView);
+  app.post('/lesson/:lessonId/edit',lesson.edit);
   app.get('/lesson/:lessonId/remove', lesson.remove);
-  app.get('/lesson/:lessonId/up',lesson.up);
-  app.get('/lesson/:lessonId/down',lesson.down);
+  app.get('/lesson/:lessonId/up', lesson.up);
+  app.get('/lesson/:lessonId/down', lesson.down);
   app.get('/lesson/:lessonId/publish', lesson.publish);
   app.get('/lesson/:lessonId/unpublish', lesson.unpublish);
-  app.get('/lesson/:lessonId/next',lesson.next);
-  app.get('/lesson/:lessonId/previous',lesson.previous);
+  app.get('/lesson/:lessonId/next', lesson.next);
+  app.get('/lesson/:lessonId/previous', lesson.previous);
   app.get('/lesson/:lessonId/complete', lesson.complete);
 
   // CDN
@@ -130,14 +134,20 @@ module.exports = function(app) {
 
   // User
   app.get('/user/profile', user.profile);
-  app.get('/user/settings',user.settingsView);
-  app.post('/user/settings',validation.lookUp(validationConfig.user.profileUpdate),user.settings);
+  app.get('/user/settings', user.settingsView);
+  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate), user.settings);
 
   //app.get('/user/:userId', user.load);
 
 
   // Admin
   app.get('/admin', admin.show);
+  app.get('/admin/labs/create', admin.labsView);
+  app.post('/admin/labs/create', admin.labs);
+  app.get('/admin/labs/show', admin.showLabsView);
+  app.get('/admin/labs/:labDefId/edit', admin.labEditView)
+  app.post('/admin/labs/:labDefId/edit', admin.labEdit)
+  app.get('/admin/labs/:labDefId/remove', admin.labRemove)
   // TODO: Temporary admin path to make a user admin
   app.get('/admin/:userId/:roleId', admin.assignRole);
 

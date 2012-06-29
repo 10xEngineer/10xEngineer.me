@@ -28,7 +28,7 @@ include _header
                 a.btn.btn-success.pull-right(href='/lesson/#{lesson.id}/publish', style='margin-right: 5px;') Publish
               - else
                 a.btn.btn-success.pull-right(href='/lesson/#{lesson.id}/unpublish', style='margin-right: 5px;') Unpublish
-              button.btn.pull-right(type='button', style='margin-right: 5px;') Edit
+              a.btn.pull-right(href='/lesson/#{lesson.id}/edit', style='margin-right: 5px;') Edit
             .progress(style='margin: 10px 0;')
               .bar(style="width: 0%;")
             div.moveBox

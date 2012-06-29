@@ -1,0 +1,23 @@
+h1 Add Labs
+br
+form(method='POST', action='', id='profileForm') 
+  p
+    h5 Name :
+    input.required(value='#{lab.name}', id='name', name='name')   
+  p 
+    h5 Type :
+    input.required(value='#{lab.type}', id='type', name='type')
+  p 
+    h5 CPU :
+    input.required(value='#{lab.cpu}', id='cpu', name='cpu')
+  p 
+    h5 Memory :
+    input.required(value='#{lab.memory}', id='memory', name='memory')
+  p 
+    h5 Storage :
+    input.required(value='#{lab.storage}', id='storage', name='storage')
+  p 
+    h5 Run List :
+    input.required(value='#{lab.runList}', id='runList', name='runList')
+  br
+  input(type='submit' ,name='submit',value='Add')

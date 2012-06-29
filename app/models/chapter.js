@@ -65,11 +65,21 @@ ChapterSchema.post('save', function() {
 ChapterSchema.methods.publish = function(publish, callback) {
   var chapter = this;
   if(publish) {
-    chapter.status = 'published';
+    publishChapter(chapter,function(chapter,error){
+      if(error) {
+        log.error(error);
+      }
+      callback();
+    });
   } else {
     chapter.status = 'draft';
-  }
-  chapter.save(callback);
+    chapter.save(function(error) {
+      if(error) {
+        log.error(error);
+      }
+      callback();
+    });
+  } 
 };
 
 ChapterSchema.methods.removeChapter= function(callback) {
@@ -96,7 +106,6 @@ ChapterSchema.methods.removeChapter= function(callback) {
     if(error) {
       callback(error);
     }
-
     callback();
   });
 };
@@ -137,4 +146,33 @@ ChapterSchema.methods.move = function(index,callback){
 
 mongoose.model('Chapter', ChapterSchema);
 
+var Chapter = load.model('Chapter');
 
+var publishChapter = function(chapter, callback) {
+
+  Chapter.findById(chapter._id)
+  .populate('lessons')
+  .run(function(error, chapter) {
+    if(error) {
+      callback(error, chapter);
+    }
+    var lessonsLength = chapter.lessons.length;
+    for(var lessonIndex = 0 ; lessonIndex < lessonsLength ; lessonIndex++) {
+      chapter.lessons[lessonIndex].status = "published";
+      chapter.lessons[lessonIndex].save(function(error){
+        if(error) {
+          log.error(error);
+        }
+      });
+    }
+    chapter.status = 'published';
+    chapter.markModified('lessons');
+
+    chapter.save(function(error) {
+      if(error) {
+        log.error(error);
+      }
+      callback(error, chapter);
+    });
+  });
+};

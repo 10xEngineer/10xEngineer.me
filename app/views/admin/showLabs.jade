@@ -1,0 +1,19 @@
+h1 Labs
+br
+table.table.table-bordered
+  thead
+    tr
+      th Name
+      th Type
+      th RunList
+      th Action
+  tbody
+    -var index = 0;
+    each lab in labs
+      tr
+        td #{lab.name}
+        td #{lab.type}
+        td #{lab.runList}
+        td 
+          a.btn.btn-success(href="/admin/labs/#{lab.id}/edit") Edit 
+          a.btn.btn-danger(href="/admin/labs/#{lab.id}/remove") Delete

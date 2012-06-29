@@ -14,6 +14,10 @@ include _header
             a.btn.btn-success(href="/chapter/create/#{course.id}") Add Chapter
             a.btn(href='/course/#{course.id}/edit/') Edit Course Info
             a.btn.btn-danger(href='/course/#{course.id}/remove/') Delete Course
+            - if(course.status != 'published')
+              a.btn.btn-success(href='/course/#{course.id}/publish', style='margin-right: 5px;') Publish
+            - else
+              a.btn.btn-success(href='/course/#{course.id}/unpublish', style='margin-right: 5px;') Unpublish
 
   .row-fluid
     ul.chapters
