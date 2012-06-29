@@ -143,9 +143,9 @@ module.exports = function(app) {
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
 
+  app.get('/admin/labs', admin.showLabsView);
   app.get('/admin/labs/create', admin.labsView);
   app.post('/admin/labs/create', admin.labs);
-  app.get('/admin/labs/show', admin.showLabsView);
   app.get('/admin/labs/:labDefId/edit', admin.labEditView)
   app.post('/admin/labs/:labDefId/edit', admin.labEdit)
   app.get('/admin/labs/:labDefId/remove', admin.labRemove)
@@ -156,9 +156,9 @@ module.exports = function(app) {
   app.get('/admin/role/:roleId/edit', admin.editRoleView);
   app.post('/admin/role/:roleId/edit', admin.editRole);
   app.get('/admin/role/:roleId/remove', admin.removeRole);
-  app.get('/admin/:userId/roles', admin.showUserRoles);
-  app.post('/admin/:userId/roles', admin.updateUserRoles);
-  app.get('/admin/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
+  app.get('/admin/user/:userId/roles', admin.showUserRoles);
+  app.post('/admin/user/:userId/roles', admin.updateUserRoles);
+  app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
 
   // Middleware
 

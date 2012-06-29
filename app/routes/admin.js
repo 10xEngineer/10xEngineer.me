@@ -60,7 +60,7 @@ module.exports.labEdit = function(req, res) {
     if(error) {
       log.error(error);
     }
-    res.redirect('/admin/labs/show');
+    res.redirect('/admin/labs');
   });
 };
 
@@ -83,7 +83,7 @@ module.exports.labs = function(req, res) {
     if(error) {
       log.error(error);
     }
-    res.redirect('/admin/labs/show');
+    res.redirect('/admin/labs');
   });
   
 };
@@ -120,10 +120,10 @@ module.exports.labRemove = function(req, res) {
     if(error) {
       log.error(error);
       req.session.error = "Can not delete labDef.";
-      res.redirect('/admin/labs/show');
+      res.redirect('/admin/labs');
     }
     req.session.message = "Lab deleted sucessfully.";
-    res.redirect('/admin/labs/show');
+    res.redirect('/admin/labs');
   });
 };
 
