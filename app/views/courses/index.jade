@@ -1,4 +1,12 @@
-  //- Course Admin index?
+script(type="text/javascript")
+  $(window).load(function() {
+    $('.flexslider').flexslider({
+      animation: "slide",
+      directionNav: true,
+      controlsContainer: ".flexslider-container"
+    });
+  });
+//- Course Admin index?
 - course = {id: 1};
 .container
   -if(everyauth.loggedIn && isAdmin)
@@ -14,42 +22,18 @@
     li
       a(href="/user/profile") My Library
 
-  .row-fluid  
-    div#gallery
-      div.item.show(href="#")
-        div.align-center
-          a(href='#')
-            img(src="/img/img/example/android01.jpg")
-        div
-          h2 Course 1: Advanced Robotics and bioenginnering
-          p It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
-            | The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, 
-            | content here', making it look like readable English.  Many desktop publishing packages and web page editors now use Lorem Ipsum as 
-            | their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved 
-            | over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-          a.btn.btn-primary.pull-right(href="/course/#{course.id}") Details
-      div.item(href="#")
-        div.align-center
-          img(src="/img/img/example/android02.jpg")
-        div
-          h2 Course 2: Advanced Robotics and bioenginnering
-          p It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
-            | The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, 
-            | content here', making it look like readable English.  Many desktop publishing packages and web page editors now use Lorem Ipsum as 
-            | their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved 
-            | over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-          a.btn.btn-primary.pull-right(href="/course/#{course.id}") Details
-      div.item(href="#")
-        div.align-center
-          img(src="/img/img/example/android03.jpg")
-        div
-          h2 Course 3: Advanced Robotics and bioenginnering
-          p It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
-            | The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, 
-            | content here', making it look like readable English.  Many desktop publishing packages and web page editors now use Lorem Ipsum as 
-            | their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved 
-            | over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-          a.btn.btn-primary.pull-right(href="/course/#{course.id}") Details
   .row-fluid
-
+    div.flexslider
+      ul.slides
+        each courseObject,courseIndex in courses
+          li
+            center
+              img.courseImage(src="#{courseObject.image}")
+            div.detailsLink
+              h1.courseTitle #{courseObject.title}
+              p #{courseObject.desc}
+              div.detailsLinkBtn
+                a.btn.btn-primary.pull-right(href="/course/#{courseObject.id}") Details
+  .row-fluid
+    .span12
   .carouselWrapper

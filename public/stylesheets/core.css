@@ -290,3 +290,15 @@ div.chapterPerogressbox {
 .align-center {
 	text-align: center;
 }
+
+
+/***********************/
+/* Course Image Silder */
+/***********************/
+
+.courseTitle {
+margin-bottom: 10px;
+}
+.courseImage {
+margin-bottom: 25px;
+}
