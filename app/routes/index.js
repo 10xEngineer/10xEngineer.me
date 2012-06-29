@@ -140,6 +140,7 @@ module.exports = function(app) {
 
 
   // Lesson
+  app.get('/lesson/serverInfo', lesson.serverInfo);
   app.get('/lesson/create/:chapterId', lesson.createView);
   app.post('/lesson/create/:chapterId', validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', lesson.showView);
