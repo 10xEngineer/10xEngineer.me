@@ -28,7 +28,6 @@ module.exports.rolesView = function(req, res) {
 
 module.exports.showUserRoles = function(req, res){
   Role.find(function (error, roles) {
-    log.info("USER::", req.user);
     res.render('admin/user_roles', {
       roles : roles
     });
@@ -63,10 +62,11 @@ module.exports.createRoleView = function(req, res) {
 };
 
 module.exports.editRoleView = function(req, res) {
-  var roleName = req.route.params['roleName'];
-  log.info("REQ.ROUTE.PARAMS['roleName'] :: ", roleName);
 
-  Role.findOne({ name: roleName }, function(error, role){
+  var roleId = parseInt(req.route.params['roleId']);
+
+  Role.findOne({ id: roleId }, function(error, role){
+    var roleName = role.name;
     if(error){
       log.error(error);
     }
@@ -91,7 +91,6 @@ module.exports.editRoleView = function(req, res) {
         course_publish : false
 
       };
-      log.info(role.permissions);
   
       for (indx = 0; indx < role.permissions.length; indx++){
         var string = role.permissions[indx];
@@ -110,7 +109,6 @@ module.exports.editRoleView = function(req, res) {
         }
       }
 
-      log.info(permits);
       res.render('admin/roleViewForm', {
         role : role,
         permits: permits
@@ -119,20 +117,55 @@ module.exports.editRoleView = function(req, res) {
   })
 };
 
+module.exports.editRole = function(req, res) {
+
+  var modifiedRoleName = req.body.name;
+  var roleId = parseInt(req.route.params['roleId']);
+  getPermissionListForRole(req, function(error, modifiedRolePermits){
+    if(!error){
+      Role.findOne({ id : roleId }, function(error, role){
+        role.modifyRole(modifiedRoleName, modifiedRolePermits, function(error){
+          if(error){
+            log.error(error);
+          }
+          res.redirect('/admin/roles');
+        })
+      })
+    }
+  })
+}
+
 module.exports.createRole = function(req, res) {
 
-  Role.generateRole(req, function(error, role){
+  var newRoleName = req.body.name;
+
+  getPermissionListForRole(req, function(error, newRolePermits){
+    Role.generateRole(newRoleName, newRolePermits, function(error, role){
+      if(error){
+        log.error(error);
+      }
+      else{
+        res.redirect('/admin/roles');
+      }
+    });
+  })
+}
+
+module.exports.removeRole = function(req, res) {
+  var roleId = parseInt(req.route.params['roleId']);
+  Role.findOne({ id : roleId}, function(error, role){
     if(error){
       log.error(error);
     }
-    else{
-      Role.find(function (error, roles) {
-        res.render('admin/roles', {
-          roles: roles
-        });    
+    else {
+      role.removeRole(function(error){
+        if(error){
+          log.error(error);
+        }
+        res.redirect('/admin/roles');
       });
     }
-  });
+  })
 }
 
 module.exports.assignRole = function(req, res) {
@@ -151,6 +184,35 @@ module.exports.assignRole = function(req, res) {
     });
   });
 };
+
+var getPermissionListForRole = function(req, callback) {
+  var newRolePermits = [];
+
+  var entities = ['admin', 'user', 'course'];
+  var allowes = ['read', 'edit', 'insert', 'delete', 'publish'];
+
+  for (eIndx = 0; eIndx < entities.length; eIndx++){
+    var entity = entities[eIndx];
+    var entity_all = false;
+    var count = 0;
+    var entity_per_arr=[];
+    for(pIndx = 0; pIndx < allowes.length; pIndx++){
+      var allow = allowes[pIndx];
+      permitString = entity + "_" + allow;
+      if(typeof(req.body[permitString]) != 'undefined') { // Checked
+        entity_per_arr.push(entity+"_all_"+allow);
+        count++;
+      }
+    }
+    if(count == allowes.length){   // found all checked for this entity
+      newRolePermits.push(entity+"_all_all");
+    }
+    else {  // join prepared array
+      newRolePermits = newRolePermits.concat(entity_per_arr);
+    }
+  }
+  callback(null, newRolePermits);
+}
 
 /*
 module.exports = function(app){

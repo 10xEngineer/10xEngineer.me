@@ -8,6 +8,7 @@ var config = load.helper('config');
 // Make _id a Numver once old schemas are migrated from version 1 to 2
 var RoleSchema = new Schema({
   _id: { type: ObjectId },
+  id: { type: Number, unique: true, index: true },
   name: { type: String, index: true, unique: true, default: 'default' },
   permissions: [{ type: String }]
 }, {
@@ -15,32 +16,51 @@ var RoleSchema = new Schema({
 });
 
 
-RoleSchema.statics.generateRole = function(request, callback) {
+/*************************************************************
+**  ::: Method to create new Role :::                       **
+*************************************************************/
+RoleSchema.statics.generateRole = function(newName, newPermissions, callback) {
 	var Role = this;
-	var entities = ['admin', 'user', 'course'];
-	var allowes = ['read', 'edit', 'insert', 'delete', 'publish'];
-
 	var curRole = new Role();
-	curRole.name = request.body.name;
-	prmitArr = [];
+	curRole.name = newName;
+	Count.getNext('roles', function(error, newId){
 
-	for (enttIndx = 0; enttIndx < entities.length; entities++){
-		entity = entities[enttIndx];
-		for(alwIndx = 0; alwIndx < allowes.length; alwIndx++){
-			allow = allowes[alwIndx];
-			param = entity + "_" + allow;
-			chkbox = request.body[param];
-			if(typeof(chkbox)!='undefined')
-				log.info(entity,"_all_",allow);
-		}
-	}
-	/*
-	curRole.save(function(error){
+		curRole.id = newId;
+		curRole.permissions = newPermissions;
+
+		curRole.save(function(error){
+			if(error){
+				callback(error);
+			}
+		});
+
+		callback(null, curRole);
+	})
+}
+
+/*************************************************************
+**  ::: Method to Remove existing Role :::                  **
+*************************************************************/
+RoleSchema.methods.removeRole = function(callback) {
+	var role = this;
+	role.remove(function(error){
 		if(error){
-			callback(error);
+			callback(error)
 		}
-	});*/
-	callback(null, curRole);
+		callback();
+	})
+}
+
+/*************************************************************
+**  ::: Method to Modify existing Role :::                  **
+*************************************************************/
+RoleSchema.methods.modifyRole = function(newName, newPermissions, callback) {
+	var role = this;
+	role.name = newName;
+	role.permissions = newPermissions;
+	role.save(function(error){
+		callback(error);
+	})
 }
 
 mongoose.model('Role', RoleSchema);

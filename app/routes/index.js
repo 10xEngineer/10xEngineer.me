@@ -168,8 +168,9 @@ module.exports = function(app) {
   app.get('/admin/roles', admin.rolesView);
   app.get('/admin/role/create', admin.createRoleView);
   app.post('/admin/role/create', admin.createRole);
-  app.get('/admin/role/:roleName/edit', admin.editRoleView);
-  app.post('/admin/role/:roleName/edit', admin.editRole);
+  app.get('/admin/role/:roleId/edit', admin.editRoleView);
+  app.post('/admin/role/:roleId/edit', admin.editRole);
+  app.get('/admin/role/:roleId/remove', admin.removeRole);
   app.get('/admin/:userId/roles', admin.showUserRoles);
   app.post('/admin/:userId/roles', admin.updateUserRoles);
   app.get('/admin/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);

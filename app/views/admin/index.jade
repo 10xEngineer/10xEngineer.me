@@ -1,14 +1,13 @@
 h1= title
-.head
-  ul
-    li
-      a(href="/admin/roles") Roles
-      .counts.pull-right
-        label [Count - #{users.length}]
+.admin_view_header
+  a.btn(href="/admin/roles") Roles
+  .counts.pull-right
+    label [Total - #{users.length}]
 .actions 
-  ul
+  ul.admin_view_list_items
     each user in users
       li 
-        a(href='/admin/#{user.id}/roles', id='#{user.id}') #{user.name}
+        label(for='#{user.id}', style='display:inline') #{user.name}
         .roles.pull-right
-            label #{user.roles.join(', ')}
+          p(style="display:inline; padding-right: 5px;") #{user.roles.join(', ')}
+          a.btn(href='/admin/#{user.id}/roles', id='#{user.id}', style="display:inline") Edit
