@@ -1,0 +1,25 @@
+h1 Assign Roles of #{extUser.name}
+
+p
+	form(method="post")
+		p
+			label(for="roles") Roles
+
+			select#selRole(style="width=320px; display:none", name="chngRoles", multiple)
+				each role in roles
+					-if(extUser.roles.join(', ').indexOf(role.name) >= 0)
+						option(value="#{role.name}", selected) #{role.name}
+					-else
+						option(value="#{role.name}") #{role.name}
+
+			div#permission.select2-container.select2-container-multi(style="width:210px;")
+				div.select2-drop(style="display:none")
+					ul.select2-results(style="width:220px")
+
+		p
+			a#cancel.btn.btn-small(href="/admin") Cancel
+			&nbsp;
+			input.btn.btn-small(type="submit", value="Apply Changes")
+
+script
+	$("#selRole").select2();
