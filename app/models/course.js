@@ -99,7 +99,8 @@ var saveCourse = function (course, callback) {
       log.error("Error comes from util - saveToDisk Function", error);
       callback(error);
     }
-    util.imageCrop(imagePath, course.cropImgInfo, function(error, croppedImagePath) {
+    var cropImageInfo = typeof(course.cropImgInfo) == 'undefined' ? '{ "x": 0, "y": 0, "x2": 200, "y2": 200, "h": 200, "w": 200}' : course.cropImgInfo;
+    util.imageCrop(imagePath, cropImageInfo, function(error, croppedImagePath) {
       if(error) {
         log.error("Error from Image crop opration", error);
         callback(error);

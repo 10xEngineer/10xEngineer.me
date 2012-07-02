@@ -1,0 +1,46 @@
+.container-fluid.course-index.inner-index
+  h1 #{lesson.title}
+  .row-fluid
+    .span10
+      form(method='POST', id='lessonForm', enctype='multipart/form-data')
+        each question, questionIndex in lesson.quiz.questions
+          div.questionBox
+            h4.question Q #{questionIndex+1}:  #{question.question}
+            -if (question.answers.length == 1)
+              - type = 'radio';
+            -if (question.answers.length > 1)
+              - type = 'checkbox'; 
+
+            each option, optionIndex in question.options
+              - var attempted = typeof(attemptedAnswers) != 'undefined' ? attemptedAnswers[questionIndex] : undefined;
+              - if(typeof(attempted) != 'undefined' && attempted[option] === 'true')
+                  div.questionAnswer.correct
+                    input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" ) 
+                    #{option}
+              - else if(typeof(attempted) != 'undefined' && attempted[option] === 'correct')
+                  div.questionAnswer.correct
+                    input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" , checked) 
+                    #{option}
+              - else if(typeof(attempted) != 'undefined' && attempted[option] === 'wrong')
+                  div.questionAnswer.wrong
+                    input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" , checked) 
+                    #{option} 
+              - else
+                  div.questionAnswer
+                    input(type='#{type}',value="#{option}",name="question[#{questionIndex}]") 
+                    #{option}
+
+        - if (typeof(attemptedAnswers) == 'undefined') 
+          p
+            input.btn.btn-primary(type='submit', value='Submit') 
+        
+      .lessonBar
+        a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+        a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
+    .span2
+      include _sidebar
+  .row-fluid
+    p
+  .row-fluid
+    .span10
+      include _footer

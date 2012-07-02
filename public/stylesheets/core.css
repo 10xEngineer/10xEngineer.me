@@ -211,13 +211,13 @@ ul.lessons li a, ul.lessons li a h3 {
 
 
 .moveBox {
-display:none;
+display:block;
 float: left;
-width:30px;
-height:25px;
+width: 15px;
+height: 25px;
 position: relative;
 left: -30px;
-top: -60px;
+top: -10px;
 }
 
 ul.chapters li .moveBox a , ul.lessons li .moveBox a {
@@ -306,3 +306,28 @@ ul.admin_view_list_items li label{
 	width: 615px;
 }
 
+/*************************************************
+**  Styles for Course editing views             **
+*************************************************/
+ul.course_list li {
+	margin: 5px 0;
+	background: white;
+	padding: 20px;
+	border: solid 1px #EEE;
+	border-radius: 10px 10px;
+	list-style: none;
+	margin-left: 0;
+	margin-bottom: 18px;
+	width: 80%;
+}
+
+ul.course_list li label {
+	display: inline;
+}
+
+div.course_editor_header {
+	margin: 5px 0;
+	margin-left: 30px;
+	margin-bottom: 18px;
+	width: 80%;
+}

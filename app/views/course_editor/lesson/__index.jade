@@ -1,0 +1,41 @@
+//- Lesson index (Lesson list)
+.container-fluid.course-index.inner-index
+  .row-fluid
+    .course-header
+      - if(typeof(course.image) != 'undefined')
+        .course-img
+          img(src='#{course.image}')
+      .course-content
+        h2 #{course.title}
+        p #{course.desc}
+        -if(everyauth.loggedIn && isAdmin)
+          .btn-strip
+            a.btn.btn-success(href="/course_editor/chapter/create/#{course.id}") Add Chapter
+            a.btn(href='/course_editor/course/#{course.id}/edit') Edit Course Info
+            a.btn.btn-danger(href='/course_editor/course/#{course.id}/remove') Delete Course
+       
+  .row-fluid
+    ul.chapters
+      - if(typeof(course.chapters) != 'undefined')
+        each chapter in course.chapters
+          - if(chapter.status == 'published' || isAdmin)
+            li.chapter
+              a(href='/course_editor/chapter/#{chapter.id}/')
+                h3	#{chapter.title}
+              - if(user != undefined && isAdmin)
+                - if(chapter.status != 'published')
+                  | (Draft)
+                a.btn.btn-danger.pull-right(href='/course_editor/chapter/#{chapter.id}/remove', style='margin-right: 5px;') Delete
+                - if(chapter.status != 'published')
+                  a.btn.btn-success.pull-right(href='/course_editor/chapter/#{chapter.id}/publish', style='margin-right: 5px;') Publish
+                - else
+                  a.btn.btn-success.pull-right(href='/course_editor/chapter/#{chapter.id}/unpublish', style='margin-right: 5px;') Unpublish
+                a.btn.pull-right(href='/course_editor/chapter/#{chapter.id}/edit', style='margin-right: 5px;') Edit
+              div.moveBox
+                a.upArrow(href="/course_editor/chapter/#{chapter.id}/up")
+                  i.icon-chevron-up
+                a.downArrow(href="/course_editor/chapter/#{chapter.id}/down")
+                  i.icon-chevron-down
+
+  div
+    a.btn(href='/course_editor') Back

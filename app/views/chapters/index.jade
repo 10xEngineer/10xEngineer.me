@@ -8,31 +8,31 @@ include _header
         p #{chapter.desc}
         -if(everyauth.loggedIn && isAdmin)
           .btn-strip
-            a.btn.btn-success(href="/lesson/create/#{chapter.id}") Add Lesson
-            a.btn(href='/chapter/#{chapter.id}/edit') Edit Chapter Info
-            a.btn.btn-danger(href='/chapter/#{chapter.id}/remove') Delete Chapter
+            //a.btn.btn-success(href="/course_editor/lesson/create/#{chapter.id}") Add Lesson
+            //a.btn(href='/course_editor/chapter/#{chapter.id}/edit') Edit Chapter Info
+            //a.btn.btn-danger(href='/course_editor/chapter/#{chapter.id}/remove') Delete Chapter
 
   .row-fluid
     ul.lessons
       - if(typeof(chapter.lessons) != 'undefined')
         each lesson in chapter.lessons
           li.lesson
-            a(href='/lesson/#{lesson.id}/')
+            a(href='/course_editor/lesson/#{lesson.id}/')
               h3 
                 #{lesson.title}
             - if(everyauth.loggedIn && isAdmin)
               - if(lesson.status != 'published')
                 | (Draft)
-              a.btn.btn-danger.pull-right(href='/lesson/#{lesson.id}/remove', style='margin-right: 5px;') Delete
+              //a.btn.btn-danger.pull-right(href='/course_editor/lesson/#{lesson.id}/remove', style='margin-right: 5px;') Delete
               - if(lesson.status != 'published')
-                a.btn.btn-success.pull-right(href='/lesson/#{lesson.id}/publish', style='margin-right: 5px;') Publish
+                //a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/publish', style='margin-right: 5px;') Publish
               - else
-                a.btn.btn-success.pull-right(href='/lesson/#{lesson.id}/unpublish', style='margin-right: 5px;') Unpublish
-              a.btn.pull-right(href='/lesson/#{lesson.id}/edit', style='margin-right: 5px;') Edit
+                //a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/unpublish', style='margin-right: 5px;') Unpublish
+              //a.btn.pull-right(href='/course_editor/lesson/#{lesson.id}/edit', style='margin-right: 5px;') Edit
             .progress(style='margin: 10px 0;')
               .bar(style="width: 0%;")
             div.moveBox
-                a.upArrow(href="/lesson/#{lesson.id}/up")
+                //a.upArrow(href="/course_editor/lesson/#{lesson.id}/up")
                   i.icon-chevron-up
-                a.downArrow(href="/lesson/#{lesson.id}/down")
+                //a.downArrow(href="/course_editor/lesson/#{lesson.id}/down")
                   i.icon-chevron-down
