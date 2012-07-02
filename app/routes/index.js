@@ -79,8 +79,6 @@ module.exports = function(app) {
   app.get('/about', main.about);
   app.get('/auth', main.auth);
   // Note: All the actual authentication routes are handled by auth middleware (everyauth). Refer Auth helper for more.
-
-
   
 
   // Course
@@ -116,7 +114,7 @@ module.exports = function(app) {
   // Lesson
   // TODO: Refactor
   app.get('/lesson/serverInfo', lesson.serverInfo);
-  
+
   app.get('/lesson/create/:chapterId', verifyPermission('lesson', 'edit'), lesson.createView);
   app.post('/lesson/create/:chapterId', verifyPermission('lesson', 'edit'), validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', verifyPermission('lesson', 'read'), lesson.showView);
