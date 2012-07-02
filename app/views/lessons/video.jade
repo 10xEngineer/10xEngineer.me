@@ -21,6 +21,8 @@ include _header
   .row-fluid
     .span10
       include _footer
+script(type='text/javascript', src='/socket.io/socket.io.js')
+script(type='text/javascript', src='/javascripts/monitor.js')
 script
   var currentVideoTime = 0, LastUpdatedTime = 0;
   $('video').mediaelementplayer({
@@ -32,6 +34,7 @@ script
     pluginPath: '/javascripts/mediaelement/',
     success: function(mediaElement, domObject) {
 
+      // At Video Start
       mediaElement.addEventListener('playing', function(e) {
         var videoResumeTime = '#{videoStartTime}';
         if(typeof(videoResumeTime) != 'number') {
@@ -41,13 +44,18 @@ script
         mediaElement.setCurrentTime(videoResumeTime);
       }, false);
 
-
+      // Find Current Time and Update it in Progress
       mediaElement.addEventListener('timeupdate', function(e) {
         currentVideoTime = mediaElement.currentTime;
         document.getElementById('current-time').innerHTML = mediaElement.currentTime;
       }, false);
 
+      // Change the Status at end of Video
       mediaElement.addEventListener('ended', function(e) {
+        
+        // Send Complete Status of Video to Server Using Socket.
+        progress.emit('change', { data: 'Completed' });
+        
         $.ajax({
           url: '/lesson/#{lesson.id}/complete/',
           success: function(data) {
@@ -68,6 +76,9 @@ script
     if((currentVideoTime - LastUpdatedTime) >= 5) {
       LastUpdatedTime = currentVideoTime ;
       console.log('Update Time :', currentVideoTime);
+      
+      // For Sending Current Updated Time to Server Using Socket.
+      progress.emit('change', { data: currentVideoTime });
       $.ajax({
         url: '/lesson/#{lesson.id}/updateProgress',
         data: { seconds: LastUpdatedTime },

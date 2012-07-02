@@ -1,3 +1,4 @@
+var express = require('express');
 var parseCookie = require('connect').utils.parseCookie;
 var Session = require('connect').middleware.session.Session;
 var RedisStore = require('connect-redis')(express);
@@ -8,7 +9,7 @@ module.exports = function(app) {
   var sessionStore = new RedisStore();
 
   io.configure(function () {
-    io.set('transports', ['websocket', 'flashsocket', 'xhr-polling']);
+    io.set('transports', ['websocket', 'flashsocket']);
     io.set('authorization', function(data, callback) {
       // check if there's a cookie header
       if (data.headers.cookie) {
@@ -43,8 +44,8 @@ module.exports = function(app) {
   });
 
   io.configure('development', function () {
-    io.set('transports', ['websocket', 'xhr-polling']);
-    io.enable('log');
+    io.set('transports', ['websocket']);
+    //io.enable('log');
   });
 
   // Initialize socket events

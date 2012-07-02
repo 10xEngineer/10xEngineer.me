@@ -13,13 +13,13 @@ module.exports = function(io) {
   io.of('/progress')
     .on('connection', function (socket) {
 
-    socket.on('change', function(data){
-      log.info(data);
+      socket.on('change', function(data){
       
+      log.info('Using Socket ::',data);
     });
 
 
-  };
+  });
 
 
 

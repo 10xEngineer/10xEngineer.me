@@ -1,5 +1,5 @@
-var progress = io.connect('http://localhost/progress');
-var code = io.connect('http://localhost/code');
+var progress = io.connect('/progress');
+var code = io.connect('/code');
 
 progress.on('connect', function() {
   
