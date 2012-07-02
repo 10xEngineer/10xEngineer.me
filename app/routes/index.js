@@ -114,6 +114,9 @@ module.exports = function(app) {
 
 
   // Lesson
+  // TODO: Refactor
+  app.get('/lesson/serverInfo', lesson.serverInfo);
+  
   app.get('/lesson/create/:chapterId', verifyPermission('lesson', 'edit'), lesson.createView);
   app.post('/lesson/create/:chapterId', verifyPermission('lesson', 'edit'), validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
   app.get('/lesson/:lessonId', verifyPermission('lesson', 'read'), lesson.showView);
@@ -128,6 +131,8 @@ module.exports = function(app) {
   app.get('/lesson/:lessonId/next', verifyPermission('lesson', 'read'),lesson.next);
   app.get('/lesson/:lessonId/previous', verifyPermission('lesson', 'read'), lesson.previous);
   app.get('/lesson/:lessonId/complete', verifyPermission('lesson', 'read'), lesson.complete);
+  app.get('/lesson/:lessonId/updateProgress', lesson.updateProgress);
+
 
   // CDN
   app.get('/cdn/:fileName', cdn.load);

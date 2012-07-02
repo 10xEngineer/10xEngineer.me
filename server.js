@@ -94,6 +94,7 @@ var init = exports.init = function(config) {
 
     // 404 Handler
     app.use(function(req, res, next) {
+      log.error('404: Not Found: ' + req.url);
       next(new Error('404'));
     });
   });

@@ -15,7 +15,7 @@ var LessonSchema = new Schema({
   id: { type: Number, unique: true, index: true },
   title: { type: String, index: true, trim: true, required: true },
   desc: { type: String, trim: true },
-  type: { type: String, enum: ['video', 'quiz', 'programming', 'config-lab'], required: true },
+  type: { type: String, enum: ['video', 'quiz', 'programming', 'sysAdmin'], required: true },
   video: {
     content: { type: String, trim: true },
     type: { type: String, enum: ['youtube', 'upload'] }
@@ -28,6 +28,10 @@ var LessonSchema = new Schema({
     skeletonCode: { type: String, trim: true },
     input: { type: String, trim: true },
     output: { type: String, trim: true }
+  },
+  sysAdmin:{
+    serverInfo: [],
+    verificationFile: { type: String, trim: true }
   },
   status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   chapter: { type: ObjectId, ref: 'Chapter', required: true },

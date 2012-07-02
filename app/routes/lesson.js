@@ -75,6 +75,37 @@ module.exports.create = function(req, res, next) {
     }
   }
 
+  // For sysAdmin Lesson
+  if(lesson.type == 'sysAdmin') {
+    
+    var serverInfoArray = [];
+    log.info(regExp);
+    var serverName = req.body.serverName;
+    if(typeof(serverName) == 'string') {
+      var optNameArray = serverName.split(' ');
+      var selectedServerNo = parseInt(optNameArray[3],10);
+      for(var count = 0 ; count < selectedServerNo; count++) {
+        serverInfoArray.push((optNameArray[0]));
+      }
+
+    } else if(typeof(serverName) == 'object') {
+
+      var length = serverName.length;
+      for (var index = 0; index < length; index++) {
+        var optNameArray = serverName[index].split(' ');
+        var selectedServerNo = parseInt(optNameArray[3],10);
+        for(var count = 0 ; count < selectedServerNo; count++) {
+          serverInfoArray.push((optNameArray[0]));
+        }
+      }
+
+    }
+
+    lesson.sysAdmin.serverInfo = serverInfoArray;
+
+
+  }
+
   var f = req.files['videofile'];
 
   lesson.save(function(error) {
@@ -150,16 +181,21 @@ module.exports.showView = function(req, res) {
     var lessonQuiz = {};
     lessonQuiz.chapter = req.chapter.id;
     lessonQuiz.lesson  = req.lesson.id;
-    progress.startLesson(lessonQuiz, function(error, next){
+    progress.startLesson(lessonQuiz, function(lessonProgress, error, next){
       if(error) {
         log.error(error);
         next(error);
       }
+      if(typeof(lessonProgress.videoProgress) != 'undefined') {
+        var videoStartTime = lessonProgress.videoProgress;
+      } else {
+        var videoStartTime = 0;
+      }
       // Render based on the type
       res.render('lessons/' + req.lesson.type, {
         title: req.lesson.title,
-        quiz: req.lesson.quiz
-
+        quiz: req.lesson.quiz,
+        videoStartTime: videoStartTime
       });
     });
   });
@@ -347,7 +383,7 @@ module.exports.edit = function(req, res){
 };
 
 
-// Lesson Comletes
+// Lesson Completes
 module.exports.complete = function(req, res) {
   res.contentType('text/plain');
   Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
@@ -369,6 +405,57 @@ module.exports.complete = function(req, res) {
   });
 
 };
+
+// Lesson Update Progress
+module.exports.updateProgress = function(req, res) {
+  res.contentType('text/plain');
+  var seconds = req.query.seconds;
+  Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
+    if(error) {
+      log.error(error);
+      res.end("false");
+    }
+    var lessonVideo = {};
+    lessonVideo.chapter = req.chapter.id;
+    lessonVideo.lesson  = req.lesson.id;
+    progress.updateProgress(lessonVideo, seconds, function(error){
+      if(error) {
+        log.error(error);
+        res.end("false");
+      }
+      res.end("true");
+    });
+  
+  });
+
+};
+
+// Lesson ServerInfo
+module.exports.serverInfo = function(req, res) {
+  res.contentType('text/plain');
+  var id = req.query.id;
+
+  LabDef.findById(id, function (error, lab) {
+    if(error) {
+      log.error(error);
+      res.end("false");
+    }
+    res.json({
+      serverInfo : {
+        cpu: lab.cpu,
+        id: lab.id,
+        memory: lab.memory,
+        name: lab.name,
+        storage: lab.storage,
+        type: lab.type,
+        runList: lab.runList
+      }
+    });
+
+  });
+
+};
+
 
 // Remove entire lesson
 module.exports.remove = function(req, res, next){
