@@ -1,5 +1,7 @@
 var everyauth = require('everyauth');
 var User = load.model('User');
+var progress = load.helper('progress');
+
 
 // TODO: Debug flag. Turn off for production use.
 everyauth.debug = true;
@@ -8,14 +10,21 @@ everyauth.debug = true;
 module.exports = function (config) {
   var redirectAction = function(res, data){
     var session = data.session;
-    var redirectTo = session.redirectTo;
-    delete session.redirectTo;
-    log.info(redirectTo);
-    if(redirectTo && typeof(redirectTo) == 'string') {
-      res.redirect(redirectTo);
-    } else {
-      res.redirect('/');
-    }
+    progress.get(session.auth.userId, function(error,progress){
+      if(error) {
+        log.error(error);
+      }
+      log.info('progress in auth :', progress);
+      session.progress = progress;
+      var redirectTo = session.redirectTo;
+      delete session.redirectTo;
+      log.info(redirectTo);
+      if(redirectTo && typeof(redirectTo) == 'string') {
+        res.redirect(redirectTo);
+      } else {
+        res.redirect('/');
+      }
+    });
   };
   
   // Google

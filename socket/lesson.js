@@ -13,9 +13,36 @@ module.exports = function(io) {
   io.of('/progress')
     .on('connection', function (socket) {
 
+      log.info('Session :', socket.handshake.session);
+
       socket.on('change', function(data){
-      
+
+      courseId = data.courseId;
+      chapterId = data.chapterId;
+      lessonId = data.lessonId;
+
       log.info('Using Socket ::',data);
+
+      log.info('Socket :',socket.handshake.session.progress[courseId]);
+
+      var chapters = socket.handshake.session.progress[courseId].chapters;
+
+      log.info('Chapters :', chapters);
+
+      var length = chapters.length;
+
+      for (var index = 0; index < length; index++) {
+        if(chapters[index].id == chapterId) {
+          var lessons = chapters[index].lessons;
+          log.info('Lessons :', lessons);
+          var lessonsLength = lessons.length;
+          for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
+            if(lessons[lessonindex].id == lessonId) {
+              log.info('Lesson ::', lessons[lessonindex]);
+            }
+          }
+        }
+      };
     });
 
 
@@ -32,13 +59,13 @@ module.exports = function(io) {
       request(
           { method: 'GET'
           , uri: wsdlurl
-        , json: {
+          , json: {
               jsonrpc: "2.0",
-              method: "createSubmission", 
+              method: "createSubmission",
               params: 
               {
-                user: "velniukas", 
-                pass: "limehouse", 
+                user: "velniukas",
+                pass: "limehouse",
                 sourceCode: data.source,
                 language: data.language, //javascript
                 input:true, //this is a parameter bug of the ideone API, it supposes to be a run time input, instead of an indicator to run code
@@ -61,10 +88,10 @@ module.exports = function(io) {
             uri: wsdlurl,
             json:{
               jsonrpc: "2.0",
-              method: "getSubmissionStatus", 
+              method: "getSubmissionStatus",
               params: 
               {
-                user: "velniukas", 
+                user: "velniukas",
                 pass: "limehouse",
                 link: data.linkCode
               }, 
@@ -77,7 +104,7 @@ module.exports = function(io) {
           }
           );
     });
-    
+
     socket.on('getSubmissionDetails', function(data){
       request(
         {
@@ -85,12 +112,12 @@ module.exports = function(io) {
           uri: wsdlurl,
           json:{
             jsonrpc: "2.0",
-            method: "getSubmissionDetails", 
-            params: 
+            method: "getSubmissionDetails",
+            params:
             {
-              user: "10xengineer", 
+              user: "10xengineer",
               pass: "secret",
-              link: data.linkCode, 
+              link: data.linkCode,
               withSource: true,
               withOutput: true,
               withCmpinfo: true,

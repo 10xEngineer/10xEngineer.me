@@ -78,7 +78,11 @@ script
       console.log('Update Time :', currentVideoTime);
       
       // For Sending Current Updated Time to Server Using Socket.
-      progress.emit('change', { data: currentVideoTime });
+      var courseId =  '#{lesson.chapter.course}';
+      var chapterId =  '#{lesson.chapter.id}';
+      var lessonId =  '#{lesson.id}';
+      progress.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+
       $.ajax({
         url: '/lesson/#{lesson.id}/updateProgress',
         data: { seconds: LastUpdatedTime },

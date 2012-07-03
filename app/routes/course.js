@@ -8,6 +8,7 @@ var User = load.model('User');
 var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
 var Progress = load.model('Progress');
+var progressHelper = load.helper('progress');
 
 var importer = load.helper('importer');
 
@@ -129,16 +130,38 @@ module.exports.import = function(req, res, next) {
 // Register for a course (if not already registered, and Go to the last viewed or first lesson. 
 module.exports.start = function(req, res, next){
   // Check if user has already started the course
+
+
   Progress.startOrContinue(req.user, req.course, function(error, progress) {
     if(error) {
       log.error(error);
       next(error);
     }
 
-    // Redirect the user to first unfinished lesson
-    progress.getNextLesson(function(error, nextLesson) {
-      res.redirect('/lesson/' + nextLesson);
-    });
+    log.info('Req :', req.session.progress);
+    log.info('Start Course :', req.course._id);
+    if(! req.session.progress[req.course._id])
+    {
+      delete req.session.progress;
+      progressHelper.get(req.session.auth.userId, function(error,progressObject){
+        if(error) {
+          log.error(error);
+        }
+        req.session.progress = progressObject;
+        
+        // Redirect the user to first unfinished lesson
+        progress.getNextLesson(function(error, nextLesson) {
+          res.redirect('/lesson/' + nextLesson);
+        });
+      });
+
+    } else {
+
+      // Redirect the user to first unfinished lesson
+      progress.getNextLesson(function(error, nextLesson) {
+        res.redirect('/lesson/' + nextLesson);
+      });
+    }
   });
 };
 

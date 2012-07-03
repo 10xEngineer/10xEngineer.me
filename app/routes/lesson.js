@@ -79,7 +79,6 @@ module.exports.create = function(req, res, next) {
   if(lesson.type == 'sysAdmin') {
     
     var serverInfoArray = [];
-    log.info(regExp);
     var serverName = req.body.serverName;
     if(typeof(serverName) == 'string') {
       var optNameArray = serverName.split(' ');
