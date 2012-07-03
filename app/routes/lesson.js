@@ -1,6 +1,7 @@
 var fs = require('fs');
 var cdn = load.helper('cdn');
 var Progress = load.model('Progress');
+var progressHelper = load.helper('progress');
 
 
 module.exports = function() {};
@@ -149,6 +150,9 @@ module.exports.create = function(req, res, next) {
 // Display a lesson
 module.exports.showView = function(req, res) {
 
+  // For Session Progres Update
+  var lesson =  req.lesson;
+  progressHelper.start(lesson, req.session.progress);
 
   //For random the options
 

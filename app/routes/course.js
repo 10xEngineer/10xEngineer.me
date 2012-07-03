@@ -137,10 +137,7 @@ module.exports.start = function(req, res, next){
       log.error(error);
       next(error);
     }
-
-    log.info('Req :', req.session.progress);
-    log.info('Start Course :', req.course._id);
-    if(! req.session.progress[req.course._id])
+    if(!req.session.progress[req.course._id] || !req.session.progress)
     {
       delete req.session.progress;
       progressHelper.get(req.session.auth.userId, function(error,progressObject){
@@ -148,7 +145,6 @@ module.exports.start = function(req, res, next){
           log.error(error);
         }
         req.session.progress = progressObject;
-        
         // Redirect the user to first unfinished lesson
         progress.getNextLesson(function(error, nextLesson) {
           res.redirect('/lesson/' + nextLesson);
@@ -156,7 +152,6 @@ module.exports.start = function(req, res, next){
       });
 
     } else {
-
       // Redirect the user to first unfinished lesson
       progress.getNextLesson(function(error, nextLesson) {
         res.redirect('/lesson/' + nextLesson);

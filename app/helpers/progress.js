@@ -3,6 +3,8 @@ var User = load.model('User');
 
 module.exports = function() {};
 
+
+// Store Progress into Session
 module.exports.get = function(userId, callback) {
 
 	User.findOne({id: userId}, function(error,user){
@@ -22,8 +24,77 @@ module.exports.get = function(userId, callback) {
 				var value = progress[progressIndex];
 				progressJSON[key] = value;
 			};
-			log.info('Progress :', progressJSON);
 			callback(null, progressJSON);
 		});
 	});
+};
+
+// Change the status of sessionProgress to start
+module.exports.start = function(lesson, progress) {
+
+	var courseId = lesson.chapter.course;
+	var chapterId = lesson.chapter.id;
+	var lessonId = lesson.id;
+
+	var chapters = progress[courseId].chapters;
+
+	var length = chapters.length;
+
+	for (var index = 0; index < length; index++) {
+		if(chapters[index].id == chapterId) {
+			var lessons = chapters[index].lessons;
+			var lessonsLength = lessons.length;
+			for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
+				if(lessons[lessonindex].id == lessonId) {
+					lessons[lessonindex].status = 'started';
+				}
+			}
+		}
+	}
+};
+
+// Change the status of sessionProgress to completed
+module.exports.completed = function(data, progress) {
+
+	var courseId = data.courseId;
+	var chapterId = data.chapterId;
+	var lessonId = data.lessonId;
+
+	var chapters = progress[courseId].chapters;
+	var length = chapters.length;
+
+	for (var index = 0; index < length; index++) {
+		if(chapters[index].id == chapterId) {
+			var lessons = chapters[index].lessons;
+			var lessonsLength = lessons.length;
+			for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
+				if(lessons[lessonindex].id == lessonId) {
+					lessons[lessonindex].status = 'completed';
+				}
+			}
+		}
+	}
+};
+
+// Set the videoProgress of sessionProgress
+module.exports.videoProgress = function(data, progress) {
+
+	var courseId = data.courseId;
+	var chapterId = data.chapterId;
+	var lessonId = data.lessonId;
+
+	var chapters = progress[courseId].chapters;
+	var length = chapters.length;
+
+	for (var index = 0; index < length; index++) {
+		if(chapters[index].id == chapterId) {
+			var lessons = chapters[index].lessons;
+			var lessonsLength = lessons.length;
+			for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
+				if(lessons[lessonindex].id == lessonId) {
+					lessons[lessonindex].videoProgress = data.data;
+				}
+			}
+		}
+	}
 };

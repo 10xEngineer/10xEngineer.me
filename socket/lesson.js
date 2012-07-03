@@ -1,4 +1,5 @@
 var request = require('request');
+var progressHelper = load.helper('progress');
 var wsdlurl = 'http://ideone.com/api/1/service.json';
 
 module.exports = function(io) {
@@ -10,46 +11,20 @@ module.exports = function(io) {
   *    status - Emitted upon change of status of an entity (course/chapter/lesson status not-started/ongoing/completed)
   *    persist - Persists current user session in mongodb upon emitted. It is emitted periodically/before session expiry
   */
-  io.of('/progress')
+  io
+    .of('/progress')
     .on('connection', function (socket) {
-
-      log.info('Session :', socket.handshake.session);
-
+      
+      // Video Progress
       socket.on('change', function(data){
-
-      courseId = data.courseId;
-      chapterId = data.chapterId;
-      lessonId = data.lessonId;
-
-      log.info('Using Socket ::',data);
-
-      log.info('Socket :',socket.handshake.session.progress[courseId]);
-
-      var chapters = socket.handshake.session.progress[courseId].chapters;
-
-      log.info('Chapters :', chapters);
-
-      var length = chapters.length;
-
-      for (var index = 0; index < length; index++) {
-        if(chapters[index].id == chapterId) {
-          var lessons = chapters[index].lessons;
-          log.info('Lessons :', lessons);
-          var lessonsLength = lessons.length;
-          for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
-            if(lessons[lessonindex].id == lessonId) {
-              log.info('Lesson ::', lessons[lessonindex]);
-            }
-          }
-        }
-      };
+        progressHelper.videoProgress(data, socket.handshake.session.progress);
+      });
+      
+      // Video Completed
+      socket.on('status', function(data){
+        progressHelper.completed(data, socket.handshake.session.progress);
+      });
     });
-
-
-  });
-
-
-
 
   io
     .of('/code')

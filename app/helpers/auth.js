@@ -14,7 +14,6 @@ module.exports = function (config) {
       if(error) {
         log.error(error);
       }
-      log.info('progress in auth :', progress);
       session.progress = progress;
       var redirectTo = session.redirectTo;
       delete session.redirectTo;
