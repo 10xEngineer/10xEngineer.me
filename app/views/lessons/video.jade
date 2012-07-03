@@ -84,8 +84,10 @@ script
       var courseId =  '#{lesson.chapter.course}';
       var chapterId =  '#{lesson.chapter.id}';
       var lessonId =  '#{lesson.id}';
+      var userId = '#{userId}';
       progress.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-
+      progress.emit('persist', { userId:userId, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+      /*
       $.ajax({
         url: '/lesson/#{lesson.id}/updateProgress',
         data: { seconds: LastUpdatedTime },
@@ -94,6 +96,6 @@ script
         },
         error: function(error, status, xhr) {
         }
-      });
+      });*/
     }
   }, 5000);

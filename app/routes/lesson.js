@@ -198,7 +198,8 @@ module.exports.showView = function(req, res) {
       res.render('lessons/' + req.lesson.type, {
         title: req.lesson.title,
         quiz: req.lesson.quiz,
-        videoStartTime: videoStartTime
+        videoStartTime: videoStartTime,
+        userId: req.user._id
       });
     });
   });
@@ -209,6 +210,10 @@ module.exports.showView = function(req, res) {
 module.exports.show = function(req, res, next){
   
   var lesson = req.lesson;
+  
+  // For Session Progres Update
+  progressHelper.completed(lesson, req.session.progress);
+
   var quizQuestions = req.lesson.quiz.questions;
   var attemptedAnswers = req.body.question;
   var quizQuestionsLength = req.lesson.quiz.questions.length;

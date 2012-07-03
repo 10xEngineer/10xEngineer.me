@@ -24,6 +24,12 @@ module.exports = function(io) {
       socket.on('status', function(data){
         progressHelper.completed(data, socket.handshake.session.progress);
       });
+
+      // Persists current user session in mongodb
+      socket.on('persist', function(data){
+        progressHelper.update(data, socket.handshake.session.progress);
+      });
+
     });
 
   io

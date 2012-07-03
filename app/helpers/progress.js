@@ -98,3 +98,26 @@ module.exports.videoProgress = function(data, progress) {
 		}
 	}
 };
+
+// Persists current progress session in mongodb
+module.exports.update = function(data, progressSession) {
+	log.info('Update.');
+	var courseId = data.courseId;
+	var userId = data.userId;
+	log.info(userId);
+	
+	Progress.findOne({user: userId, course: courseId}, function(error, progress) {
+		if(error) {
+			log.error(error);
+		}
+
+		progress.chapters = progressSession[courseId].chapters;
+		
+		progress.markModified('chapters');
+		progress.save(function(error) {
+			if(error) {
+				log.error(error);
+			}
+		});
+	});
+};
