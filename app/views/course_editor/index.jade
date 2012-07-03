@@ -1,4 +1,8 @@
-h1 Courses - Admin
+h1 Courses - 
+	-if(everyauth.loggedIn && isAdmin)
+		| Admin
+	-else
+		| #{user.name}
 
 p
 	.course_editor_header
@@ -12,11 +16,23 @@ p
 p
 	ul.course_list
 		each course in courses
-			li 
-				a(href='/course_editor/course/#{course.id}') #{course.title}
-				a.btn.btn-danger.pull-right(href="/course_editor/course/#{course.id}/remove") Remove
-				-if(course.status != 'published')
-					a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/publish", style="margin-right: 5px") Publish
-				-else
-					a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/unpublish", style="margin-right: 5px") Unpublish
-				a.btn.pull-right(href="/course_editor/course/#{course.id}/edit", style="margin-right: 5px") Edit
+			-if(everyauth.loggedIn && isAdmin)
+				li 
+					a(href='/course_editor/course/#{course.id}') #{course.title}
+					a.btn.btn-danger.pull-right(href="/course_editor/course/#{course.id}/remove") Remove
+					-if(course.status != 'published')
+						a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/publish", style="margin-right: 5px") Publish
+					-else
+						a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/unpublish", style="margin-right: 5px") Unpublish
+					a.btn.pull-right(href="/course_editor/course/#{course.id}/edit", style="margin-right: 5px") Edit
+					//.object #{course}
+			-else if(course.created_by == user._id)
+				li
+					a(href='/course_editor/course/#{course.id}') #{course.title}
+					a.btn.btn-danger.pull-right(href="/course_editor/course/#{course.id}/remove") Remove
+					-if(course.status != 'published')
+						a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/publish", style="margin-right: 5px") Publish
+					-else
+						a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/unpublish", style="margin-right: 5px") Unpublish
+					a.btn.pull-right(href="/course_editor/course/#{course.id}/edit", style="margin-right: 5px") Edit
+					//.object #{course}

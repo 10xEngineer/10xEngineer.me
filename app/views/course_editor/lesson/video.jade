@@ -1,5 +1,8 @@
 .container-fluid.lesson.inner-index
   h1 #{lesson.title}
+  p 
+    strong Description :-
+    p #{lesson.desc}
   .row-fluid
     .span10
       video#player(width='930', height='525', preload="none")
@@ -7,9 +10,9 @@
           source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
         - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
           source(type='video/mp4', src='#{lesson.video.content}')
-      .lessonBar
-        a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-        a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+      .backPanel
+        a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back
+        //a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
  
   .row-fluid
     p

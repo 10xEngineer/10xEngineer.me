@@ -74,7 +74,7 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
         
       #sysAdmin.tab-pane
         h3 SysAdmin
-        select.serverName(name='serverName', multiple='multiple')
+        select.serverName#serverName(name='serverName', multiple='multiple')
         a.btn(data-toggle="modal", href="#myModal") Add Server
         div.modal.hide#myModal
           div.modal-header
@@ -83,17 +83,22 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
           div.modal-body
             p Select Server :
             select#selectedServer(name='selectedServer')
+              option(value="0") Select
               each labInstance,index in lab
-                option(value="#{labInstance.name} ") #{labInstance.name}
+                option(value="#{labInstance._id} ") #{labInstance.name}
+            div#serverInfo
             a.btn#addServerName(data-dismiss="modal") Add
+              
           div.modal-footer
             a.btn(data-dismiss="modal") Close
+        p Upload Verification File :
+        input.input-large(name='verificationFile', type='file')
 
   - else
     != partial('editLesson');
   br
   p
-    input.btn.btn-primary(type='submit', value='Submit')
+    input.btn.btn-primary#formSubmit(type='submit', value='Submit')
 
   - if(edit && typeof(lesson.programming) != 'undefined')
     script(type='text/javascript')
@@ -106,17 +111,28 @@ script(type='text/javascript')
   $(document).ready(function() {
 
     //----------------------------------------------------- //
+    //  On Form Submit                                      //
+    //----------------------------------------------------- //
+    
+    $('#formSubmit').click(function(){
+      $('#serverName option').each(function() {
+        $(this).attr('selected', 'selected');
+      });
+    });
+
+
+    //----------------------------------------------------- //
     //  Select Upload / Youtube Video                       //
     //----------------------------------------------------- //
 
     $('.tabs a:last').tab('show');
 
     // For Choose Upload or Youtube
-    if($('#videoType').val()=="Upload"){
+    if($('#videoType').val()=="Upload") {
         $('#youtube').hide();
         $('#upload').show();
         $('#type').val('upload');
-      }
+    }
     $('#videoType').change(function(){
       if($('#videoType').val()=="Upload"){
         $('#youtube').hide();
@@ -134,7 +150,7 @@ script(type='text/javascript')
     //  For Preview of Youtube Video on Video Tabe          //
     //----------------------------------------------------- //
 
-    $('#showYoutubePreview').click(function(){
+    $('#showYoutubePreview').click(function() {
       $('#videoPreview').html('');
       var url = getYoutubeID($('#videoLink').val());
       
@@ -147,8 +163,7 @@ script(type='text/javascript')
       }).appendTo('#videoPreview'); 
     });
 
-    function getYoutubeID(url)
-    {
+    function getYoutubeID(url) {
       // For Youtube  Video Verification
       if(/http:\\/\\/youtu.be\\/(\\w+)/.test(url)) {
         var youtubeParse = /http:\\/\\/youtu.be\\/(\\w+)/.exec(url);
@@ -163,8 +178,7 @@ script(type='text/javascript')
         url = "http://www.youtube.com/embed/"+youtubeParse[1];
         $('#videoContent').val(youtubeParse[1]);
         return url;
-      }
-      
+      } 
     }
 
     //----------------------------------------------------- //
@@ -192,12 +206,24 @@ script(type='text/javascript')
       
       } else if(index == 'quiz') {
 
+        $('#code').val('');
+        $('#input').val('');
+        $('#output').val('');
         $('#video').val('');
         $('#videoLink').val(''); 
         $('#lessonType').val('quiz');
         addQuiz();
-      }
 
+      } else if(index == 'sysAdmin') {
+
+        $('#code').val('');
+        $('#input').val('');
+        $('#output').val('');
+        $('#video').val('');
+        $('#videoLink').val(''); 
+        $('#lessonType').val('sysAdmin');
+
+      }
     });
 
     //-------------------------------------------------------//
@@ -208,9 +234,7 @@ script(type='text/javascript')
     var optDiv='<div class="addedOption"><input type="checkBox" class="questionOptionCheckbox"><input type="text" class="questionOption"></div>';
 
     var addQuiz = function() {
-
-    $(queDiv).appendTo('#questionBox'); 
-
+      $(queDiv).appendTo('#questionBox'); 
     };
 
     $(".question").live("keyup",function() {
@@ -261,6 +285,7 @@ script(type='text/javascript')
         assignNamesForQuiz($('#questionBox'));
       }
     });
+
     $(".questionOption").live("keyup",function() {    
       var par_que_div=$(this).parents("div").eq(1);
       if(par_que_div.find(".questionOption:last").val()!="") {
@@ -268,6 +293,7 @@ script(type='text/javascript')
         assignNamesForQuiz($('#questionBox'));
       }
     });
+
     $(".questionOption").live("blur",function() {
         if($(this).val()=="") {                         
           if($(this).parents(".options").find(".questionOption:last").attr('name') != $(this).attr('name')) {
@@ -279,6 +305,7 @@ script(type='text/javascript')
           assignNamesForQuiz($('#questionBox'));
         }
     });
+
     $(".question").live("blur",function() {
       if($(this).val()=="") {
         $(this).parent(".addedQuestion").remove();
@@ -288,13 +315,14 @@ script(type='text/javascript')
         assignNamesForQuiz($('#questionBox'));
       }
     });
+
     var assignNamesForQuiz = function($container) {
       $container.find('.addedQuestion').each(function(i, questionContainer) {
         $(questionContainer).find('.question').attr('name', 'question[' + i + ']');
         assignNamesForOptions($(questionContainer), i);
       });             
     };
-    
+
     var assignNamesForOptions = function($container, questionId) {
       $container.find('.questionOption').each(function(j, el) {
         $(el).attr('name', 'questionOption['+questionId+']['+j+']');
@@ -320,36 +348,82 @@ script(type='text/javascript')
       }
     });
 
+    //--------------------------------------------------------------- //
+    //  SysAdmin : Show Selected Server Info in POP up Sceen          //
+    //--------------------------------------------------------------- //  
+
+    $('#selectedServer').change(function(){
+      
+      if($('#selectedServer :selected').val() == '0') {
+        $('#serverInfo').html('');
+        return;
+      }
+
+      var $serverId = $('#selectedServer :selected').val().split(' ');
+      $.ajax({
+        url: '/lesson/serverInfo/',
+        data: { id: $serverId[0] },
+        success: function(data) {
+          var serverInfo = data.serverInfo;
+          $('#serverInfo').html('<table class="table table-bordered"><tr><td><h5> Name :</h5></td><td>'+serverInfo.name+'</td></tr><tr><td><h5> Type :</h5></td><td>'+serverInfo.type+'</td></tr><tr><td><h5> CPU :</h5></td><td>'+serverInfo.cpu+'</td></tr><tr><td><h5> Memory :</h5></td><td>'+serverInfo.memory+'</td></tr><tr><td><h5> Storage :</h5></td><td>'+serverInfo.storage+'</td></tr><tr><td><h5> Run List :</h5></td><td>'+serverInfo.runList+'</td></tr></table>');
+        },
+        error: function(error, status, xhr) {
+          console.log(JSON.stringify(error) + "Status: " + status);
+        }
+      });
+      
+      
+    });
+
     //----------------------------------------------------- //
     //  SysAdmin : Add server name into List                //
     //----------------------------------------------------- //  
 
     $('#addServerName').click(function(){
-      checkServerName($('#selectedServer :selected').text());
+      
+      if($('#selectedServer :selected').val() == '0') {
+        alert('Please select server.');
+        return false;
+      }
+
+      // Call function for to add into Multiple Select
+      checkServerName($('#selectedServer :selected').text(), $('#selectedServer :selected').val());
     });  
 
-    var checkServerName = function(selectedServerValue) {
+    var checkServerName = function(selectedServerText, selectedServerValue) {
       
       var serverNameJSON = {};
       var count=0, temp = 0;
       var regExp = new RegExp('^([a-zA-z0-9\\\\s]+\\\\()( \\\\d+ )(\\\\))$');
       $("select.serverName option").each(function () {
+
         var tempOptValue= '';
         var tempOptValue= $(this).val().split('(');
         var selectedServerVal = selectedServerValue + " ";
+
         if(tempOptValue[0] == selectedServerVal && (regExp.test($(this).html()))) {
+          
+          // For set Text of Multiple Select
           var optNameArray = regExp.exec($(this).html());
           optNameArray[2] = parseInt(optNameArray[2],10) + 1 ;
           optNameArray.splice(0,1);
           optNameArray = optNameArray.join(' ');
+          
+          // For set Value of Multiple Select
+          var optValArray = regExp.exec($(this).val());
+          optValArray[2] = parseInt(optValArray[2],10) + 1 ;
+          optValArray.splice(0,1);
+          optValArray = optValArray.join(' ');
+
           $(this).text(optNameArray);
-          $(this).val(optNameArray);
+          $(this).val(optValArray);
           temp = 1;
         }
       });
 
+      // If not available in Multiple Select than append on it.
       if(temp == 0) {
-        $(".serverName").append("<option value='"+selectedServerValue+" ( 1 )'>"+selectedServerValue+" ( 1 )</option>");
+        $(".serverName").append("<option value='"+selectedServerValue+" ( 1 )'>"+selectedServerText+" ( 1 )</option>");
       }
       
     };

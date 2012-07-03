@@ -24,7 +24,8 @@ var cdn = load.helper('cdn');
 module.exports.coursesList = function(req, res){
 	Course.find({},function(error, courses){
 	  res.render('course_editor', {
-	  	courses : courses
+	  	courses : courses,
+      user: req.user
 	  });
 	})
 };
@@ -55,7 +56,7 @@ module.exports.create = function(req, res, next){
   course.save(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not create course.";
+      req.session.error = "Can not create course.";
       next(error);
     }
 
@@ -63,7 +64,7 @@ module.exports.create = function(req, res, next){
 
     //Set the course info in the session to let socket.io know about it.
     req.session.newCourse = {title: course.title, _id: course._id};
-    message = "Course created successfully.";
+    req.session.message = "Course created successfully.";
     res.redirect('/course_editor/course/' + id);
   });
 
@@ -93,10 +94,7 @@ module.exports.importView = function(req, res){
 ************************************/
 module.exports.import = function(req, res, next) {
 
-  log.info('Uploading file', req.body, "FILES:", req.files); // form is there but not accessible
   var f = req.files['course-file'];
-  log.info('Uploaded %s to %s', f.filename, f.path);
-  log.info('copying file from temp upload dir to course dir');
 
   // Read the uploaded file and parse it into a course structure
   var parsedCourse;
@@ -104,11 +102,14 @@ module.exports.import = function(req, res, next) {
     parsedCourse = JSON.parse(fs.readFileSync(f.path, 'utf-8'));
   } catch (e) {
     log.error(e);
-    error = "Can not import course.";
+    req.session.error = "Can not import course.";
     //res.redirect('/course/import', {error: e});
   }
 
   // Create a new course based on the parsed file
+
+  parsedCourse['created_by'] = req.user._id;
+  log.info(parsedCourse);
   importer.course(parsedCourse, function(error, course) {
 
     // Add chapters
@@ -132,7 +133,7 @@ module.exports.import = function(req, res, next) {
     }
 
     // Success
-    message = "Import Sucessfully Course.";
+    req.session.message = "Import Sucessfully Course.";
     res.redirect('/course_editor');
   });
 };
@@ -174,9 +175,9 @@ module.exports.remove = function(req, res, next){
   course.removeCourse(function(error){
     if (error) {
       log.error(error);
-      error = "Can not remove course.";
+      req.session.error = "Can not remove course.";
     }
-    message = "Sucessfully course removed.";
+    req.session.message = "Sucessfully course removed.";
     res.redirect('/course_editor');
   });
 };
@@ -379,6 +380,9 @@ module.exports.lessonCreate = function(req, res, next) {
   lesson.desc    = req.body.description;
   lesson.type    = req.body.type;
   
+  log.debug(req.body);
+  log.debug(lesson);
+
   // For Video Lesson
   if(lesson.type == 'video') {
     lesson.video.type    = req.body.videoType;
@@ -419,12 +423,40 @@ module.exports.lessonCreate = function(req, res, next) {
     }
   }
 
+  // For sysAdmin Lesson
+  if(lesson.type == 'sysAdmin') {
+    
+    var serverInfoArray = [];
+    var serverName = req.body.serverName;
+    if(typeof(serverName) == 'string') {
+      var optNameArray = serverName.split(' ');
+      var selectedServerNo = parseInt(optNameArray[3],10);
+      for(var count = 0 ; count < selectedServerNo; count++) {
+        serverInfoArray.push((optNameArray[0]));
+      }
+
+    } else if(typeof(serverName) == 'object') {
+
+      var length = serverName.length;
+      for (var index = 0; index < length; index++) {
+        var optNameArray = serverName[index].split(' ');
+        var selectedServerNo = parseInt(optNameArray[3],10);
+        for(var count = 0 ; count < selectedServerNo; count++) {
+          serverInfoArray.push((optNameArray[0]));
+        }
+      }
+
+    }
+
+    lesson.sysAdmin.serverInfo = serverInfoArray;
+  }
+
   var f = req.files['videofile'];
 
   lesson.save(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not create lesson.";
+      req.session.error = "Can not create lesson.";
     }
     var id = lesson.id;
     if(lesson.type == 'video' && lesson.video.type == 'upload')
@@ -447,18 +479,19 @@ module.exports.lessonCreate = function(req, res, next) {
             }
 
             req.session.newLesson = {title: lesson.title, _id: lesson._id};
-            message = "Lesson created successfully.";
-            res.redirect('/course_editor/chapter/' + req.chapter.id);
+            req.session.message = "Lesson created successfully.";
+            res.redirect('/course_editor/lesson/' + id);
           });
         });
       });
     } else {
       req.session.newLesson = {title: lesson.title, _id: lesson._id};
-      message = "Lesson created successfully.";
-      res.redirect('/course_editor/chapter/' + req.chapter.id);
+      req.session.message = "Lesson created successfully.";
+      res.redirect('/course_editor/lesson/' + id);
     }
   });
 };
+
 
 // Lesson Edit
 module.exports.lessonEditView = function(req, res) {
@@ -548,7 +581,7 @@ module.exports.lessonEdit = function(req, res){
   lesson.save(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not create lesson.";
+      req.session.error = "Can not create lesson.";
     }
     var id = lesson.id;
     if(lesson.type == 'video' && lesson.video.type == 'upload' && req.files.videofile.name !== '') {
@@ -567,13 +600,13 @@ module.exports.lessonEdit = function(req, res){
               next(error);
             }
 
-            message = "Lesson edited successfully.";
+            req.session.message = "Lesson edited successfully.";
             res.redirect('/course_editor/chapter/' + req.chapter.id);
           });
         });
       });
     } else {
-      message = "Lesson edited successfully.";
+      req.session.message = "Lesson edited successfully.";
       res.redirect('/course_editor/chapter/' + req.chapter.id);
     }
   });
@@ -588,10 +621,10 @@ module.exports.lessonRemove = function(req, res, next){
   lesson.removeLesson(function(error){
     if (error) {
       log.error(error);
-      error = "Can not remove lesson.";
+      req.session.error = "Can not remove lesson.";
       res.redirect('/course_editor/chapter/:id');
     }
-    message = "Sucessfully lesson removed.";
+    req.session.message = "Sucessfully lesson removed.";
     res.redirect('/course_editor/chapter/'+ chapterId);
   });
 };
@@ -634,7 +667,7 @@ module.exports.lessonUp = function(req, res, next){
       log.error(error);
       error = "Can not moved lesson.";
     }
-    message = "Lesson moved sucessfully.";
+    req.session.message = "Lesson moved sucessfully.";
     res.redirect('/course_editor/chapter/' + lesson.chapter.id);
   });
 };
@@ -647,9 +680,9 @@ module.exports.lessonDown = function(req, res, next){
   lesson.move(1, function(error) {
     if(error) {
       log.error(error);
-      error = "Can not moved lesson.";
+      req.session.error = "Can not moved lesson.";
     }
-    message = "Lesson moved sucessfully.";
+    req.session.message = "Lesson moved sucessfully.";
     res.redirect('/course_editor/chapter/' + lesson.chapter.id);
   });
 };
@@ -658,5 +691,20 @@ module.exports.lessonDown = function(req, res, next){
 
 module.exports.lessonView = function(req, res) {
   //For random the options
-   res.render('course_editor/lesson/lessonView');
+  log.debug('Lesson ', req.lesson);
+  var lesson = req.lesson;
+  if(lesson.type=='sysAdmin'){
+    LabDef.find({_id: { $in : lesson.sysAdmin.serverInfo}}, function(error, labdeflist){
+      log.info(labdeflist);
+      res.render('course_editor/lesson/' + req.lesson.type, {
+        lesson: lesson,
+        labs : labdeflist
+      });
+    })
+  }
+  else {
+    res.render('course_editor/lesson/' + req.lesson.type, {
+      lesson : lesson
+    });
+  }
 };

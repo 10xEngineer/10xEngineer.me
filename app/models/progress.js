@@ -37,7 +37,8 @@ var LessonProgressSchema = new Schema({
   status: { type: String, enum: ['not-started', 'started', 'completed'], default: 'not-started'},
   quiz: {
     answers :{ type: {} }
-  }
+  },
+  videoProgress : { type: String}
 });
 
 
@@ -255,9 +256,9 @@ CourseProgressSchema.methods.startLesson = function(lessonJSON, callback) {
   progress.markModified('chapters');
   progress.save(function(error) {
     if(error) {
-      callback(error);
+      callback(lesson, error);
     }
-    callback();
+    callback(lesson);
   });
 }
 
@@ -278,6 +279,31 @@ CourseProgressSchema.methods.completeLesson = function(lessonJSON, callback) {
             lesson.quiz.answers = lessonJSON.quiz;
           }
           lesson.status = 'completed';
+          break;
+        }
+      }
+    }
+  }
+  progress.markModified('chapters');
+  progress.save(function(error) {
+    if(error) {
+      callback(error);
+    }
+    callback();
+  });
+}
+
+CourseProgressSchema.methods.updateProgress = function(lessonJSON, seconds, callback) {
+  var progress = this;
+  chapterId = lessonJSON.chapter;
+  lessonId  = lessonJSON.lesson;
+  for (var chapterIndex in progress.chapters) {
+    var chapter = progress.chapters[chapterIndex];
+    if(chapter.id == chapterId){
+      for(var lessonIndex in chapter.lessons) {
+        var lesson = chapter.lessons[lessonIndex];
+        if(lesson.id == lessonId) {
+          lesson.videoProgress = seconds;
           break;
         }
       }
