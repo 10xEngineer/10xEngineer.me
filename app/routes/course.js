@@ -144,18 +144,13 @@ module.exports.start = function(req, res, next){
 
 // Load specific course and display chapter index
 module.exports.show = function(req, res, next){
-
-  Progress.findOne({ user: req.user._id, course: req.course._id }, function(error, progress) {
-    if(error) {
-      callback(error);
-    }
+    var progress = req.session.progress[req.course._id];
     res.render('courses/courseDetails', {
       title: req.course.title,
       chapter: undefined,
       index :0,
       progressObject : progress
     });
-  });
 };
 
 // Edit course

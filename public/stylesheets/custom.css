@@ -1,3 +1,4 @@
+a, a:active, a:hover, a:focus, a:selected, a:visited{outline:none;border:none;}
 .navbar-inner .container .pull-right a {font-size: 13px;};
 #footer .container .span6 {width:230px;}
 #footer .container .span6 img{padding-right:5px;}
@@ -21,7 +22,7 @@ color:#ffffff;font-weight:bold;font-size:17px;margin-bottom:5px;}
 .detailsBorder {margin-bottom:20px;border: 1px solid #000000;}
 
 .courseDetailsWrapper {padding-top:10px;}
-.detailsBorder h2, .courseDetailsWrapper p{padding:10px;}
+.detailsBorder h2, .courseDetailsWrapper p{padding:5px;}
 
 .reviewHeader{border-bottom: 1px solid #000000;margin-bottom: 5px;font-weight:bold;font-size:20px;}
 
@@ -37,7 +38,7 @@ color:#ffffff;font-weight:bold;font-size:17px;margin-bottom:5px;}
 
 #detailsAccordion .accordion-group .accordion-body .accordion-inner ul{padding:0;margin:0;}
 #detailsAccordion .accordion-group .accordion-body .accordion-inner li{padding-top:5px;}
-#detailsAccordion .accordion-group .accordion-body .accordion-inner a {padding-left: 30px}
+#detailsAccordion .accordion-group .accordion-body .accordion-inner a {margin-left: 25px;}
 
 .videoIcon, .quizIcon, .programmingIcon, .sysAdminIcon {background-repeat: no-repeat;background-position: left top;height:25px;width:25px;}
 .videoIcon{background-image: url(../img/video.png);}
@@ -56,5 +57,13 @@ li.googl, li.tw{padding-bottom: 10px;}
 .loginWrapper .loginBox{text-align:center;padding:50px 0;min-width:370px}
 
 .loginArea{background-color: #D3D3D3;padding:50px 20px}
-.loginArea h1{padding-bottom:10px;
-ul.auth-service{padding:0;}
+.loginArea h1{padding-bottom:10px;}
+
+.progress{margin:0px 15px 10px 15px;}
+.progressTotal{margin: 0 20px 10px;}
+.progressBar{margin:10px;}
+.detailImage img{padding-top:25px;}
+.statusNotStarted, .statusonGoing, .statusCompleted{background-repeat: no-repeat;background-position: left top;height:16px;width:16px;left: 33px;position: relative;top: 3px;}
+.statusNotStarted{background-image: url(../img/not-started.png);}
+.statusonGoing{background-image: url(../img/ongoing.png);}
+.statusCompleted{background-image: url(../img/finished.png);}

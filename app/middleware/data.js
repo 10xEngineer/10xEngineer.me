@@ -30,7 +30,6 @@ module.exports = function(app) {
             callback(null, populatedChapter);
           });
         }, function(error, chapters) {
-          log.info(chapters);
 
           course.id = parseInt(course.id.toString());
           course.chapters = chapters;
