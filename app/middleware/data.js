@@ -30,14 +30,15 @@ module.exports = function(app) {
             callback(null, populatedChapter);
           });
         }, function(error, chapters) {
-          log.info(chapters);
 
-          course.id = parseInt(course.id.toString());
-          course.chapters = chapters;
+          course.id = parseInt(course.id.toString(), 10);
 
+          req.chapters = chapters;
           req.course = course;
+
           req.app.helpers({
-            course: course
+            course: course,
+            chapters: chapters
           });
           next();
         });
@@ -58,7 +59,7 @@ module.exports = function(app) {
       }
 
       if(chapter) {
-        chapter.id = parseInt(chapter.id.toString());
+        chapter.id = parseInt(chapter.id.toString(), 10);
         req.chapter = chapter;
         req.course = chapter.course;
         req.app.helpers({
@@ -87,7 +88,7 @@ module.exports = function(app) {
           Chapter.findById(lesson.chapter._id)
           .populate('lessons')
           .run(function(error, chapter) {
-            lesson.id = parseInt(lesson.id.toString());
+            lesson.id = parseInt(lesson.id.toString(), 10);
             req.lesson = lesson;
             req.chapter = chapter;
             req.course = course;
