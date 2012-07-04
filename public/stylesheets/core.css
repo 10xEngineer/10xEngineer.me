@@ -399,7 +399,7 @@ ul.auth-service{padding:0;}
 /*****************************/
 
 /* Custom.css overrides */
-.videoIcon, .quizIcon, .programmingIcon, .sysAdminIcon, .not-started, .ongoing, .completed {
+.videoIcon, .quizIcon, .programmingIcon, .sysAdminIcon, .not-started, .ongoing, .completed, {
   display: inline-block;
 }
 #detailsAccordion .accordion-group .accordion-body .accordion-inner a {
@@ -415,7 +415,19 @@ a, a:active, a:hover, a:focus, a:selected, a:visited{outline:none;border:none;}
 .progressTotal{margin: 0 20px 10px;}
 .progressBar{margin:10px;}
 .detailImage img{padding-top:25px;}
-.not-started, .ongoing, .completed{background-repeat: no-repeat;background-position: left top;height:25px;width:25px;vertical-align: middle;}
-.not-started{background-image: url(../img/not-started.png);}
-.ongoing{background-image: url(../img/ongoing.png);}
-.completed{background-image: url(../img/finished.png);}
+.not-started, .ongoing, .completed{background-repeat: no-repeat;background-position: left top;height:25px;width:25px;margin: -25px 0px 0px 25px;}
+.not-started{background-position: center;background-image: url(../img/not-started.png);height:25px;}
+.ongoing{background-position: center;background-image: url(../img/ongoing.png);height:25px;}
+.completed{background-position: center;background-image: url(../img/finished.png);height:25px;}
+
+.lessonTitle {height:25px;margin: -20px 0px 0px 25px;}
+
+
+
+
+
+
+
+
+
+
