@@ -149,7 +149,7 @@ module.exports.show = function(req, res, next){
     if(error) {
       callback(error);
     }
-    res.render('courses/chapters', {
+    res.render('courses/courseDetails', {
       title: req.course.title,
       chapter: undefined,
       index :0,
