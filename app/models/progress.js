@@ -15,7 +15,7 @@ var CourseProgressSchema = new Schema({
   _id: { type: ObjectId },
   user: { type: ObjectId, ref: 'User' },
   course: { type: ObjectId, ref: 'Course' },
-  status: { type: String, enum: ['started', 'completed'], default: 'started'},
+  status: { type: String, enum: ['ongoing', 'completed'], default: 'ongoing'},
   progress: Number,
   chapters: [ ChapterProgressSchema ]
 }, {
@@ -26,7 +26,7 @@ var ChapterProgressSchema = new Schema({
   _id: { type: Number },
   id: Number,
   seq: Number,
-  status: { type: String, enum: ['not-started', 'started', 'completed'], default: 'not-started', required: true },
+  status: { type: String, enum: ['not-started', 'ongoing', 'completed'], default: 'not-started', required: true },
   progress: Number,
   lessons: [ LessonProgressSchema ]
 });
@@ -34,7 +34,7 @@ var ChapterProgressSchema = new Schema({
 var LessonProgressSchema = new Schema({
   _id: Number,
   id: Number,
-  status: { type: String, enum: ['not-started', 'started', 'completed'], default: 'not-started'},
+  status: { type: String, enum: ['not-started', 'ongoing', 'completed'], default: 'not-started'},
   quiz: {
     answers :{ type: {} }
   },
@@ -159,7 +159,7 @@ CourseProgressSchema.pre('save', function(next) {
         }, 0);
 
         progress.progress = chapterProgress;
-        progress.status = 'started';
+        progress.status = 'ongoing';
 
         next();
       });
@@ -247,7 +247,7 @@ CourseProgressSchema.methods.startLesson = function(lessonJSON, callback) {
       for(var lessonIndex in chapter.lessons) {
         var lesson = chapter.lessons[lessonIndex];
         if(lesson.id == lessonId) {
-          lesson.status = 'started';
+          lesson.status = 'ongoing';
           break;
         }
       }
