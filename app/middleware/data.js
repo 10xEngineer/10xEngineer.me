@@ -1,3 +1,4 @@
+var async = require('async');
 var User = load.model('User');
 var Course = load.model('Course');
 var Chapter = load.model('Chapter');
@@ -16,14 +17,33 @@ module.exports = function(app) {
       }
 
       if(course) {
-        course.id = parseInt(course.id.toString());
-        req.course = course;
-        req.app.helpers({
-          course: course
-        });
-      }
 
-      next();
+        // Populate lessons in course chapters
+        async.map(course.chapters, function(chapter, callback) {
+          Chapter.findById(chapter._id)
+            .populate('lessons')
+            .run(function(error, populatedChapter) {
+            if(error) {
+              callback(error);
+            }
+
+            callback(null, populatedChapter);
+          });
+        }, function(error, chapters) {
+          log.info(chapters);
+
+          course.id = parseInt(course.id.toString());
+          course.chapters = chapters;
+
+          req.course = course;
+          req.app.helpers({
+            course: course
+          });
+          next();
+        });
+      } else {
+        next();
+      }
     });
   });
 
