@@ -5,7 +5,7 @@
       .chapter-content
         h2 #{chapter.title}
         p #{chapter.desc}
-        -if(everyauth.loggedIn && isAdmin)
+        -if(everyauth.loggedIn)
           .btn-strip
             a.btn.btn-success(href="/course_editor/lesson/create/#{chapter.id}") Add Lesson
             a.btn(href='/course_editor/chapter/#{chapter.id}/edit') Edit Chapter Info
@@ -19,7 +19,7 @@
             a(href='/course_editor/lesson/#{lesson.id}')
               h3 
                 #{lesson.title}
-            - if(everyauth.loggedIn && isAdmin)
+            - if(everyauth.loggedIn)
               - if(lesson.status != 'published')
                 | (Draft)
               a.btn.btn-danger.pull-right(href='/course_editor/lesson/#{lesson.id}/remove', style='margin-right: 5px;') Delete

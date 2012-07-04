@@ -1,4 +1,4 @@
--if(lesson.type == 'video')
+- if(lesson.type == 'video')
   input#videoContent(name='videoContent' ,type='hidden')
   input#type(name='videoType' ,type='hidden')
   h3 Upload Video
@@ -23,11 +23,11 @@
       - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
         source(type='video/mp4', src='#{lesson.video.content}')
 
--else if(lesson.type == 'quiz')
+- else if(lesson.type == 'quiz')
   h3 Quiz
   br
   div#questionBox
-    -var questionNo = 0;
+    - var questionNo = 0;
     each questionContent,questionIndex in lesson.quiz.questions
       div.addedQuestion
         p Question #{questionIndex}:
@@ -35,19 +35,19 @@
         br
         div.options
           p Options
-          -var optionnameIndex = 0;
+          - var optionnameIndex = 0;
           each option,optionIndex in answersJSON[questionIndex]
             div.addedOption
-              -if(option)
+              - if(option)
                 input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]", checked)
-              -else
+              - else
                 input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
               input.questionOption(type="text", value="#{optionIndex}", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
-              -optionnameIndex = optionnameIndex + 1;
+              - optionnameIndex = optionnameIndex + 1;
           div.addedOption
             input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
             input.questionOption(type="text", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
-      -questionNo =questionNo + 1;
+      - questionNo = questionNo + 1;
     div.addedQuestion
       p Question #{questionNo}:
       input.question(type="text", name="question[#{questionNo}]")
@@ -58,7 +58,7 @@
           input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionNo}][0]")
           input.questionOption(type="text", name="questionOption[#{questionNo}][0]")
 
--else if(lesson.type == 'programming')
+- else if(lesson.type == 'programming')
   p Programming :
   select#editLanguage(name='language')
     option(value='c_cpp') C
@@ -71,3 +71,36 @@
   textarea#input(name='input') #{lesson.programming.input}
   p Enter Output :
   textarea#output(name='output') #{lesson.programming.output}
+
+- else if(lesson.type == 'sysAdmin')
+    select.serverName#serverName(name='serverName', multiple='multiple')
+      each labInstance in lab
+        - var count = 0;
+        - if(typeof(lesson.sysAdmin.serverInfo)!='undefined') {
+        -   for(var index = 0; index < lesson.sysAdmin.serverInfo.length; index++){
+        -     if(lesson.sysAdmin.serverInfo[index].toString() == labInstance._id.toString()) {count++;}
+        -   }
+        -   if(count>0)
+              option(value="#{labInstance._id} ( #{count} )", selected) #{labInstance.name} ( #{count} )
+        - }
+    a.btn(data-toggle="modal", href="#myModal", style="margin-left: 5px;") Add Server
+    div.modal.hide#myModal
+      div.modal-header
+        button.close(type="button", data-dismiss="modal") x
+        h3 Add Server 
+      div.modal-body
+        p Select Server :
+        select#selectedServer(name='selectedServer')
+          option(value="0") Select
+          each labInstance,index in lab
+            option(value="#{labInstance._id}") #{labInstance.name}
+        div#serverInfo
+        a.btn#addServerName(data-dismiss="modal") Add
+      div.modal-footer
+        a.btn(data-dismiss="modal") Close
+    p Upload Verification File :
+    input.input-large(name='verificationFile', type='file')
+- else
+  pre
+    strong Sorry 
+    | Undefined Lesson type [unable to edit]

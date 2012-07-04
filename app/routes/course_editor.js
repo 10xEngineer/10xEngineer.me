@@ -109,7 +109,6 @@ module.exports.import = function(req, res, next) {
   // Create a new course based on the parsed file
 
   parsedCourse['created_by'] = req.user._id;
-  log.info(parsedCourse);
   importer.course(parsedCourse, function(error, course) {
 
     // Add chapters
@@ -380,9 +379,6 @@ module.exports.lessonCreate = function(req, res, next) {
   lesson.desc    = req.body.description;
   lesson.type    = req.body.type;
   
-  log.debug(req.body);
-  log.debug(lesson);
-
   // For Video Lesson
   if(lesson.type == 'video') {
     lesson.video.type    = req.body.videoType;
@@ -518,12 +514,14 @@ module.exports.lessonEditView = function(req, res) {
       }
     }
   }
-
-  res.render('course_editor/lesson/edit', {
-    title: req.lesson.title,
-    description: req.lesson.desc,
-    answersJSON: answersJSON,
-    edit: true
+  LabDef.find(function (error, lab) {
+    res.render('course_editor/lesson/edit', {
+      title: req.lesson.title,
+      description: req.lesson.desc,
+      answersJSON: answersJSON,
+      edit: true,
+      lab: lab
+    });
   });
 }
 
@@ -578,6 +576,34 @@ module.exports.lessonEdit = function(req, res){
     }
     lesson.quiz.questions = lessonInstanceQuestion;
   }
+
+  // Sys Admin Lesson 
+  if(lesson.type == 'sysAdmin'){
+    var serverInfoArray = [];
+    var serverName = req.body.serverName;
+    if(typeof(serverName) == 'string') {
+      var optNameArray = serverName.split(' ');
+      var selectedServerNo = parseInt(optNameArray[2],10);
+      for(var count = 0 ; count < selectedServerNo; count++) {
+        serverInfoArray.push((optNameArray[0]));
+      }
+
+    } else if(typeof(serverName) == 'object') {
+
+      var length = serverName.length;
+      for (var index = 0; index < length; index++) {
+        var optNameArray = serverName[index].split(' ');
+        var selectedServerNo = parseInt(optNameArray[2],10);
+        for(var count = 0 ; count < selectedServerNo; count++) {
+          serverInfoArray.push((optNameArray[0]));
+        }
+      }
+    }
+    lesson.sysAdmin.serverInfo = serverInfoArray;
+    var f = req.files['videofile'];
+  }
+
+  // Save edited lesson
   lesson.save(function(error) {
     if(error) {
       log.error(error);
@@ -611,7 +637,6 @@ module.exports.lessonEdit = function(req, res){
     }
   });
 };
-
 
 module.exports.lessonRemove = function(req, res, next){
 

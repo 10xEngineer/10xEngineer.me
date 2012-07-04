@@ -86,21 +86,9 @@ module.exports = function(app) {
 
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.list);
-/*
-  app.get('/course/create', verifyPermission('course', 'edit'), course.createView);
-  app.post('/course/create', verifyPermission('course', 'edit'), validation.lookUp(validationConfig.course.createCourse), course.create);
-  app.get('/course/import', verifyPermission('course', 'edit'), course.importView);
-  app.post('/course/import', verifyPermission('course', 'edit'), course.import);
-*/
   app.get('/course/:courseId/start', verifyPermission('course', 'read'), course.start);
   app.get('/course/:courseId', verifyPermission('course', 'read'), course.show);
- /*
-  app.get('/course/:courseId/edit', verifyPermission('course', 'edit'), course.updateView);
-  app.post('/course/:courseId/edit', verifyPermission('course', 'edit'), validation.lookUp(validationConfig.course.editCourse), course.update);
-  app.get('/course/:courseId/remove', verifyPermission('course', 'delete'), course.remove);
-  app.get('/course/:courseId/publish', course.publish);
-  app.get('/course/:courseId/unpublish', course.unpublish);
-*/
+
   // Course Editor
 
   // Course oprations
@@ -140,20 +128,7 @@ module.exports = function(app) {
 
 
   // Chapter
- /*
-  app.get('/chapter/create/:courseId', verifyPermission('chapter', 'edit'), chapter.createView);
-  app.post('/chapter/create/:courseId', verifyPermission('chapter', 'edit'), validation.lookUp(validationConfig.chapter.createChapter), chapter.create);
-*/
   app.get('/chapter/:chapterId',verifyPermission('chapter', 'read'), chapter.show);
-/*
-  app.get('/chapter/:chapterId/edit', verifyPermission('chapter', 'edit'), chapter.editView);
-  app.post('/chapter/:chapterId/edit', verifyPermission('chapter', 'edit'), validation.lookUp(validationConfig.chapter.editChapter), chapter.edit);
-  app.get('/chapter/:chapterId/remove', verifyPermission('chapter', 'delete'), chapter.remove);
-  app.get('/chapter/:chapterId/publish', verifyPermission('chapter', 'publish'), chapter.publish);
-  app.get('/chapter/:chapterId/unpublish', verifyPermission('chapter', 'publish'), chapter.unpublish);
-  app.get('/chapter/:chapterId/up', verifyPermission('chapter', 'edit'), chapter.up);
-  app.get('/chapter/:chapterId/down', verifyPermission('chapter', 'edit'), chapter.down);
-*/
 
   // Lesson
 /*
@@ -161,21 +136,9 @@ module.exports = function(app) {
   // TODO: Refactor
 */
   app.get('/lesson/serverInfo', lesson.serverInfo);
-/*  
-  app.get('/lesson/create/:chapterId', verifyPermission('lesson', 'edit'), lesson.createView);
-  app.post('/lesson/create/:chapterId', verifyPermission('lesson', 'edit'), validation.lookUp(validationConfig.lesson.createLesson), lesson.create);
-*/
+
   app.get('/lesson/:lessonId', verifyPermission('lesson', 'read'), lesson.showView);
   app.post('/lesson/:lessonId', verifyPermission('lesson', 'read'), lesson.show);
-/*
-  app.get('/lesson/:lessonId/edit',lesson.editView);
-  app.post('/lesson/:lessonId/edit',lesson.edit);
-  app.get('/lesson/:lessonId/remove', verifyPermission('lesson', 'delete'), lesson.remove);
-  app.get('/lesson/:lessonId/up', verifyPermission('lesson', 'edit'), lesson.up);
-  app.get('/lesson/:lessonId/down', verifyPermission('lesson', 'edit'), lesson.down);
-  app.get('/lesson/:lessonId/publish',verifyPermission('lesson', 'publish'), lesson.publish);
-  app.get('/lesson/:lessonId/unpublish', verifyPermission('lesson', 'publish'), lesson.unpublish);
-*/
   app.get('/lesson/:lessonId/next', verifyPermission('lesson', 'read'),lesson.next);
   app.get('/lesson/:lessonId/previous', verifyPermission('lesson', 'read'), lesson.previous);
   app.get('/lesson/:lessonId/complete', verifyPermission('lesson', 'read'), lesson.complete);

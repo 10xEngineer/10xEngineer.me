@@ -1,5 +1,4 @@
 form(method='POST', id='lessonForm', enctype='multipart/form-data')
-  input#lessonType(name='type' ,type='hidden' ,value='video')
   p
     label(for="title") Title:
     input.required(value='#{lesson.title}', id='title', name='title')
@@ -8,6 +7,8 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
     textarea.required(name='description', id='description')
       #{lesson.desc}
   - if(!edit)
+
+    input#lessonType(name='type', type='hidden', value='video')
     ul#myTab.nav.nav-tabs
       li.active
         a(href='#video', data-toggle='tab') Video
@@ -36,7 +37,7 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
           input#videoLink.input-large(name='videofile', type='text', placeholder='Video File')
           input#showYoutubePreview(type="button", value="Preview")
         div#videoPreview  
-      
+        
       #quiz.tab-pane
         h3 Quiz
         br
@@ -88,21 +89,21 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
                 option(value="#{labInstance._id} ") #{labInstance.name}
             div#serverInfo
             a.btn#addServerName(data-dismiss="modal") Add
-              
           div.modal-footer
             a.btn(data-dismiss="modal") Close
         p Upload Verification File :
         input.input-large(name='verificationFile', type='file')
-
+        
   - else
-    != partial('editLesson');
+    input#lessonType(name='type', type='hidden', value='#{lesson.type}')
+    != partial('editLesson')
   br
   p
     input.btn.btn-primary#formSubmit(type='submit', value='Submit')
 
   - if(edit && typeof(lesson.programming) != 'undefined')
     script(type='text/javascript')
-  
+    
       // This should be only executed inside edit
       $('#editLanguage').val('#{lesson.programming.language}');
 
