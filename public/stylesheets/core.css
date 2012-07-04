@@ -399,11 +399,23 @@ ul.auth-service{padding:0;}
 /*****************************/
 
 /* Custom.css overrides */
-.videoIcon, .quizIcon, .programmingIcon, .sysAdminIcon {
+.videoIcon, .quizIcon, .programmingIcon, .sysAdminIcon, .not-started, .ongoing, .completed {
   display: inline-block;
 }
 #detailsAccordion .accordion-group .accordion-body .accordion-inner a {
   padding-left: 10px;
 }
 
+a, a:active, a:hover, a:focus, a:selected, a:visited{outline:none;border:none;}
+.detailsBorder h2, .courseDetailsWrapper p{padding:5px;}
 
+.loginArea h1{padding-bottom:10px;}
+
+.progress{margin:0px 15px 10px 15px;}
+.progressTotal{margin: 0 20px 10px;}
+.progressBar{margin:10px;}
+.detailImage img{padding-top:25px;}
+.not-started, .ongoing, .completed{background-repeat: no-repeat;background-position: left top;height:25px;width:25px;vertical-align: middle;}
+.not-started{background-image: url(../img/not-started.png);}
+.ongoing{background-image: url(../img/ongoing.png);}
+.completed{background-image: url(../img/finished.png);}

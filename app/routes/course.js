@@ -149,7 +149,7 @@ module.exports.show = function(req, res, next){
       title: req.course.title,
       chapter: undefined,
       index :0,
-      progressObject : progress
+      progress : progress
     });
 };
 

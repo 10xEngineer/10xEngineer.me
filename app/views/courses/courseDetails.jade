@@ -23,7 +23,7 @@
           .row-fluid.detailsBorder
             h3 Overall Course Progress
             .progress.progress-striped.progressTotal
-              .bar(style="width: #{progressObject.progress}%;")
+              .bar(style="width: #{progress.progress}%;")
     .row-fluid
       .span6
         #detailsAccordion.accordion
@@ -32,14 +32,15 @@
               div.accordion-heading
                 a(href="##{chapter.id}", data-parent="#detailsAccordion", data-toggle="collapse", class="accordion-toggle") #{chapter.title}
                 .progress
-                  .bar(style="width: #{progressObject.chapters[chapterIndex].progress}%;")
+                  .bar(style="width: #{progress.chapters[chapterIndex].progress}%;")
               div(class="accordion-body collapse", id="#{chapter.id}", style="height: 0px;")
                 .accordion-inner
                   ul
-                    each lesson in chapter.lessons
+                    each lesson, lessonIndex in chapter.lessons
                       - var icon = lesson.type + 'Icon';
                       li
                         div.lessonType(class="#{icon}")
+                        div.lessonStatus(class="#{progress.chapters[chapterIndex].lessons[lessonIndex].status}")
                         a(href="/lesson/#{lesson.id}") #{lesson.title}
       .span6
         h3 Chapter 1
