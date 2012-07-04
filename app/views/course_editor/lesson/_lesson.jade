@@ -389,10 +389,31 @@ script(type='text/javascript')
 
       // Call function for to add into Multiple Select
       checkServerName($('#selectedServer :selected').text(), $('#selectedServer :selected').val());
+      addOptionDiv($('#selectedServer :selected').text());
     });  
 
+    var addOptionDiv = function (selectedServerText){
+      console.log("Here");
+      var newDiv = $('<div/>', {
+        html : selectedServerText,
+        style : "display: inline-block; background-color: #d9edf7; margin: 3px 3px; padding: 3px 5px;"
+        });
+      $('<i class="icon-remove close pull-right closeOptBtn" style="margin-left:5px;"></i>').click(function(){
+        console.log("Here on close");
+        removeOptDiv($(this).parent());
+      }).appendTo(newDiv);
+      newDiv.appendTo('#selectedOptContainer');
+    }
+
+  
+    var removeOptDiv = function(selfDiv) {
+      console.log(selfDiv);
+      selfDiv.remove();
+    }
+
     var checkServerName = function(selectedServerText, selectedServerValue) {
-      
+
+
       var serverNameJSON = {};
       var count=0, temp = 0;
       var regExp = new RegExp('^([a-zA-z0-9\\\\s]+\\\\()( \\\\d+ )(\\\\))$');

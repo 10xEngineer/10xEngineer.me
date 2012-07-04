@@ -73,7 +73,7 @@
   textarea#output(name='output') #{lesson.programming.output}
 
 - else if(lesson.type == 'sysAdmin')
-    select.serverName#serverName(name='serverName', multiple='multiple')
+    select.serverName#serverName(name='serverName', multiple='multiple', style='display:none')
       each labInstance in lab
         - var count = 0;
         - if(typeof(lesson.sysAdmin.serverInfo)!='undefined') {
@@ -83,7 +83,8 @@
         -   if(count>0)
               option(value="#{labInstance._id} ( #{count} )", selected) #{labInstance.name} ( #{count} )
         - }
-    a.btn(data-toggle="modal", href="#myModal", style="margin-left: 5px;") Add Server
+    #selectedOptContainer(style="min-height: 20px; width: 210px; border: 1px solid; padding: 3px 5px;")
+    a.btn(data-toggle="modal", href="#myModal", style="margin: 5px 0px;") Add Server
     div.modal.hide#myModal
       div.modal-header
         button.close(type="button", data-dismiss="modal") x
