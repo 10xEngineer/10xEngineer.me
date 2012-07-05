@@ -1,0 +1,26 @@
+//- @@TODO: Tabs is okay but need other content
+//- require pageslide ace2
+
+
+.container-fluid
+  h1 #{lesson.title}
+  p 
+    strong Description :-
+    p #{lesson.desc}
+  p
+    strong Language :
+    | #{lesson.programming.language}
+  p
+    strong SampleCode :
+    pre #{lesson.programming.skeletonCode}
+
+  p
+    strong Input :
+    pre #{lesson.programming.input}
+
+  p
+    strong Output :
+    pre #{lesson.programming.output}
+
+  p
+    a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back

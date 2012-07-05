@@ -1,0 +1,15 @@
+.container-fluid.course-index.inner-index
+  h1 #{lesson.title}
+  p
+    strong Description:-
+    p #{lesson.desc}
+  .row-fluid
+    .span10
+        each question, questionIndex in lesson.quiz.questions
+          div.questionBox
+            h4.question Q #{questionIndex+1}:  #{question.question}
+
+            ul
+            each option, optionIndex in question.options
+              li #{option}
+  a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back

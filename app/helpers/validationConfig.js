@@ -34,7 +34,6 @@ module.exports.lesson = {
 
 	createLesson : {
 		title : {required:true},
-		description : {required: false},
 		type : {
 			required: true,
 			checkFor:{
@@ -48,11 +47,20 @@ module.exports.lesson = {
 						}
 					}
 				},
+				quiz : {
+					question: { required: 1},
+					questionOption:{ required: 2},
+					questionOptionCheckbox:{ required: 1}
+				},
 				programming: {
 					language : {required:true},
 					code: {required: true},
 					input: {required: true},
 					output: {required: true}
+				},
+				sysAdmin :{
+					serverName : {required: 1},
+					verificationFile : {required:true}
 				}
 			}
 		}

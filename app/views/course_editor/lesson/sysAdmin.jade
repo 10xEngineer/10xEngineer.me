@@ -1,0 +1,41 @@
+//- @@TODO: Tabs is okay but need other content
+//- require pageslide ace2
+
+
+.container-fluid
+	h1 #{lesson.title}
+
+	p 
+		strong Description :-
+		p #{lesson.desc}
+	
+	p
+		h3 server information
+		- if(typeof(labs) != 'undefined')
+			ul
+				each lab in labs
+					- var count = 0;
+					- if(typeof(lesson.sysAdmin.serverInfo) != 'undefined')
+						- for(var index=0; index < lesson.sysAdmin.serverInfo.length; index++) if(lesson.sysAdmin.serverInfo[index] == lab._id) count++;
+							li 
+								strong #{lab['name']} ( #{count} )
+								ul
+									li
+										strong Type :
+										| #{lab['type']}
+									li 
+										strong storage :
+										| #{lab['storage']}
+									li
+										strong memory :
+										| #{lab['memory']}
+									li
+										strong cpu :
+										| #{lab['cpu']}
+									li
+										strong Run List :
+										| #{lab['runList']}
+
+
+	p
+		a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back

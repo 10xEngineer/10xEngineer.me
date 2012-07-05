@@ -73,7 +73,7 @@ module.exports.remove = function(req, res) {
       res.redirect('/chapter/:id');
     }
     req.session.message = "Chaper deleted sucessfully.";
-    res.redirect('/course/'+ courseId);
+    res.redirect('/course_editor/course/'+ courseId);
   });
 };
 
@@ -87,7 +87,7 @@ module.exports.publish = function(req, res) {
       req.session.error = "Can not published chapter.";
     }
     req.session.message = "Chapter published sucessfully.";
-    res.redirect('/course/' + chapter.course.id);
+    res.redirect('/course_editor/course/' + chapter.course.id);
   });
 };
 
@@ -100,7 +100,7 @@ module.exports.unpublish = function(req, res) {
       req.session.error = "Can not unpublished chapter.";
     }
     req.session.message = "Chapter unpublished sucessfully.";
-    res.redirect('/course/' + chapter.course.id);
+    res.redirect('/course_editor/course/' + chapter.course.id);
   });
 };
 

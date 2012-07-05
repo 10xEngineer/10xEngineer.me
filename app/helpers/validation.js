@@ -1,6 +1,6 @@
 module.exports = {
 
-	required : function (value ) {
+	required : function (value, checkFor) {
 
 		function ltrim(str) { 
 			for(var k = 0; k < str.length && isWhitespace(str.charAt(k)); k++);
@@ -18,10 +18,68 @@ module.exports = {
 			return (whitespaceChars.indexOf(charToCheck) != -1);
 		}
 
-		if(typeof(value) != 'undefined') {
-			if(trim(value) != '') {
+		function validateString(obj){
+			if(trim(obj)!='')
 				return true;
-			} else {
+			else 
+				return " is required";
+		}
+
+		function validateObject(obj, num){
+			log.info("Enter in object validation with obj=", obj, " and num=", num);
+			var length = obj.length;
+			log.info("Object length counted is ", length);
+			var validCount = 0;
+			var validation = true;
+			for(index = 0; index < length; index++){
+				if(typeof(obj[index])=='string'){
+					if(validateString(obj[index])===true){
+						validCount++;
+					}
+					else{
+					}
+				}
+				else if(typeof(obj[index])=='object'){
+					if(validation == true) validation = false;
+					if(validateObject(obj[index], num)===true){
+						validCount++;
+					}
+					else{
+					}
+				}
+				else {
+					continue;
+				}
+			}
+
+			if(validation){
+				if(validCount >= num){
+					return true;
+				}
+				else if(validCount == 0){
+					return 0;
+				}
+				else{
+					return " is invalid";
+				}
+			}
+			else if(validCount>0){
+				return true;
+			}
+			else {
+				return "Invalid";
+			}
+		}
+
+		if(typeof(value) != 'undefined') {
+			log.debug('Value :: ', value, " & Type :: ", typeof(value));
+			if(typeof(value) == 'string') {
+				return validateString(value);
+			}
+			else if (typeof(value) == 'object') {
+				return validateObject(value, checkFor);
+			}
+			else {
 				return "is required";			
 			}
 		} else {

@@ -1,0 +1,19 @@
+h2 Lesson 
+
+p
+	label 
+		strong Title : 
+		|	#{lesson.title}
+
+p
+	label 
+		strong	Discription::
+		p	#{lesson.desc}
+
+p
+	label 
+		strong	Type : 
+		|	#{lesson.type}
+
+p
+	a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back

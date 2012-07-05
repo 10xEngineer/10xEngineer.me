@@ -40,9 +40,9 @@ script
         if(typeof(videoResumeTime) != 'number') {
           videoResumeTime = parseInt(videoResumeTime);
         }
-        //console.log("Vidoe starting Time : " + videoResumeTime);
         mediaElement.setCurrentTime(videoResumeTime);
       }, false);
+
 
       // Find Current Time and Update it in Progress
       mediaElement.addEventListener('timeupdate', function(e) {
@@ -78,7 +78,6 @@ script
   var updateProgress = setInterval(function() {
     if((currentVideoTime - LastUpdatedTime) >= 5) {
       LastUpdatedTime = currentVideoTime ;
-      //console.log('Update Time :', currentVideoTime);
       
       // For Sending Current Updated Time to Server Using Socket.
       var courseId =  '#{lesson.chapter.course}';
@@ -86,16 +85,5 @@ script
       var lessonId =  '#{lesson.id}';
       var userId = '#{userId}';
       progress.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-      progress.emit('persist', { userId:userId, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-      /*
-      $.ajax({
-        url: '/lesson/#{lesson.id}/updateProgress',
-        data: { seconds: LastUpdatedTime },
-        success: function(data) {
-          $('.lessonBar .btn-success').addClass('btn-large');
-        },
-        error: function(error, status, xhr) {
-        }
-      });*/
     }
   }, 5000);

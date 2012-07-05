@@ -1,0 +1,27 @@
+h1 Courses - 
+	-if(everyauth.loggedIn && isAdmin)
+		| Admin
+	-else
+		| #{user.name}
+
+p
+	.course_editor_header
+			a.btn(href="/course_editor/create") 
+				i.icon-plus
+				|	Add Course 
+			a.btn.pull-right(href="/course_editor/import") 
+				i.icon-download-alt
+				|	Import Course
+
+p
+	ul.course_list
+		each course in courses
+			-if(everyauth.loggedIn && (isAdmin || course.created_by.toString() == user._id.toString()))
+				li 
+					a(href='/course_editor/course/#{course.id}') #{course.title}
+					a.btn.btn-danger.pull-right(href="/course_editor/course/#{course.id}/remove") Remove
+					-if(course.status != 'published')
+						a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/publish", style="margin-right: 5px") Publish
+					-else
+						a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/unpublish", style="margin-right: 5px") Unpublish
+					a.btn.pull-right(href="/course_editor/course/#{course.id}/edit", style="margin-right: 5px") Edit
