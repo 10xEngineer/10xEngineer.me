@@ -57,6 +57,10 @@ module.exports.lesson = {
 					code: {required: true},
 					input: {required: true},
 					output: {required: true}
+				},
+				sysAdmin :{
+					serverName : {required: 1},
+					verificationFile : {required:true}
 				}
 			}
 		}

@@ -74,20 +74,25 @@
 
 - else if(lesson.type == 'sysAdmin')
     select.serverName#serverName(name='serverName', multiple='multiple', style='display:none')
-      each labInstance in lab
-        - var count = 0;
-        - if(typeof(lesson.sysAdmin.serverInfo)!='undefined') {
-        -   for(var index = 0; index < lesson.sysAdmin.serverInfo.length; index++){
-        -     if(lesson.sysAdmin.serverInfo[index].toString() == labInstance._id.toString()) {count++;}
-        -   }
-        -   if(count>0)
-              option(value="#{labInstance._id} ( #{count} )", selected) #{labInstance.name} ( #{count} )
-        - }
-    #selectedOptContainer(style="min-height: 20px; width: 210px; border: 1px solid; padding: 3px 5px;")
+      each item in lesson.sysAdmin.serverInfo
+        each labInstance in lab
+          - if (labInstance._id.toString() == item)
+            option(value='#{item}') #{labInstance.name}
+
+    #selectedOptContainer
+      each item in lesson.sysAdmin.serverInfo
+        each labInstance in lab
+          - if(labInstance._id.toString() == item)
+            div( class="optionDiv", rel="popover",
+              data-content="<table class='table table-bordered'><tr><td><h5> Name :</h5></td><td>#{labInstance.name}</td></tr><tr><td><h5> Type :</h5></td><td>#{labInstance.type}</td></tr><tr><td><h5> CPU :</h5></td><td>#{labInstance.cpu}</td></tr><tr><td><h5> Memory :</h5></td><td>#{labInstance.memory}</td></tr><tr><td><h5> Storage :</h5></td><td>#{labInstance.storage}</td></tr><tr><td><h5> Run List :</h5></td><td>#{labInstance.runList}</td></tr></table>",
+              data-original-title="#{labInstance.name}") #{labInstance.name}
+              i.icon-remove.close.pull-right.closeOptBtn
+
     a.btn(data-toggle="modal", href="#myModal", style="margin: 5px 0px;") Add Server
-    div.modal.hide#myModal
+    div.modal.hide.fade#myModal
       div.modal-header
-        button.close(type="button", data-dismiss="modal") x
+        button.close(type="button", data-dismiss="modal")
+          i.icon-remove
         h3 Add Server 
       div.modal-body
         p Select Server :

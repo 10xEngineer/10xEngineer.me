@@ -421,7 +421,13 @@ module.exports.lessonCreate = function(req, res, next) {
 
   // For sysAdmin Lesson
   if(lesson.type == 'sysAdmin') {
-    
+    var serverInfoArray = [];
+    var serverName = req.body.serverName;
+    lesson.sysAdmin.serverInfo = serverName;
+    log.info("SERVER INFO :: ", lesson.sysAdmin.serverInfo);
+    var f = req.files['videofile'];
+   
+/*
     var serverInfoArray = [];
     var serverName = req.body.serverName;
     if(typeof(serverName) == 'string') {
@@ -448,6 +454,8 @@ module.exports.lessonCreate = function(req, res, next) {
   }
 
   var f = req.files['videofile'];
+*/
+  }
 
   lesson.save(function(error) {
     if(error) {
@@ -581,25 +589,7 @@ module.exports.lessonEdit = function(req, res){
   if(lesson.type == 'sysAdmin'){
     var serverInfoArray = [];
     var serverName = req.body.serverName;
-    if(typeof(serverName) == 'string') {
-      var optNameArray = serverName.split(' ');
-      var selectedServerNo = parseInt(optNameArray[2],10);
-      for(var count = 0 ; count < selectedServerNo; count++) {
-        serverInfoArray.push((optNameArray[0]));
-      }
-
-    } else if(typeof(serverName) == 'object') {
-
-      var length = serverName.length;
-      for (var index = 0; index < length; index++) {
-        var optNameArray = serverName[index].split(' ');
-        var selectedServerNo = parseInt(optNameArray[2],10);
-        for(var count = 0 ; count < selectedServerNo; count++) {
-          serverInfoArray.push((optNameArray[0]));
-        }
-      }
-    }
-    lesson.sysAdmin.serverInfo = serverInfoArray;
+    lesson.sysAdmin.serverInfo = serverName;
     var f = req.files['videofile'];
   }
 

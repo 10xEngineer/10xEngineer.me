@@ -331,3 +331,24 @@ div.course_editor_header {
 	margin-bottom: 18px;
 	width: 80%;
 }
+
+/**************************************************
+**  Style for Sys admin editing                  **
+**************************************************/
+.optionDiv{
+	display: block; 
+	background-color: #d9edf7; 
+	margin: 3px 3px; 
+	padding: 3px 5px;
+}
+
+.closeOptBtn{
+	margin-left:5px;
+}
+
+#selectedOptContainer{
+	min-height: 20px; 
+	width: 210px; 
+	border: 1px solid; 
+	padding: 3px 5px;
+}

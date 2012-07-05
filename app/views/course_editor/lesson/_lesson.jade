@@ -75,18 +75,23 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
         
       #sysAdmin.tab-pane
         h3 SysAdmin
-        select.serverName#serverName(name='serverName', multiple='multiple')
-        a.btn(data-toggle="modal", href="#myModal") Add Server
-        div.modal.hide#myModal
+        //- select.serverName#serverName(name='serverName', multiple='multiple')
+        select.serverName#serverName(name='serverName', multiple='multiple', style='display:none')
+
+        #selectedOptContainer
+
+        a.btn(data-toggle="modal", href="#myModal", style="margin: 5px 0px;") Add Server
+        div.modal.hide.fade#myModal
           div.modal-header
-            button.close(type="button", data-dismiss="modal") x
+            button.close(type="button", data-dismiss="modal") 
+              i.icon-remove
             h3 Add Server 
           div.modal-body
             p Select Server :
             select#selectedServer(name='selectedServer')
               option(value="0") Select
               each labInstance,index in lab
-                option(value="#{labInstance._id} ") #{labInstance.name}
+                option(value="#{labInstance._id}") #{labInstance.name}
             div#serverInfo
             a.btn#addServerName(data-dismiss="modal") Add
           div.modal-footer
@@ -386,34 +391,63 @@ script(type='text/javascript')
         alert('Please select server.');
         return false;
       }
+      var Details = $('#serverInfo').html();
 
       // Call function for to add into Multiple Select
       checkServerName($('#selectedServer :selected').text(), $('#selectedServer :selected').val());
-      addOptionDiv($('#selectedServer :selected').text());
+      addOptionDiv($('#selectedServer :selected').text(), Details);
     });  
 
-    var addOptionDiv = function (selectedServerText){
+    var addOptionDiv = function (selectedServerText, details){
       console.log("Here");
       var newDiv = $('<div/>', {
-        html : selectedServerText,
-        style : "display: inline-block; background-color: #d9edf7; margin: 3px 3px; padding: 3px 5px;"
+        "html" : selectedServerText,
+        "class" : "optionDiv",
+        "rel" : "popover",
+        "data-content" : details,
+        "data-original-title" : selectedServerText,
         });
-      $('<i class="icon-remove close pull-right closeOptBtn" style="margin-left:5px;"></i>').click(function(){
+      $('<i class="icon-remove close pull-right closeOptBtn"></i>').click(function(){
         console.log("Here on close");
-        removeOptDiv($(this).parent());
+        $parent = $(this).parent();
+        $(this).remove();
+        removeOptFromSelect($parent.html());
+        $parent.popover('hide');
+        $parent.remove();
       }).appendTo(newDiv);
       newDiv.appendTo('#selectedOptContainer');
+      $('.optionDiv').popover();
     }
-
   
-    var removeOptDiv = function(selfDiv) {
-      console.log(selfDiv);
-      selfDiv.remove();
+    $('.closeOptBtn').click(function(){
+        console.log("Here on close");
+        $parent = $(this).parent();
+        $(this).remove();
+        removeOptFromSelect($parent.html());
+        $parent.popover('hide');
+        $parent.remove();
+    });
+
+    $('.optionDiv').popover();
+
+    var removeOptFromSelect = function(htmlText){
+      var $options = $("select.serverName option");
+      for(var index = 0; index < $options.length; index++){
+        var $option = $($options.get(index));
+        console.log("Test :: "+$option.html().toString()+" with "+htmlText);
+        if ($option.html().toString() == htmlText){
+          console.log($option);
+          $($options[index]).remove();
+          break;
+        }
+      }
     }
 
     var checkServerName = function(selectedServerText, selectedServerValue) {
 
+    $(".serverName").append("<option value='"+selectedServerValue+"'>"+selectedServerText+"</option>");
 
+    /*
       var serverNameJSON = {};
       var count=0, temp = 0;
       var regExp = new RegExp('^([a-zA-z0-9\\\\s]+\\\\()( \\\\d+ )(\\\\))$');
@@ -447,7 +481,7 @@ script(type='text/javascript')
       if(temp == 0) {
         $(".serverName").append("<option value='"+selectedServerValue+" ( 1 )'>"+selectedServerText+" ( 1 )</option>");
       }
-      
+    */  
     };
 
   });
