@@ -103,10 +103,14 @@ module.exports.create = function(req, res, next) {
 
     lesson.sysAdmin.serverInfo = serverInfoArray;
 
-    var f = req.files['verificationFile'];
+<<<<<<< HEAD
 
+=======
   }
 
+  var f = req.files['videofile'];
+  var verificationFile = req.files['verificationFile'];
+>>>>>>> 2ad56a85d4110e6ce10e1a52b49b1062bde31aeb
 
   lesson.save(function(error) {
     if(error) {
@@ -114,8 +118,7 @@ module.exports.create = function(req, res, next) {
       error = "Can not create lesson.";
     }
     var id = lesson.id;
-    if(lesson.type == 'video' && lesson.video.type == 'upload')
-    {
+    if(lesson.type == 'video' && lesson.video.type == 'upload') {
       var fileName = 'lessonVideo_' + id;
 
       cdn.saveFile(fileName, f, function(error, fileName) {
@@ -127,6 +130,31 @@ module.exports.create = function(req, res, next) {
         Lesson.findOne({ id: id }, function(error, lesson) {
           // Save the CDN URL if available
           lesson.video.content = fileName;
+          lesson.save(function(error) {
+            if(error) {
+              log.error(error);
+              next(error);
+            }
+
+            req.session.newLesson = {title: lesson.title, _id: lesson._id};
+            message = "Lesson created successfully.";
+            res.redirect('/lesson/' + id);
+          });
+        });
+      });
+    } else if(lesson.type == 'sysAdmin') {
+
+      var fileName = 'lessonSysAdmin_' + id;
+
+      cdn.saveFile(fileName, verificationFile, function(error, fileName) {
+        if(error) {
+          log.error(error);
+          next(error);
+        }
+
+        Lesson.findOne({ id: id }, function(error, lesson) {
+          // Save the CDN URL if available
+          lesson.sysAdmin.verificationFile = fileName;
           lesson.save(function(error) {
             if(error) {
               log.error(error);
