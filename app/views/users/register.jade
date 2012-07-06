@@ -1,9 +1,83 @@
-h1 We require some more information about you
-br
-form(method='POST', action='') 
-  p 
-    h5 Email :
-    input.required(id='email', name='email')  
-  br
-  input(type='submit' ,name='submit',value='Finish')
-  
+!!! 5
+html(lang="en")
+	head
+		meta(charset="utf-8")
+		-if(typeof(title) != 'undefined') 
+			title #{title}
+		
+		link(rel="stylesheet", href="/stylesheets/bootstrap.min.css")
+		link(rel='stylesheet', type='text/css', href='/stylesheets/bootstrap-responsive.min.css')
+		link(type='text/css', href='/stylesheets/jquery.pageslide.css', rel='stylesheet')
+		link(rel='stylesheet', href='/stylesheets/tabs.css')
+		link(rel='stylesheet', href='/stylesheets/jquery.Jcrop.min.css')
+		link(rel='stylesheet', href='/javascripts/mediaelement/mediaelementplayer.min.css')
+		link(type='text/css', href='/stylesheets/core.css', rel='stylesheet')
+		link(type='text/css', href='/stylesheets/corner-ribbon.css', rel='stylesheet')
+		link(type='text/css', href='/stylesheets/select2.css', rel='stylesheet')
+
+		script(type='text/javascript', src='/javascripts/jquery-1.7.1.min.js')
+		script(type='text/javascript', src='/javascripts/bootstrap.min.js')
+		script(type='text/javascript', src='/javascripts/jquery.easing-1.3.pack.js')
+		script(type='text/javascript', src='/javascripts/jquery.Jcrop.min.js')
+		script(type='text/javascript', src='/javascripts/mediaelement/mediaelement-and-player.min.js')
+		script(src="/javascripts/yepnope-1.5.4.min.js")
+		script(src='http://www.filepicker.io/static/js/filepicker.js')
+		script(type='text/javascript', src='/javascripts/select2.min.js')
+		body
+			.container
+				section#navbar
+					.navbar.span12
+						.navbar-inner
+							.container
+								a.btn.btn-navbar(data-toggle="collapse",data-target=".nav-collapse")
+									span.icon-bar
+									span.icon-bar
+									span.icon-bar
+								a.brand(href='#', style='font-size:2em;') 
+									span(style='color:white;font-weight:bold;') 10
+									span(style='color:orange;') x
+									span(style='color:white;') Engineer
+									span(style='color:orange;font-weight:bold;') .
+									span(style='color:white;') me
+									// img(src='/img/10xengineer.me.png', alt='10xEngineer.me')
+			.container.auth-page
+				-if(typeof(error) != 'undefined') 
+					div.alert.alert-block
+						a.close(data-dismiss='alert',href='#') x
+						h4.alert-heading Warning
+						#{error}
+				-else if(typeof(message) != 'undefined') 
+					div.alert.alert-info
+						a.close(data-dismiss='alert',href='#') x
+						h4.alert-heading Information 
+						#{message}
+				.container
+					.span6.offset3.registerBox
+						h2	 We require some more information about you
+						br
+						form(method='POST', action='') 
+							h5.emailLabel  Email
+							p.center
+								input.required(id='email', name='email')  
+								br
+								input.btn-large.btn-primary.regBtn(type='submit', name='submit', value='Finish')
+					.span12
+						footer
+							p 
+							strong &copy;2012 10xEngineer.me. 
+							| All rights reserved.
+
+			#pageslide(style='display:none')
+//- note: subject to move to individe page
+			script(type='text/javascript', src='/javascripts/jquery.fittext.js')
+			script(type='text/javascript', src='/javascripts/jquery.pageslide.js') 
+			script(type='text/javascript', src='/javascripts/ace_2/ace.js')
+			script(src='/javascripts/core.init.js')
+
+		script(type='text/javascript')
+			// call the partial-specific javascript helper: init() function when the partials are completed loading
+			$(document).ready(function() {
+				if(typeof init == 'function') { 
+					init(); 
+				}
+			});

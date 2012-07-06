@@ -1,6 +1,5 @@
 var User = load.model('User');
 var util = load.helper('util');
-var JSON5 = require('json5');
 
 module.exports = function() {};
 

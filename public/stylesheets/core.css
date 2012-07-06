@@ -352,3 +352,25 @@ div.course_editor_header {
 	border: 1px solid; 
 	padding: 3px 5px;
 }
+
+/**************************************************
+**  Register                                     **
+**************************************************/
+
+.registerBox {
+	border :1px solid #999;
+	padding:20px 20px 0px 20px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+.emailLabel {
+	text-align: center;
+	margin:20px;
+}
+.center {
+	text-align: center;
+}
+.regBtn {
+	margin:20px 0px 0px;
+}
