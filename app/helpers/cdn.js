@@ -67,7 +67,6 @@ module.exports.saveFile = function(fileName, fileDesc, callback) {
   self.saveFileNew(fileName, fileDesc.path, fileDesc.type, callback);
 };
 
-// file save by hk
 module.exports.saveFileNew = function(fileName, filePath, contentType, callback) {
 
   var db = mongoose.connection.db;

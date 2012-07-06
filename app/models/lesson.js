@@ -31,7 +31,8 @@ var LessonSchema = new Schema({
   },
   sysAdmin:{
     serverInfo: [],
-    verificationFile: { type: String, trim: true }
+    verificationFile: { type: String, trim: true },
+    vms : []
   },
   status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   chapter: { type: ObjectId, ref: 'Chapter', required: true },

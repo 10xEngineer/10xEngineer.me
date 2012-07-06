@@ -1,0 +1,124 @@
+a.btn(data-toggle="modal", href="#myModal", style="margin: 5px 0px;") Add Server
+div.modal.hide.fade#myModal
+  div.modal-header
+    button.close(type="button", data-dismiss="modal") 
+      i.icon-remove
+    h3 Add Server 
+  div.modal-body
+    p Select Server :
+    select#selectedServer(name='selectedServer')
+      option(value="0") Select
+      each labInstance,index in lab
+        option(value="#{labInstance._id}") #{labInstance.name}
+    div#serverInfo
+    a.btn#addServerName(data-dismiss="modal") Add
+  div.modal-footer
+    a.btn(data-dismiss="modal") Close
+p Upload Verification File :
+input.input-large(name='verificationFile', type='file')
+
+script
+  //--------------------------------------------------------------- //
+  //  SysAdmin : Show Selected Server Info in POP up Sceen          //
+  //--------------------------------------------------------------- //  
+
+  $('#selectedServer').change(function(){
+
+    if($('#selectedServer :selected').val() == '0') {
+      $('#serverInfo').html('');
+      return;
+    }
+
+    var $serverId = $('#selectedServer :selected').val().split(' ');
+    $.ajax({
+      url: '/lesson/serverInfo/',
+      data: { id: $serverId[0] },
+      success: function(data) {
+        var serverInfo = data.serverInfo;
+        $('#serverInfo').html('<table class="table table-bordered"><tr><td><h5> Name :</h5></td><td><input type="text" id="name"/></td></tr><tr><tr><td><h5> HostName :</h5></td><td><input type="text" id="hostName"/></td></tr><tr><td><h5> Type :</h5></td><td>'+serverInfo.type+'</td></tr><tr><td><h5> Memory :</h5></td><td>'+serverInfo.memory+'</td></tr><tr><td><h5> Storage :</h5></td><td>'+serverInfo.storage+'</td></tr><tr><td><h5> Run List :</h5></td><td>'+serverInfo.runList+'</td></tr></table>');
+      },
+      error: function(error, status, xhr) {
+        console.log(JSON.stringify(error) + "Status: " + status);
+      }
+    });
+  });
+
+  //----------------------------------------------------- //
+  //  SysAdmin : Add server name into List                //
+  //----------------------------------------------------- //  
+
+  $('#addServerName').click(function(){
+    
+    if($('#selectedServer :selected').val() == '0') {
+      alert('Please select server.');
+      return false;
+    }
+    var displayName = $('#name').val() + " (" + $('#selectedServer :selected').text() + ")";
+    checkServerName($('#selectedServer :selected').text(), $('#selectedServer :selected').val(), $('#name').val(), $('#hostName').val());
+    
+    $nameParent = $('#name').parent();
+    $nameParent.append($('#name').val());
+    $('#name').remove();
+    $hostNameParent = $('#hostName').parent();
+    $hostNameParent.append($('#hostName').val());
+    $('#hostName').remove();
+    var Details = $('#serverInfo').html();
+    $nameParent.html('');
+    $hostNameParent.html('');
+    $nameParent.append($('<input/>',{"id":"name"}));
+    $hostNameParent.append($('<input/>',{"id":"hostName"}));
+    // Call function for to add into Multiple Select
+    addOptionDiv($('#selectedServer :selected').text(), Details, displayName);
+  });  
+
+  var addOptionDiv = function (selectedServerText, details, displayName){
+    var newDiv = $('<div/>', {
+      "html" : displayName,
+      "class" : "optionDiv",
+      "rel" : "popover",
+      "data-content" : details,
+      "data-original-title" : selectedServerText,
+    });
+    $('<i class="icon-remove close pull-right closeOptBtn"></i>').click(function(){
+      $parent = $(this).parent();
+      $(this).remove();
+      removeOptFromSelect($parent.html());
+      $parent.popover('hide');
+      $parent.remove();
+    }).appendTo(newDiv);
+    newDiv.appendTo('#selectedOptContainer');
+    $('.optionDiv').popover();
+  }
+  
+  $('.closeOptBtn').click(function(){
+    $parent = $(this).parent();
+    $(this).remove();
+    removeOptFromSelect($parent.html());
+    $parent.popover('hide');
+    $parent.remove();
+  });
+
+  $('.optionDiv').popover();
+
+  var removeOptFromSelect = function(htmlText){
+    var $optServers = $("select.serverName option");
+    var $optNames = $("#vmName option");
+    var $optHostNames = $("#vmHostName option");
+    for(var index = 0; index < $optServers.length; index++){
+      var templet = $($optServers.get(index)).html();
+      var vmName = $($optNames.get(index)).html();
+      var finalString = vmName+" ("+templet+")";
+      if (finalString == htmlText){
+        $($optServers[index]).remove();
+        $($optNames[index]).remove();
+        $($optHostNames[index]).remove();
+        break;
+      }
+    }
+  }
+
+  var checkServerName = function(selectedServerText, selectedServerValue, name, hostName) {
+    $(".serverName").append("<option value='"+selectedServerValue+"'>"+selectedServerText+"</option>");
+    $("#vmName").append("<option value='"+name+"'>"+name+"</option>");
+    $("#vmHostName").append("<option value='"+hostName+"'>"+hostName+"</option>");
+  };

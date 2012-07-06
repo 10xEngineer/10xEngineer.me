@@ -1,15 +1,12 @@
 h1 Add Labs
 br
-form(method='POST', action='', id='profileForm') 
+form(method='POST') 
   p
     h5 Name :
     input.required(value='#{lab.name}', id='name', name='name')   
   p 
     h5 Type :
     input.required(value='#{lab.type}', id='type', name='type')
-  p 
-    h5 CPU :
-    input.required(value='#{lab.cpu}', id='cpu', name='cpu')
   p 
     h5 Memory :
     input.required(value='#{lab.memory}', id='memory', name='memory')
@@ -18,6 +15,17 @@ form(method='POST', action='', id='profileForm')
     input.required(value='#{lab.storage}', id='storage', name='storage')
   p 
     h5 Run List :
-    input.required(value='#{lab.runList}', id='runList', name='runList')
+    select#runList(name="runList", multiple)
+        each item in itemList
+          - if(typeof(lab.runList) == 'string' && lab.runList == item)
+            option(value="#{item}", selected) #{item}
+          - else if(typeof(lab.runList) != 'undefined' && lab.runList.join(', ').indexOf(item) >= 0)
+            option(value="#{item}", selected) #{item}
+          - else
+            option(value="#{item}") #{item}
+
   br
-  input(type='submit' ,name='submit',value='Add')
+  input.btn(type='submit' ,name='submit',value='Add')
+
+script
+  $('#runList').select2();

@@ -37,5 +37,11 @@
   },
   "admin": {
     "twitter": "steve_messina"
-  }
+  },
+  "vms": [ 
+    "mysql",
+    "apache2",
+    "tomcat",
+    "apt"
+  ]
 }

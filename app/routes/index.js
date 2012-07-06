@@ -157,9 +157,9 @@ module.exports = function(app) {
   app.get('/admin/labs', admin.showLabsView);
   app.get('/admin/labs/create', admin.labsView);
   app.post('/admin/labs/create', admin.labs);
-  app.get('/admin/labs/:labDefId/edit', admin.labEditView)
-  app.post('/admin/labs/:labDefId/edit', admin.labEdit)
-  app.get('/admin/labs/:labDefId/remove', admin.labRemove)
+  app.get('/admin/labs/:labDefId/edit', admin.labEditView);
+  app.post('/admin/labs/:labDefId/edit', admin.labEdit);
+  app.get('/admin/labs/:labDefId/remove', admin.labRemove);
 
   app.get('/admin/roles', admin.rolesView);
   app.get('/admin/role/create', admin.createRoleView);

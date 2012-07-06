@@ -74,38 +74,34 @@
 
 - else if(lesson.type == 'sysAdmin')
     select.serverName#serverName(name='serverName', multiple='multiple', style='display:none')
-      each item in lesson.sysAdmin.serverInfo
+      each item in lesson.sysAdmin.vms
         each labInstance in lab
-          - if (labInstance._id.toString() == item)
-            option(value='#{item}') #{labInstance.name}
+          - if (labInstance._id.toString() == item.ref)
+            option(value='#{item.ref}') #{labInstance.name}
+
+    select#vmName(name='vmNames', multiple='multiple', style='display:none')
+      each item in lesson.sysAdmin.vms
+        each labInstance in lab
+          - if (labInstance._id.toString() == item.ref)
+            option(value='#{item.vm_name}') #{item.vm_name}
+
+    select#vmHostName(name='vmHostNames', multiple='multiple', style='display:none')
+      each item in lesson.sysAdmin.vms
+        each labInstance in lab
+          - if (labInstance._id.toString() == item.ref)
+            option(value='#{item.hostname}') #{item.hostname}
 
     #selectedOptContainer
-      each item in lesson.sysAdmin.serverInfo
+      each item in lesson.sysAdmin.vms
         each labInstance in lab
-          - if(labInstance._id.toString() == item)
+          - if(labInstance._id.toString() == item.ref)
             div( class="optionDiv", rel="popover",
-              data-content="<table class='table table-bordered'><tr><td><h5> Name :</h5></td><td>#{labInstance.name}</td></tr><tr><td><h5> Type :</h5></td><td>#{labInstance.type}</td></tr><tr><td><h5> CPU :</h5></td><td>#{labInstance.cpu}</td></tr><tr><td><h5> Memory :</h5></td><td>#{labInstance.memory}</td></tr><tr><td><h5> Storage :</h5></td><td>#{labInstance.storage}</td></tr><tr><td><h5> Run List :</h5></td><td>#{labInstance.runList}</td></tr></table>",
-              data-original-title="#{labInstance.name}") #{labInstance.name}
+              data-content="<table class='table table-bordered'><tr><td><h5> Name :</h5></td><td>#{item.vm_name}</td></tr><tr><td><h5> Hostname :</h5></td><td>#{item.hostname}</td></tr><tr><td><h5> Type :</h5></td><td>#{labInstance.type}</td></tr><tr><td><h5> Memory :</h5></td><td>#{labInstance.memory}</td></tr><tr><td><h5> Storage :</h5></td><td>#{labInstance.storage}</td></tr><tr><td><h5> Run List :</h5></td><td>#{labInstance.runList}</td></tr></table>",
+              data-original-title="#{labInstance.name}") #{item.vm_name} (#{labInstance.name})
               i.icon-remove.close.pull-right.closeOptBtn
+    
+    != partial('sysAdminForm')
 
-    a.btn(data-toggle="modal", href="#myModal", style="margin: 5px 0px;") Add Server
-    div.modal.hide.fade#myModal
-      div.modal-header
-        button.close(type="button", data-dismiss="modal")
-          i.icon-remove
-        h3 Add Server 
-      div.modal-body
-        p Select Server :
-        select#selectedServer(name='selectedServer')
-          option(value="0") Select
-          each labInstance,index in lab
-            option(value="#{labInstance._id}") #{labInstance.name}
-        div#serverInfo
-        a.btn#addServerName(data-dismiss="modal") Add
-      div.modal-footer
-        a.btn(data-dismiss="modal") Close
-    p Upload Verification File :
-    input.input-large(name='verificationFile', type='file')
 - else
   pre
     strong Sorry 
