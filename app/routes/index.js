@@ -40,6 +40,14 @@ var verifyPermission = function(entity, action){
   };
 };
 
+var accessPermission = function(req, res, next) {
+  if(req.loggedIn && ( req.path == '/auth' || req.path == '/register')) {
+    res.redirect('/');
+  }
+
+};
+
+
 
 module.exports = function(app) {
 
@@ -69,10 +77,10 @@ module.exports = function(app) {
   // Miscellaneous
   app.get('/', main.home);
   app.get('/about', main.about);
-  app.get('/auth', main.auth);
+  app.get('/auth', accessPermission, main.auth);
   // Note: All the actual authentication routes are handled by auth middleware (everyauth). Refer Auth helper for more.
-  app.get('/register', main.registerView);
-  app.post('/register', main.register);
+  app.get('/register', accessPermission, main.registerView);
+  app.post('/register', accessPermission, main.register);
   
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.list);
