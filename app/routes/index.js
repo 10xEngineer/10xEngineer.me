@@ -60,15 +60,6 @@ module.exports = function(app) {
     next();
   });
 
-  app.all('/*', function(req, res, next){
-    if(req.loggedIn && ( typeof(req.user.email) == 'undefined' || req.user.email === '') && req.path != '/user/settings') {
-      res.redirect('/user/settings');
-      return;
-    }
-    next();
-  });
-
-
   // Load Express data middleware
   load.middleware('data')(app);
 
@@ -80,8 +71,9 @@ module.exports = function(app) {
   app.get('/about', main.about);
   app.get('/auth', main.auth);
   // Note: All the actual authentication routes are handled by auth middleware (everyauth). Refer Auth helper for more.
+  app.get('/register', main.registerView);
+  app.post('/register', main.register);
   
-
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.list);
   app.get('/course/:courseId/start', verifyPermission('course', 'read'), course.start);

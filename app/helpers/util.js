@@ -8,6 +8,7 @@ var mime = require('mime');
 
 module.exports = function() {};
 
+// Converts the date to epoch/unix time
 module.exports.dateToEpoch = function(date) {
   log.info("DateToEpoch: ", new Date(date).getTime());
   return new Date(date).getTime();
@@ -16,12 +17,34 @@ module.exports.dateToEpoch = function(date) {
 module.exports.findFirst = function( key, jsonObj ) {
 	var firstProp;
 	for(var key in jsonObj) {
-	    if(jsonObj.hasOwnProperty(key)) {
-	        firstProp = jsonObj[key];
-	        break;
-	    }
+    if(jsonObj.hasOwnProperty(key)) {
+      firstProp = jsonObj[key];
+      break;
+    }
 	}
 	return firstProp;
+}
+
+module.exports.merge = function(obj1, obj2) {
+  for(var key in obj2) {
+    if(obj2.hasOwnProperty(key)) {
+      obj1[key] = obj2[key];
+    }
+  }
+
+  return obj1;
+};
+
+// Redirects to previously saved page
+module.exports.redirectBackOrHome = function(req, res) {
+  var redirectTo = req.session.redirectTo;
+  delete req.session.redirectTo;
+
+  if(redirectTo && typeof(redirectTo) == 'string') {
+    res.redirect(redirectTo);
+  } else {
+    res.redirect('/');
+  }
 }
 
 // Save file

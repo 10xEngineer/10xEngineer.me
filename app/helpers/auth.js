@@ -10,19 +10,12 @@ everyauth.debug = true;
 module.exports = function (config) {
   var redirectAction = function(res, data){
     var session = data.session;
-    progress.get(session.auth.userId, function(error,progress){
+    progress.get(session.auth.userId, function(error, progress){
       if(error) {
         log.error(error);
       }
       session.progress = progress;
-      var redirectTo = session.redirectTo;
-      delete session.redirectTo;
-      log.info(redirectTo);
-      if(redirectTo && typeof(redirectTo) == 'string') {
-        res.redirect(redirectTo);
-      } else {
-        res.redirect('/');
-      }
+      res.redirect('/register');
     });
   };
   
@@ -82,7 +75,14 @@ module.exports = function (config) {
           });
         });
       } else {
-         User.findOrCreate('twitter', twitUser, promise);
+        // Email hack
+
+        // Store twitter user info into the database and set the flag
+        session.regWizard = {
+          email: false
+        };
+
+        User.findOrCreate('twitter', twitUser, promise);
       }
      
       return promise;
