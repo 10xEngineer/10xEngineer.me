@@ -21,7 +21,7 @@
   "db": {
     "address": "mongodb://localhost/",
     "database": "10xengineer",
-    "schemaVersion": 4
+    "schemaVersion": 5
   },
   "mail": {
     "host": "smtp.gmail.com",

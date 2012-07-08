@@ -116,5 +116,40 @@ var migrate = function(dbVersion, codeVersion, done) {
       done();
     });
 
+  } else if(dbVersion == 4) {
+    // Role reset.
+    Role.remove({}, function(error) {
+      log.info('Deleted all existing roles. Recreating...');
+
+      var defaultRole = new Role();
+      defaultRole.permissions = [];
+
+      defaultRole.save(function(error){
+        if(error) {
+          log.error(error);
+          process.exit();
+        }
+
+        // Add admin role
+        var adminRole = new Role();
+        adminRole.name = 'admin';
+        adminRole.permissions = [];
+        adminRole.permissions.push('course_all_all');
+        adminRole.permissions.push('user_all_all');
+        adminRole.permissions.push('admin_all_all');
+
+        adminRole.save(function(error) {
+
+          var userRole = new Role();
+          userRole.name = 'user';
+          userRole.permissions = [];
+          userRole.permissions.push('course_all_all');
+
+          userRole.save(function(error) {
+            done();
+          });
+        });
+      });
+    });
   }
 };
