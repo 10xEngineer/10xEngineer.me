@@ -171,21 +171,21 @@ module.exports = function(app) {
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
 
-  app.get('/admin/labs', admin.showLabsView);
-  app.get('/admin/labs/create', admin.labsView);
-  app.post('/admin/labs/create', admin.labs);
-  app.get('/admin/labs/:labDefId/edit', admin.labEditView);
-  app.post('/admin/labs/:labDefId/edit', admin.labEdit);
-  app.get('/admin/labs/:labDefId/remove', admin.labRemove);
+  app.get('/admin/labs', verifyPermission('admin', 'read'), admin.showLabsView);
+  app.get('/admin/labs/create', verifyPermission('admin', 'edit'), admin.labsView);
+  app.post('/admin/labs/create', verifyPermission('admin', 'edit'), admin.labs);
+  app.get('/admin/labs/:labDefId/edit', verifyPermission('admin', 'edit'), admin.labEditView);
+  app.post('/admin/labs/:labDefId/edit', verifyPermission('admin', 'edit'), admin.labEdit);
+  app.get('/admin/labs/:labDefId/remove', verifyPermission('admin', 'delete'), admin.labRemove);
 
-  app.get('/admin/roles', admin.rolesView);
-  app.get('/admin/role/create', admin.createRoleView);
-  app.post('/admin/role/create', admin.createRole);
-  app.get('/admin/role/:roleId/edit', admin.editRoleView);
-  app.post('/admin/role/:roleId/edit', admin.editRole);
-  app.get('/admin/role/:roleId/remove', admin.removeRole);
-  app.get('/admin/user/:userId/roles', admin.showUserRoles);
-  app.post('/admin/user/:userId/roles', admin.updateUserRoles);
+  app.get('/admin/roles', verifyPermission('admin', 'read'), admin.rolesView);
+  app.get('/admin/role/create', verifyPermission('admin', 'edit'), admin.createRoleView);
+  app.post('/admin/role/create', verifyPermission('admin', 'edit'), admin.createRole);
+  app.get('/admin/role/:roleId/edit', verifyPermission('admin', 'edit'), admin.editRoleView);
+  app.post('/admin/role/:roleId/edit', verifyPermission('admin', 'edit'), admin.editRole);
+  app.get('/admin/role/:roleId/remove', verifyPermission('admin', 'delete'), admin.removeRole);
+  app.get('/admin/user/:userId/roles', verifyPermission('admin', 'read'), admin.showUserRoles);
+  app.post('/admin/user/:userId/roles', verifyPermission('admin', 'edit'), admin.updateUserRoles);
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
 
 };
