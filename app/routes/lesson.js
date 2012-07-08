@@ -103,14 +103,10 @@ module.exports.create = function(req, res, next) {
 
     lesson.sysAdmin.serverInfo = serverInfoArray;
 
-<<<<<<< HEAD
-
-=======
   }
 
   var f = req.files['videofile'];
   var verificationFile = req.files['verificationFile'];
->>>>>>> 2ad56a85d4110e6ce10e1a52b49b1062bde31aeb
 
   lesson.save(function(error) {
     if(error) {
