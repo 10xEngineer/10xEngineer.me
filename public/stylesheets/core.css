@@ -374,3 +374,141 @@ div.course_editor_header {
 .regBtn {
 	margin:20px 0px 0px;
 }
+
+/***********************/
+/* Course Image Silder */
+/***********************/
+
+.courseTitle {
+margin-bottom: 10px;
+}
+.courseImage {
+margin-bottom: 25px;
+}
+
+
+.courseBtn {
+font-size: 25px;
+width:170px;
+height:68px;
+margin-right:20px;
+}
+
+.courseBtnText {
+float:left;
+margin-top:10px;
+margin-left:5px;
+}
+
+.forumBtn {
+font-size: 25px;
+width:150px;
+height:68px;
+}
+
+.forumBtnText {
+float:left;
+margin-top:10px;
+margin-left:5px;
+}
+
+
+/* Generic bootstrap extensions */
+.align-center {
+	text-align: center;
+}
+
+/******************************/
+/* Start Merge with Custom   */
+/******************************/
+
+.navbar-inner .container .pull-right a {font-size: 13px;};
+#footer .container .span6 {width:230px;}
+#footer .container .span6 img{padding-right:5px;}
+#footer .container .span6 p{padding-top:5px;padding-left:5px;}
+#footer .container .socialmedia{float:right;}
+.span12 .span4 {padding-bottom: 5px;}
+#content {background-color:#F5F5F5;padding-top:15px;}
+
+.courseMenuNav{background-color:#3DB4FF;float: left;padding-bottom:5px;padding-top:5px;position:relative;text-align:center;width:100%;
+color:#ffffff;font-weight:bold;font-size:17px;margin-bottom:5px;}
+.courseMenu .active{background-color:#22A3FF;color:#333333;}
+.courseMenuNav:hover{background-color:#22A3FF;}
+
+.flexslider .row-fluid .btn-group {float:right;padding-top:5px;}
+.carouselWrapper {padding-bottom:5px;}
+
+.line{padding-top:10px;border-top: 1px solid #000000;}
+.carouselWrapper .carousel-inner .item img {margin: 10px;}
+.carouselButton{line-height: 200px;vertical-align: middle;}
+
+.detailsBorder {margin-bottom:20px;border: 1px solid #000000;}
+
+.courseDetailsWrapper {padding-top:10px;}
+.detailsBorder h2, .courseDetailsWrapper p{padding:10px;}
+
+.reviewHeader{border-bottom: 1px solid #000000;margin-bottom: 5px;font-weight:bold;font-size:20px;}
+
+.reviewHeader {background-color: none}
+.row-fluid .reviewBox {background-color:#E8E8E8; border: 1px solid #000000; margin-bottom: 5px}
+
+#carsouselItems .selectedItem img, #carsouselItems img:hover{border: 5px solid #3DB4FF;height: 170px;width: 230px;}
+.courseDetailsWrapper .row-fluid h1{font-size:18px;margin:0;padding:0;}
+.courseDetailsWrapper .row-fluid p{font-size:12px;margin:0;padding:0 5px;}
+.backBtn {float:right;padding:15px}
+#detailsAccordion .accordion-group li, ul.auth-service {list-style:none;margin:0;padding:0;}
+
+
+#detailsAccordion .accordion-group .accordion-body .accordion-inner ul{padding:0;margin:0;}
+#detailsAccordion .accordion-group .accordion-body .accordion-inner li{padding-top:5px;}
+#detailsAccordion .accordion-group .accordion-body .accordion-inner a {padding-left: 30px}
+
+.videoIcon, .quizIcon, .programmingIcon, .sysAdminIcon {background-repeat: no-repeat;background-position: left top;height:25px;width:25px;}
+.videoIcon{background-image: url(../img/video.png);}
+.quizIcon{background-image: url(../img/quiz.png);}
+.programmingIcon{background-image: url(../img/programming.png);}
+.sysAdminIcon{background-image: url(../img/admin.png);}
+
+.auth-service .btn {width: 240px}
+.auth-service span{float:left;padding:5px 0 0 5px;font-size:20px;font-weight:bold;}
+.googlIcon, .twIcon, .fbIcon{background-repeat: no-repeat;background-position: left top;height:32px;width:32px;float:left;}
+.googlIcon{background-image: url(../img/googleIcon.png);}
+.twIcon{background-image: url(../img/twitterIcon.png);}
+.fbIcon{background-image: url(../img/facebookIcon.png);}
+
+li.googl, li.tw{padding-bottom: 10px;}
+.loginWrapper .loginBox{text-align:center;padding:50px 0;min-width:370px}
+
+.loginArea{background-color: #D3D3D3;padding:50px 20px}
+.loginArea h1{padding-bottom:10px;}
+ul.auth-service{padding:0;}
+
+/*****************************/
+/* Ends :Merge with Custom   */
+/*****************************/
+
+/* Custom.css overrides */
+.videoIcon, .quizIcon, .programmingIcon, .sysAdminIcon, .not-started, .ongoing, .completed, {
+  display: inline-block;
+}
+#detailsAccordion .accordion-group .accordion-body .accordion-inner a {
+  padding-left: 10px;
+}
+
+a, a:active, a:hover, a:focus, a:selected, a:visited{outline:none;border:none;}
+.detailsBorder h2, .courseDetailsWrapper p{padding:5px;}
+
+.loginArea h1{padding-bottom:10px;}
+
+.progress{margin:0px 15px 10px 15px;}
+.progressTotal{margin: 0 20px 10px;}
+.progressBar{margin:10px;}
+.detailImage img{padding-top:25px;}
+.not-started, .ongoing, .completed{background-repeat: no-repeat;background-position: left top;height:25px;width:25px;margin: -25px 0px 0px 25px;}
+.not-started{background-position: center;background-image: url(../img/not-started.png);height:25px;}
+.ongoing{background-position: center;background-image: url(../img/ongoing.png);height:25px;}
+.completed{background-position: center;background-image: url(../img/finished.png);height:25px;}
+
+.lessonTitle {height:25px;margin: -20px 0px 0px 25px;}
+
+

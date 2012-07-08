@@ -1,58 +1,38 @@
-.navbar.span12
+.navbar
 	.navbar-inner
-		.container
-			a.btn.btn-navbar(data-toggle="collapse",data-target=".nav-collapse")
-				span.icon-bar
-				span.icon-bar
-				span.icon-bar
-			a.brand(href='/about', style='font-size:2em;') 
-				span(style='color:white;font-weight:bold;') 10
-				span(style='color:orange;') x
-				span(style='color:white;') Engineer
-				span(style='color:orange;font-weight:bold;') .
-				span(style='color:white;') me
-				// img(src='/img/10xengineer.me.png', alt='10xEngineer.me')
-			ul.nav.nav-collapse
-				li.active
-					a(href='/')
-						i.icon-home.icon-white 
-						| Home
-				li.dropdown
-					a.dropdown-toggle(href='/courses', data-toggle='dropdown')
-						i.icon-calendar.icon-white 
-						| Courses
-						b.caret
-					ul.dropdown-menu
+		.container(style="width: 1170px;")
+				a.btn.btn-navbar(data-toggle="collapse",data-target=".nav-collapse")
+					span.icon-bar
+					span.icon-bar
+					span.icon-bar
+				a.brand(href='/', style='font-size:2em;') 
+					span(style='color:white;font-weight:bold;') 10
+					span(style='color:orange;') x
+					span(style='color:white;') Engineer
+					span(style='color:orange;font-weight:bold;') .
+					span(style='color:white;') me
+					// img(src='/img/10xengineer.me.png', alt='10xEngineer.me')
+				//form.navbar-search.pull-right(action='')
+				//	input.search-query.span3(type='text', placeholder='Search Contents')
+				ul.nav.pull-right.nav-collapse
+					-if(!everyauth.loggedIn)
 						li
-							a(href='#') My Courses
-						li.divider
+							a(href='/auth')
+								i.icon-user.icon-white
+								|  Sign In
+					-if(everyauth.loggedIn)
 						li
-							a(href='#') Upcoming Courses
-				li.dropdown
-					a(href='http://10xEngineer.me:80')
-						i.icon-map-marker.icon-white 
-						| Forum
-			//form.navbar-search.pull-right(action='')
-			//	input.search-query.span3(type='text', placeholder='Search Contents')
-			ul.nav.pull-right.nav-collapse
-				-if(!everyauth.loggedIn)
-					li
-						a(href='/auth')
-							i.icon-user.icon-white
-							|  Sign In
-				-if(everyauth.loggedIn)
-					li
-						a(href='/user/profile')
-							- if(isAdmin)
-								i.icon-eye-open.icon-white
-							- else
-								i.icon-user.icon-white 
-							|  #{everyauth.user.name} 
-							- if(isAdmin)
-								| ( 
-								strong(style='color:yellow') admin 
-								| )
-					li
-						a(href='/logout')
-							i.icon-star-empty.icon-white
-							|  Sign Out
+							a(href='/user/profile')
+								- if(isAdmin)
+									i.icon-eye-open.icon-white
+								- else
+									i.icon-user.icon-white 
+								|  #{everyauth.user.name} 
+								- if(isAdmin)
+									| ( 
+									strong(style='color:yellow') admin 
+									| )
+						li
+							a(href='/logout')
+								i.icon-star-empty.icon-white
+								|  Sign Out
