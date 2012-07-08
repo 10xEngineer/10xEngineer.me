@@ -53,7 +53,7 @@ module.exports.create = function(req, res, next){
   course.save(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not create course.";
+      req.session.error = "Can not create course.";
       next(error);
     }
 
@@ -61,7 +61,7 @@ module.exports.create = function(req, res, next){
 
     //Set the course info in the session to let socket.io know about it.
     req.session.newCourse = {title: course.title, _id: course._id};
-    message = "Course created successfully.";
+    req.session.message = "Course created successfully.";
     res.redirect('/course/' + id);
   });
 
@@ -91,7 +91,7 @@ module.exports.import = function(req, res, next) {
     parsedCourse = JSON.parse(fs.readFileSync(f.path, 'utf-8'));
   } catch (e) {
     log.error(e);
-    error = "Can not import course.";
+    req.session.error = "Can not import course.";
     //res.redirect('/course/import', {error: e});
   }
 
@@ -119,7 +119,7 @@ module.exports.import = function(req, res, next) {
     }
 
     // Success
-    message = "Import Sucessfully Course.";
+    req.session.message = "Import Sucessfully Course.";
     res.redirect('/courses');
   });
 };
@@ -203,9 +203,9 @@ module.exports.remove = function(req, res, next){
   course.removeCourse(function(error){
     if (error) {
       log.error(error);
-      error = "Can not remove course.";
+      req.session.error = "Can not remove course.";
     }
-    message = "Sucessfully course removed.";
+    req.session.message = "Sucessfully course removed.";
     res.redirect('/courses/');
   });
 };

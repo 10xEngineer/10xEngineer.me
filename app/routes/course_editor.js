@@ -722,7 +722,7 @@ module.exports.lessonUp = function(req, res, next){
   lesson.move(0, function(error) {
     if(error) {
       log.error(error);
-      error = "Can not moved lesson.";
+      req.session.error = "Can not moved lesson.";
     }
     req.session.message = "Lesson moved sucessfully.";
     res.redirect('/course_editor/chapter/' + lesson.chapter.id);

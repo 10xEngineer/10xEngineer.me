@@ -111,7 +111,7 @@ module.exports.create = function(req, res, next) {
   lesson.save(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not create lesson.";
+      req.session.error = "Can not create lesson.";
     }
     var id = lesson.id;
     if(lesson.type == 'video' && lesson.video.type == 'upload') {
@@ -133,7 +133,7 @@ module.exports.create = function(req, res, next) {
             }
 
             req.session.newLesson = {title: lesson.title, _id: lesson._id};
-            message = "Lesson created successfully.";
+            req.session.message = "Lesson created successfully.";
             res.redirect('/lesson/' + id);
           });
         });
@@ -158,14 +158,14 @@ module.exports.create = function(req, res, next) {
             }
 
             req.session.newLesson = {title: lesson.title, _id: lesson._id};
-            message = "Lesson created successfully.";
+            req.session.message = "Lesson created successfully.";
             res.redirect('/lesson/' + id);
           });
         });
       });
     } else {
       req.session.newLesson = {title: lesson.title, _id: lesson._id};
-      message = "Lesson created successfully.";
+      req.session.message = "Lesson created successfully.";
       res.redirect('/lesson/' + id);
     }
   });
@@ -383,7 +383,7 @@ module.exports.edit = function(req, res){
   lesson.save(function(error) {
     if(error) {
       log.error(error);
-      error = "Can not create lesson.";
+      req.session.error = "Can not create lesson.";
     }
     var id = lesson.id;
     if(lesson.type == 'video' && lesson.video.type == 'upload' && req.files.videofile.name !== '') {
@@ -402,13 +402,13 @@ module.exports.edit = function(req, res){
               next(error);
             }
 
-            message = "Lesson edited successfully.";
+            req.session.message = "Lesson edited successfully.";
             res.redirect('/lesson/' + id);
           });
         });
       });
     } else {
-      message = "Lesson edited successfully.";
+      req.session.message = "Lesson edited successfully.";
       res.redirect('/lesson/' + id);
     }
   });
@@ -498,10 +498,10 @@ module.exports.remove = function(req, res, next){
   lesson.removeLesson(function(error){
     if (error) {
       log.error(error);
-      error = "Can not remove lesson.";
+      req.session.error = "Can not remove lesson.";
       res.redirect('/chapter/:id');
     }
-    message = "Sucessfully lesson removed.";
+    req.session.message = "Sucessfully lesson removed.";
     res.redirect('/chapter/'+ chapterId);
   });
 };
@@ -515,9 +515,9 @@ module.exports.up = function(req, res, next){
   lesson.move(0, function(error) {
     if(error) {
       log.error(error);
-      error = "Can not moved lesson.";
+      req.session.error = "Can not moved lesson.";
     }
-    message = "Lesson moved sucessfully.";
+    req.session.message = "Lesson moved sucessfully.";
     res.redirect('/chapter/' + lesson.chapter.id);
   });
 };
@@ -562,9 +562,9 @@ module.exports.down = function(req, res, next){
   lesson.move(1, function(error) {
     if(error) {
       log.error(error);
-      error = "Can not moved lesson.";
+      req.session.error = "Can not moved lesson.";
     }
-    message = "Lesson moved sucessfully.";
+    req.session.message = "Lesson moved sucessfully.";
     res.redirect('/chapter/' + lesson.chapter.id);
   });
 };
@@ -577,7 +577,7 @@ module.exports.next = function(req,res){
   lesson.getNext(function(error,nextLessonID) {
     if(error) {
       log.error(error);
-      error = "Can not moved to next lesson.";
+      req.session.error = "Can not moved to next lesson.";
     }  
     if(nextLessonID == null) {
       res.redirect('/course/' + req.course.id);
@@ -595,7 +595,7 @@ module.exports.previous = function(req,res){
   lesson.getPrevious(function(error,preLessonID) {
     if(error) {
       log.error(error);
-      error = "Can not moved to previous lesson.";
+      req.session.error = "Can not moved to previous lesson.";
     }
     if(preLessonID == null) {
       res.redirect('/course/' + req.course.id);
