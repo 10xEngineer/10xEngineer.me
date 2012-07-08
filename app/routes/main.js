@@ -1,9 +1,10 @@
+var User = load.model('User');
+var util = load.helper('util');
 
 module.exports = function() {};
 
 // Miscellaneous routes
 module.exports.home = function(req, res){
-  log.info(req.user);
   res.render('main', {
     title: '10xEngineer.me Home', 
     coursenav: "N",
@@ -28,3 +29,64 @@ module.exports.auth = function(req, res){
   });
 };
 
+module.exports.registerView = function(req, res) {
+  if(req.loggedIn && !req.user.email) {
+    res.render('users/register', {
+      layout: '',
+      title: 'Register'
+    });
+  } else {
+    util.redirectBackOrHome(req, res);
+  }
+};
+
+module.exports.register = function(req, res, next) {
+  var email = req.body.email;
+
+  // Check for existing accounts based on current email
+  User.findOne({ email: email }, function(error, user) {
+    if(error) {
+      log.error(error);
+      next(error);
+    }
+
+    if(!user) {
+      // Save email address in current user
+      user = req.user;
+      user.email = email;
+      user.save(function(error) {
+        if(error) {
+          log.error(error);
+          next(error);
+        }
+
+        util.redirectBackOrHome(req, res);
+      });
+    } else {
+      // Merge existing user with current user
+      var currentUser = req.user;
+
+      var userObj = user.toObject();
+      delete userObj._id;
+      delete userObj.id;
+
+      currentUser = util.merge(currentUser, userObj);
+      currentUser.save(function(error) {
+        if(error) {
+          log.error(error);
+          next(error);
+        }
+
+        // Delete existing user
+        user.remove(function(error) {
+          if(error) {
+            log.error(error);
+            next(error);
+          }
+  
+          util.redirectBackOrHome(req, res);
+        });
+      });
+    }
+  });
+};

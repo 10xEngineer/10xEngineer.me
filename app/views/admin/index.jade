@@ -1,35 +1,15 @@
-h1= title
-.actions 
-  ul
-    each user in users
-      li 
-        a(href='/user/#{user.id}', id='#{user.id}') #{user.name}
-        .roles.btn-group.pull-right(data-toggle='buttons-checkbox')
-          each role in roles
-            - if(user.roles.join(',').indexOf(role.name) >= 0)
-              button.btn.active(id='#{role._id}') #{role.name}
-            - else
-              button.btn(id='#{role._id}') #{role.name}
-
-script
-  $('.roles').button();
-  $('.roles button').click(function(e) {
-    var self = this;
-    $.ajax({
-      url: '/admin/' + $(self).parents().find('a').attr('id') + '/' + $(self).attr('id'),
-      type: 'get',
-      success: function(data) {
-        if(typeof(data) == 'string') {
-          data = JSON.parse(data);
-        }
-        
-        if(!data.success) {
-          $(self).removeClass('active');
-        }
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
-    
-  });
+.container
+  h1= title
+  .admin_view_header
+    a.btn(href="/admin/roles", style="margin-right: 5px;") Roles
+    a.btn(href="/admin/labs") Labs
+    .counts.pull-right
+      label [Total - #{users.length}]
+  .actions 
+    ul.admin_view_list_items
+      each user in users
+        li 
+          label(for='#{user.id}', style='display:inline') #{user.name}
+          .roles.pull-right
+            p(style="display:inline; padding-right: 5px;") #{user.roles.join(', ')}
+            a.btn(href='/admin/user/#{user.id}/roles', id='#{user.id}', style="display:inline") Edit

@@ -1,0 +1,28 @@
+.container
+  h1 Labs
+
+  br
+
+  .labs_header
+    a.btn.pull-right(href="/admin/labs/create", style="margin-bottom: 5px;") 
+      i.icon-plus
+      |   Add New Lab
+
+
+  table.table.table-bordered
+    thead
+      tr
+        th Name
+        th Type
+        th RunList
+        th Action
+    tbody
+      -var index = 0;
+      each lab in labs
+        tr
+          td #{lab.name}
+          td #{lab.type}
+          td #{lab.runList}
+          td 
+            a.btn.btn-success(href="/admin/labs/#{lab.id}/edit", style="margin-right: 5px;") Edit 
+            a.btn.btn-danger(href="/admin/labs/#{lab.id}/remove") Delete

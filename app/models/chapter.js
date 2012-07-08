@@ -10,7 +10,7 @@ var ChapterSchema = new Schema({
   id: { type: Number, unique: true, index: true },
   title: { type: String, index: true, trim: true, required: true },
   desc: { type: String, trim: true },
-  status: { type: String, default: 'draft', enum: ['draft', 'punlished'], required: true },
+  status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   course: { type: ObjectId, ref: 'Course', required: true },
   lessons: [{ type: ObjectId, ref: 'Lesson' }],
   created_at: { type: Date, default: Date.now },
@@ -64,16 +64,115 @@ ChapterSchema.post('save', function() {
 
 ChapterSchema.methods.publish = function(publish, callback) {
   var chapter = this;
-  
-  if(chapter.publish) {
-    chapter.status = 'published';
+  if(publish) {
+    publishChapter(chapter,function(chapter,error){
+      if(error) {
+        log.error(error);
+      }
+      callback();
+    });
   } else {
     chapter.status = 'draft';
+    chapter.save(function(error) {
+      if(error) {
+        log.error(error);
+      }
+      callback();
+    });
+  } 
+};
+
+ChapterSchema.methods.removeChapter= function(callback) {
+  // TODO: Remove all child 
+  var chapter = this;
+  var course = chapter.course;
+  
+  // For Remove Chapter _Id from Course Table
+  for (var i = 0 ; i < course.chapters.length; i++) {
+    if(course.chapters[i].toString() == chapter._id.toString()) {
+      
+      course.chapters.splice(i,1);
+      
+      course.markModified('chapters');
+      course.save(function(error) {
+        if(error) {
+          log.error(error);
+        }
+      });
+    }
   }
 
-  chapter.save(callback);
+  chapter.remove(function(error) {
+    if(error) {
+      callback(error);
+    }
+    callback();
+  });
+};
+
+
+// For Move Up & Down Chapter
+ChapterSchema.methods.move = function(index,callback){
+
+  var chapter = this ;
+  var temp;
+  var course = chapter.course;
+  for (var i = 0 ; i < course.chapters.length; i++) {
+    if(course.chapters[i].toString() == chapter._id.toString()) {
+      if(index == 0) {
+        if(i-1 >= 0) {
+            temp = course.chapters[i];
+            course.chapters[i] = course.chapters[i-1];
+            course.chapters[i-1] = temp;
+            break;
+          }
+      }  
+      else if(index == 1) {
+      
+        if(i+1 <= course.chapters.length) {
+            temp = course.chapters[i];
+            course.chapters[i] = course.chapters[i+1];
+            course.chapters[i+1] = temp;
+        break;
+          }
+      }      
+    }
+  }
+  course.markModified('chapters');
+  course.save(callback);
+
+
 };
 
 mongoose.model('Chapter', ChapterSchema);
 
+var Chapter = load.model('Chapter');
 
+var publishChapter = function(chapter, callback) {
+
+  Chapter.findById(chapter._id)
+  .populate('lessons')
+  .run(function(error, chapter) {
+    if(error) {
+      callback(error, chapter);
+    }
+    var lessonsLength = chapter.lessons.length;
+    for(var lessonIndex = 0 ; lessonIndex < lessonsLength ; lessonIndex++) {
+      chapter.lessons[lessonIndex].status = "published";
+      chapter.lessons[lessonIndex].save(function(error){
+        if(error) {
+          log.error(error);
+        }
+      });
+    }
+    chapter.status = 'published';
+    chapter.markModified('lessons');
+
+    chapter.save(function(error) {
+      if(error) {
+        log.error(error);
+      }
+      callback(error, chapter);
+    });
+  });
+};

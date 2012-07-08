@@ -1,12 +1,10 @@
-var config = load.helper('config');
-var dbConfig = config.db;
-
 var Metadata = load.model('Metadata');
 var Count = load.model('Count');
 var User = load.model('User');
 var Role = load.model('Role');
+var LabDef = load.model('LabDef');
 
-module.exports = function() {
+module.exports = function(config) {
   var self = this;
 
   // Check current schema version from database
@@ -14,10 +12,11 @@ module.exports = function() {
     if(error) {
       log.error(error);
     }
+    var codeSchemaVersion = config.get('db:schemaVersion');
 
-    if(currentVersion !== dbConfig.schemaVersion) {
+    if(currentVersion !== codeSchemaVersion) {
       // Schema has changed. Execute migration functions.
-      migrateSchema(currentVersion, dbConfig.schemaVersion, function(version) {
+      migrateSchema(currentVersion, codeSchemaVersion, function(version) {
 
         // Update schemaVersion in the database
         Metadata.setValue('schemaVersion', version);
@@ -101,7 +100,56 @@ var migrate = function(dbVersion, codeVersion, done) {
         });
       });
     });
-  } else if(dbversion == 3) {
+  } else if(dbVersion == 3) {
+    // Defualt LabDef 
+    var labDef = new LabDef();
+    labDef.name = 'Web Server';
+    labDef.type = 'Ubuntu';
+    labDef.cpu = 1;
+    labDef.memory = 768;
+    labDef.storage = 1024;
 
+    labDef.save(function(error){
+      if(error) {
+        log.error(error);
+      }
+      done();
+    });
+
+  } else if(dbVersion == 4) {
+    // Role reset.
+    Role.remove({}, function(error) {
+      log.info('Deleted all existing roles. Recreating...');
+
+      var defaultRole = new Role();
+      defaultRole.permissions = [];
+
+      defaultRole.save(function(error){
+        if(error) {
+          log.error(error);
+          process.exit();
+        }
+
+        // Add admin role
+        var adminRole = new Role();
+        adminRole.name = 'admin';
+        adminRole.permissions = [];
+        adminRole.permissions.push('course_all_all');
+        adminRole.permissions.push('user_all_all');
+        adminRole.permissions.push('admin_all_all');
+
+        adminRole.save(function(error) {
+
+          var userRole = new Role();
+          userRole.name = 'user';
+          userRole.permissions = [];
+          userRole.permissions.push('course_all_all');
+
+          userRole.save(function(error) {
+            done();
+          });
+        });
+      });
+    });
   }
 };

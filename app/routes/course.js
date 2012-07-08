@@ -5,29 +5,31 @@ var path = require('path')
 // Load models
 var Course = load.model('Course');
 var User = load.model('User');
-
 var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
+var Progress = load.model('Progress');
+var progressHelper = load.helper('progress');
 
 var importer = load.helper('importer');
-var util = load.helper('util');
 
 module.exports = function() {};
 
 // List existing courses
 module.exports.list = function(req, res){
-  var registered_courses = [];
-  if( typeof(req.user) != 'undefined' && typeof(req.user.registered_courses) != 'undefined') {
-    registered_courses = req.user.registered_courses;
-  }
-
+  var formatedProgress = {};
   Course.find({}, function(error, courses){
-    res.render('courses', { 
-      title: 'Courses',
-      courses: courses,
-      registered_courses: registered_courses
+    Progress.find({ user: req.user._id }, function(error, progresses){
+      for(var index = 0; index < progresses.length; index++){
+        var progress = progresses[index];
+        formatedProgress[progress.course] = progress.status;
+      }
+      res.render('courses', { 
+        title: 'Courses',
+        courses: courses,
+        progress : formatedProgress
+      });
     });
-  });
+  })
 };
 
 // Create new course form
@@ -39,24 +41,30 @@ module.exports.createView = function(req, res){
 };
 
 // Create a new course
-module.exports.create = function(req, res){
+module.exports.create = function(req, res, next){
   var course = new Course();
+  var util = load.helper('util');
   course.title = req.body.title;
   course.desc = req.body.description;
   course.image = req.body.image;
+  course.cropImgInfo = req.body.cropImgInfo;
   course.created_by = req.user._id;
 
   course.save(function(error) {
     if(error) {
       log.error(error);
+      req.session.error = "Can not create course.";
+      next(error);
     }
 
     var id = course.id;
 
     //Set the course info in the session to let socket.io know about it.
     req.session.newCourse = {title: course.title, _id: course._id};
+    req.session.message = "Course created successfully.";
     res.redirect('/course/' + id);
   });
+
 };
 
 // TODO: Quick course import tool. Modify to support the new course format
@@ -83,6 +91,7 @@ module.exports.import = function(req, res, next) {
     parsedCourse = JSON.parse(fs.readFileSync(f.path, 'utf-8'));
   } catch (e) {
     log.error(e);
+    req.session.error = "Can not import course.";
     //res.redirect('/course/import', {error: e});
   }
 
@@ -110,6 +119,7 @@ module.exports.import = function(req, res, next) {
     }
 
     // Success
+    req.session.message = "Import Sucessfully Course.";
     res.redirect('/courses');
   });
 };
@@ -118,30 +128,47 @@ module.exports.import = function(req, res, next) {
 //TODO : Go to the last lesson if course already started
 //TODO : Also add this course to the users registered courses
 // Register for a course (if not already registered, and Go to the last viewed or first lesson. 
-module.exports.start = function(req, res){
-  //log.debug('course: ' + req.course);
-  //log.debug('chapters: ' + req.course.chapters[0]); 
-  //log.debug('lessons: ' + req.course.chapters[0].lessons);
-  var course = req.course;
-  if (course.chapters.length > 0) {
-	  var chapter = course.chapters[0];
-	  if (chapter.lessons.length > 0) {
-		  //log.debug('lesson from chapter: '+ chapter.lessons[0]);
-		  Lesson.findById( chapter.lessons[0].__id, function(err, doc) {
-			//log.debug('found lesson: '+doc);
-			res.redirect('/lesson/' + doc.id+'/');
-		  });
+module.exports.start = function(req, res, next){
+  // Check if user has already started the course
 
-      }
-  }
+
+  Progress.startOrContinue(req.user, req.course, function(error, progress) {
+    if(error) {
+      log.error(error);
+      next(error);
+    }
+    if(!req.session.progress[req.course._id] || !req.session.progress)
+    {
+      delete req.session.progress;
+      progressHelper.get(req.session.auth.userId, function(error,progressObject){
+        if(error) {
+          log.error(error);
+        }
+        req.session.progress = progressObject;
+        // Redirect the user to first unfinished lesson
+        progress.getNextLesson(function(error, nextLesson) {
+          res.redirect('/lesson/' + nextLesson);
+        });
+      });
+
+    } else {
+      // Redirect the user to first unfinished lesson
+      progress.getNextLesson(function(error, nextLesson) {
+        res.redirect('/lesson/' + nextLesson);
+      });
+    }
+  });
 };
 
 // Load specific course and display chapter index
-module.exports.show = function(req, res){
-  res.render('courses/chapters', {
-    title: req.course.title,
-    chapter: undefined
-  });
+module.exports.show = function(req, res, next){
+    var progress = req.session.progress[req.course._id];
+    res.render('courses/courseDetails', {
+      title: req.course.title,
+      chapter: undefined,
+      index :0,
+      progress : progress
+    });
 };
 
 // Edit course
@@ -153,23 +180,60 @@ module.exports.updateView = function(req, res, next){
 
 // TODO: Update course
 module.exports.update = function(req, res, next){
-  res.render('courses/edit', {
-    title: req.course.title
+  var course = req.course;
+  course.title = req.body.title;
+  course.desc = req.body.description;
+  course.image = req.body.image;
+
+  course.save(function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not updated course.";
+    }
+    req.session.message = "Course updated sucessfully.";
+    res.redirect('/course/' + course.id);
   });
 };
 
 // Remove entire course and its chapters
 module.exports.remove = function(req, res, next){
-  log.info('Removing course...');
-
+  
   var course = req.course;
 
   course.removeCourse(function(error){
     if (error) {
       log.error(error);
+      req.session.error = "Can not remove course.";
     }
+    req.session.message = "Sucessfully course removed.";
     res.redirect('/courses/');
   });
 };
 
+// Publish a course
+module.exports.publish = function(req, res) {
+  var course = req.course;
 
+  course.publish(true, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not published course.";
+    }
+    req.session.message = "Course published sucessfully.";
+    res.redirect('/course/' + course.id);
+  });
+};
+
+// unpublish a chapter
+module.exports.unpublish = function(req, res) {
+  var course = req.course;
+  
+  course.publish(false, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not unpublished course.";
+    }
+    req.session.message = "Course unpublished sucessfully.";
+    res.redirect('/course/' + course.id);
+  });
+};

@@ -1,0 +1,48 @@
+.container
+  .container-fluid.lesson.inner-index
+    h1 #{lesson.title}
+    p 
+      strong Description :-
+      p #{lesson.desc}
+    .row-fluid
+      .span10
+        video#player(width='930', height='525', preload="none")
+          - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
+            source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
+          - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
+            source(type='video/mp4', src='#{lesson.video.content}')
+        .backPanel
+          a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back
+          //a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+   
+    .row-fluid
+      p
+
+  script
+    $('video').mediaelementplayer({
+      enablePluginDebug: false,
+      defaultVideoWidth: 930,
+      defaultVideoHeight: 525,
+      features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
+      alwaysShowControls: true,
+      pluginPath: '/javascripts/mediaelement/',
+      success: function(mediaElement, domObject) {
+        mediaElement.addEventListener('timeupdate', function(e) {
+          //document.getElementById('current-time').innerHTML = mediaElement.currentTime;
+        }, false);
+        mediaElement.addEventListener('ended', function(e) {
+          $.ajax({
+            url: '/lesson/#{lesson.id}/complete/',
+            success: function(data) {
+              $('.lessonBar .btn-success').addClass('btn-large');
+            },
+            error: function(error, status, xhr) {
+              console.log(JSON.stringify(error) + "Status: " + status);
+            }
+          });
+        }, false);
+      },
+      error: function(err) {
+        console.log(err);
+      }
+    });

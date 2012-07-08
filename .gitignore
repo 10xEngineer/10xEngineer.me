@@ -33,6 +33,4 @@ nbproject
 .CVS
 .idea
 node_modules
-app/node_modules
 app/upload/*
-app/public/quiz/*

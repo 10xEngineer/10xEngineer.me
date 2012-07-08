@@ -1,0 +1,33 @@
+.container-fluid
+	.row-fluid
+		.span12
+			ul.breadcrumb
+				li
+					a(href='/courses') Courses
+					span.divider /
+				- if(typeof (course) != 'undefined')
+					li
+						a(href='/course/#{course.id}') #{course.title}
+						span.divider /
+					- if(typeof (chapter) != 'undefined')
+						li
+							a(href='/chapter/#{chapter.id}') #{chapter.title}
+							span.divider /
+						- if(typeof (lesson_id) != 'undefined' && typeof(lesson) != 'undefined')
+							li
+								a(href='/courses/#{course._id}/#{unit_id}/#{lesson_id}') #{lesson.title}
+								span.divider /
+
+		//
+			.span7
+				ul.nav.nav-pills
+					li.active
+						a(href='#overview') Overview
+					li
+						a(href='/ContentManager') Course Content
+					li
+						a(href='/') Discussion
+					li
+						a(href='#announcements') Announcements
+					li
+						a(href='/progress') Progress

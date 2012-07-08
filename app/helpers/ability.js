@@ -1,9 +1,11 @@
 var _ = require('underscore');
+var async = require('async');
 
 var Role = load.model('Role');
 
-module.exports.can = function(roles, entity, target, action) {
-  return _.filter(roles, function(roleName) {
+module.exports.can = function(roles, entity, target, action, callback) {
+  var matched = false;
+  async.forEach(roles, function(roleName, callback) {
     Role.findOne({ name: roleName }, function(error, role) {
       if(error) {
         log.error(error);
@@ -25,7 +27,11 @@ module.exports.can = function(roles, entity, target, action) {
         return false;
       });
 
-      return (matchedPermissions.length > 0);
+      matched = matched || matchedPermissions.length > 0;
+      callback();
     });
+  },
+  function(error) {
+    callback(matched);
   });
 }

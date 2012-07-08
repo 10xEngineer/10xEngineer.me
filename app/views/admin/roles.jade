@@ -1,0 +1,21 @@
+.container
+	h1 Roles
+
+	p
+		.admin_view_header
+			a.btn(href="/admin/role/create") 
+				i.icon-plus 
+				|  Add Role
+	p
+		ul.admin_view_list_items
+			each role in roles
+				li
+					div(style="display:inline;")
+						label(style="display:inline;") #{role.name}
+					div(style="display:inline; float: right;")
+						a.btn.btn-danger(href="/admin/role/#{role.id}/remove") Remove
+					div(style="display:inline; float: right; margin-right:5px")
+						a.btn((href="/admin/role/#{role.id}/edit") Edit
+	p
+		.admin_view_footer
+			a.btn(href="/admin") Back to admin Panel.
