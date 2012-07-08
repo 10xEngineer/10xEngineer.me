@@ -10,6 +10,7 @@ module.exports.course = function(data, callback) {
   course.title = data.title;
   course.desc = data.desc;
   course.image = data.image;
+  course.created_by = data.created_by;
 
   course.save(function(error) {
     if(error) {

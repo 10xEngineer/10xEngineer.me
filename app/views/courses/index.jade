@@ -1,77 +1,39 @@
+script(type="text/javascript")
+  $(window).load(function() {
+    $('.flexslider').flexslider({
+      animation: "slide",
+      directionNav: true,
+      controlsContainer: ".flexslider-container"
+    });
+  });
 //- Course Admin index?
-.container-fluid.course-index.inner-index
+- course = {id: 1};
+.container
   -if(everyauth.loggedIn && isAdmin)
-    .row-fluid
-      .span1
       p.actions.clearfix
-        a(href='/course/create').btn.btn-large.btn-primary.pull-left Add Course
-        a(href='/course/import').btn.btn-large.btn-inverse.pull-right Import a course
-    .span1
-  #carousel.row
-    .span10.offset1
-      .carousel#course-carousel.slide.hidden-phone
-          ul.carousel-inner(style="width:100%; height:600px")
-            each course, code in courses
-              li.item.ribbon-wrapper
-                - if (registered_courses != undefined && registered_courses[course.id] && user != undefined)
-                  .ribbon-wrapper-green
-                    - if(registered_courses[course.id].status == 'COMPLETED')
-                      .ribbon-green COMPLETED
-                    - else
-                      .ribbon-green(style='color: yellow;') IN PROGRESS
-                a(href='/course/#{course.id}/')
-                  img.responsive(src="#{course.image}", style="height:400px; width:100%")
-                .carousel-caption
-                  h3 #{course.title}
-                  p Taught by Steve M.
-                    span.pull-right
-                      - if (registered_courses != undefined && user != undefined)
-                          - if ( registered_courses[course.id] )
-                               a.btn.btn-primary.btn-large(href='/course/#{course.id}/start') GO TO YOUR COURSE
-                          - else
-                               a.btn.btn-primary.btn-large(href='/course/#{course.id}/start') START THIS COURSE
-                        - else
-                          a.btn.btn-large.btn-info(href='/course/#{course.id}') LEARN MORE
+        a(href='/course_editor/create').btn.btn-primary.pull-left Add Course
+        a(href='/course_editor/import').btn.btn-inverse.pull-right Import a course
 
-          // carousel-nav
-          a.carousel-control.left(href='#course-carousel', data-slide='prev') &lsaquo;
-          a.carousel-control.right(href='#course-carousel', data-slide='next') &rsaquo;
-    .span1
-  #grid.row-fluid(style='display:none')
-    ul.thumbnails
-      each course, code in courses
-        li.span3.well
-          .ribbon-wrapper
-            - if (registered_courses != undefined && registered_courses[course.id] && user != undefined)
-              .ribbon-wrapper-green
-                - if(registered_courses[course.id].status == 'COMPLETED')
-                  .ribbon-green COMPLETED
-                - else
-                  .ribbon-green(style='color: yellow;') IN PROGRESS
-          a.thumbnail(href="/course/#{course.id}/")
-            img(src="#{course.image}")
-          p
-            #{course.content}
-  .row-fluid.span8
-    a#show_grid.button(href='#')
-      i.icon-th-large 
-      span  Grid
-    span
-    | 
-    a#show_carousel.button(href='#')
-      i.icon-retweet
-      span  Carousel
+  ul.nav.nav-pills.courseMenu
+    li.active
+      a(href="/courses") Featured
+    li
+      a(href="/courses/all") Course Library
+    li
+      a(href="/user/profile") My Library
 
-  script(type='text/javascript')
-    function init() {
-      $('.item').first().addClass("active");
-      $('.carousel').carousel(/*{ interval: 3000, pause:"hover"}*/);
-      $('#show_grid').click(function(e){
-        $('#grid').show(500);
-        $('#carousel').hide();
-      });
-      $('#show_carousel').click(function(e){
-        $('#carousel').show(500);
-        $('#grid').hide();
-      })
-    }
+  .row-fluid
+    div.flexslider
+      ul.slides
+        each courseObject,courseIndex in courses
+          li
+            center
+              img.courseImage(src="#{courseObject.image}")
+            div.detailsLink
+              h1.courseTitle #{courseObject.title}
+              p #{courseObject.desc}
+              div.detailsLinkBtn
+                a.btn.btn-primary.pull-right(href="/course/#{courseObject.id}") Details
+  .row-fluid
+    .span12
+  .carouselWrapper

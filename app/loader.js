@@ -12,8 +12,6 @@ var Load = function(type, name) {
   var type = args[0];
   if(type == 'model') {
     return loadModel(name);
-  } else if(type == 'model_init') {
-    return initModel(name);
   } else if(type == 'helper') {
     return loadHelper(name);
   } else if(type == 'middleware') {
@@ -26,11 +24,6 @@ var Load = function(type, name) {
     log.error('Invalid type');
     process.exit(1);
   }
-};
-
-var initModel = Load.model_init = function(name) {
-  var modelPath = rootPath + '/models';
-  return require(path.join(modelPath, name));
 };
 
 var loadModel = Load.model = function(name) {

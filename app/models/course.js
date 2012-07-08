@@ -4,6 +4,12 @@ var mongoose = require('mongoose')
 
 var Count = mongoose.model('Count');
 var cdn = load.helper('cdn');
+var util = load.helper('util');
+var fs = require('fs');
+var path = require('path')
+var gm = require('gm');
+var mime = require('mime');
+
 
 var CourseSchema = new Schema({
   _id: { type: ObjectId },
@@ -12,7 +18,7 @@ var CourseSchema = new Schema({
   desc: { type: String },
   image: { type: String },
   created_by: { type: ObjectId, ref: 'User' },
-  status: { type: String, default: 'draft', enum: ['draft', 'punlished'], required: true },
+  status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
   chapters: [{ type: ObjectId, ref: 'Chapter'}],
   created_at: { type: Date, default: Date.now, select: false },
   modified_at: { type: Date, default: Date.now, select: false }
@@ -42,7 +48,8 @@ CourseSchema.pre('save', function(next) {
 });
 
 CourseSchema.methods.removeCourse = function(callback) {
-  // TODO: Remove all child chapters and lessons
+  // TODO: Remove all child chapters and lessons. Also remove any progress associated with it.
+  
   var course = this;
 
   course.remove(function(error) {
@@ -50,6 +57,31 @@ CourseSchema.methods.removeCourse = function(callback) {
       callback(error);
     }
 
+    callback();
+  });
+};
+
+CourseSchema.methods.publish = function(publish, callback) {
+  var course = this;
+  if(publish) {
+        var chaptersLength = course.chapters.length;
+        for(var chapterIndex = 0 ; chapterIndex < chaptersLength ; chapterIndex++) {
+          var chapter = course.chapters[chapterIndex];
+          chapter.publish(true, function(error){
+            if(error){
+              log.error(error);
+            }
+          });
+        }
+      course.status = 'published';
+  } else {
+    course.status = 'draft';
+  }
+  course.markModified('chapters');
+  course.save(function(error) {
+    if(error) {
+      log.error(error);
+    }
     callback();
   });
 };
@@ -62,14 +94,67 @@ var saveCourse = function (course, callback) {
   var fileName = 'courseImage_' + course.id;
 
   // Process image
-  cdn.save(course.image, fileName, function(error, newUrl) {
-    course.image = newUrl;
-    course.save(function(error) {
+  util.saveToDisk(course.image, function(error, imagePath){
+    if(error){
+      log.error("Error comes from util - saveToDisk Function", error);
+      callback(error);
+    }
+    var cropImageInfo = typeof(course.cropImgInfo) == 'undefined' ? '{ "x": 0, "y": 0, "x2": 200, "y2": 200, "h": 200, "w": 200}' : course.cropImgInfo;
+    util.imageCrop(imagePath, cropImageInfo, function(error, croppedImagePath) {
       if(error) {
+        log.error("Error from Image crop opration", error);
         callback(error);
       }
 
-      callback(null);
+      // deletes old original file aftred crops
+      fs.unlink(imagePath, function (error) {
+        if (error) {
+          log.error("Error from unlink file", error);
+          callback(error);
+        }
+      });
+
+      // resize croped file
+      util.imageResize(croppedImagePath, function(error, resizedImagePath){
+        if(error){
+          log.error("Image Resize opration", error);
+          callback(error);
+        }
+  
+        var fileType = mime.extension(mime.lookup(resizedImagePath));
+
+        // deletes old croped file after resize
+        fs.unlink(croppedImagePath, function (error) {
+          if (error) {
+            log.error("Error from unlink file", error);
+            callback(error);
+          }
+        });
+
+        // fress resized image stores to database
+        cdn.saveFileNew(fileName, resizedImagePath, fileType, function(error){
+          if (error) {
+            log.error("Error from save file in database", error);
+            callback(error);
+          }
+
+          fs.unlink(resizedImagePath, function (error) {
+            if (error) {
+              log.error("Error from unlink file", error);
+              callback(error);
+            }
+          });
+
+          course.image = '/cdn/' + fileName;
+          course.save(function(error) {
+            if(error) {
+              callback(error);
+            }
+            callback();
+          });
+        });
+      });
     });
+
   });
 };
