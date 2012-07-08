@@ -1,7 +1,7 @@
 var User = load.model('User');
 var Role = load.model('Role');
 var LabDef = load.model('LabDef');
-
+var config = require('../config/config');
 var _ = require('underscore');
 
 
@@ -21,7 +21,8 @@ module.exports.show = function(req, res) {
 
 module.exports.labsView = function(req, res) {  
   res.render('admin/labs', {
-    lab: {name: '', type: '', cpu: '', memory: '',storage: '', runList: ''},
+    lab: {name: '', type: '', /*cpu: '', */memory: '',storage: ''},
+    itemList: config.get('vms')
   });
 };
 
@@ -31,14 +32,15 @@ module.exports.labEditView = function(req, res) {
     id : lab.id,
     name : lab.name, 
     type  : lab.type,
-    cpu : lab.cpu,
+    //cpu : lab.cpu,
     memory : lab.memory,
     storage : lab.storage,
-    runList  : []
+    runList  : lab.runList
   };
-  instanceLab.runList = lab.runList.join(',');
+  //instanceLab.runList = lab.runList.join(',');
   res.render('admin/labs', {
-    lab:instanceLab
+    lab:instanceLab,
+    itemList: config.get('vms')
   });
 };
 
@@ -46,16 +48,17 @@ module.exports.labEdit = function(req, res) {
   var labDef = req.labDef;
   labDef.name = req.body.name;
   labDef.type = req.body.type;
-  labDef.cpu = req.body.cpu;
+  /*labDef.cpu = req.body.cpu;*/
   labDef.memory = req.body.memory;
   labDef.storage = req.body.storage;
-  labDef.runList = [];
+  labDef.runList = req.body.runList;
+  /*labDef.runList = [];
   var runListArray = req.body.runList.split(',');
   var runListLength = runListArray.length;
   for (var index = 0; index < runListLength; index++) {
     labDef.runList[index] = runListArray[index];
   };
-
+*/
   labDef.save(function(error){
     if(error) {
       log.error(error);
@@ -69,16 +72,10 @@ module.exports.labs = function(req, res) {
   var labDef = new LabDef();
   labDef.name = req.body.name;
   labDef.type = req.body.type;
-  labDef.cpu = req.body.cpu;
+  //labDef.cpu = req.body.cpu;
   labDef.memory = req.body.memory;
   labDef.storage = req.body.storage;
-  labDef.runList = [];
-  var runListArray = req.body.runList.split(',');
-  var runListLength = runListArray.length;
-  for (var index = 0; index < runListLength; index++) {
-    labDef.runList[index] = runListArray[index];
-  };
-
+  labDef.runList = req.body.runList;
   labDef.save(function(error){
     if(error) {
       log.error(error);
@@ -90,23 +87,11 @@ module.exports.labs = function(req, res) {
 
 module.exports.showLabsView = function(req, res) {  
   LabDef.find(function (error, lab) {
-    var labsLength = lab.length;
-    var tempLabs = [];
-    for (var index = 0; index < labsLength; index++) {
-      var instanceLab = {
-        id : '',
-        name : '', 
-        type  : '',
-        runList  : []
-      };
-      instanceLab.id = lab[index].id;
-      instanceLab.name = lab[index].name;
-      instanceLab.type = lab[index].type;
-      instanceLab.runList = lab[index].runList.join(',');
-      tempLabs.push(instanceLab);
-    };
+
+    var vmList = config.get('vms');
     res.render('admin/showLabs', {
-        labs: tempLabs
+        labs: lab,
+        itemList: vmList
     }); 
   });
 };

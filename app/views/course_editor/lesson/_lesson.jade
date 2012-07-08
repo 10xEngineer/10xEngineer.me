@@ -77,27 +77,12 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
         h3 SysAdmin
         //- select.serverName#serverName(name='serverName', multiple='multiple')
         select.serverName#serverName(name='serverName', multiple='multiple', style='display:none')
+        select#vmName(name='vmNames', multiple='multiple', style='display:none')
+        select#vmHostName(name='vmHostNames', multiple='multiple', style='display:none')
 
         #selectedOptContainer
 
-        a.btn(data-toggle="modal", href="#myModal", style="margin: 5px 0px;") Add Server
-        div.modal.hide.fade#myModal
-          div.modal-header
-            button.close(type="button", data-dismiss="modal") 
-              i.icon-remove
-            h3 Add Server 
-          div.modal-body
-            p Select Server :
-            select#selectedServer(name='selectedServer')
-              option(value="0") Select
-              each labInstance,index in lab
-                option(value="#{labInstance._id}") #{labInstance.name}
-            div#serverInfo
-            a.btn#addServerName(data-dismiss="modal") Add
-          div.modal-footer
-            a.btn(data-dismiss="modal") Close
-        p Upload Verification File :
-        input.input-large(name='verificationFile', type='file')
+        != partial('sysAdminForm')
         
   - else
     input#lessonType(name='type', type='hidden', value='#{lesson.type}')
@@ -122,6 +107,12 @@ script(type='text/javascript')
     
     $('#formSubmit').click(function(){
       $('#serverName option').each(function() {
+        $(this).attr('selected', 'selected');
+      });
+      $('#vmName option').each(function() {
+        $(this).attr('selected', 'selected');
+      });
+      $('#vmHostName option').each(function() {
         $(this).attr('selected', 'selected');
       });
     });
@@ -353,135 +344,4 @@ script(type='text/javascript')
         console.log(err);
       }
     });
-
-    //--------------------------------------------------------------- //
-    //  SysAdmin : Show Selected Server Info in POP up Sceen          //
-    //--------------------------------------------------------------- //  
-
-    $('#selectedServer').change(function(){
-      
-      if($('#selectedServer :selected').val() == '0') {
-        $('#serverInfo').html('');
-        return;
-      }
-
-      var $serverId = $('#selectedServer :selected').val().split(' ');
-      $.ajax({
-        url: '/lesson/serverInfo/',
-        data: { id: $serverId[0] },
-        success: function(data) {
-          var serverInfo = data.serverInfo;
-          $('#serverInfo').html('<table class="table table-bordered"><tr><td><h5> Name :</h5></td><td>'+serverInfo.name+'</td></tr><tr><td><h5> Type :</h5></td><td>'+serverInfo.type+'</td></tr><tr><td><h5> CPU :</h5></td><td>'+serverInfo.cpu+'</td></tr><tr><td><h5> Memory :</h5></td><td>'+serverInfo.memory+'</td></tr><tr><td><h5> Storage :</h5></td><td>'+serverInfo.storage+'</td></tr><tr><td><h5> Run List :</h5></td><td>'+serverInfo.runList+'</td></tr></table>');
-        },
-        error: function(error, status, xhr) {
-          console.log(JSON.stringify(error) + "Status: " + status);
-        }
-      });
-      
-      
-    });
-
-    //----------------------------------------------------- //
-    //  SysAdmin : Add server name into List                //
-    //----------------------------------------------------- //  
-
-    $('#addServerName').click(function(){
-      
-      if($('#selectedServer :selected').val() == '0') {
-        alert('Please select server.');
-        return false;
-      }
-      var Details = $('#serverInfo').html();
-
-      // Call function for to add into Multiple Select
-      checkServerName($('#selectedServer :selected').text(), $('#selectedServer :selected').val());
-      addOptionDiv($('#selectedServer :selected').text(), Details);
-    });  
-
-    var addOptionDiv = function (selectedServerText, details){
-      console.log("Here");
-      var newDiv = $('<div/>', {
-        "html" : selectedServerText,
-        "class" : "optionDiv",
-        "rel" : "popover",
-        "data-content" : details,
-        "data-original-title" : selectedServerText,
-        });
-      $('<i class="icon-remove close pull-right closeOptBtn"></i>').click(function(){
-        console.log("Here on close");
-        $parent = $(this).parent();
-        $(this).remove();
-        removeOptFromSelect($parent.html());
-        $parent.popover('hide');
-        $parent.remove();
-      }).appendTo(newDiv);
-      newDiv.appendTo('#selectedOptContainer');
-      $('.optionDiv').popover();
-    }
-  
-    $('.closeOptBtn').click(function(){
-        console.log("Here on close");
-        $parent = $(this).parent();
-        $(this).remove();
-        removeOptFromSelect($parent.html());
-        $parent.popover('hide');
-        $parent.remove();
-    });
-
-    $('.optionDiv').popover();
-
-    var removeOptFromSelect = function(htmlText){
-      var $options = $("select.serverName option");
-      for(var index = 0; index < $options.length; index++){
-        var $option = $($options.get(index));
-        console.log("Test :: "+$option.html().toString()+" with "+htmlText);
-        if ($option.html().toString() == htmlText){
-          console.log($option);
-          $($options[index]).remove();
-          break;
-        }
-      }
-    }
-
-    var checkServerName = function(selectedServerText, selectedServerValue) {
-
-    $(".serverName").append("<option value='"+selectedServerValue+"'>"+selectedServerText+"</option>");
-
-    /*
-      var serverNameJSON = {};
-      var count=0, temp = 0;
-      var regExp = new RegExp('^([a-zA-z0-9\\\\s]+\\\\()( \\\\d+ )(\\\\))$');
-      $("select.serverName option").each(function () {
-
-        var tempOptValue= '';
-        var tempOptValue= $(this).val().split('(');
-        var selectedServerVal = selectedServerValue + " ";
-
-        if(tempOptValue[0] == selectedServerVal && (regExp.test($(this).html()))) {
-          
-          // For set Text of Multiple Select
-          var optNameArray = regExp.exec($(this).html());
-          optNameArray[2] = parseInt(optNameArray[2],10) + 1 ;
-          optNameArray.splice(0,1);
-          optNameArray = optNameArray.join(' ');
-          
-          // For set Value of Multiple Select
-          var optValArray = regExp.exec($(this).val());
-          optValArray[2] = parseInt(optValArray[2],10) + 1 ;
-          optValArray.splice(0,1);
-          optValArray = optValArray.join(' ');
-
-          $(this).text(optNameArray);
-          $(this).val(optValArray);
-          temp = 1;
-        }
-      });
-
-      // If not available in Multiple Select than append on it.
-      if(temp == 0) {
-        $(".serverName").append("<option value='"+selectedServerValue+" ( 1 )'>"+selectedServerText+" ( 1 )</option>");
-      }
-    */  
-    };
-
   });

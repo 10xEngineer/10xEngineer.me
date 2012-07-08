@@ -5,7 +5,7 @@ var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
 var LabDef = load.model('LabDef');
 var cdn = load.helper('cdn');
-
+//var request = require('request');
 
 
 
@@ -378,11 +378,47 @@ module.exports.lessonCreate = function(req, res, next) {
   lesson.title   = req.body.title;
   lesson.desc    = req.body.description;
   lesson.type    = req.body.type;
-  
+  var f;
+
   // For Video Lesson
   if(lesson.type == 'video') {
     lesson.video.type    = req.body.videoType;
     lesson.video.content = req.body.videoContent;
+    f = req.files['videofile'];
+    lesson.save(function(error) {
+      if(error) {
+        log.error(error);
+        req.session.error = "Can not create lesson.";
+      }
+      var id = lesson.id;
+      if(lesson.video.type == 'upload')
+      {
+        var fileName = 'lessonVideo_' + id;
+
+        cdn.saveFile(fileName, f, function(error, fileName) {
+          if(error) {
+            log.error(error);
+            next(error);
+          }
+
+          Lesson.findOne({ id: id }, function(error, lesson) {
+            // Save the CDN URL if available
+            lesson.video.content = fileName;
+            lesson.save(function(error) {
+              if(error) {
+                log.error(error);
+                next(error);
+              }
+
+              req.session.newLesson = {title: lesson.title, _id: lesson._id};
+              req.session.message = "Lesson created successfully.";
+              res.redirect('/course_editor/lesson/' + id);
+            });
+          });
+        });
+      }
+      else saveLesson(lesson, req, res); 
+    });
   }
 
   // For Programming Lesson
@@ -391,6 +427,7 @@ module.exports.lessonCreate = function(req, res, next) {
     lesson.programming.skeletonCode = req.body.code ;
     lesson.programming.input = req.body.input ;
     lesson.programming.output = req.body.output ;
+    saveLesson(lesson, req, res);
   }
   // For Quiz Lesson
   if(lesson.type == 'quiz') {
@@ -417,85 +454,89 @@ module.exports.lessonCreate = function(req, res, next) {
       }
       lessonInstanceQuestion.push(instanceQuestion);
     }
+    saveLesson(lesson, req, res);
   }
 
   // For sysAdmin Lesson
   if(lesson.type == 'sysAdmin') {
+    var f = req.files['verificationFile'];
     var serverInfoArray = [];
-    var serverName = req.body.serverName;
-    lesson.sysAdmin.serverInfo = serverName;
-    log.info("SERVER INFO :: ", lesson.sysAdmin.serverInfo);
-    var f = req.files['videofile'];
-   
-/*
-    var serverInfoArray = [];
-    var serverName = req.body.serverName;
-    if(typeof(serverName) == 'string') {
-      var optNameArray = serverName.split(' ');
-      var selectedServerNo = parseInt(optNameArray[3],10);
-      for(var count = 0 ; count < selectedServerNo; count++) {
-        serverInfoArray.push((optNameArray[0]));
-      }
+    var vmTamplateIdList = req.body.serverName;
+    var vmNameList = req.body.vmNames;
+    var vmHostNameList = req.body.vmHostNames;
+    var vms = [];
+    if(typeof(vmTamplateIdList) == 'string') vmTamplateIdList = [vmTamplateIdList];
+    if(typeof(vmNameList) == 'string') vmNameList = [vmNameList];
+    if(typeof(vmHostNameList) == 'string') vmHostNameList = [vmHostNameList];
 
-    } else if(typeof(serverName) == 'object') {
-
-      var length = serverName.length;
-      for (var index = 0; index < length; index++) {
-        var optNameArray = serverName[index].split(' ');
-        var selectedServerNo = parseInt(optNameArray[3],10);
-        for(var count = 0 ; count < selectedServerNo; count++) {
-          serverInfoArray.push((optNameArray[0]));
+    LabDef.find({_id : { $in : vmTamplateIdList}}, function (error, lab) {
+      for(var index = 0; index < vmTamplateIdList.length; index++) {
+        var tmpJSON = {};
+        tmpJSON['vm_name'] = vmNameList[index];
+        tmpJSON['hostname'] = vmHostNameList[index];
+        tmpJSON['ref'] = vmTamplateIdList[index];
+        for(labIndex = 0; labIndex < lab.length; labIndex++) {
+          if(vmTamplateIdList[index] == lab[labIndex]._id) {
+            tmpJSON['vm_type'] = lab[labIndex].type;
+            tmpJSON['runlist'] = lab[labIndex].runList;
+            tmpJSON['vm_attrs'] = {};
+            tmpJSON['vm_attrs']['memory'] = lab[labIndex].memory;
+            tmpJSON['vm_attrs']['storage'] = lab[labIndex].storage;
+          }
         }
+        vms.push(tmpJSON);
       }
+      log.info("FINAL JSON :: ", vms);
+  
+      var sysAdminConfig = {
+        name : lesson.name,
+        vms : vms
+      };
+     
+      request({
+        method: 'POST',
+        uri: 'http://mc.10xengineer.me/def',
+        multipart: 
+          [ { 
+              'content-type': 'application/json',
+              body: sysAdminConfig
+            }
+          ] 
+        },
+        function (error, response, body) {
+          // TODO : write code for save sysAdmin lesson using responce id and token
+          log.info("Body :: ", body);
+          lesson.sysAdmin.vms = response;
+          saveLesson(lesson, req, res);
 
-    }
+        });
 
-    lesson.sysAdmin.serverInfo = serverInfoArray;
+    });
+  
+
+
   }
 
-  var f = req.files['videofile'];
-*/
-  }
+};
 
+var saveLesson = function(lesson, req, res){
   lesson.save(function(error) {
     if(error) {
       log.error(error);
       req.session.error = "Can not create lesson.";
     }
     var id = lesson.id;
-    if(lesson.type == 'video' && lesson.video.type == 'upload')
-    {
-      var fileName = 'lessonVideo_' + id;
-
-      cdn.saveFile(fileName, f, function(error, fileName) {
-        if(error) {
-          log.error(error);
-          next(error);
-        }
-
-        Lesson.findOne({ id: id }, function(error, lesson) {
-          // Save the CDN URL if available
-          lesson.video.content = fileName;
-          lesson.save(function(error) {
-            if(error) {
-              log.error(error);
-              next(error);
-            }
-
-            req.session.newLesson = {title: lesson.title, _id: lesson._id};
-            req.session.message = "Lesson created successfully.";
-            res.redirect('/course_editor/lesson/' + id);
-          });
-        });
-      });
-    } else {
-      req.session.newLesson = {title: lesson.title, _id: lesson._id};
-      req.session.message = "Lesson created successfully.";
-      res.redirect('/course_editor/lesson/' + id);
-    }
+  
+    req.session.newLesson = {title: lesson.title, _id: lesson._id};
+    req.session.message = "Lesson created successfully.";
+    res.redirect('/course_editor/lesson/' + id);
   });
-};
+}
 
+var request = function(config, callback) {
+  var actualObj = config.multipart[0].body['vms'];
+  callback(null, actualObj, config);
+}
 
 // Lesson Edit
 module.exports.lessonEditView = function(req, res) {
@@ -528,7 +569,8 @@ module.exports.lessonEditView = function(req, res) {
       description: req.lesson.desc,
       answersJSON: answersJSON,
       edit: true,
-      lab: lab
+      lab: lab,
+      lesson : req.lesson
     });
   });
 }
@@ -706,11 +748,9 @@ module.exports.lessonDown = function(req, res, next){
 
 module.exports.lessonView = function(req, res) {
   //For random the options
-  log.debug('Lesson ', req.lesson);
   var lesson = req.lesson;
   if(lesson.type=='sysAdmin'){
     LabDef.find({_id: { $in : lesson.sysAdmin.serverInfo}}, function(error, labdeflist){
-      log.info(labdeflist);
       res.render('course_editor/lesson/' + req.lesson.type, {
         lesson: lesson,
         labs : labdeflist
