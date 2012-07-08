@@ -1,31 +1,32 @@
-h1 Add Labs
-br
-form(method='POST') 
-  p
-    h5 Name :
-    input.required(value='#{lab.name}', id='name', name='name')   
-  p 
-    h5 Type :
-    input.required(value='#{lab.type}', id='type', name='type')
-  p 
-    h5 Memory :
-    input.required(value='#{lab.memory}', id='memory', name='memory')
-  p 
-    h5 Storage :
-    input.required(value='#{lab.storage}', id='storage', name='storage')
-  p 
-    h5 Run List :
-    select#runList(name="runList", multiple)
-        each item in itemList
-          - if(typeof(lab.runList) == 'string' && lab.runList == item)
-            option(value="#{item}", selected) #{item}
-          - else if(typeof(lab.runList) != 'undefined' && lab.runList.join(', ').indexOf(item) >= 0)
-            option(value="#{item}", selected) #{item}
-          - else
-            option(value="#{item}") #{item}
-
+.container
+  h1 Add Labs
   br
-  input.btn(type='submit' ,name='submit',value='Add')
+  form(method='POST') 
+    p
+      h5 Name :
+      input.required(value='#{lab.name}', id='name', name='name')   
+    p 
+      h5 Type :
+      input.required(value='#{lab.type}', id='type', name='type')
+    p 
+      h5 Memory :
+      input.required(value='#{lab.memory}', id='memory', name='memory')
+    p 
+      h5 Storage :
+      input.required(value='#{lab.storage}', id='storage', name='storage')
+    p 
+      h5 Run List :
+      select#runList(name="runList", multiple)
+          each item in itemList
+            - if(typeof(lab.runList) == 'string' && lab.runList == item)
+              option(value="#{item}", selected) #{item}
+            - else if(typeof(lab.runList) != 'undefined' && lab.runList.join(', ').indexOf(item) >= 0)
+              option(value="#{item}", selected) #{item}
+            - else
+              option(value="#{item}") #{item}
 
-script
-  $('#runList').select2();
+    br
+    input.btn(type='submit' ,name='submit',value='Add')
+
+  script
+    $('#runList').select2();

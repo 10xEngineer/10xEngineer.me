@@ -43,13 +43,15 @@ var verifyPermission = function(entity, action){
 var accessPermission = function(req, res, next) {
   if(req.loggedIn && ( req.path == '/auth' || req.path == '/register')) {
     res.redirect('/');
+  } else {
+    next();
   }
-
 };
 
 
 
 module.exports = function(app) {
+
 
   // Interceptors
   app.all('/*', function(req, res, next) {
@@ -68,8 +70,20 @@ module.exports = function(app) {
     next();
   });
 
+  // Convert a parameter to integer
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId'], function(req, res, next, num, name){ 
+    var parsedNum = parseInt(num, 10);
+    if( isNaN(num) ){
+      next(new Error('Invalid route: ' + num));
+    } else {
+      req.params[name] = parsedNum;
+      next();
+    }
+  });
+
   // Load Express data middleware
   load.middleware('data')(app);
+
 
 
   // Routes
@@ -84,8 +98,11 @@ module.exports = function(app) {
   
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.list);
-  app.get('/course/:courseId/start', verifyPermission('course', 'read'), course.start);
+  app.get('/courses/all', verifyPermission('course', 'read'), course.list);
+
   app.get('/course/:courseId', verifyPermission('course', 'read'), course.show);
+  app.get('/course/:courseId/start', verifyPermission('course', 'read'), course.start);
+  app.get('/course/:courseId/continue', verifyPermission('course', 'read'), course.start);
 
   // Course Editor
 
@@ -171,15 +188,4 @@ module.exports = function(app) {
   app.post('/admin/user/:userId/roles', admin.updateUserRoles);
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
 
-  // Middleware
-
-  // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'lessonId', 'userId'], function(req, res, next, num, name){ 
-    req.params[name] = num = parseInt(num, 10);
-    if( isNaN(num) ){
-      next(new Error('failed to parseInt ' + num));
-    } else {
-      next();
-    }
-  });
 };

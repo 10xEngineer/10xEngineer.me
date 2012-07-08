@@ -1,89 +1,87 @@
-include ../_breadcrumb
-.container-fluid.lesson.inner-index
-  h1 #{lesson.title}
-  .row-fluid
-    .span10
-      video#player(width='930', height='525', preload="none")
-        - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
-          source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
-        - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
-          source(type='video/mp4', src='#{lesson.video.content}')
-      .lessonBar
-        a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-        a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
-      .time
-        p Time: 
-        span#current-time
-    .span2
-      include _sidebar
-  .row-fluid
-    p
-  .row-fluid
-    .span10
-      include _footer
-script(type='text/javascript', src='/socket.io/socket.io.js')
-script(type='text/javascript', src='/javascripts/monitor.js')
-script
-  var currentVideoTime = 0, LastUpdatedTime = 0;
-  $('video').mediaelementplayer({
-    enablePluginDebug: false,
-    defaultVideoWidth: 930,
-    defaultVideoHeight: 525,
-    features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
-    alwaysShowControls: true,
-    pluginPath: '/javascripts/mediaelement/',
-    success: function(mediaElement, domObject) {
+.container
+  include ../_breadcrumb
+  .container-fluid.lesson.inner-index
+    h1 #{lesson.title}
+    .row-fluid
+      .span10
+        video#player(width='930', height='525', preload="none")
+          - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
+            source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
+          - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
+            source(type='video/mp4', src='#{lesson.video.content}')
+        .lessonBar
+          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+      .span2
+        include _sidebar
+    .row-fluid
+      p
+    - if(false)
+      .row-fluid
+        .span10
+          include _footer
+  script(type='text/javascript', src='/socket.io/socket.io.js')
+  script(type='text/javascript', src='/javascripts/monitor.js')
+  script
+    var currentVideoTime = 0, LastUpdatedTime = 0;
+    $('video').mediaelementplayer({
+      enablePluginDebug: false,
+      defaultVideoWidth: 930,
+      defaultVideoHeight: 525,
+      features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
+      alwaysShowControls: true,
+      pluginPath: '/javascripts/mediaelement/',
+      success: function(mediaElement, domObject) {
 
-      // At Video Start
-      mediaElement.addEventListener('playing', function(e) {
-        var videoResumeTime = '#{videoStartTime}';
-        if(typeof(videoResumeTime) != 'number') {
-          videoResumeTime = parseInt(videoResumeTime);
-        }
-        mediaElement.setCurrentTime(videoResumeTime);
-      }, false);
+        // At Video Start
+        mediaElement.addEventListener('playing', function(e) {
+          var videoResumeTime = '#{videoStartTime}';
+          if(typeof(videoResumeTime) != 'number') {
+            videoResumeTime = parseInt(videoResumeTime);
+          }
+          mediaElement.setCurrentTime(videoResumeTime);
+        }, false);
 
 
-      // Find Current Time and Update it in Progress
-      mediaElement.addEventListener('timeupdate', function(e) {
-        currentVideoTime = mediaElement.currentTime;
-        document.getElementById('current-time').innerHTML = mediaElement.currentTime;
-      }, false);
+        // Find Current Time and Update it in Progress
+        mediaElement.addEventListener('timeupdate', function(e) {
+          currentVideoTime = mediaElement.currentTime;
+        }, false);
 
-      // Change the Status at end of Video
-      mediaElement.addEventListener('ended', function(e) {
+        // Change the Status at end of Video
+        mediaElement.addEventListener('ended', function(e) {
+          
+          // Send Complete Status of Video to Server Using Socket.
+          var courseId =  '#{lesson.chapter.course}';
+          var chapterId =  '#{lesson.chapter.id}';
+          var lessonId =  '#{lesson.id}';
+          progress.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          
+          $.ajax({
+            url: '/lesson/#{lesson.id}/complete/',
+            success: function(data) {
+              $('.lessonBar .btn-success').addClass('btn-large');
+            },
+            error: function(error, status, xhr) {
+              console.log(JSON.stringify(error) + "Status: " + status);
+            }
+          });
+        }, false);
+      },
+      error: function(err) {
+        console.log(err);
+      }
+    });
+
+    var updateProgress = setInterval(function() {
+      if((currentVideoTime - LastUpdatedTime) >= 5) {
+        LastUpdatedTime = currentVideoTime ;
         
-        // Send Complete Status of Video to Server Using Socket.
+        // For Sending Current Updated Time to Server Using Socket.
         var courseId =  '#{lesson.chapter.course}';
         var chapterId =  '#{lesson.chapter.id}';
         var lessonId =  '#{lesson.id}';
-        progress.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-        
-        $.ajax({
-          url: '/lesson/#{lesson.id}/complete/',
-          success: function(data) {
-            $('.lessonBar .btn-success').addClass('btn-large');
-          },
-          error: function(error, status, xhr) {
-            console.log(JSON.stringify(error) + "Status: " + status);
-          }
-        });
-      }, false);
-    },
-    error: function(err) {
-      console.log(err);
-    }
-  });
-
-  var updateProgress = setInterval(function() {
-    if((currentVideoTime - LastUpdatedTime) >= 5) {
-      LastUpdatedTime = currentVideoTime ;
-      
-      // For Sending Current Updated Time to Server Using Socket.
-      var courseId =  '#{lesson.chapter.course}';
-      var chapterId =  '#{lesson.chapter.id}';
-      var lessonId =  '#{lesson.id}';
-      var userId = '#{userId}';
-      progress.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-    }
-  }, 5000);
+        var userId = '#{userId}';
+        progress.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+      }
+    }, 5000);

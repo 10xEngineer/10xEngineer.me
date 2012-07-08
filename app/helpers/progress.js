@@ -46,7 +46,7 @@ module.exports.start = function(lesson, progress) {
 			var lessonsLength = lessons.length;
 			for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
 				if(lessons[lessonindex].id == lessonId) {
-					lessons[lessonindex].status = 'started';
+					lessons[lessonindex].status = 'ongoing';
 				}
 			}
 		}

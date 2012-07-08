@@ -1,363 +1,364 @@
-//- @@TODO: Tabs is okay but need other content
-//- require pageslide ace2
+.container
+  //- @@TODO: Tabs is okay but need other content
+  //- require pageslide ace2
 
-include ../_breadcrumb
+  include ../_breadcrumb
 
-.container-fluid
-  h1 #{lesson.title}
-  link(rel="stylesheet", href="/stylesheets/ribbon.css")
-  link(rel="stylesheet", href="/stylesheets/jquery-ui-lightness/jquery-ui-1.8.19.custom.css")
-  style(type="text/css")
-    #pageslide select{
-      width:120px;
-    }
-  .row-fluid
-    .span10
-      .row-fluid
-        form#editform.well(onsubmit='return false')
-          .row-fluid.action-bar
-            .btn-group.pull-left
-              a.btn.btn-primary(onclick='submitSourceCode()') Run
-              a.btn.open(href='#modal') Settings
-            .btn-group.pull-right
-              a.btn Help
-          #language.row-fluid
-            .span2  
-              .label.label-info  
-          .row-fluid
-            #panel.well(style='display:none;position:absolute;background:whitesmoke;z-index:999;')
-              #modal(style='margin-top:10px')
-                #editorSetting
-                  table
-                    tr
-                      td
-                        label(for="mode") Mode
-                      td
-                        select#mode(size="1")
-                          option(value="javascript", selected="selected") JavaScript
-                          option(value="xml") XML
-                          option(value="html") HTML
-                          option(value="css") CSS
-                          option(value="scss") SCSS
-                          option(value="python") Python
-                          option(value="php") PHP
-                          option(value="java") Java
-                          option(value="ruby") Ruby
-                          option(value="c_cpp") C/C++
-                          option(value="coffee") CoffeeScript
-                          option(value="json") JSON
-                          option(value="perl") Perl
-                          option(value="clojure") Clojure
-                          option(value="ocaml") OCaml
-                          option(value="csharp") C#
-                          option(value="svg") SVG
-                          option(value="textile") Textile
-                          option(value="groovy") Groovy
-                          option(value="scala") Scala
-                    tr
-                      td
-                        label(for="theme") Theme
-                      td
-                        select#theme(size="1") 
-                          option(value="clouds") Clouds
-                          option(value="clouds_midnight") Clouds Midnight
-                          option(value="cobalt") Cobalt
-                          option(value="crimson_editor") Crimson Editor
-                          option(value="dawn") Dawn
-                          option(value="eclipse") Eclipse
-                          option(value="idle_fingers") idleFingers
-                          option(value="kr_theme") krTheme
-                          option(value="merbivore") Merbivore
-                          option(value="merbivore_soft") Merbivore Soft
-                          option(value="mono_industrial") Mono Industrial
-                          option(value="monokai") Monokai
-                          option(value="pastel_on_dark") Pastel on dark
-                          option(value="solarized_dark") Solarized Dark
-                          option(value="solarized_light") Solarized Light
-                          option(value="textmate", selected="selected") TextMate
-                          option(value="twilight") Twilight
-                          option(value="vibrant_ink") Vibrant Ink
-                    tr
-                      td
-                        label(for="fontsize") Font Size
-                      td
-                        select#fontsize(size="1") 
-                          option(value="10px") 10px
-                          option(value="11px") 11px
-                          option(value="12px", selected="selected") 12px
-                          option(value="14px") 14px
-                          option(value="16px") 16px
-                          option(value="20px") 20px
-                          option(value="24px") 24px
-                    tr
-                      td
-                        label(for="highlight_active") Highlight Active Line
-                      td
-                        input(type="checkbox", name="highlight_active", checked)#highlight_active.checked
-                    tr
-                      td
-                        label(for="show_hidden") Show Invisibles
-                      td
-                        input(type="checkbox", name="show_hidden")#show_hidden 
-                    tr
-                      td
-                        label(for="soft_wrap") Soft Wrap
-                      td
-                        select#soft_wrap(size="1") 
-                          option(value="off") Off
-                          option(value="40") 40 Chars
-                          option(value="80") 80 Chars
-                          option(value="free") Free
-                    tr
-                      td
-                        label(for="show_gutter") Show Gutter
-                      td
-                        input(type="checkbox", checked)#show_gutter.checked
-                    tr
-                      td
-                        label(for="show_print_margin") Show Print Margin
-                      td
-                        input(type="checkbox")#show_print_margin.checked
-                    tr
-                      td
-                        label(for="soft_tab") Use Soft Tab
-                      td
-                        input(type="checkbox")#soft_tab.checked
-                    tr
-                      td
-                        label(for="highlight_selected_word") Highlight selected word
-                      td
-                        input(type="checkbox")#highlight_selected_word.checked
-                a(href="javascript:$.pageslide.close()").btn.btn-info Close
-            #source-editor 
-              .controls
-                input#sourcecode(type='hidden', name='sourcecode', value='#{lesson.programming.skeletonCode}')
-                #editor(style='position:relative;width:100%;height:400px;') #{lesson.programming.skeletonCode}
-              .form-actions
-                span.danger
-                  a#clear.button.btn.btn-danger RESET
-                span.pull-right
-                  button#submit.button.btn.btn-submit SUBMIT
-      .row-fluid
-        p.pull-right 10xEngineer.me uses 
-          a(href="http://ideone.com") ideone.com 
-          | &copy; by 
-          a(href="http://sphere-research.com") Sphere Research Labs
-
-    .span2
-      include _sidebar
-
-  script(type='text/javascript', src='/javascripts/ace_2/ace.js')
-  script(type='text/javascript', src='/socket.io/socket.io.js')
-  script(type='text/javascript', src='/javascripts/jquery-ui/jquery-ui-1.8.19.custom.min.js')
-  script(type='text/javascript', src='/javascripts/jquery.pageslide.js')
-  script(type='text/javascript')
-    var socket=io.connect('/code');
-    var editor;
-    var themes = {};
-    function loadTheme(name) {
-      //check if the theme source files have been loaded before
-      if(themes[name]){
-        editor.setTheme(themes[name]);
-        return;
+  .container-fluid
+    h1 #{lesson.title}
+    link(rel="stylesheet", href="/stylesheets/ribbon.css")
+    link(rel="stylesheet", href="/stylesheets/jquery-ui-lightness/jquery-ui-1.8.19.custom.css")
+    style(type="text/css")
+      #pageslide select{
+        width:120px;
       }
+    .row-fluid
+      .span10
+        .row-fluid
+          form#editform.well(onsubmit='return false')
+            .row-fluid.action-bar
+              .btn-group.pull-left
+                a.btn.btn-primary(onclick='submitSourceCode()') Run
+                a.btn.open(href='#modal') Settings
+              .btn-group.pull-right
+                a.btn Help
+            #language.row-fluid
+              .span2  
+                .label.label-info  
+            .row-fluid
+              #panel.well(style='display:none;position:absolute;background:whitesmoke;z-index:999;')
+                #modal(style='margin-top:10px')
+                  #editorSetting
+                    table
+                      tr
+                        td
+                          label(for="mode") Mode
+                        td
+                          select#mode(size="1")
+                            option(value="javascript", selected="selected") JavaScript
+                            option(value="xml") XML
+                            option(value="html") HTML
+                            option(value="css") CSS
+                            option(value="scss") SCSS
+                            option(value="python") Python
+                            option(value="php") PHP
+                            option(value="java") Java
+                            option(value="ruby") Ruby
+                            option(value="c_cpp") C/C++
+                            option(value="coffee") CoffeeScript
+                            option(value="json") JSON
+                            option(value="perl") Perl
+                            option(value="clojure") Clojure
+                            option(value="ocaml") OCaml
+                            option(value="csharp") C#
+                            option(value="svg") SVG
+                            option(value="textile") Textile
+                            option(value="groovy") Groovy
+                            option(value="scala") Scala
+                      tr
+                        td
+                          label(for="theme") Theme
+                        td
+                          select#theme(size="1") 
+                            option(value="clouds") Clouds
+                            option(value="clouds_midnight") Clouds Midnight
+                            option(value="cobalt") Cobalt
+                            option(value="crimson_editor") Crimson Editor
+                            option(value="dawn") Dawn
+                            option(value="eclipse") Eclipse
+                            option(value="idle_fingers") idleFingers
+                            option(value="kr_theme") krTheme
+                            option(value="merbivore") Merbivore
+                            option(value="merbivore_soft") Merbivore Soft
+                            option(value="mono_industrial") Mono Industrial
+                            option(value="monokai") Monokai
+                            option(value="pastel_on_dark") Pastel on dark
+                            option(value="solarized_dark") Solarized Dark
+                            option(value="solarized_light") Solarized Light
+                            option(value="textmate", selected="selected") TextMate
+                            option(value="twilight") Twilight
+                            option(value="vibrant_ink") Vibrant Ink
+                      tr
+                        td
+                          label(for="fontsize") Font Size
+                        td
+                          select#fontsize(size="1") 
+                            option(value="10px") 10px
+                            option(value="11px") 11px
+                            option(value="12px", selected="selected") 12px
+                            option(value="14px") 14px
+                            option(value="16px") 16px
+                            option(value="20px") 20px
+                            option(value="24px") 24px
+                      tr
+                        td
+                          label(for="highlight_active") Highlight Active Line
+                        td
+                          input(type="checkbox", name="highlight_active", checked)#highlight_active.checked
+                      tr
+                        td
+                          label(for="show_hidden") Show Invisibles
+                        td
+                          input(type="checkbox", name="show_hidden")#show_hidden 
+                      tr
+                        td
+                          label(for="soft_wrap") Soft Wrap
+                        td
+                          select#soft_wrap(size="1") 
+                            option(value="off") Off
+                            option(value="40") 40 Chars
+                            option(value="80") 80 Chars
+                            option(value="free") Free
+                      tr
+                        td
+                          label(for="show_gutter") Show Gutter
+                        td
+                          input(type="checkbox", checked)#show_gutter.checked
+                      tr
+                        td
+                          label(for="show_print_margin") Show Print Margin
+                        td
+                          input(type="checkbox")#show_print_margin.checked
+                      tr
+                        td
+                          label(for="soft_tab") Use Soft Tab
+                        td
+                          input(type="checkbox")#soft_tab.checked
+                      tr
+                        td
+                          label(for="highlight_selected_word") Highlight selected word
+                        td
+                          input(type="checkbox")#highlight_selected_word.checked
+                  a(href="javascript:$.pageslide.close()").btn.btn-info Close
+              #source-editor 
+                .controls
+                  input#sourcecode(type='hidden', name='sourcecode', value='#{lesson.programming.skeletonCode}')
+                  #editor(style='position:relative;width:100%;height:400px;') #{lesson.programming.skeletonCode}
+                .form-actions
+                  span.danger
+                    a#clear.button.btn.btn-danger RESET
+                  span.pull-right
+                    button#submit.button.btn.btn-submit SUBMIT
+        .row-fluid
+          p.pull-right 10xEngineer.me uses 
+            a(href="http://ideone.com") ideone.com 
+            | &copy; by 
+            a(href="http://sphere-research.com") Sphere Research Labs
 
-      var fileName = "/javascripts/ace_2/theme-" + name + ".js";
-      loadScriptFile(fileName, function(){
-        var path = "ace/theme/"+name;
-        themes[name] = path;
-        editor.setTheme(path);
-      });
-    }
+      .span2
+        include _sidebar
 
-    var modes = {};
-    function loadMode(name){
-      $('#language .label').text(name);
-      //check if the language source files have been loaded before
-      if(modes[name]) {
-        editor.getSession().setMode(new modes[name]);
-        return;
-      }
-
-      var fileName = "/javascripts/ace_2/mode-" + name + ".js";
-      loadScriptFile(fileName, function(){
-        var Mode = require("ace/mode/"+name).Mode;
-        modes[name] = Mode;
-        editor.getSession().setMode(new Mode());
-      });
-    }
-
-    //dynamically load javascript source file
-    function loadScriptFile(path, callback) {
-      var head = document.getElementsByTagName('head')[0];
-      var s = document.createElement('script');
-
-      s.src = path;
-      head.appendChild(s);
-
-      s.onload = callback;
-    }
-
-    function init() {
-      editor = ace.edit('editor');
-      $(".open").pageslide({direction: "right", modal: true, iframe:false});
-
-      $('#editor').resizable({
-        resize: function(event, ui){
-          editor.resize();
+    script(type='text/javascript', src='/javascripts/ace_2/ace.js')
+    script(type='text/javascript', src='/socket.io/socket.io.js')
+    script(type='text/javascript', src='/javascripts/jquery-ui/jquery-ui-1.8.19.custom.min.js')
+    script(type='text/javascript', src='/javascripts/jquery.pageslide.js')
+    script(type='text/javascript')
+      var socket=io.connect('/code');
+      var editor;
+      var themes = {};
+      function loadTheme(name) {
+        //check if the theme source files have been loaded before
+        if(themes[name]){
+          editor.setTheme(themes[name]);
+          return;
         }
-      })
 
-      if( $('editor') ) {
-        //binding the setting panel events
-        $("#mode").change(function(e){
-          loadMode(e.target.value);
-        })
-        $("#theme").change(function(e){
-          loadTheme(e.target.value);
-        })
-        $("#fontsize").change(function(e){
-          document.getElementById('editor').style.fontSize=e.target.value;
-        })
-        $("#highlight_active").change(function(e){
-          editor.setHighlightActiveLine(e.target.checked);
-        })
-        $("#show_hidden").change(function(e){
-          editor.setShowInvisibles(e.target.checked);
-        })
-        $("#soft_wrap").change(function(e){
-          var session = editor.getSession();
-          var renderer = editor.renderer;
-          switch (e.target.value) {
-            case "off":
-              session.setUseWrapMode(false);
-              renderer.setPrintMarginColumn(80);
-              break;
-            case "40":
-              session.setUseWrapMode(true);
-              session.setWrapLimitRange(40, 40);
-              renderer.setPrintMarginColumn(40);
-              break;
-            case "80":
-              session.setUseWrapMode(true);
-              session.setWrapLimitRange(80, 80);
-              renderer.setPrintMarginColumn(80);
-              break;
-            case "free":
-              session.setUseWrapMode(true);
-              session.setWrapLimitRange(null, null);
-              renderer.setPrintMarginColumn(80);
-              break;
+        var fileName = "/javascripts/ace_2/theme-" + name + ".js";
+        loadScriptFile(fileName, function(){
+          var path = "ace/theme/"+name;
+          themes[name] = path;
+          editor.setTheme(path);
+        });
+      }
+
+      var modes = {};
+      function loadMode(name){
+        $('#language .label').text(name);
+        //check if the language source files have been loaded before
+        if(modes[name]) {
+          editor.getSession().setMode(new modes[name]);
+          return;
+        }
+
+        var fileName = "/javascripts/ace_2/mode-" + name + ".js";
+        loadScriptFile(fileName, function(){
+          var Mode = require("ace/mode/"+name).Mode;
+          modes[name] = Mode;
+          editor.getSession().setMode(new Mode());
+        });
+      }
+
+      //dynamically load javascript source file
+      function loadScriptFile(path, callback) {
+        var head = document.getElementsByTagName('head')[0];
+        var s = document.createElement('script');
+
+        s.src = path;
+        head.appendChild(s);
+
+        s.onload = callback;
+      }
+
+      function init() {
+        editor = ace.edit('editor');
+        $(".open").pageslide({direction: "right", modal: true, iframe:false});
+
+        $('#editor').resizable({
+          resize: function(event, ui){
+            editor.resize();
           }
         })
-        $("#show_gutter").change(function(e){
-          editor.renderer.setShowGutter(e.target.checked); 
-        }) 
-        $("#show_print_margin").change(function(e){
-          editor.renderer.setShowPrintMargin(e.target.checked); 
-        })
-        $("#soft_tab").change(function(e){
-          editor.getSession().setUseSoftTabs(e.target.checked);  
-        })
-        $("#highlight_selected_word").change(function(e){
-          editor.setHighlightSelectedWord(e.target.checked);
-        });
 
-        //load default theme and language
-        loadTheme("textmate");    
-        loadMode('#{lesson.programming.language}');
+        if( $('editor') ) {
+          //binding the setting panel events
+          $("#mode").change(function(e){
+            loadMode(e.target.value);
+          })
+          $("#theme").change(function(e){
+            loadTheme(e.target.value);
+          })
+          $("#fontsize").change(function(e){
+            document.getElementById('editor').style.fontSize=e.target.value;
+          })
+          $("#highlight_active").change(function(e){
+            editor.setHighlightActiveLine(e.target.checked);
+          })
+          $("#show_hidden").change(function(e){
+            editor.setShowInvisibles(e.target.checked);
+          })
+          $("#soft_wrap").change(function(e){
+            var session = editor.getSession();
+            var renderer = editor.renderer;
+            switch (e.target.value) {
+              case "off":
+                session.setUseWrapMode(false);
+                renderer.setPrintMarginColumn(80);
+                break;
+              case "40":
+                session.setUseWrapMode(true);
+                session.setWrapLimitRange(40, 40);
+                renderer.setPrintMarginColumn(40);
+                break;
+              case "80":
+                session.setUseWrapMode(true);
+                session.setWrapLimitRange(80, 80);
+                renderer.setPrintMarginColumn(80);
+                break;
+              case "free":
+                session.setUseWrapMode(true);
+                session.setWrapLimitRange(null, null);
+                renderer.setPrintMarginColumn(80);
+                break;
+            }
+          })
+          $("#show_gutter").change(function(e){
+            editor.renderer.setShowGutter(e.target.checked); 
+          }) 
+          $("#show_print_margin").change(function(e){
+            editor.renderer.setShowPrintMargin(e.target.checked); 
+          })
+          $("#soft_tab").change(function(e){
+            editor.getSession().setUseSoftTabs(e.target.checked);  
+          })
+          $("#highlight_selected_word").change(function(e){
+            editor.setHighlightSelectedWord(e.target.checked);
+          });
+
+          //load default theme and language
+          loadTheme("textmate");    
+          loadMode('#{lesson.programming.language}');
+        }
+
+        $('a#clear').click(function(e){
+          editor.getSession().setValue($('#sourcecode').val());
+          editor.focus();
+        })
       }
 
-      $('a#clear').click(function(e){
-        editor.getSession().setValue($('#sourcecode').val());
-        editor.focus();
-      })
-    }
-
-    //Submit the code to be created on IDEONE compiler
-    var languages = {
-      'python': '4',
-      'ruby': '17',
-      'javascript' : '112'
-    }
-    function submitSourceCode(){
-      $('#compile_result').addClass('alert').addClass('alert-info');
-      $('#compile_result').text('COMPILING...\\n');
-      $('#compile_output').hide();
-      var sourceCode = editor.getSession().getValue();
-      var languageCode = $('#pageslide #mode').val();
-      if(!languageCode){
-        languageCode = $('#mode').val();
+      //Submit the code to be created on IDEONE compiler
+      var languages = {
+        'python': '4',
+        'ruby': '17',
+        'javascript' : '112'
       }
-      var data = {'source':sourceCode, 'language':languages[languageCode]};
-      socket.emit('submitcode', data);
+      function submitSourceCode(){
+        $('#compile_result').addClass('alert').addClass('alert-info');
+        $('#compile_result').text('COMPILING...\\n');
+        $('#compile_output').hide();
+        var sourceCode = editor.getSession().getValue();
+        var languageCode = $('#pageslide #mode').val();
+        if(!languageCode){
+          languageCode = $('#mode').val();
+        }
+        var data = {'source':sourceCode, 'language':languages[languageCode]};
+        socket.emit('submitcode', data);
 
-      
-    }
-    //Receive the link code for later check
-    var linkCode;
-    socket.on('codesent', function(data){
-      linkCode = data.result.link;
-      setTimeout(function(){
-        socket.emit('getSubmissionStatus', {linkCode:linkCode});
-      }, 1000);
-    });
-
-    
-    socket.on('submissionStatus', function(data){
-      if(data.result.status == 0){
-        socket.emit('getSubmissionDetails', {linkCode:linkCode});
         
       }
-      else {
-        socket.emit('getSubmissionStatus', {linkCode:linkCode});
-      }
-    });
+      //Receive the link code for later check
+      var linkCode;
+      socket.on('codesent', function(data){
+        linkCode = data.result.link;
+        setTimeout(function(){
+          socket.emit('getSubmissionStatus', {linkCode:linkCode});
+        }, 1000);
+      });
 
-    //Check the compilation status and get the run result
-    var errors = {
-      '0': 'not running – the paste has been created with run parameter set to false',
-      '11': 'compilation error  – the program could not be executed due to compilation errors',
-      '12': 'runtime   error   –   the   program   finished because of  the runtime error, for example: division by zero,  array index out of bounds,uncaught exception',
-      '13': "time  limit  exceeded   –   the   program   didn't stop before the time limit",
-      '15': 'success - everything went ok',
-      '17': "memory limit exceeded – the program tried to use more memory than it is allowed",
-      '19': "illegal system call – the program tried to call illegal system function",
-      '20': "internal error – some problem occurred on ideone.com; try to submit the paste again and if that fails too, then please contact us"
-    }
-
-    socket.on('submissionDetails', function(data){
-        var res = $('#compile_result');
-        var out = $('#compile_output');
-        out.removeClass('alert').removeClass('alert-info').removeClass('alert-error').show();
-        res.removeClass('alert').removeClass('alert-warning').removeClass('alert-success');
-
-        if(typeof data.result.output != 'undefined' && data.result.result == 15) {
-          res.addClass('alert').addClass('alert-success');
-          res.text("COMPILED OK\\n");
-          out.addClass('alert').addClass('alert-info');
-          out.text(data.result.output);
+      
+      socket.on('submissionStatus', function(data){
+        if(data.result.status == 0){
+          socket.emit('getSubmissionDetails', {linkCode:linkCode});
+          
         }
-        else
-        if(typeof data.result.stderr != 'undefined' && data.result.stderr != "" || data.result.result != 15) {
-          res.addClass('alert').addClass('alert-warning');
-          res.text(errors[data.result.result]);
-          out.addClass('alert').addClass('alert-error');
-          out.text(data.result.stderr);
+        else {
+          socket.emit('getSubmissionStatus', {linkCode:linkCode});
         }
-    });
+      });
 
-    $('#submit').click(function(e) {
-      var sourceCode = editor.getSession().getValue();
-      var languageCode = $('#pageslide #mode').val();
-      if(!languageCode){
-        languageCode = $('#mode').val();
+      //Check the compilation status and get the run result
+      var errors = {
+        '0': 'not running – the paste has been created with run parameter set to false',
+        '11': 'compilation error  – the program could not be executed due to compilation errors',
+        '12': 'runtime   error   –   the   program   finished because of  the runtime error, for example: division by zero,  array index out of bounds,uncaught exception',
+        '13': "time  limit  exceeded   –   the   program   didn't stop before the time limit",
+        '15': 'success - everything went ok',
+        '17': "memory limit exceeded – the program tried to use more memory than it is allowed",
+        '19': "illegal system call – the program tried to call illegal system function",
+        '20': "internal error – some problem occurred on ideone.com; try to submit the paste again and if that fails too, then please contact us"
       }
-      var data = {'source':sourceCode, 'language':languages[languageCode]};
-      socket.emit('submitcode', data);
-    });
 
-    // Periodically save the code
-    var saveTimer = window.setInterval(function() {
-      socket.emit('saveCurrentStatus', { code: editor.getSession().getValue()})
-    }, 10000);
+      socket.on('submissionDetails', function(data){
+          var res = $('#compile_result');
+          var out = $('#compile_output');
+          out.removeClass('alert').removeClass('alert-info').removeClass('alert-error').show();
+          res.removeClass('alert').removeClass('alert-warning').removeClass('alert-success');
+
+          if(typeof data.result.output != 'undefined' && data.result.result == 15) {
+            res.addClass('alert').addClass('alert-success');
+            res.text("COMPILED OK\\n");
+            out.addClass('alert').addClass('alert-info');
+            out.text(data.result.output);
+          }
+          else
+          if(typeof data.result.stderr != 'undefined' && data.result.stderr != "" || data.result.result != 15) {
+            res.addClass('alert').addClass('alert-warning');
+            res.text(errors[data.result.result]);
+            out.addClass('alert').addClass('alert-error');
+            out.text(data.result.stderr);
+          }
+      });
+
+      $('#submit').click(function(e) {
+        var sourceCode = editor.getSession().getValue();
+        var languageCode = $('#pageslide #mode').val();
+        if(!languageCode){
+          languageCode = $('#mode').val();
+        }
+        var data = {'source':sourceCode, 'language':languages[languageCode]};
+        socket.emit('submitcode', data);
+      });
+
+      // Periodically save the code
+      var saveTimer = window.setInterval(function() {
+        socket.emit('saveCurrentStatus', { code: editor.getSession().getValue()})
+      }, 10000);
