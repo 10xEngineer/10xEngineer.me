@@ -36,11 +36,13 @@ var verifyPermission = function(entity, action){
           next();
           return;          
         } else {
+          res.redirect('/');
           res.write('content is not accessible for your account.');
           res.end();
         }
       });
     } else {
+      res.redirect('/');
       res.write('content is not accessible for your account.');
       res.end();
     }
