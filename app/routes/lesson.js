@@ -219,11 +219,14 @@ module.exports.showView = function(req, res) {
         var videoStartTime = 0;
       }
       // Render based on the type
-      res.render('lessons/' + req.lesson.type, {
-        title: req.lesson.title,
-        quiz: req.lesson.quiz,
-        videoStartTime: videoStartTime,
-        userId: req.user._id
+      Lesson.find({}, function(error, allLessons){
+        res.render('lessons/' + req.lesson.type, {
+          title: req.lesson.title,
+          quiz: req.lesson.quiz,
+          videoStartTime: videoStartTime,
+          userId: req.user._id,
+          allLessons : allLessons
+        });
       });
     });
   });
@@ -287,9 +290,13 @@ module.exports.show = function(req, res, next){
         log.error(error);
         next(error);
       }
-      res.render('lessons/' + lesson.type, {
-        title: req.lesson.title,
-        attemptedAnswers: answersJSON
+            // Render based on the type
+      Lesson.find({}, function(error, allLessons){
+        res.render('lessons/' + lesson.type, {
+          title: req.lesson.title,
+          attemptedAnswers: answersJSON,
+          allLessons : allLessons
+        });
       });
     });
   });

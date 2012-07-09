@@ -14,10 +14,28 @@ var importer = load.helper('importer');
 
 module.exports = function() {};
 
-// List existing courses
-module.exports.list = function(req, res){
+// List existing all courses
+module.exports.allList = function(req, res){
   var formatedProgress = {};
   Course.find({}, function(error, courses){
+    Progress.find({ user: req.user._id }, function(error, progresses){
+      for(var index = 0; index < progresses.length; index++){
+        var progress = progresses[index];
+        formatedProgress[progress.course] = progress.status;
+      }
+      res.render('courses/allList', { 
+        title: 'Courses',
+        courses: courses,
+        progress : formatedProgress
+      });
+    });
+  })
+};
+
+// List existing featured courses
+module.exports.featuredList = function(req, res){
+  var formatedProgress = {};
+  Course.find({ featured : true }, function(error, courses){
     Progress.find({ user: req.user._id }, function(error, progresses){
       for(var index = 0; index < progresses.length; index++){
         var progress = progresses[index];
@@ -137,8 +155,10 @@ module.exports.start = function(req, res, next){
       log.error(error);
       next(error);
     }
-    if(!req.session.progress[req.course._id] || !req.session.progress)
+    if(!req.session.progress || !req.session.progress[req.course._id])
     {
+      // TODO: Refactor to use less db calls
+      // Refresh progress
       delete req.session.progress;
       progressHelper.get(req.session.auth.userId, function(error,progressObject){
         if(error) {
@@ -237,3 +257,4 @@ module.exports.unpublish = function(req, res) {
     res.redirect('/course/' + course.id);
   });
 };
+

@@ -1,7 +1,8 @@
 {
     "title": "Private Cloud",
     "content": "\"Private cloud\" is infrastructure operated solely for a single organization, whether managed internally or by a third-party and hosted internally or externally. They have attracted criticism because users \"still have to buy, build, and manage them\" and thus do not benefit from less hands-on management, essentially lacking the economic model that makes cloud computing such an intriguing concept.",
-    "image": "https://encrypted-tbn3.google.com/images?q=tbn:ANd9GcQgQKWeGhCh4nL_dOwc5nbbMcbv5hMFOI26Sx0gHnZ5wTfO4q3u",
+    "iconImage": "https://encrypted-tbn3.google.com/images?q=tbn:ANd9GcQgQKWeGhCh4nL_dOwc5nbbMcbv5hMFOI26Sx0gHnZ5wTfO4q3u",
+    "wallImage": "https://encrypted-tbn3.google.com/images?q=tbn:ANd9GcQgQKWeGhCh4nL_dOwc5nbbMcbv5hMFOI26Sx0gHnZ5wTfO4q3u",
     "chapters": [
         {
             "title": "Introduction",

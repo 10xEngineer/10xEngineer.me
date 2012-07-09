@@ -5,6 +5,7 @@ var fs = require('fs');
 var gm = require('gm');
 var path = require('path');
 var mime = require('mime');
+var tmpFileUploadDir = appRoot + '/app/upload';
 
 module.exports = function() {};
 
@@ -23,6 +24,19 @@ module.exports.findFirst = function( key, jsonObj ) {
     }
 	}
 	return firstProp;
+}
+
+module.exports.randomString = function(stringLength) {
+  var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+  if (!stringLength>0) {
+    var stringLength = 8;
+  }
+  var randomString = '';
+  for (var i=0; i<stringLength; i++) {
+    var rnum = Math.floor(Math.random() * chars.length);
+    randomString += chars.substring(rnum,rnum+1);
+  }
+  return randomString; 
 }
 
 module.exports.merge = function(obj1, obj2) {
@@ -49,14 +63,14 @@ module.exports.redirectBackOrHome = function(req, res) {
 
 // Save file
 module.exports.saveToDisk = function(imgUrl, callback) {
+  var self = this;
 	var parsedUrl = url.parse(imgUrl, true);
-
 
  	var protocol = (parsedUrl.protocol === 'http:' ? http : parsedUrl.protocol === 'https:' ? https : null);
  	protocol.get(parsedUrl, function(res) {
 
     var fileType = mime.extension(res.headers['content-type']);
-    var filePath = path.join(tmpFileUploadDir,"tmpImage." + fileType);
+    var filePath = path.join(tmpFileUploadDir, self.randomString(10) + '.' + fileType);
 
   	var data = '';
 
@@ -82,42 +96,53 @@ module.exports.saveToDisk = function(imgUrl, callback) {
     }
   });
 };
+ 
+/*
+* Process (crop -> resize) an image
+* 
+* options:
+*   crop:
+*     x: coordinate of crop start position
+*     y: coordinate of crop start position
+*     h: height of result image
+*     w: width of result image
+*   resize:
+*     h: height after resize
+*     w: width after resize
+* 
+*/
+module.exports.processImage = function(imagePath, options, callback) {
+  var fileType = mime.extension(mime.lookup(imagePath));
+  var resultImagePath = path.join(tmpFileUploadDir, "tmpCropedImage." + fileType);
 
-// Image Crop function
-module.exports.imageCrop = function(filePath, cropDetailStringify, callback) {
+  var processBatch = gm(imagePath);
 
-  var fileType = mime.extension(mime.lookup(filePath));
-  var fileCropedPath = path.join(tmpFileUploadDir,"tmpCropedImage." + fileType);
-  var cropDetail = JSON.parse(cropDetailStringify);
-  var width = cropDetail.w;
-  var height = cropDetail.h;
-  var x = cropDetail.x;
-  var y = cropDetail.y;
+  if(options && options.crop) {
+    var cropOpt = options.crop;
+    processBatch = processBatch.crop(cropOpt.w, cropOpt.h, cropOpt.x, cropOpt.y);
+  }
 
-  gm(filePath)
-    .crop(width,height,x,y)
-    .write(fileCropedPath, function(error){
+  if(options && options.resize) {
+    var resizeOpt = options.resize;
+    processBatch = processBatch.resize(resizeOpt.w, resizeOpt.h);
+  }
+
+  // Process the image
+  processBatch.write(resultImagePath, function(error){
     if (error) {
-      log.error("Croped write opration", error);
-      callback(error);
-    } 
-    callback(null, fileCropedPath, filePath);
-  });
-}
-
-// Image Resize function
-module.exports.imageResize = function(filePath, callback){
-
-  var fileType = mime.extension(mime.lookup(filePath));
-  var fileResizedPath = path.join(tmpFileUploadDir,"tmpResizedImage." + fileType);
-
-  gm(filePath)
-    .resize(200, 200)
-    .write(fileResizedPath, function(error){
-    if(error){
+      log.error(error);
       callback(error);
     }
 
-    callback(null, fileResizedPath, filePath);
+    // deletes old original file
+    fs.unlink(imagePath, function (error) {
+      if (error) {
+        log.error("Error removing file.", error);
+        callback(error);
+      }
+
+      callback(null, resultImagePath);
+    });
   });
+
 }

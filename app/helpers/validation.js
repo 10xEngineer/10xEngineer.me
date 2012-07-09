@@ -26,9 +26,7 @@ module.exports = {
 		}
 
 		function validateObject(obj, num){
-			log.info("Enter in object validation with obj=", obj, " and num=", num);
 			var length = obj.length;
-			log.info("Object length counted is ", length);
 			var validCount = 0;
 			var validation = true;
 			for(index = 0; index < length; index++){
@@ -72,7 +70,6 @@ module.exports = {
 		}
 
 		if(typeof(value) != 'undefined') {
-			log.debug('Value :: ', value, " & Type :: ", typeof(value));
 			if(typeof(value) == 'string') {
 				return validateString(value);
 			}

@@ -4,13 +4,15 @@ module.exports.course = {
 	createCourse : {
 		title : {required: true},
 		description : {required : true},
-		image : {required:true}
+		iconImage : {required:true},
+		wallImage : {required:true}
 	},
 
 	editCourse : {
 		title : {required: true},
 		description : {required : true},
-		image : {required:true}
+		iconImage : {required:true},
+		wallImage : {required:true}
 	}
 
 }

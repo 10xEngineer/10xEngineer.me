@@ -9,15 +9,18 @@ script(type="text/javascript")
 //- Course Admin index?
 - course = {id: 1};
 .container
+  -if(everyauth.loggedIn && isAdmin)
+      p.actions.clearfix
+        a(href='/course_editor/create').btn.btn-primary.pull-left Add Course
+        a(href='/course_editor/import').btn.btn-inverse.pull-right Import a course
+
   ul.nav.nav-pills.courseMenu
-    li.active
-      a(href="/courses") Featured
     li
+      a(href="/courses") Featured
+    li.active
       a(href="/courses/all") Course Library
     li
       a(href="/user/profile") My Library
-    li
-      a(href="/course_editor") Course editor
     
   .row-fluid
     div.flexslider
