@@ -290,9 +290,13 @@ module.exports.show = function(req, res, next){
         log.error(error);
         next(error);
       }
-      res.render('lessons/' + lesson.type, {
-        title: req.lesson.title,
-        attemptedAnswers: answersJSON
+            // Render based on the type
+      Lesson.find({}, function(error, allLessons){
+        res.render('lessons/' + lesson.type, {
+          title: req.lesson.title,
+          attemptedAnswers: answersJSON,
+          allLessons : allLessons
+        });
       });
     });
   });

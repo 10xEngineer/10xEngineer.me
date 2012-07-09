@@ -26,6 +26,19 @@ module.exports.findFirst = function( key, jsonObj ) {
 	return firstProp;
 }
 
+module.exports.randomString = function(stringLength) {
+  var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+  if (!stringLength>0) {
+    var stringLength = 8;
+  }
+  var randomString = '';
+  for (var i=0; i<stringLength; i++) {
+    var rnum = Math.floor(Math.random() * chars.length);
+    randomString += chars.substring(rnum,rnum+1);
+  }
+  return randomString; 
+}
+
 module.exports.merge = function(obj1, obj2) {
   for(var key in obj2) {
     if(obj2.hasOwnProperty(key)) {
@@ -50,14 +63,14 @@ module.exports.redirectBackOrHome = function(req, res) {
 
 // Save file
 module.exports.saveToDisk = function(imgUrl, callback) {
+  var self = this;
 	var parsedUrl = url.parse(imgUrl, true);
-
 
  	var protocol = (parsedUrl.protocol === 'http:' ? http : parsedUrl.protocol === 'https:' ? https : null);
  	protocol.get(parsedUrl, function(res) {
 
     var fileType = mime.extension(res.headers['content-type']);
-    var filePath = path.join(tmpFileUploadDir,"tmpImage." + fileType);
+    var filePath = path.join(tmpFileUploadDir, self.randomString(10) + '.' + fileType);
 
   	var data = '';
 

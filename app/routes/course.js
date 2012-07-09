@@ -155,8 +155,10 @@ module.exports.start = function(req, res, next){
       log.error(error);
       next(error);
     }
-    if(!req.session.progress[req.course._id] && !req.session.progress)
+    if(!req.session.progress || !req.session.progress[req.course._id])
     {
+      // TODO: Refactor to use less db calls
+      // Refresh progress
       delete req.session.progress;
       progressHelper.get(req.session.auth.userId, function(error,progressObject){
         if(error) {

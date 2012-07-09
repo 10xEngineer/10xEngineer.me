@@ -56,9 +56,9 @@ module.exports.start = function(lesson, progress) {
 // Change the status of sessionProgress to completed
 module.exports.completed = function(data, progress) {
 
-	var courseId = data.courseId;
-	var chapterId = data.chapterId;
-	var lessonId = data.lessonId;
+	var courseId = data.chapter.course;
+	var chapterId = data.chapter._id;
+	var lessonId = data._id;
 
 	var chapters = progress[courseId].chapters;
 	var length = chapters.length;
@@ -79,9 +79,9 @@ module.exports.completed = function(data, progress) {
 // Set the videoProgress of sessionProgress
 module.exports.videoProgress = function(data, progress) {
 
-	var courseId = data.courseId;
-	var chapterId = data.chapterId;
-	var lessonId = data.lessonId;
+	var courseId = data.chapter.course;
+	var chapterId = data.chapter._id;
+	var lessonId = data._id;
 
 	var chapters = progress[courseId].chapters;
 	var length = chapters.length;
