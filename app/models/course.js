@@ -39,12 +39,10 @@ CourseSchema.pre('save', function(next) {
       var regex = new RegExp('^/cdn/');
       var options = {processIcon: false, processWall: false};
 
-      if(regex.test(course.iconImage)) {
-        log.info('icon local');
+      if(!regex.test(course.iconImage)) {
         options.processIcon = true;
       }
-      if(regex.test(course.wallImage)) {
-        log.info('wall local');
+      if(!regex.test(course.wallImage)) {
         options.processWall = true;
       }
 
@@ -138,10 +136,16 @@ var processImages = function (course, options, callback) {
   var jobs = {};
   if(options.processIcon) {
     iconCropInfo = course.cropIconImgInfo || iconCropInfo;
+    if(typeof(iconCropInfo) == 'string') {
+      iconCropInfo = JSON.parse(iconCropInfo);
+    }
     jobs['icon'] = imageJob(course.iconImage, iconFileName, {crop: iconCropInfo, resize: iconResizeInfo});
   }
   if(options.processWall) {
     wallCropInfo = course.cropWallImgInfo || wallCropInfo;
+    if(typeof(wallCropInfo) == 'string') {
+      wallCropInfo = JSON.parse(wallCropInfo);
+    }
     jobs['wall'] = imageJob(course.wallImage, wallFileName, {crop: wallCropInfo, resize: wallResizeInfo});
   }
 
@@ -179,7 +183,7 @@ var imageJob = function(imageUrl, fileName, params) {
       util.processImage(imagePath, params, function(error, processedImagePath) {
         var fileType = mime.extension(mime.lookup(processedImagePath));
 
-        cdn.saveFileNew(wallFileName, processedImagePath, fileType, function(error){
+        cdn.saveFileNew(fileName, processedImagePath, fileType, function(error){
           if (error) {
             log.error("Error from save file in database", error);
             asyncCallback(error);
@@ -192,7 +196,7 @@ var imageJob = function(imageUrl, fileName, params) {
             }
           });
 
-          asyncCallback(null, '/cdn/' + wallFileName);
+          asyncCallback(null, '/cdn/' + fileName);
         });
       });
     });
