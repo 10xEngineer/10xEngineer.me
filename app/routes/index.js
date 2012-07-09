@@ -48,7 +48,7 @@ var verifyPermission = function(entity, action){
 };
 
 var accessPermission = function(req, res, next) {
-  if(req.loggedIn && ( req.path == '/auth' || req.path == '/register')) {
+  if(req.loggedIn && ( req.path == '/auth' )) {
     res.redirect('/');
   } else {
     next();
