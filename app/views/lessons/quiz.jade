@@ -4,7 +4,7 @@
   .container-fluid.course-index.inner-index
     h1 #{lesson.title}
     .row-fluid
-      .span10
+      .span9
         form(method='POST', id='lessonForm', enctype='multipart/form-data')
           each question, questionIndex in lesson.quiz.questions
             div.questionBox
@@ -40,10 +40,10 @@
         .lessonBar
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
           a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
-      .span2
+      .span3
         include _sidebar
     .row-fluid
       p
     .row-fluid
-      .span10
+      .span9
         include _footer

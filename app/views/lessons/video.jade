@@ -3,8 +3,8 @@
   .container-fluid.lesson.inner-index
     h1 #{lesson.title}
     .row-fluid
-      .span10
-        video#player(width='930', height='525', preload="none")
+      .span9
+        video#player(width='840', height='475', preload="none")
           - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
             source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
           - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
@@ -12,13 +12,13 @@
         .lessonBar
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
           a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
-      .span2
+      .span3
         include _sidebar
     .row-fluid
       p
     - if(false)
       .row-fluid
-        .span10
+        .span9
           include _footer
   script(type='text/javascript', src='/socket.io/socket.io.js')
   script(type='text/javascript', src='/javascripts/monitor.js')
@@ -26,8 +26,8 @@
     var currentVideoTime = 0, LastUpdatedTime = 0;
     $('video').mediaelementplayer({
       enablePluginDebug: false,
-      defaultVideoWidth: 930,
-      defaultVideoHeight: 525,
+      defaultVideoWidth: 840,
+      defaultVideoHeight: 475,
       features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
       alwaysShowControls: true,
       pluginPath: '/javascripts/mediaelement/',
