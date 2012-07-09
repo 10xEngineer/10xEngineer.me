@@ -48,9 +48,12 @@ module.exports.create = function(req, res, next){
   var util = load.helper('util');
   course.title = req.body.title;
   course.desc = req.body.description;
-  course.image = req.body.image;
-  course.cropImgInfo = req.body.cropImgInfo;
+  course.iconImage = req.body.iconImage;
+  course.cropIconImgInfo = req.body.cropIconImgInfo;
+  course.wallImage = req.body.wallImage;
+  course.cropWallImgInfo = req.body.cropWallImgInfo;
   course.created_by = req.user._id;
+  log.info(course);
 
   // Saves Created Course
   course.save(function(error) {
@@ -61,7 +64,7 @@ module.exports.create = function(req, res, next){
     }
 
     var id = course.id;
-
+    log.info("Course saved.");
     //Set the course info in the session to let socket.io know about it.
     req.session.newCourse = {title: course.title, _id: course._id};
     req.session.message = "Course created successfully.";

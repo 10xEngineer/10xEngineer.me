@@ -95,6 +95,8 @@ module.exports.imageCrop = function(filePath, cropDetailStringify, callback) {
   var x = cropDetail.x;
   var y = cropDetail.y;
 
+  log.info("Get Parameters [ x:",x,", y:",y,", height:",height,", width:", width, "]");
+
   gm(filePath)
     .crop(width,height,x,y)
     .write(fileCropedPath, function(error){
@@ -107,13 +109,14 @@ module.exports.imageCrop = function(filePath, cropDetailStringify, callback) {
 }
 
 // Image Resize function
-module.exports.imageResize = function(filePath, callback){
+module.exports.imageResize = function(filePath, resizeDetails, callback){
 
   var fileType = mime.extension(mime.lookup(filePath));
   var fileResizedPath = path.join(tmpFileUploadDir,"tmpResizedImage." + fileType);
+  log.info("Resize to ", resizeDetails);
 
   gm(filePath)
-    .resize(200, 200)
+    .resize(resizeDetails.width, resizeDetails.height)
     .write(fileResizedPath, function(error){
     if(error){
       callback(error);

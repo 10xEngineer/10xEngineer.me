@@ -1,7 +1,8 @@
 {
     "title": "Devops",
     "desc": "\"DevOps\" is an emerging set of principles, methods and practices for communication, collaboration and integration between software development (application/software engineering) and IT operations (systems administration/infrastructure) professionals. It has developed in response to the emerging understanding of the interdependence and importance of both the development and operations disciplines in meeting an organization's goal of rapidly producing software products and services",
-    "image": "https://encrypted-tbn0.google.com/images?q=tbn:ANd9GcSYlEdiwQRZJSJyJVS8gkL6fQyNh9_GWqPiVtWfLiSUAR5fpYEs",
+    "iconImage": "https://encrypted-tbn0.google.com/images?q=tbn:ANd9GcSYlEdiwQRZJSJyJVS8gkL6fQyNh9_GWqPiVtWfLiSUAR5fpYEs",
+    "wallImage": "https://encrypted-tbn0.google.com/images?q=tbn:ANd9GcSYlEdiwQRZJSJyJVS8gkL6fQyNh9_GWqPiVtWfLiSUAR5fpYEs",
     "chapters": [
         {
             "title": "Introduction to DevOps",
