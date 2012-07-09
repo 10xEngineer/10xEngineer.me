@@ -1,0 +1,90 @@
+{
+    "title": "How To Train Your Dragon",
+    "desc": "This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings who has a dragonling and want to train it for domestic use.",
+    "iconImage": "http://f.cl.ly/items/3v3q1d1P210n2c290e0C/dragonIcon.png",
+    "wallImage": "http://f.cl.ly/items/1F2E0A0H1D2U0z1V3Q2s/Wallpaper.png",
+    "chapters": [
+        {
+            "title": "Basic Training",
+            "desc": "Basic training on dragon training.",
+            "lessons": [
+                {
+                    "title": "Basic Training",
+                    "desc": "In HD",
+                    "type": "video",
+                    "video": "oKiYuIsPxYk",
+                    "videoType": "youtube"
+                },
+                {
+                    "title": "How not to fly",
+                    "desc": "In HD",
+                    "type": "video",
+                    "video": "9W1MgDcB7SE",
+                    "videoType": "youtube"
+                },
+                {
+                    "title": "Your first DragonScript",
+                    "type": "programming",
+                    "language": "javascript",
+                    "skeletonCode": "function helloDragon() {}",
+                    "input": "test",
+                    "output": "test"
+                }
+            ]
+        },
+        {
+            "title": "Dragon Types",
+            "lessons": [
+                {
+                    "title": "Deadly Nadder",
+                    "desc": "",
+                    "type": "video",
+                    "video": "uizSzFooXME",
+                    "videoType": "youtube"
+                },
+                {
+                    "title": "Monsterous Nightmare",
+                    "desc": "",
+                    "type": "video",
+                    "video": "mZpgqsIrEbw",
+                    "videoType": "youtube"
+                },
+                {
+                    "title": "Hideous Zippleback",
+                    "desc": "",
+                    "type": "video",
+                    "video": "ZapnEiKdEu8",
+                    "videoType": "youtube"
+                },
+                {
+                    "title": "The Gronckle",
+                    "desc": "",
+                    "type": "video",
+                    "video": "yuCFlVS9fQU",
+                    "videoType": "youtube"
+                },
+                {
+                    "title": "Night Fury",
+                    "desc": "",
+                    "type": "video",
+                    "video": "6aNxELQVZ_Y",
+                    "videoType": "youtube"
+                },
+                {
+                    "title": "Identify A Dragon",
+                    "type": "quiz",
+                    "questions": [{
+                        "question": "Which dragon has two heads?",
+                        "options": ["Night Fury", "The Gronkle", "Hideous Zippleback", "Monsterous Nightmare"],
+                        "answers": ["Hideous Zippleback"]
+                    },
+                    {
+                        "question": "Which dragon(s) are quick fliers?",
+                        "options": ["The Gronkle", "Night Fury", "Fiery Hazard", "Monsterous Nightmare"],
+                        "answers": ["Night Fury", "Fiery Hazard"]
+                    }]
+                }
+            ]
+        }
+    ]
+}
