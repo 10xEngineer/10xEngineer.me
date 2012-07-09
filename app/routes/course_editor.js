@@ -22,12 +22,14 @@ var cdn = load.helper('cdn');
 ** Show Main Page of Course Editor **
 ************************************/
 module.exports.coursesList = function(req, res){
-	Course.find({},function(error, courses){
-	  res.render('course_editor', {
-	  	courses : courses,
-      user: req.user
-	  });
-	})
+  Course.find({})
+    .populate('created_by')
+    .run(function(error, courses) {
+  	  res.render('course_editor', {
+  	  	courses : courses,
+        user: req.user
+  	  });
+	});
 };
 
 /************************************
@@ -48,9 +50,12 @@ module.exports.create = function(req, res, next){
   var util = load.helper('util');
   course.title = req.body.title;
   course.desc = req.body.description;
-  course.image = req.body.image;
-  course.cropImgInfo = req.body.cropImgInfo;
+  course.iconImage = req.body.iconImage;
+  course.cropIconImgInfo = req.body.cropIconImgInfo;
+  course.wallImage = req.body.wallImage;
+  course.cropWallImgInfo = req.body.cropWallImgInfo;
   course.created_by = req.user._id;
+  log.info(course);
 
   // Saves Created Course
   course.save(function(error) {
@@ -61,7 +66,7 @@ module.exports.create = function(req, res, next){
     }
 
     var id = course.id;
-
+    log.info("Course saved.");
     //Set the course info in the session to let socket.io know about it.
     req.session.newCourse = {title: course.title, _id: course._id};
     req.session.message = "Course created successfully.";
@@ -195,7 +200,7 @@ module.exports.publish = function(req, res) {
   });
 };
 
-// unpublish a chapter
+// unpublish a course
 module.exports.unpublish = function(req, res) {
   var course = req.course;
   
@@ -208,6 +213,33 @@ module.exports.unpublish = function(req, res) {
     res.redirect('/course_editor');
   });
 
+};
+
+// Featured a course
+module.exports.featured = function(req, res) {
+  var course = req.course;
+  course.setFeatured(true, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not featured course.";
+    }
+    req.session.message = "Course featured sucessfully.";
+    res.redirect('/course_editor');
+  });
+};
+
+// Unfeatured a course
+module.exports.unfeatured = function(req, res) {
+  var course = req.course;
+  
+  course.setFeatured(false, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not unfeatured course.";
+    }
+    req.session.message = "Course unfeatured sucessfully.";
+    res.redirect('/course_editor');
+  });
 };
 
 
@@ -486,7 +518,6 @@ module.exports.lessonCreate = function(req, res, next) {
         }
         vms.push(tmpJSON);
       }
-      log.info("FINAL JSON :: ", vms);
   
       var sysAdminConfig = {
         name : lesson.name,
@@ -505,7 +536,6 @@ module.exports.lessonCreate = function(req, res, next) {
         },
         function (error, response, body) {
           // TODO : write code for save sysAdmin lesson using responce id and token
-          log.info("Body :: ", body);
           lesson.sysAdmin.vms = response;
           saveLesson(lesson, req, res);
 

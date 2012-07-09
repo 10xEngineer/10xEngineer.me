@@ -7,47 +7,88 @@ form(method='POST', id='courseForm' ,enctype='multipart/form-data')
     textarea.required(name='description', id='description')
       #{course.desc}
   p
-    input#cropImgInfo(name='cropImgInfo', type='hidden')
+    input#cropIconImgInfo(name='cropIconImgInfo', type='hidden')
+    input#cropWallImgInfo(name='cropWallImgInfo', type='hidden')
   p
-    label(for="selectImage") Image:
-    button.btn(type='button', name='selectImage', id='selectImage') Choose
-    .previewPane
-      - if(course.image)
-        img#cropTarget(src='#{course.image}')
-        input(type='hidden', name='image', value='#{course.image}')
+    label(for="selectIconImage") Icon Image:
+    button.btn(type='button', name='selectIconImage', id='selectIconImage') Choose
+    .iconPreviewPane
+      - if(course.iconImage)
+        img#cropTargetIcon(src='#{course.iconImage}')
+        input(type='hidden', name='iconImage', value='#{course.iconImage}')
+  p
+    label(for="selectWallImage") Wallpaper Image:
+    button.btn(type='button', name='selectWallImage', id='selectWallImage') Choose
+    .wallPreviewPane
+      - if(course.wallImage)
+        img#cropTargetWall(src='#{course.wallImage}')
+        input(type='hidden', name='wallImage', value='#{course.wallImage}')
   p
     input.btn.btn-primary(type='submit', value='Submit')
 
 script
   $(document).ready(function() {
     filepicker.setKey('462_D0Z1RnO8iMRHhSZb');
-    $("#selectImage").click(function(){
+    
+    $("#selectIconImage").click(function(){
       filepicker.getFile(filepicker.MIMETYPES.IMAGES, {'multiple':false}, function(url, token, data) {
-        var $previewPane = $('.previewPane');
+        var $previewPane = $('.iconPreviewPane');
 
         $previewPane.empty();
         $('<img/>', {
           src: url,
-          id: 'cropTarget'
+          id: 'cropTargetIcon'
         }).appendTo($previewPane);
 
         $('<input/>', {
           type: 'hidden',
-          name: 'image',
+          name: 'iconImage',
           value: url
         }).appendTo($previewPane);
-
-        // Initialize JCrop
-        $('#cropTarget').Jcrop({
-          aspectRatio: 1,
-          minSize: [200, 200],
-          setSelect: [0, 0, 200, 200],
+  
+        // Initialize JCrop for Icon
+        $('#cropTargetIcon').Jcrop({
+          aspectRatio: 250/250,
+          //- minSize: [250, 250],
+          setSelect: [0, 0, 250, 250],
           bgOpacity: 0.5,
           onSelect: function(c){
-            $('#cropImgInfo').val(JSON.stringify(c))
+            $('#cropIconImgInfo').val(JSON.stringify(c))
           }
         });
 
       });
     });
+    
+    $("#selectWallImage").click(function(){
+      filepicker.getFile(filepicker.MIMETYPES.IMAGES, {'multiple':false}, function(url, token, data) {
+        var $previewPane = $('.wallPreviewPane');
+
+        $previewPane.empty();
+        $('<img/>', {
+          src: url,
+          id: 'cropTargetWall'
+        }).appendTo($previewPane);
+
+        $('<input/>', {
+          type: 'hidden',
+          name: 'wallImage',
+          value: url
+        }).appendTo($previewPane);
+
+        // Initialize JCrop for wallpaper
+        $('#cropTargetWall').Jcrop({
+          aspectRatio: 800/450,
+          //- minSize: [800, 450],
+          setSelect: [0, 0, 800, 450],
+          bgOpacity: 0.5,
+          onSelect: function(c){
+            $('#cropWallImgInfo').val(JSON.stringify(c))
+          }
+        });
+      });
+    });
+
+
+
   });

@@ -448,10 +448,11 @@ color:#ffffff;font-weight:bold;font-size:17px;margin-bottom:5px;}
 .carouselWrapper .carousel-inner .item img {margin: 10px;}
 .carouselButton{line-height: 200px;vertical-align: middle;}
 
-.detailsBorder {margin-bottom:20px;border: 1px solid #000000;}
+.detailsBorder {margin-bottom:20px;border: 2px solid #eee;-moz-border-radius: 15px;border-radius: 15px;padding:5px;}
 
 .courseDetailsWrapper {padding-top:10px;}
 .detailsBorder h2, .courseDetailsWrapper p{padding:10px;}
+.lessonList{ list-style:none;}
 
 .reviewHeader{border-bottom: 1px solid #000000;margin-bottom: 5px;font-weight:bold;font-size:20px;}
 

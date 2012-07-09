@@ -13,7 +13,7 @@
         width:120px;
       }
     .row-fluid
-      .span10
+      .span9
         .row-fluid
           form#editform.well(onsubmit='return false')
             .row-fluid.action-bar
@@ -139,13 +139,18 @@
                     a#clear.button.btn.btn-danger RESET
                   span.pull-right
                     button#submit.button.btn.btn-submit SUBMIT
+
+        .lessonBar.row-fluid
+          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
+
         .row-fluid
           p.pull-right 10xEngineer.me uses 
             a(href="http://ideone.com") ideone.com 
             | &copy; by 
             a(href="http://sphere-research.com") Sphere Research Labs
 
-      .span2
+      .span3
         include _sidebar
 
     script(type='text/javascript', src='/javascripts/ace_2/ace.js')

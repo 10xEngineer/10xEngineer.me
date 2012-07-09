@@ -3,9 +3,9 @@
   .container-fluid.course-index.inner-index
     .row-fluid
       .course-header
-        - if(typeof(course.image) != 'undefined')
+        - if(typeof(course.iconImage) != 'undefined')
           .course-img
-            img(src='#{course.image}')
+            img(src='#{course.iconImage}')
         .course-content
           h2 #{course.title}
           p #{course.desc}
