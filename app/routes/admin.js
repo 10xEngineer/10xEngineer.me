@@ -2,7 +2,11 @@ var User = load.model('User');
 var Role = load.model('Role');
 var LabDef = load.model('LabDef');
 var config = require('../config/config');
+var importer = load.helper('importer');
 var _ = require('underscore');
+var fs = require('fs');
+var async = require('async');
+
 
 
 module.exports = function() {};
@@ -17,6 +21,45 @@ module.exports.show = function(req, res) {
       });
     });
   });
+};
+
+module.exports.usersImportView = function(req, res) {  
+  res.render('admin/usersImport');
+};
+
+module.exports.usersImport = function(req, res) {  
+  
+  var f = req.files['users-file'];
+  var fileContent = fs.readFileSync(f.path);
+  fileContent = fileContent.toString();
+  var fileContentArray = fileContent.split(',');
+
+  var length = fileContentArray.length;
+  function isWhitespace(charToCheck) {
+    var whitespaceChars = " \t\n\r\f";
+    return (whitespaceChars.indexOf(charToCheck) != -1);
+  }
+  function ltrim(str) { 
+    for(var k = 0; k < str.length && isWhitespace(str.charAt(k)); k++);
+    return str.substring(k, str.length);
+  }
+  function rtrim(str) {
+    for(var j=str.length-1; j>=0 && isWhitespace(str.charAt(j)) ; j--) ;
+    return str.substring(0,j+1);
+  }
+  function trim(str) {
+    return ltrim(rtrim(str));
+  }
+  for (var index = 0; index < length; index++) {
+    fileContentArray[index] = trim(fileContentArray[index]);
+  };
+  async.forEach(fileContentArray, importer.users, function(error){
+    if(error) {
+      log.error(error);
+    }
+  });
+  req.session.message = "Import Sucessfully Course.";
+  res.redirect('/admin');
 };
 
 module.exports.labsView = function(req, res) {  

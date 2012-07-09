@@ -113,10 +113,7 @@ UserSchema.statics.findOrCreate = function(source, userData, promise) {
 
 
 UserSchema.methods.updateUserRoles = function(roles, callback){
-  log.info("ROLES :: ",roles);
-  log.info("BEFORE :: ", this);
   this.roles = roles;
-  log.info("AFTER :: ", this);
   this.save(function(error){
     if(error){
       log.error(error);

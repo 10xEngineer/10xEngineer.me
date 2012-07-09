@@ -1,6 +1,7 @@
 var Course = load.model('Course');
 var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
+var User = load.model('User');
 
 
 module.exports = function() {};
@@ -73,3 +74,25 @@ module.exports.lesson = function(data, chapterId, callback) {
     }
   });
 };
+
+
+module.exports.users = function(email, callback) {
+  User.findOne({email: email}, function(error, dbUser) {
+    if (error) {
+      callback(error);
+    }
+    if(dbUser == null) {
+      user = new User();
+      user.email = email;
+      user.roles = ['default'];
+      user.save(function(error){
+        if(error) {
+          log.error(error);
+          callback(error);
+        }
+        callback(null);
+      });
+    }
+    callback(null);
+  });
+}

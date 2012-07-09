@@ -173,6 +173,8 @@ module.exports = function(app) {
 
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
+  app.get('/admin/usersImport', admin.usersImportView);
+  app.post('/admin/usersImport', admin.usersImport);
 
   app.get('/admin/labs', verifyPermission('admin', 'read'), admin.showLabsView);
   app.get('/admin/labs/create', verifyPermission('admin', 'edit'), admin.labsView);
