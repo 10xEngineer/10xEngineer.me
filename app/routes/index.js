@@ -175,6 +175,8 @@ module.exports = function(app) {
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
   app.get('/admin/usersImport', admin.usersImportView);
   app.post('/admin/usersImport', admin.usersImport);
+  app.get('/admin/approve', admin.approveView);
+  app.get('/admin/approve/:userId', admin.approve);
 
   app.get('/admin/labs', verifyPermission('admin', 'read'), admin.showLabsView);
   app.get('/admin/labs/create', verifyPermission('admin', 'edit'), admin.labsView);

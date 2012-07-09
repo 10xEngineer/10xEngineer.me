@@ -23,6 +23,28 @@ module.exports.show = function(req, res) {
   });
 };
 
+module.exports.approveView = function(req, res) {
+  User.find({ roles : { $ne : 'user' } } ,function(error, users) {
+    res.render('admin/approve', {
+      title: '10xengineer.me Beta Approval',
+      users: users,
+    });
+  });
+};
+
+module.exports.approve = function(req, res) {  
+  var length = req.extUser.roles.length;
+  req.extUser.roles[length++] = 'user';
+  var user = req.extUser;
+  user.markModified('roles');
+  user.save(function(error){
+    if(error) {
+      log.error(error);
+    }
+    res.redirect('/admin/approve');
+  })
+};
+
 module.exports.usersImportView = function(req, res) {  
   res.render('admin/usersImport');
 };
