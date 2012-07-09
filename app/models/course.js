@@ -19,6 +19,7 @@ var CourseSchema = new Schema({
   image: { type: String },
   created_by: { type: ObjectId, ref: 'User' },
   status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
+  featured: { type: Boolean, default: 'false' },
   chapters: [{ type: ObjectId, ref: 'Chapter'}],
   created_at: { type: Date, default: Date.now, select: false },
   modified_at: { type: Date, default: Date.now, select: false }
@@ -64,16 +65,16 @@ CourseSchema.methods.removeCourse = function(callback) {
 CourseSchema.methods.publish = function(publish, callback) {
   var course = this;
   if(publish) {
-        var chaptersLength = course.chapters.length;
-        for(var chapterIndex = 0 ; chapterIndex < chaptersLength ; chapterIndex++) {
-          var chapter = course.chapters[chapterIndex];
-          chapter.publish(true, function(error){
-            if(error){
-              log.error(error);
-            }
-          });
+    var chaptersLength = course.chapters.length;
+    for(var chapterIndex = 0 ; chapterIndex < chaptersLength ; chapterIndex++) {
+      var chapter = course.chapters[chapterIndex];
+      chapter.publish(true, function(error){
+        if(error){
+          log.error(error);
         }
-      course.status = 'published';
+      });
+    }
+    course.status = 'published';
   } else {
     course.status = 'draft';
   }
@@ -81,6 +82,19 @@ CourseSchema.methods.publish = function(publish, callback) {
   course.save(function(error) {
     if(error) {
       log.error(error);
+    }
+    callback();
+  });
+};
+
+CourseSchema.methods.setFeatured = function(featured, callback) {
+  var course = this;
+
+  course.featured = featured;
+  course.save(function(error) {
+    if(error) {
+      log.error(error);
+      callback(error);
     }
     callback();
   });

@@ -14,10 +14,28 @@ var importer = load.helper('importer');
 
 module.exports = function() {};
 
-// List existing courses
-module.exports.list = function(req, res){
+// List existing all courses
+module.exports.allList = function(req, res){
   var formatedProgress = {};
   Course.find({}, function(error, courses){
+    Progress.find({ user: req.user._id }, function(error, progresses){
+      for(var index = 0; index < progresses.length; index++){
+        var progress = progresses[index];
+        formatedProgress[progress.course] = progress.status;
+      }
+      res.render('courses/allList', { 
+        title: 'Courses',
+        courses: courses,
+        progress : formatedProgress
+      });
+    });
+  })
+};
+
+// List existing featured courses
+module.exports.featuredList = function(req, res){
+  var formatedProgress = {};
+  Course.find({ featured : true }, function(error, courses){
     Progress.find({ user: req.user._id }, function(error, progresses){
       for(var index = 0; index < progresses.length; index++){
         var progress = progresses[index];
@@ -237,3 +255,4 @@ module.exports.unpublish = function(req, res) {
     res.redirect('/course/' + course.id);
   });
 };
+

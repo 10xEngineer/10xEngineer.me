@@ -25,4 +25,8 @@
 							a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/publish", style="margin-right: 5px") Publish
 						-else
 							a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/unpublish", style="margin-right: 5px") Unpublish
+						-if(! course.featured)
+							a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/featured", style="margin-right: 5px") Featured
+						-else
+							a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/unfeatured", style="margin-right: 5px") Unfeatured
 						a.btn.pull-right(href="/course_editor/course/#{course.id}/edit", style="margin-right: 5px") Edit

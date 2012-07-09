@@ -195,7 +195,7 @@ module.exports.publish = function(req, res) {
   });
 };
 
-// unpublish a chapter
+// unpublish a course
 module.exports.unpublish = function(req, res) {
   var course = req.course;
   
@@ -208,6 +208,33 @@ module.exports.unpublish = function(req, res) {
     res.redirect('/course_editor');
   });
 
+};
+
+// Featured a course
+module.exports.featured = function(req, res) {
+  var course = req.course;
+  course.setFeatured(true, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not featured course.";
+    }
+    req.session.message = "Course featured sucessfully.";
+    res.redirect('/course_editor');
+  });
+};
+
+// Unfeatured a course
+module.exports.unfeatured = function(req, res) {
+  var course = req.course;
+  
+  course.setFeatured(false, function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not unfeatured course.";
+    }
+    req.session.message = "Course unfeatured sucessfully.";
+    res.redirect('/course_editor');
+  });
 };
 
 
