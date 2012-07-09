@@ -1,15 +1,23 @@
 .container
   h1= title
+  p
+    a.btn.pull-right(href="/admin/usersImport") 
+      i.icon-download-alt
+      | Import User Email
   .admin_view_header
     a.btn(href="/admin/roles", style="margin-right: 5px;") Roles
-    a.btn(href="/admin/labs") Labs
+    a.btn(href="/admin/labs", style="margin-right: 5px;") Labs 
+    a.btn(href="/admin/approve") Approve
     .counts.pull-right
       label [Total - #{users.length}]
   .actions 
     ul.admin_view_list_items
       each user in users
-        li 
-          label(for='#{user.id}', style='display:inline') #{user.name}
+        li
+          -if(user.name) 
+            label(for='#{user.id}', style='display:inline') #{user.name}
+          -else
+            label(for='#{user.id}', style='display:inline') #{user.email}
           .roles.pull-right
             p(style="display:inline; padding-right: 5px;") #{user.roles.join(', ')}
             a.btn(href='/admin/user/#{user.id}/roles', id='#{user.id}', style="display:inline") Edit

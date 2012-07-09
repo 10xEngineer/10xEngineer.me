@@ -40,7 +40,8 @@
         #detailsAccordion.accordion#myCollapsible
           each chapter, chapterIndex in chapters
             .accordion-group
-              input.desc(name='desc' ,type='hidden' ,value='#{chapter.desc}')
+              -var chapterDesc = chapter.desc || "";
+              input.desc(name='desc' ,type='hidden' ,value='#{chapterDesc}')
               input.title(name='title' ,type='hidden' ,value='#{chapter.title}')
               div.accordion-heading.contentChapter
                 a(href="##{chapter.id}", data-parent="#detailsAccordion", data-toggle="collapse", class="accordion-toggle") #{chapter.title}
@@ -59,8 +60,9 @@
                         div.lessonTitle
                           a(href="/lesson/#{lesson.id}") #{lesson.title}
       .span6
-        h3#chapterTitle 
-        p#chapterDesc 
+        h3#chapterTitle #{chapters[0].title}
+        -var desc = chapters[0].desc || "";
+        p#chapterDesc #{desc}
         .row-fluid
           .btn-group.backBtn
             a.btn.btn-large(href="javascript:history.go(-1)") back

@@ -36,11 +36,13 @@ var verifyPermission = function(entity, action){
           next();
           return;          
         } else {
+          res.redirect('/');
           res.write('content is not accessible for your account.');
           res.end();
         }
       });
     } else {
+      res.redirect('/');
       res.write('content is not accessible for your account.');
       res.end();
     }
@@ -48,7 +50,7 @@ var verifyPermission = function(entity, action){
 };
 
 var accessPermission = function(req, res, next) {
-  if(req.loggedIn && ( req.path == '/auth' || req.path == '/register')) {
+  if(req.loggedIn && ( req.path == '/auth' )) {
     res.redirect('/');
   } else {
     next();
@@ -104,8 +106,8 @@ module.exports = function(app) {
   app.post('/register', accessPermission, main.register);
   
   // Course
-  app.get('/courses', verifyPermission('course', 'read'), course.list);
-  app.get('/courses/all', verifyPermission('course', 'read'), course.list);
+  app.get('/courses', verifyPermission('course', 'read'), course.featuredList);
+  app.get('/courses/all', verifyPermission('course', 'read'), course.allList);
 
   app.get('/course/:courseId', verifyPermission('course', 'read'), course.show);
   app.get('/course/:courseId/start', verifyPermission('course', 'read'), course.start);
@@ -125,6 +127,8 @@ module.exports = function(app) {
   app.get('/course_editor/course/:courseId/remove', verifyPermission('course', 'delete'), course_editor.remove);
   app.get('/course_editor/course/:courseId/publish', verifyPermission('course', 'publish'), course_editor.publish);
   app.get('/course_editor/course/:courseId/unpublish', verifyPermission('course', 'publish'), course_editor.unpublish);
+  app.get('/course_editor/course/:courseId/featured', verifyPermission('course', 'publish'), course_editor.featured);
+  app.get('/course_editor/course/:courseId/unfeatured', verifyPermission('course', 'publish'), course_editor.unfeatured);
   // Chapter oprations 
   app.get('/course_editor/chapter/create/:courseId', verifyPermission('course', 'edit'), course_editor.chapterCreateView);
   app.post('/course_editor/chapter/create/:courseId', verifyPermission('course', 'edit'), validation.lookUp(validationConfig.chapter.createChapter), course_editor.chapterCreate);
@@ -173,6 +177,10 @@ module.exports = function(app) {
 
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
+  app.get('/admin/usersImport', admin.usersImportView);
+  app.post('/admin/usersImport', admin.usersImport);
+  app.get('/admin/approve', admin.approveView);
+  app.get('/admin/approve/:userId', admin.approve);
 
   app.get('/admin/labs', verifyPermission('admin', 'read'), admin.showLabsView);
   app.get('/admin/labs/create', verifyPermission('admin', 'edit'), admin.labsView);

@@ -26,4 +26,9 @@
 						-else
 							a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/unpublish", style="margin-right: 5px") Unpublish
 						a.btn.pull-right(href="/course_editor/course/#{course.id}/edit", style="margin-right: 5px") Edit
-						p created By : #{course.created_by.name}
+						-if(! course.featured)
+							a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/featured", style="margin-right: 5px") Add to Featured
+						-else
+							a.btn.btn-success.pull-right(href="/course_editor/course/#{course.id}/unfeatured", style="margin-right: 5px") Remove from Featured
+						- if(course.created_by)
+							p created By : #{course.created_by.name}
