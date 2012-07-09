@@ -219,11 +219,14 @@ module.exports.showView = function(req, res) {
         var videoStartTime = 0;
       }
       // Render based on the type
-      res.render('lessons/' + req.lesson.type, {
-        title: req.lesson.title,
-        quiz: req.lesson.quiz,
-        videoStartTime: videoStartTime,
-        userId: req.user._id
+      Lesson.find({}, function(error, allLessons){
+        res.render('lessons/' + req.lesson.type, {
+          title: req.lesson.title,
+          quiz: req.lesson.quiz,
+          videoStartTime: videoStartTime,
+          userId: req.user._id,
+          allLessons : allLessons
+        });
       });
     });
   });

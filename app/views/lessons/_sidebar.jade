@@ -6,16 +6,26 @@
           i.icon-book
           | Course Content
         - var chapters = course.chapters || []
-        each innerChapter in chapters
-          li
-            li.nav-header 
-              //a(href='/chapter/#{innerChapter.id}/') #{innerChapter.title}
-              #{innerChapter.title}
-              - if (innerChapter._id.toString() == lesson.chapter._id.toString())
-                each innerLesson in chapter.lessons
-                  - if (innerLesson.id.toString() == lesson.id.toString())
-                      li
-                        #{innerLesson.title}
-                  - else
-                      li 
-                        a(href='/lesson/#{innerLesson.id}') #{innerLesson.title}
+        #chaptersCollapseble.accordion
+          each innerChapter in chapters
+            .accordion-group
+              .accordion-heading
+                a.accordion-toggle(data-toggle="collapse", data-parent="#chaptersCollapseble", href="#les#{innerChapter.id}")
+                  li.nav-header #{innerChapter.title}
+                  - log.info(innerChapter);
+              .accordion-body.collapse(id="les#{innerChapter.id}")
+                .accordion-inner
+                  each innerLesson in allLessons
+                    - if (innerLesson.chapter.toString() == innerChapter._id.toString())
+                      - log.info("Inside if with >> ", innerLesson.chapter, ":", innerChapter._id);
+                      - if (innerLesson.id.toString() == lesson.id.toString())
+                          li
+                            #{innerLesson.title}
+                      - else
+                          li 
+                            a(href='/lesson/#{innerLesson.id}') #{innerLesson.title}
+
+script
+  $(document).ready(function(){
+    $('.collapse').collapse('show');
+  })
