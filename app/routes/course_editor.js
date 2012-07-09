@@ -486,7 +486,6 @@ module.exports.lessonCreate = function(req, res, next) {
         }
         vms.push(tmpJSON);
       }
-      log.info("FINAL JSON :: ", vms);
   
       var sysAdminConfig = {
         name : lesson.name,
@@ -505,7 +504,6 @@ module.exports.lessonCreate = function(req, res, next) {
         },
         function (error, response, body) {
           // TODO : write code for save sysAdmin lesson using responce id and token
-          log.info("Body :: ", body);
           lesson.sysAdmin.vms = response;
           saveLesson(lesson, req, res);
 

@@ -5,6 +5,7 @@ var fs = require('fs');
 var gm = require('gm');
 var path = require('path');
 var mime = require('mime');
+var tmpFileUploadDir = appRoot + '/app/upload';
 
 module.exports = function() {};
 
