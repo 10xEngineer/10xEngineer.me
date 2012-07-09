@@ -22,12 +22,14 @@ var cdn = load.helper('cdn');
 ** Show Main Page of Course Editor **
 ************************************/
 module.exports.coursesList = function(req, res){
-	Course.find({},function(error, courses){
-	  res.render('course_editor', {
-	  	courses : courses,
-      user: req.user
-	  });
-	})
+  Course.find({})
+    .populate('created_by')
+    .run(function(error, courses) {
+  	  res.render('course_editor', {
+  	  	courses : courses,
+        user: req.user
+  	  });
+	});
 };
 
 /************************************
