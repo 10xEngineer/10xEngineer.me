@@ -29,7 +29,7 @@ module.exports.validation = function(entity, config) {
 	var errors = "";
 
 	for(key in config){
-		configsOfKey = config[key];
+		var configsOfKey = config[key];
 		for(action in configsOfKey){
 			if(typeof(configsOfKey[action])=='object' && action == 'checkFor'){
 				var subConfig;
@@ -51,5 +51,6 @@ module.exports.validation = function(entity, config) {
 			}			
 		}
 	}
+
 	return errors;
 }

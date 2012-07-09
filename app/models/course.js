@@ -36,8 +36,22 @@ CourseSchema.pre('save', function(next) {
     Count.getNext('course', function(error, id) {
       course.id = id;
 
+      var regex = new RegExp('^/cdn/');
+      var options = {processIcon: false, processWall: false};
+
+      if(regex.test(course.iconImage)) {
+        log.info('icon local');
+        options.processIcon = true;
+      }
+      if(regex.test(course.wallImage)) {
+        log.info('wall local');
+        options.processWall = true;
+      }
+
+      log.info(options);
+
       // Save image
-      saveCourse(course, function(error) {
+      processImages(course, options, function(error) {
         if(error) {
           next(error);
         }
@@ -92,72 +106,77 @@ CourseSchema.methods.publish = function(publish, callback) {
 mongoose.model('Course', CourseSchema);
 
 
-var saveCourse = function (course, callback) {
+var processImages = function (course, options, callback) {
   var now = new Date();
   var iconFileName = 'courseIconImage_' + course.id;
   var wallFileName = 'courseWallImage_' + course.id;
-  var iconResizeDetail = {
+  var iconCropInfo = {
+    "x": 0,
+    "y": 0,
+    "x2": 200,
+    "y2": 200,
+    "h": 200,
+    "w": 200
+  }
+  var wallCropInfo = {
+    "x": 0,
+    "y": 0,
+    "x2": 800,
+    "y2": 450,
+    "h": 450,
+    "w": 800
+  }
+  var iconResizeInfo = {
     "w" : 200,
     "h" : 200
   };
-  var wallResizeDetail = {
+  var wallResizeInfo = {
     "w" : 800,
     "h" : 450
   };
 
-  async.parallel([
-  function(asyncCallback){
+  var jobs = {};
+  if(options.processIcon) {
+    iconCropInfo = course.cropIconImgInfo || iconCropInfo;
+    jobs['icon'] = imageJob(course.iconImage, iconFileName, {crop: iconCropInfo, resize: iconResizeInfo});
+  }
+  if(options.processWall) {
+    wallCropInfo = course.cropWallImgInfo || wallCropInfo;
+    jobs['wall'] = imageJob(course.wallImage, wallFileName, {crop: wallCropInfo, resize: wallResizeInfo});
+  }
+
+  async.parallel(jobs, function(error, results) {
+    if(error){
+      callback(error);
+    }
+    else{
+      log.info(results);
+
+      if(results.icon) {
+        course.iconImage = results.icon;
+      }
+      if(results.wall) {
+        course.wallImage = results.wall;
+      }
+
+      callback();
+    }
+  });
+};
+
+
+var imageJob = function(imageUrl, fileName, params) {
+
+  return function(asyncCallback){
 
     // Process icon image
-    util.saveToDisk(course.iconImage, function(error, imagePath){
+    util.saveToDisk(imageUrl, function(error, imagePath){
       if(error){
         log.error("Error comes from util - saveToDisk Function", error);
         asyncCallback(error);
       }
 
-      var cropIconImageInfo = typeof(course.cropIconImgInfo) == 'undefined' ? '{ "x": 0, "y": 0, "x2": 200, "y2": 200, "h": 200, "w": 200}' : course.cropIconImgInfo;
-
-      util.processImage(imagePath, {
-        crop: cropIconImageInfo,
-        resize: iconResizeDetail
-      },
-      function(error, processedImagePath) {
-        var fileType = mime.extension(mime.lookup(processedImagePath));
-
-        cdn.saveFileNew(iconFileName, processedImagePath, fileType, function(error){
-          if (error) {
-            log.error("Error from save file in database", error);
-            asyncCallback(error);
-          }
-
-          fs.unlink(processedImagePath, function (error) {
-            if (error) {
-              log.error("Error from unlink file", error);
-              asyncCallback(error);
-            }
-          });
-
-          asyncCallback(null, '/cdn/' + iconFileName);
-        });
-      });
-    });
-
-  }, function(asyncCallback){
-
-    // Process icon image
-    util.saveToDisk(course.wallImage, function(error, imagePath){
-      if(error){
-        log.error("Error comes from util - saveToDisk Function", error);
-        asyncCallback(error);
-      }
-
-      var cropWallImageInfo = typeof(course.cropWallImgInfo) == 'undefined' ? '{ "x": 0, "y": 0, "x2": 800, "y2": 450, "h": 450, "w": 800}' : course.cropWallImgInfo;
-
-      util.processImage(imagePath, {
-        crop: cropWallImageInfo,
-        resize: wallResizeDetail
-      },
-      function(error, processedImagePath) {
+      util.processImage(imagePath, params, function(error, processedImagePath) {
         var fileType = mime.extension(mime.lookup(processedImagePath));
 
         cdn.saveFileNew(wallFileName, processedImagePath, fileType, function(error){
@@ -177,150 +196,5 @@ var saveCourse = function (course, callback) {
         });
       });
     });
-  }], 
-  function(error, imageNames){
-    if(error){
-      callback(error);
-    }
-    else{
-      log.info(imageNames);
-      course.iconImage = imageNames[0];
-      course.wallImage = imageNames[1];
-      callback();
-    }
-  });
-
-/*
-  // Process icon image
-  util.saveToDisk(course.iconImage, function(error, imagePath){
-    if(error){
-      log.error("Error comes from util - saveToDisk Function", error);
-      callback(error);
-    }
-
-    var cropIconImageInfo = typeof(course.cropIconImgInfo) == 'undefined' ? '{ "x": 0, "y": 0, "x2": 200, "y2": 200, "h": 200, "w": 200}' : course.cropIconImgInfo;
-    util.imageCrop(imagePath, cropIconImageInfo, function(error, croppedImagePath) {
-      if(error) {
-        log.error("Error from Image crop opration", error);
-        callback(error);
-      }
-
-      // deletes old original file aftred crops
-      fs.unlink(imagePath, function (error) {
-        if (error) {
-          log.error("Error from unlink file", error);
-          callback(error);
-        }
-      });
-
-      // resize croped file
-      util.imageResize(croppedImagePath, function(error, resizedImagePath){
-        if(error){
-          log.error("Image Resize opration", error);
-          callback(error);
-        }
-  
-        var fileType = mime.extension(mime.lookup(resizedImagePath));
-
-        // deletes old croped file after resize
-        fs.unlink(croppedImagePath, function (error) {
-          if (error) {
-            log.error("Error from unlink file", error);
-            callback(error);
-          }
-        });
-
-        // fress resized image stores to database
-        cdn.saveFileNew(iconFileName, resizedImagePath, fileType, function(error){
-          if (error) {
-            log.error("Error from save file in database", error);
-            callback(error);
-          }
-
-          fs.unlink(resizedImagePath, function (error) {
-            if (error) {
-              log.error("Error from unlink file", error);
-              callback(error);
-            }
-          });
-
-          course.image = '/cdn/' + iconFileName;
-          course.save(function(error) {
-            if(error) {
-              callback(error);
-            }
-            callback();
-          });
-        });
-      });
-    });
-
-  });
-
-  // Process wall image
-  util.saveToDisk(course.wallImage, function(error, imagePath){
-    if(error){
-      log.error("Error comes from util - saveToDisk Function", error);
-      callback(error);
-    }
-
-    var cropWallImageInfo = typeof(course.cropWallImgInfo) == 'undefined' ? '{ "x": 0, "y": 0, "x2": 200, "y2": 200, "h": 200, "w": 200}' : course.cropWallImgInfo;
-    util.imageCrop(imagePath, cropWallImageInfo, function(error, croppedImagePath) {
-      if(error) {
-        log.error("Error from Image crop opration", error);
-        callback(error);
-      }
-
-      // deletes old original file aftred crops
-      fs.unlink(imagePath, function (error) {
-        if (error) {
-          log.error("Error from unlink file", error);
-          callback(error);
-        }
-      });
-
-      // resize croped file
-      util.imageResize(croppedImagePath, function(error, resizedImagePath){
-        if(error){
-          log.error("Image Resize opration", error);
-          callback(error);
-        }
-  
-        var fileType = mime.extension(mime.lookup(resizedImagePath));
-
-        // deletes old croped file after resize
-        fs.unlink(croppedImagePath, function (error) {
-          if (error) {
-            log.error("Error from unlink file", error);
-            callback(error);
-          }
-        });
-
-        // fress resized image stores to database
-        cdn.saveFileNew(wallFileName, resizedImagePath, fileType, function(error){
-          if (error) {
-            log.error("Error from save file in database", error);
-            callback(error);
-          }
-
-          fs.unlink(resizedImagePath, function (error) {
-            if (error) {
-              log.error("Error from unlink file", error);
-              callback(error);
-            }
-          });
-
-          course.image = '/cdn/' + wallFileName;
-          course.save(function(error) {
-            if(error) {
-              callback(error);
-            }
-            callback();
-          });
-        });
-      });
-    });
-
-  });
-*/
-};
+  };
+}

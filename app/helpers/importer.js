@@ -9,7 +9,8 @@ module.exports.course = function(data, callback) {
   var course = new Course();
   course.title = data.title;
   course.desc = data.desc;
-  course.image = data.image;
+  course.iconImage = data.iconImage;
+  course.wallImage = data.wallImage;
   course.created_by = data.created_by;
 
   course.save(function(error) {
@@ -62,6 +63,12 @@ module.exports.lesson = function(data, chapterId, callback) {
   if(data.type === 'video') {
     lesson.video.content = data.video;
     lesson.video.type = data.videoType;
+  } else if(data.type === 'quiz') {
+    
+  } else if(data.type === 'programming') {
+    
+  } else if(data.type === 'sysAdmin') {
+    
   } else {
     // Not supported for now
   }
