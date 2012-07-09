@@ -83,45 +83,53 @@ module.exports.saveToDisk = function(imgUrl, callback) {
     }
   });
 };
+ 
+/*
+* Process (crop -> resize) an image
+* 
+* options:
+*   crop:
+*     x: coordinate of crop start position
+*     y: coordinate of crop start position
+*     h: height of result image
+*     w: width of result image
+*   resize:
+*     h: height after resize
+*     w: width after resize
+* 
+*/
+module.exports.processImage = function(imagePath, options, callback) {
+  var fileType = mime.extension(mime.lookup(imagePath));
+  var resultImagePath = path.join(tmpFileUploadDir, "tmpCropedImage." + fileType);
 
-// Image Crop function
-module.exports.imageCrop = function(filePath, cropDetailStringify, callback) {
+  var processBatch = gm(imagePath);
 
-  var fileType = mime.extension(mime.lookup(filePath));
-  var fileCropedPath = path.join(tmpFileUploadDir,"tmpCropedImage." + fileType);
-  var cropDetail = JSON.parse(cropDetailStringify);
-  var width = cropDetail.w;
-  var height = cropDetail.h;
-  var x = cropDetail.x;
-  var y = cropDetail.y;
+  if(options && options.crop) {
+    var cropOpt = options.crop;
+    processBatch = processBatch.crop(cropOpt.w, cropOpt.h, cropOpt.x, cropOpt.y);
+  }
 
-  log.info("Get Parameters [ x:",x,", y:",y,", height:",height,", width:", width, "]");
+  if(options && options.resize) {
+    var resizeOpt = options.resize;
+    processBatch = processBatch.resize(resizeOpt.w, resizeOpt.h);
+  }
 
-  gm(filePath)
-    .crop(width,height,x,y)
-    .write(fileCropedPath, function(error){
+  // Process the image
+  processBatch.write(resultImagePath, function(error){
     if (error) {
-      log.error("Croped write opration", error);
-      callback(error);
-    } 
-    callback(null, fileCropedPath, filePath);
-  });
-}
-
-// Image Resize function
-module.exports.imageResize = function(filePath, resizeDetails, callback){
-
-  var fileType = mime.extension(mime.lookup(filePath));
-  var fileResizedPath = path.join(tmpFileUploadDir,"tmpResizedImage." + fileType);
-  log.info("Resize to ", resizeDetails);
-
-  gm(filePath)
-    .resize(resizeDetails.width, resizeDetails.height)
-    .write(fileResizedPath, function(error){
-    if(error){
+      log.error(error);
       callback(error);
     }
 
-    callback(null, fileResizedPath, filePath);
+    // deletes old original file
+    fs.unlink(imagePath, function (error) {
+      if (error) {
+        log.error("Error removing file.", error);
+        callback(error);
+      }
+
+      callback(null, resultImagePath);
+    });
   });
+
 }
