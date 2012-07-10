@@ -23,12 +23,13 @@
                     "videoType": "youtube"
                 },
                 {
-                    "title": "Your first DragonScript",
+                    "title": "Hello Dragons",
+                    "desc": "Write a function called 'main' using javascript, which appends ' is awesome' to its first parameter and returns the result.",
                     "type": "programming",
                     "language": "javascript",
-                    "skeletonCode": "function helloDragon() {}",
-                    "input": "test",
-                    "output": "test"
+                    "skeletonCode": "function main(param) {\n    return param + ' is awesome';\n}",
+                    "input": "Night Fury",
+                    "output": "Night Fury is awesome"
                 }
             ]
         },

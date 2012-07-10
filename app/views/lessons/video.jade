@@ -20,8 +20,6 @@
       .row-fluid
         .span9
           include _footer
-  script(type='text/javascript', src='/socket.io/socket.io.js')
-  script(type='text/javascript', src='/javascripts/monitor.js')
   script
     var currentVideoTime = 0, LastUpdatedTime = 0;
     $('video').mediaelementplayer({
@@ -51,6 +49,7 @@
         // Change the Status at end of Video
         mediaElement.addEventListener('ended', function(e) {
           
+
           if(#{progressFlag}) {  
             // Send Complete Status of Video to Server Using Socket.
             var courseId =  '#{lesson.chapter.course}';
@@ -74,6 +73,7 @@
         console.log(err);
       }
     });
+
 
     if(#{progressFlag}) {
       var updateProgress = setInterval(function() {
