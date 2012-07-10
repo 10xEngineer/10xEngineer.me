@@ -61,10 +61,7 @@
 - else if(lesson.type == 'programming')
   p Programming :
   select#editLanguage(name='language')
-    option(value='c_cpp') C
-    option(value='c_cpp') C++
-    option(value='css') CSS
-    option(value='Java') Java
+    option(value="javascript", selected="selected") JavaScript
   p Code :
   textarea#code(name='code') #{lesson.programming.skeletonCode}
   p Enter Input :

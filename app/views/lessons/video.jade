@@ -20,8 +20,6 @@
       .row-fluid
         .span9
           include _footer
-  script(type='text/javascript', src='/socket.io/socket.io.js')
-  script(type='text/javascript', src='/javascripts/monitor.js')
   script
     var currentVideoTime = 0, LastUpdatedTime = 0;
     $('video').mediaelementplayer({
@@ -55,7 +53,7 @@
           var courseId =  '#{lesson.chapter.course}';
           var chapterId =  '#{lesson.chapter.id}';
           var lessonId =  '#{lesson.id}';
-          progress.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId });
           
           $.ajax({
             url: '/lesson/#{lesson.id}/complete/',
@@ -82,6 +80,6 @@
         var chapterId =  '#{lesson.chapter.id}';
         var lessonId =  '#{lesson.id}';
         var userId = '#{userId}';
-        progress.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+        progressSocket.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
       }
     }, 5000);

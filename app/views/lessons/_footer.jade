@@ -6,27 +6,12 @@ section
 		li
 			a(href="#description", data-toggle="tab") 
 				| COURSE DESCRIPTION
-		li
-			a(href="#material", data-toggle="tab") 
-				| SUPPLEMENTARY MATERIAL
 
 	.tab-content#info-tab-content
 		.tab-pane.fade.in.active#comment
-			h3 Introduction
-			| Hi! I'm your Instructor, Steve. I'll be giving you tips and hints below the lecture videos and quizzes. Here's our first tip:
-			| To navigate through the unit click look to the side-bar to the right of the video.
-			| Also check out the official Course Forums if you have any questions!
+			#{lesson.desc}
 		.tab-pane.fade#description
-			h3 Description
-			if (course && course.content)
-				| #{course.content}
-		.tab-pane.fade#material
-			h3 Material
-			ul
-				li Course Forums
-				li CS101 Unit 1 Notes
-				li CS101 Unit 1 Glossary
-				li CS101 Unit 1 Python Reference
+			#{course.desc}
 
 script
 	$(function () {
