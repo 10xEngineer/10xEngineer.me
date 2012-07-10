@@ -30,12 +30,13 @@ module.exports = function(io) {
       
       // Video Progress
       socket.on('change', function(data){
-        progressHelper.videoProgress(data, socket.handshake.session);
+        progressHelper.lessonUpdateProgress(data, socket.handshake.session);
       });
       
       // Video Completed
       socket.on('status', function(data){
-        progressHelper.videoCompleted(data, socket.handshake.session);
+        log.info('Data :', data);
+        progressHelper.lessonCompleted(data, socket.handshake.session);
       });
 
       // Persists current user session in mongodb

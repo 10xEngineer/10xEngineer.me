@@ -298,10 +298,16 @@
       }
 
       $(document).ready(function() {
+
+        var courseId =  '#{lesson.chapter.course}';
+        var chapterId =  '#{lesson.chapter._id}';
+        var lessonId =  '#{lesson._id}';
+        
         codeSocket.on('codePassed', function(data) {
           displayMessage('success', 'Congratulations, your code executed successfully.');
 
           // TODO: Save code and change lesson status to completed
+          progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId, data : data});
 
         });
 
@@ -310,6 +316,8 @@
           displayMessage('error', error);
 
           // TODO: Save code
+          // For Sending Current Code to Server Using Socket.
+          progressSocket.emit('change', { type:"programming", data: data, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
           
         });
 
@@ -327,7 +335,7 @@
         // Periodically save the code
         var saveTimer = window.setInterval(function() {
           var data = { 'source': editor.getSession().getValue(), 'lessonId': '#{lesson.id}'};
-          progressSocket.emit('saveCurrentStatus', data)
+          progressSocket.emit('change', { type:"programming", data: data, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
         }, 10000);
 
       });

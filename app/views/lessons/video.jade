@@ -55,7 +55,7 @@
             var courseId =  '#{lesson.chapter.course}';
             var chapterId =  '#{lesson.chapter._id}';
             var lessonId =  '#{lesson._id}';
-            progress.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId});
+            progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId});
           }
 
           /*$.ajax({
@@ -85,8 +85,7 @@
           var courseId =  '#{lesson.chapter.course}';
           var chapterId =  '#{lesson.chapter.id}';
           var lessonId =  '#{lesson.id}';
-          var userId = '#{userId}';
-          progress.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          progressSocket.emit('change', { type: 'video', data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
           
         }
       }, 5000);

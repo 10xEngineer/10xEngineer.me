@@ -86,7 +86,7 @@ module.exports.completed = function(data, session) {
 };
 
 // Change the status of video lesson sessionProgress to completed
-module.exports.videoCompleted = function(data, session) {
+module.exports.lessonCompleted = function(data, session) {
 
   var progress = session.progress;
   var courseId = data.courseId;
@@ -101,6 +101,9 @@ module.exports.videoCompleted = function(data, session) {
       var lessonsLength = lessons.length;
       for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
         if(lessons[lessonindex]._id == lessonId) {
+          if(data.data) {
+            lessons[lessonindex].sourse = data.data;
+          }
           lessons[lessonindex].status = 'completed';
         }
       }
@@ -110,8 +113,8 @@ module.exports.videoCompleted = function(data, session) {
   progressCalculate(session, courseId);
 };
 
-// Set the videoProgress of sessionProgress
-module.exports.videoProgress = function(data, session) {
+// Set the video / programming lesson sessionProgress
+module.exports.lessonUpdateProgress = function(data, session) {
 
   var progress = session.progress;
   var courseId = data.courseId;
@@ -127,7 +130,11 @@ module.exports.videoProgress = function(data, session) {
       var lessonsLength = lessons.length;
       for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
         if(lessons[lessonindex].id == lessonId) {
-          lessons[lessonindex].videoProgress = data.data;
+          if(data.type == "video") {
+            lessons[lessonindex].videoProgress = data.data;
+          } else if(data.type == "programming") {
+            lessons[lessonindex].videoProgress = data.data;
+          }
         }
       }
     }
