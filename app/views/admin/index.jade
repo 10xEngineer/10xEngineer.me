@@ -7,6 +7,7 @@
   .admin_view_header
     a.btn(href="/admin/roles", style="margin-right: 5px;") Roles
     a.btn(href="/admin/labs", style="margin-right: 5px;") Labs 
+    a.btn(href='/admin/clearProgress', id='#{user.id}', style="display:inline; margin-right: 5px;") Clear Progress           
     a.btn(href="/admin/approve") Approve
     .counts.pull-right
       label [Total - #{users.length}]
@@ -14,9 +15,9 @@
     ul.admin_view_list_items
       each user in users
         li
-          -if(user.name) 
+          - if(user.name) 
             label(for='#{user.id}', style='display:inline') #{user.name}
-          -else
+          - else
             label(for='#{user.id}', style='display:inline') #{user.email}
           .roles.pull-right
             p(style="display:inline; padding-right: 5px;") #{user.roles.join(', ')}

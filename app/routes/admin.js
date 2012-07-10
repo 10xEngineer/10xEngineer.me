@@ -213,6 +213,12 @@ module.exports.updateUserRoles = function(req, res) {
   })
 }
 
+module.exports.clearProgress = function(req, res){
+  req.session.progress = {};
+  req.session.message = "Progress cleared Sucessfully !!!";
+  res.redirect('/admin');
+}
+
 module.exports.newRoleView = function(req, res) {
   res.render('admin/newRole');
 };
