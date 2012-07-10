@@ -20,8 +20,6 @@
       .row-fluid
         .span9
           include _footer
-  script(type='text/javascript', src='/socket.io/socket.io.js')
-  script(type='text/javascript', src='/javascripts/monitor.js')
   script
     var currentVideoTime = 0, LastUpdatedTime = 0;
     $('video').mediaelementplayer({
@@ -51,13 +49,16 @@
         // Change the Status at end of Video
         mediaElement.addEventListener('ended', function(e) {
           
-          // Send Complete Status of Video to Server Using Socket.
-          var courseId =  '#{lesson.chapter.course}';
-          var chapterId =  '#{lesson.chapter.id}';
-          var lessonId =  '#{lesson.id}';
-          progress.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-          
-          $.ajax({
+
+          if(#{progressFlag}) {  
+            // Send Complete Status of Video to Server Using Socket.
+            var courseId =  '#{lesson.chapter.course}';
+            var chapterId =  '#{lesson.chapter._id}';
+            var lessonId =  '#{lesson._id}';
+            progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId});
+          }
+
+          /*$.ajax({
             url: '/lesson/#{lesson.id}/complete/',
             success: function(data) {
               $('.lessonBar .btn-success').addClass('btn-large');
@@ -65,7 +66,7 @@
             error: function(error, status, xhr) {
               console.log(JSON.stringify(error) + "Status: " + status);
             }
-          });
+          });*/
         }, false);
       },
       error: function(err) {
@@ -73,15 +74,19 @@
       }
     });
 
-    var updateProgress = setInterval(function() {
-      if((currentVideoTime - LastUpdatedTime) >= 5) {
-        LastUpdatedTime = currentVideoTime ;
-        
-        // For Sending Current Updated Time to Server Using Socket.
-        var courseId =  '#{lesson.chapter.course}';
-        var chapterId =  '#{lesson.chapter.id}';
-        var lessonId =  '#{lesson.id}';
-        var userId = '#{userId}';
-        progress.emit('change', { data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-      }
-    }, 5000);
+
+    if(#{progressFlag}) {
+      var updateProgress = setInterval(function() {
+        if((currentVideoTime - LastUpdatedTime) >= 5) {
+
+          LastUpdatedTime = currentVideoTime ;
+
+          // For Sending Current Updated Time to Server Using Socket.
+          var courseId =  '#{lesson.chapter.course}';
+          var chapterId =  '#{lesson.chapter.id}';
+          var lessonId =  '#{lesson.id}';
+          progressSocket.emit('change', { type: 'video', data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          
+        }
+      }, 5000);
+    }

@@ -23,15 +23,16 @@
             .row-fluid.detailsBorder
               h3 Rating: 
               img(src="/img/th_rating.gif")
-          - if(progress)
-            .row-fluid.detailsBorder
-              h3 Overall Course Progress
-              .progress.progress-striped.progressTotal
-                .bar(style="width: #{progress.progress}%;")
-            .row-fluid
-              a.btn.btn-primary.btn-large(href="/course/#{course.id}/continue") Continue
-          - else
-            a.btn.btn-primary.btn-large(href="/course/#{course.id}/start") Start
+          - if(progress) 
+            - if(progress.status != 'completed')
+              .row-fluid.detailsBorder
+                h3 Overall Course Progress
+                .progress.progressTotal
+                  .bar(style="width: #{progress.progress}%;")
+              .row-fluid
+                a.btn.btn-primary.btn-large(href="/course/#{course.id}/continue") Continue
+          - if(!progress)
+              a.btn.btn-primary.btn-large(href="/course/#{course.id}/start") Start
     .row-fluid
       .span12
 
@@ -58,10 +59,16 @@
                         - if(progress)
                           div.lessonStatus.pull-right(class="#{progress.chapters[chapterIndex].lessons[lessonIndex].status}")
                         div.lessonTitle
-                          a(href="/lesson/#{lesson.id}") #{lesson.title}
+                          - if(progress)
+                            a(href="/lesson/#{lesson.id}") #{lesson.title}
+                          - else 
+                            p #{lesson.title}
       .span6
-        h3#chapterTitle #{chapters[0].title}
-        -var desc = chapters[0].desc || "";
+        -var title = "", desc = "";
+        -if(chapters[0])
+          title = chapters[0].title;
+          desc = chapters[0].desc;
+        h3#chapterTitle #{title}
         p#chapterDesc #{desc}
         .row-fluid
           .btn-group.backBtn

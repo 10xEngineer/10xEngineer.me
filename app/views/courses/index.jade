@@ -23,14 +23,15 @@ script(type="text/javascript")
     div.flexslider
       ul.slides
         each courseObject,courseIndex in courses
-          li
-            center
-              img.courseImage(src="#{courseObject.wallImage}")
-            div.detailsLink
-              h1.courseTitle #{courseObject.title}
-              p #{courseObject.desc}
-              div.detailsLinkBtn
-                a.btn.btn-primary.pull-right(href="/course/#{courseObject.id}") Details
+          -if(courseObject.status == 'published' || isAdmin)
+            li
+              center
+                img.courseImage(src="#{courseObject.wallImage}")
+              div.detailsLink
+                h1.courseTitle #{courseObject.title}
+                p #{courseObject.desc}
+                div.detailsLinkBtn
+                  a.btn.btn-primary.pull-right(href="/course/#{courseObject.id}") Details
   .row-fluid
     .span12
   .carouselWrapper

@@ -152,3 +152,18 @@ var readFile = function(fd, gs, offset, size, callback) {
   });
 };
 
+module.exports.unlinkFile = function(name, callback){
+  
+  var db = mongoose.connection.db;
+
+  var nameArr = /\/cdn\/([a-zA-Z_0-9]+)/.exec(name);
+  var finalName = nameArr[1];
+
+  mongoose.mongo.GridStore.unlink(db, finalName, function(error){
+    if(error){
+      callback(error);
+    }
+    callback();
+  })
+
+}

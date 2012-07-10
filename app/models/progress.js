@@ -114,7 +114,7 @@ CourseProgressSchema.pre('save', function(next) {
             }
 
             lessons.push({
-              _id: lesson.id,
+              _id: lesson._id,
               id: lesson.id,
               seq: lessonIndex++,
               status: 'not-started'
@@ -136,7 +136,7 @@ CourseProgressSchema.pre('save', function(next) {
           }
           
           progress.chapters.push({
-            _id: chapter.id,
+            _id: chapter._id,
             id: chapter.id,
             seq: chapterIndex++,
             lessons: lessons,
