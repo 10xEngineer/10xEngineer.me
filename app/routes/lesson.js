@@ -174,9 +174,7 @@ module.exports.create = function(req, res, next) {
 // Display a lesson
 module.exports.showView = function(req, res) {
 
-  // For Session Progres Update
   var lesson =  req.lesson;
-  progressHelper.start(lesson, req.session.progress);
 
   //For random the options
 
@@ -199,24 +197,34 @@ module.exports.showView = function(req, res) {
   for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
     randomOption(quizQuestions[questionsIndex].options);
   }
+  
+  // For Progress
+  var videoStartTime = 0;
+  var progressFlag = false;
   var progress = req.session.progress[lesson.chapter.course];
-  var chapters = progress.chapters;
-  var chaptersLength = chapters.length;
-  for (var index = 0; index < chaptersLength; index++) {
-    if(chapters[index]._id == lesson.chapter._id) {
-      var lessons = chapters[index].lessons;
-      var lessonsLength = lessons.length;
-      for (var lenssonIndex = 0; lenssonIndex < lessonsLength; lenssonIndex++) {
-        if(lessons[lenssonIndex]._id == lesson._id) {
-          if(typeof(lessons[lenssonIndex].videoProgress) != 'undefined') {
-            var videoStartTime = lessons[lenssonIndex].videoProgress;
-          } else {
-            var videoStartTime = 0;
+  if(progress.status != 'completed') {
+    
+    // For Session Progres Update
+    progressHelper.start(lesson, req.session);
+    
+    var chapters = progress.chapters;
+    var chaptersLength = chapters.length;
+    
+    for (var index = 0; index < chaptersLength; index++) {
+      if(chapters[index]._id == lesson.chapter._id) {
+        var lessons = chapters[index].lessons;
+        var lessonsLength = lessons.length;
+        for (var lenssonIndex = 0; lenssonIndex < lessonsLength; lenssonIndex++) {
+          if(lessons[lenssonIndex]._id == lesson._id) {
+            if(typeof(lessons[lenssonIndex].videoProgress) != 'undefined') {
+              videoStartTime = lessons[lenssonIndex].videoProgress;
+            }
           }
         }
-      };
+      }
     }
-  };  
+    progressFlag = true;
+  }
 
   // Render based on the type
   Lesson.find({}, function(error, allLessons){
@@ -225,7 +233,8 @@ module.exports.showView = function(req, res) {
       quiz: req.lesson.quiz,
       videoStartTime: videoStartTime,
       userId: req.user._id,
-      allLessons : allLessons
+      allLessons : allLessons,
+      progressFlag : progressFlag
     });
   });
 };
@@ -235,7 +244,10 @@ module.exports.show = function(req, res, next){
   var lesson = req.lesson;
   
   // For Session Progres Update
-  progressHelper.completed(lesson, req.session);
+  var progress = req.session.progress[lesson.chapter.course];
+  if(progress.status != 'completed') {
+    progressHelper.completed(lesson, req.session);
+  }
 
   var quizQuestions = req.lesson.quiz.questions;
   var attemptedAnswers = req.body.question;
@@ -272,28 +284,12 @@ module.exports.show = function(req, res, next){
     }
   }
 
-  Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
-    if(error) {
-      log.error(error);
-      next(error);
-    }
-    var lessonQuiz = {};
-    lessonQuiz.chapter = req.chapter.id;
-    lessonQuiz.lesson  = req.lesson.id;
-    lessonQuiz.quiz    = answersJSON;
-    progress.completeLesson(lessonQuiz, function(error, next){
-      if(error) {
-        log.error(error);
-        next(error);
-      }
-            // Render based on the type
-      Lesson.find({}, function(error, allLessons){
-        res.render('lessons/' + lesson.type, {
-          title: req.lesson.title,
-          attemptedAnswers: answersJSON,
-          allLessons : allLessons
-        });
-      });
+  // Render based on the type
+  Lesson.find({}, function(error, allLessons){
+    res.render('lessons/' + lesson.type, {
+      title: req.lesson.title,
+      attemptedAnswers: answersJSON,
+      allLessons : allLessons
     });
   });
 };
