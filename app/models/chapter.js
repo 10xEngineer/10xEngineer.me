@@ -4,6 +4,7 @@ var mongoose = require('mongoose')
 
 var Count = mongoose.model('Count');
 var Course = mongoose.model('Course');
+var async = require('async');
 
 var ChapterSchema = new Schema({
   _id: { type: ObjectId },
@@ -84,31 +85,76 @@ ChapterSchema.methods.publish = function(publish, callback) {
 
 ChapterSchema.methods.removeChapter= function(callback) {
   // TODO: Remove all child 
-  var chapter = this;
-  var course = chapter.course;
-  
-  // For Remove Chapter _Id from Course Table
-  for (var i = 0 ; i < course.chapters.length; i++) {
-    if(course.chapters[i].toString() == chapter._id.toString()) {
-      
-      course.chapters.splice(i,1);
-      
-      course.markModified('chapters');
-      course.save(function(error) {
-        if(error) {
-          log.error(error);
-        }
-      });
-    }
-  }
+  Chapter.findById(this._id).populate('lessons').run(function(error, chapter){
 
-  chapter.remove(function(error) {
-    if(error) {
-      callback(error);
-    }
-    callback();
-  });
+    chapter.lessons[0].removeAllLessonsFromThisChapter(function(error){
+      if(error){
+        callback(error)
+      }
+
+      // For Remove Chapter _Id from Course Table
+      Course.findById(chapter.course, function(error, course){
+        if (error) {
+          callback(error);
+        }
+
+        for (var i = 0 ; i < course.chapters.length; i++) {
+          if(course.chapters[i].toString() == chapter._id.toString()) {
+            
+            course.chapters.splice(i,1);
+            
+            course.markModified('chapters');
+            course.save(function(error) {
+              if(error) {
+                log.error(error);
+              }
+            });
+          }
+        }
+      })
+
+      chapter.remove(function(error) {
+        if(error) {
+          callback(error);
+        }
+        callback();
+      });
+    });      
+  })
+  
 };
+
+ChapterSchema.methods.removeAllChapterFromThisCourse = function(callback){
+
+  var refChapter = this;
+
+  Chapter.find({course:refChapter.course}).populate('lessons').run(function(error, chapters){
+    if(chapters.length>0){
+      async.forEach(
+        chapters, 
+        function(chapter, forEachCallback){
+          chapter.lessons[0].removeAllLessonsFromThisChapter(function(error){
+            if(error){
+              forEachCallback(error);
+            }
+            forEachCallback();
+          });
+        },
+        function(error){
+          if(error){
+            callback(error);
+          }
+          Chapter.remove({course:refChapter.course}, function(error){
+            if(error){
+              callback(error);
+            }
+            callback();
+          });
+        }
+      );
+    }
+  });
+}
 
 
 // For Move Up & Down Chapter
