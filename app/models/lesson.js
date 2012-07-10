@@ -5,6 +5,8 @@ var mongoose = require('mongoose')
 var Count = mongoose.model('Count');
 var Chapter = mongoose.model('Chapter');
 var Course = mongoose.model('Course');
+var async = require('async');
+var cdn = load.helper('cdn');
 
 var Chapter = load.model('Chapter');
 var Course = load.model('Course');
@@ -98,27 +100,73 @@ LessonSchema.methods.removeLesson= function(callback) {
   
  
   // For Remove Lession _Id from Chapter Table
-  for (var i = 0 ; i < chapter.lessons.length; i++) {
-    if(chapter.lessons[i].toString() == lesson._id.toString()) {
-      
-      chapter.lessons.splice(i,1);
-      
-      chapter.markModified('lessons');
-      chapter.save(function(error) {
-        if(error) {
-          log.error(error);
+  Chapter.findById(chapter, function(error, chapter){
+    for (var i = 0 ; i < chapter.lessons.length; i++) {
+      if(chapter.lessons[i].toString() == lesson._id.toString()) {
+        
+        chapter.lessons.splice(i,1);
+        
+        chapter.markModified('lessons');
+        chapter.save(function(error) {
+          if(error) {
+            log.error(error);
+          }
+        });
+      }
+    }
+
+    if(lesson.type == "video" && lesson.video.type == "upload"){
+      cdn.unlinkFile(lesson.video.content, function(error){
+        if(error){
+          callback(error);
         }
+        lesson.remove(function(error) {
+          if(error) {
+            callback(error);
+          }
+          callback();
+        });
       });
     }
-  }
 
-  lesson.remove(function(error) {
-    if(error) {
-      callback(error);
-    }
-    callback();
-  });
+  })
 };
+
+LessonSchema.methods.removeAllLessonsFromThisChapter = function(callback){
+
+  var refLesson = this;
+
+  Lesson.find({chapter:refLesson.chapter}, function(error, lessons){
+
+    if(lessons.length>0){
+      async.forEach(
+        lessons,
+        function(lesson, forEachCallback){
+          if(lesson.type == "video" && lesson.video.type == "upload"){
+            cdn.unlinkFile(lesson.video.content, function(error){
+              if(error){
+                forEachCallback(error);
+              }
+              forEachCallback();
+            });
+          }
+          forEachCallback();
+        },
+        function(error){
+          if(error){
+            callback(error);
+          }
+          Lesson.remove({chapter: refLesson.chapter}, function(error){
+            if(error){
+              callback(error);
+            }
+            callback();
+          });
+        }
+      );
+    }
+  });
+}
 
 LessonSchema.methods.publish = function(publish, callback) {
   var lesson = this;

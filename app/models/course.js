@@ -12,6 +12,7 @@ var mime = require('mime');
 var async = require('async');
 
 
+
 var CourseSchema = new Schema({
   _id: { type: ObjectId },
   id: { type: Number, unique: true, index: true },
@@ -66,15 +67,51 @@ CourseSchema.methods.removeCourse = function(callback) {
   // TODO: Remove all child chapters and lessons. Also remove any progress associated with it.
   
   var course = this;
+  // Remove chapters of that course
+  if(course.chapters.length>0){
+    course.chapters[0].removeAllChapterFromThisCourse(function(error){
+      if(error){
+        callback(error);
+      }
 
-  course.remove(function(error) {
-    if(error) {
+      // Remove images
+      cdn.unlinkFile(course.iconImage, function(error){
+        if (error) {
+          callback(error);
+        };
+        cdn.unlinkFile(course.wallImage, function(error){
+          if (error) {
+            callback(error);
+          };
+          course.remove(function(error) {
+            if(error) {
+              callback(error);
+            }
+            callback();
+          });
+        });
+      });
+    });
+  };
+
+  // Remove images
+  cdn.unlinkFile(course.iconImage, function(error){
+    if (error) {
       callback(error);
-    }
-
-    callback();
+    };
+    cdn.unlinkFile(course.wallImage, function(error){
+      if (error) {
+        callback(error);
+      };
+      course.remove(function(error) {
+        if(error) {
+          callback(error);
+        }
+        callback();
+      });
+    });
   });
-};
+}
 
 CourseSchema.methods.publish = function(publish, callback) {
   var course = this;
