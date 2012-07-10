@@ -40,13 +40,19 @@ module.exports.randomString = function(stringLength) {
 }
 
 module.exports.merge = function(obj1, obj2) {
+  var obj = {};
+  for(var key in obj1) {
+    if(obj1.hasOwnProperty(key)) {
+      obj[key] = obj1[key];
+    }
+  }
   for(var key in obj2) {
     if(obj2.hasOwnProperty(key)) {
-      obj1[key] = obj2[key];
+      obj[key] = obj2[key];
     }
   }
 
-  return obj1;
+  return obj;
 };
 
 // Redirects to previously saved page

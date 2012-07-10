@@ -153,14 +153,31 @@
       .span3
         include _sidebar
 
+    .row-fluid
+      include _footer
+
+    .row-fluid
+      .span12
+
     script(type='text/javascript', src='/javascripts/ace_2/ace.js')
-    script(type='text/javascript', src='/socket.io/socket.io.js')
     script(type='text/javascript', src='/javascripts/jquery-ui/jquery-ui-1.8.19.custom.min.js')
     script(type='text/javascript', src='/javascripts/jquery.pageslide.js')
     script(type='text/javascript')
-      var socket=io.connect('/code');
       var editor;
       var themes = {};
+
+      //Check the compilation status and get the run result
+      var errors = {
+        '0': 'not running – the paste has been created with run parameter set to false',
+        '11': 'compilation error  – the program could not be executed due to compilation errors',
+        '12': 'runtime   error   –   the   program   finished because of  the runtime error, for example: division by zero,  array index out of bounds,uncaught exception',
+        '13': "time  limit  exceeded   –   the   program   didn't stop before the time limit",
+        '15': 'success - everything went ok',
+        '17': "memory limit exceeded – the program tried to use more memory than it is allowed",
+        '19': "illegal system call – the program tried to call illegal system function",
+        '20': "internal error – some problem occurred on ideone.com; try to submit the paste again and if that fails too, then please contact us"
+      }
+
       function loadTheme(name) {
         //check if the theme source files have been loaded before
         if(themes[name]){
@@ -280,90 +297,45 @@
         })
       }
 
-      //Submit the code to be created on IDEONE compiler
-      var languages = {
-        'python': '4',
-        'ruby': '17',
-        'javascript' : '112'
-      }
-      function submitSourceCode(){
-        $('#compile_result').addClass('alert').addClass('alert-info');
-        $('#compile_result').text('COMPILING...\\n');
-        $('#compile_output').hide();
-        var sourceCode = editor.getSession().getValue();
-        var languageCode = $('#pageslide #mode').val();
-        if(!languageCode){
-          languageCode = $('#mode').val();
-        }
-        var data = {'source':sourceCode, 'language':languages[languageCode]};
-        socket.emit('submitcode', data);
+      $(document).ready(function() {
 
+        var courseId =  '#{lesson.chapter.course}';
+        var chapterId =  '#{lesson.chapter._id}';
+        var lessonId =  '#{lesson._id}';
         
-      }
-      //Receive the link code for later check
-      var linkCode;
-      socket.on('codesent', function(data){
-        linkCode = data.result.link;
-        setTimeout(function(){
-          socket.emit('getSubmissionStatus', {linkCode:linkCode});
-        }, 1000);
-      });
+        codeSocket.on('codePassed', function(data) {
+          displayMessage('success', 'Congratulations, your code executed successfully.');
 
-      
-      socket.on('submissionStatus', function(data){
-        if(data.result.status == 0){
-          socket.emit('getSubmissionDetails', {linkCode:linkCode});
+          // TODO: Save code and change lesson status to completed
+          progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId, data : data});
+
+        });
+
+        codeSocket.on('codeFailed', function(data) {
+          var error = data.stderr || data.error || 'Unknown error. Please contact support.';
+          displayMessage('error', error);
+
+          // TODO: Save code
+          // For Sending Current Code to Server Using Socket.
+          progressSocket.emit('change', { type:"programming", data: data, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
           
-        }
-        else {
-          socket.emit('getSubmissionStatus', {linkCode:linkCode});
-        }
-      });
+        });
 
-      //Check the compilation status and get the run result
-      var errors = {
-        '0': 'not running – the paste has been created with run parameter set to false',
-        '11': 'compilation error  – the program could not be executed due to compilation errors',
-        '12': 'runtime   error   –   the   program   finished because of  the runtime error, for example: division by zero,  array index out of bounds,uncaught exception',
-        '13': "time  limit  exceeded   –   the   program   didn't stop before the time limit",
-        '15': 'success - everything went ok',
-        '17': "memory limit exceeded – the program tried to use more memory than it is allowed",
-        '19': "illegal system call – the program tried to call illegal system function",
-        '20': "internal error – some problem occurred on ideone.com; try to submit the paste again and if that fails too, then please contact us"
-      }
-
-      socket.on('submissionDetails', function(data){
-          var res = $('#compile_result');
-          var out = $('#compile_output');
-          out.removeClass('alert').removeClass('alert-info').removeClass('alert-error').show();
-          res.removeClass('alert').removeClass('alert-warning').removeClass('alert-success');
-
-          if(typeof data.result.output != 'undefined' && data.result.result == 15) {
-            res.addClass('alert').addClass('alert-success');
-            res.text("COMPILED OK\\n");
-            out.addClass('alert').addClass('alert-info');
-            out.text(data.result.output);
+        $('#submit').click(function(e) {
+          var sourceCode = editor.getSession().getValue();
+          var languageCode = $('#pageslide #mode').val();
+          if(!languageCode){
+            languageCode = $('#mode').val();
           }
-          else
-          if(typeof data.result.stderr != 'undefined' && data.result.stderr != "" || data.result.result != 15) {
-            res.addClass('alert').addClass('alert-warning');
-            res.text(errors[data.result.result]);
-            out.addClass('alert').addClass('alert-error');
-            out.text(data.result.stderr);
-          }
-      });
+          var data = {'source':sourceCode, 'language': languageCode, 'lessonId': '#{lesson.id}'};
+          displayMessage('info', 'Compiling...');
+          codeSocket.emit('submitcode', data);
+        });
 
-      $('#submit').click(function(e) {
-        var sourceCode = editor.getSession().getValue();
-        var languageCode = $('#pageslide #mode').val();
-        if(!languageCode){
-          languageCode = $('#mode').val();
-        }
-        var data = {'source':sourceCode, 'language':languages[languageCode]};
-        socket.emit('submitcode', data);
-      });
+        // Periodically save the code
+        var saveTimer = window.setInterval(function() {
+          var data = { 'source': editor.getSession().getValue(), 'lessonId': '#{lesson.id}'};
+          progressSocket.emit('change', { type:"programming", data: data, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+        }, 10000);
 
-      // Periodically save the code
-      var saveTimer = window.setInterval(function() {
-        socket.emit('saveCurrentStatus', { code: editor.getSession().getValue()})
-      }, 10000);
+      });
