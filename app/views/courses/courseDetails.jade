@@ -24,7 +24,7 @@
               h3 Rating: 
               img(src="/img/th_rating.gif")
           - if(progress) 
-            -if(progress.status != 'completed')
+            - if(progress.status != 'completed')
               .row-fluid.detailsBorder
                 h3 Overall Course Progress
                 .progress.progressTotal
@@ -59,7 +59,10 @@
                         - if(progress)
                           div.lessonStatus.pull-right(class="#{progress.chapters[chapterIndex].lessons[lessonIndex].status}")
                         div.lessonTitle
-                          a(href="/lesson/#{lesson.id}") #{lesson.title}
+                          - if(progress)
+                            a(href="/lesson/#{lesson.id}") #{lesson.title}
+                          - else 
+                            p #{lesson.title}
       .span6
         -var title = "", desc = "";
         -if(chapters[0])
