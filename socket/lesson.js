@@ -17,12 +17,12 @@ module.exports = function(io) {
       
       // Video Progress
       socket.on('change', function(data){
-        progressHelper.videoProgress(data, socket.handshake.session.progress);
+        progressHelper.videoProgress(data, socket.handshake.session);
       });
       
       // Video Completed
       socket.on('status', function(data){
-        progressHelper.completed(data, socket.handshake.session.progress);
+        progressHelper.videoCompleted(data, socket.handshake.session);
       });
 
       // Persists current user session in mongodb

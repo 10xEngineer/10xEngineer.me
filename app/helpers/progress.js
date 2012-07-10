@@ -54,35 +54,61 @@ module.exports.start = function(lesson, progress) {
 };
 
 // Change the status of sessionProgress to completed
-module.exports.completed = function(data, progress) {
+module.exports.completed = function(data, session) {
 
+	var progress = session.progress;
 	var courseId = data.chapter.course;
 	var chapterId = data.chapter._id;
 	var lessonId = data._id;
-
 	var chapters = progress[courseId].chapters;
 	var length = chapters.length;
 
 	for (var index = 0; index < length; index++) {
-		if(chapters[index].id == chapterId) {
+		if(chapters[index]._id == chapterId) {
 			var lessons = chapters[index].lessons;
 			var lessonsLength = lessons.length;
 			for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
-				if(lessons[lessonindex].id == lessonId) {
+				if(lessons[lessonindex]._id == lessonId) {
 					lessons[lessonindex].status = 'completed';
 				}
 			}
 		}
 	}
+	saveSession(session);
+};
+
+// Change the status of video lesson sessionProgress to completed
+module.exports.videoCompleted = function(data, session) {
+
+	var progress = session.progress;
+	var courseId = data.courseId;
+	var chapterId = data.chapterId;
+	var lessonId = data.lessonId;
+	var chapters = progress[courseId].chapters;
+	var length = chapters.length;
+
+	for (var index = 0; index < length; index++) {
+		if(chapters[index]._id == chapterId) {
+			var lessons = chapters[index].lessons;
+			var lessonsLength = lessons.length;
+			for (var lessonindex = 0; lessonindex < lessonsLength; lessonindex++) {
+				if(lessons[lessonindex]._id == lessonId) {
+					lessons[lessonindex].status = 'completed';
+				}
+			}
+		}
+	}
+	saveSession(session);
 };
 
 // Set the videoProgress of sessionProgress
-module.exports.videoProgress = function(data, progress) {
+module.exports.videoProgress = function(data, session) {
 
-	var courseId = data.chapter.course;
-	var chapterId = data.chapter._id;
-	var lessonId = data._id;
-
+	var progress = session.progress;
+	var courseId = data.courseId;
+	var chapterId = data.chapterId;
+	var lessonId = data.lessonId;
+	
 	var chapters = progress[courseId].chapters;
 	var length = chapters.length;
 
@@ -97,14 +123,13 @@ module.exports.videoProgress = function(data, progress) {
 			}
 		}
 	}
+	saveSession(session);
 };
 
 // Persists current progress session in mongodb
 module.exports.update = function(data, progressSession) {
-	log.info('Update.');
 	var courseId = data.courseId;
 	var userId = data.userId;
-	log.info(userId);
 	
 	Progress.findOne({user: userId, course: courseId}, function(error, progress) {
 		if(error) {
@@ -120,4 +145,8 @@ module.exports.update = function(data, progressSession) {
 			}
 		});
 	});
+};
+
+var saveSession = function(session, callback) {
+	session.save(callback);
 };

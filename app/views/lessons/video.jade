@@ -53,9 +53,9 @@
           
           // Send Complete Status of Video to Server Using Socket.
           var courseId =  '#{lesson.chapter.course}';
-          var chapterId =  '#{lesson.chapter.id}';
-          var lessonId =  '#{lesson.id}';
-          progress.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          var chapterId =  '#{lesson.chapter._id}';
+          var lessonId =  '#{lesson._id}';
+          progress.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId});
           
           $.ajax({
             url: '/lesson/#{lesson.id}/complete/',

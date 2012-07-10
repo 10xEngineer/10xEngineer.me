@@ -199,39 +199,35 @@ module.exports.showView = function(req, res) {
   for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
     randomOption(quizQuestions[questionsIndex].options);
   }
-
-  Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
-    if(error) {
-      log.error(error);
-      next(error);
+  var progress = req.session.progress[lesson.chapter.course];
+  var chapters = progress.chapters;
+  var chaptersLength = chapters.length;
+  for (var index = 0; index < chaptersLength; index++) {
+    if(chapters[index]._id == lesson.chapter._id) {
+      var lessons = chapters[index].lessons;
+      var lessonsLength = lessons.length;
+      for (var lenssonIndex = 0; lenssonIndex < lessonsLength; lenssonIndex++) {
+        if(lessons[lenssonIndex]._id == lesson._id) {
+          if(typeof(lessons[lenssonIndex].videoProgress) != 'undefined') {
+            var videoStartTime = lessons[lenssonIndex].videoProgress;
+          } else {
+            var videoStartTime = 0;
+          }
+        }
+      };
     }
-    var lessonQuiz = {};
-    lessonQuiz.chapter = req.chapter.id;
-    lessonQuiz.lesson  = req.lesson.id;
-    progress.startLesson(lessonQuiz, function(lessonProgress, error, next){
-      if(error) {
-        log.error(error);
-        next(error);
-      }
-      if(typeof(lessonProgress.videoProgress) != 'undefined') {
-        var videoStartTime = lessonProgress.videoProgress;
-      } else {
-        var videoStartTime = 0;
-      }
-      // Render based on the type
-      Lesson.find({}, function(error, allLessons){
-        res.render('lessons/' + req.lesson.type, {
-          title: req.lesson.title,
-          quiz: req.lesson.quiz,
-          videoStartTime: videoStartTime,
-          userId: req.user._id,
-          allLessons : allLessons
-        });
-      });
+  };  
+
+  // Render based on the type
+  Lesson.find({}, function(error, allLessons){
+    res.render('lessons/' + req.lesson.type, {
+      title: req.lesson.title,
+      quiz: req.lesson.quiz,
+      videoStartTime: videoStartTime,
+      userId: req.user._id,
+      allLessons : allLessons
     });
   });
-
-  
 };
 
 module.exports.show = function(req, res, next){
@@ -239,7 +235,7 @@ module.exports.show = function(req, res, next){
   var lesson = req.lesson;
   
   // For Session Progres Update
-  progressHelper.completed(lesson, req.session.progress);
+  progressHelper.completed(lesson, req.session);
 
   var quizQuestions = req.lesson.quiz.questions;
   var attemptedAnswers = req.body.question;
