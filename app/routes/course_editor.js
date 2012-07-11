@@ -3,6 +3,7 @@ var importer = load.helper('importer');
 var fs = require('fs');
 var Chapter = load.model('Chapter');
 var Lesson = load.model('Lesson');
+var Progress = load.model('Progress');
 var LabDef = load.model('LabDef');
 var cdn = load.helper('cdn');
 //var request = require('request');
@@ -175,14 +176,22 @@ module.exports.update = function(req, res, next){
 module.exports.remove = function(req, res, next){
   
   var course = req.course;
+  var course_id = course._id;
 
   course.removeCourse(function(error){
     if (error) {
       log.error(error);
       req.session.error = "Can not remove course.";
     }
-    req.session.message = "Sucessfully course removed.";
-    res.redirect('/course_editor');
+    Progress.removeCourseProgress(course_id, function(error){
+      if(error) {
+        log.error(error);
+        req.session.error = "Can not remove course progress.";
+        res.redirect('/course_editor/');
+      }
+      req.session.message = "Sucessfully course removed.";
+      res.redirect('/course_editor');
+    });
   });
 };
 

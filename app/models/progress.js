@@ -318,6 +318,18 @@ CourseProgressSchema.methods.updateProgress = function(lessonJSON, seconds, call
   });
 }
 
+CourseProgressSchema.statics.removeCourseProgress = function(course_Id, callback) {
+  Progress = this;
+
+  Progress.remove({course:course_Id}, function(error) {
+    if(error) {
+      callback(error);
+    }
+    callback();
+  });
+
+}
+
 mongoose.model('Progress', CourseProgressSchema);
 
 
