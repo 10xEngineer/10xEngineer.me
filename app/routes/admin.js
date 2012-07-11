@@ -53,10 +53,11 @@ module.exports.usersImport = function(req, res) {
   
   var f = req.files['users-file'];
   var fileContent = fs.readFileSync(f.path);
+  
   fileContent = fileContent.toString();
-  var fileContentArray = fileContent.split(',');
-
+  var fileContentArray = fileContent.split('\n');
   var length = fileContentArray.length;
+  
   function isWhitespace(charToCheck) {
     var whitespaceChars = " \t\n\r\f";
     return (whitespaceChars.indexOf(charToCheck) != -1);
@@ -72,14 +73,21 @@ module.exports.usersImport = function(req, res) {
   function trim(str) {
     return ltrim(rtrim(str));
   }
-  for (var index = 0; index < length; index++) {
-    fileContentArray[index] = trim(fileContentArray[index]);
+  
+  var emails = [];
+  var count = 0 ;
+  for (var index = 1; index < (length-1); index++) {
+    var LineArray = fileContentArray[index].split(',');
+    emails[count++] = trim(LineArray[5]);
   };
-  async.forEach(fileContentArray, importer.users, function(error){
+
+  
+  async.forEach(emails, importer.users, function(error){
     if(error) {
       log.error(error);
     }
   });
+
   req.session.message = "Import Sucessfully Course.";
   res.redirect('/admin');
 };
