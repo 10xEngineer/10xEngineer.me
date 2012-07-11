@@ -74,23 +74,29 @@ CourseSchema.methods.removeCourse = function(callback) {
         callback(error);
       }
 
-      // Remove images
-      cdn.unlinkFile(course.iconImage, function(error){
-        if (error) {
+      req.session.removeCourseProgress(course._id, function(error){
+        if(error){
           callback(error);
-        };
-        cdn.unlinkFile(course.wallImage, function(error){
+        }
+        // Remove images
+        cdn.unlinkFile(course.iconImage, function(error){
           if (error) {
             callback(error);
           };
-          course.remove(function(error) {
-            if(error) {
+          cdn.unlinkFile(course.wallImage, function(error){
+            if (error) {
               callback(error);
-            }
-            callback();
+            };
+            course.remove(function(error) {
+              if(error) {
+                callback(error);
+              }
+              callback();
+            });
           });
         });
-      });
+      })
+
     });
   };
 
