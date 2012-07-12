@@ -41,10 +41,10 @@ module.exports.load = function(req, res) {
     seekLength = parseInt(parsedRange[1], 10);
     if(parsedRange[2]) {
       readBytes = parseInt(parsedRange[2], 10);
-      if(readBytes<=seekLength){
+      if(readBytes <= seekLength){
         log.error("Invalid Range");
         res.statusCode = 416;
-        res.end();
+        return res.end();
       }
     }
   }
