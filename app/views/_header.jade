@@ -28,10 +28,10 @@
 								- else
 									i.icon-user.icon-white 
 								|  #{everyauth.user.name} 
-								- if(isAdmin)
-									| ( 
-									strong(style='color:yellow') admin 
-									| )
+						- if(isAdmin)
+							li
+								a(href="/admin", style='color:yellow') ( admin )
+								
 						li
 							a(href='/logout')
 								i.icon-star-empty.icon-white
