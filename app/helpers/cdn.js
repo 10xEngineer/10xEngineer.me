@@ -98,8 +98,8 @@ module.exports.saveFileNew = function(fileName, filePath, contentType, callback)
   });
 };
 
-// Load file
-module.exports.load = function(fileName, callback) {
+// Load file attributes
+module.exports.head = function(fileName, callback) {
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
 
@@ -113,8 +113,32 @@ module.exports.load = function(fileName, callback) {
 
     var contentType = gs.contentType;
     var contentLength = gs.length;
-    gs.read(function(error, data) {
-      callback(null, data, contentType, contentLength);
+
+    gs.close();
+    callback(null, contentType, contentLength);
+  });
+};
+
+// Load file
+module.exports.load = function(fileName, seekLength, callback) {
+  var db = mongoose.connection.db;
+  var GridStore = mongoose.mongo.GridStore;
+
+  var gs = new GridStore(db, fileName, 'r');
+
+  gs.open(function(error, gs) {
+    if (error) {
+      log.error(error);
+      callback(error);
+    }
+
+    var contentType = gs.contentType;
+    var contentLength = gs.length;
+
+    gs.seek(seekLength, function(error, gs) {
+      gs.read(function(error, data) {
+        callback(null, data, contentType, contentLength);
+      });
     });
   });
 };

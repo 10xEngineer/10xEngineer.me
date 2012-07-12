@@ -178,8 +178,6 @@ module.exports = function(app) {
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
   app.get('/admin/clearProgress', verifyPermission('admin', 'read'), admin.clearProgress);
-  app.get('/admin/usersImport', admin.usersImportView);
-  app.post('/admin/usersImport', admin.usersImport);
   app.get('/admin/approve', admin.approveView);
   app.get('/admin/approve/:userId', admin.approve);
 
@@ -196,8 +194,12 @@ module.exports = function(app) {
   app.get('/admin/role/:roleId/edit', verifyPermission('admin', 'edit'), admin.editRoleView);
   app.post('/admin/role/:roleId/edit', verifyPermission('admin', 'edit'), admin.editRole);
   app.get('/admin/role/:roleId/remove', verifyPermission('admin', 'delete'), admin.removeRole);
+  
+  app.get('/admin/usersImport', admin.usersImportView);
+  app.post('/admin/usersImport', admin.usersImport);
   app.get('/admin/user/:userId/roles', verifyPermission('admin', 'read'), admin.showUserRoles);
   app.post('/admin/user/:userId/roles', verifyPermission('admin', 'edit'), admin.updateUserRoles);
+  app.get('/admin/user/:userId/remove', verifyPermission('admin', 'delete'), admin.removeUser);
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
 
 };
