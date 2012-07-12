@@ -134,6 +134,10 @@ module.exports.load = function(fileName, seekLength, callback) {
 
     var contentType = gs.contentType;
     var contentLength = gs.length;
+    log.info(seekLength," :: ", contentLength);
+    if(seekLength>=contentLength) {
+      callback("Invalid Range");
+    }
 
     gs.seek(seekLength, function(error, gs) {
       gs.read(function(error, data) {
