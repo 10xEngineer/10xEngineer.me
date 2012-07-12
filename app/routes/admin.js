@@ -92,6 +92,19 @@ module.exports.usersImport = function(req, res) {
   res.redirect('/admin');
 };
 
+module.exports.removeUser = function(req, res, next) {
+  var user = req.extUser;
+  user.remove(function(error) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not delete user.";
+      res.redirect('/admin');
+    }
+    req.session.message = "User deleted sucessfully.";
+    res.redirect('/admin');
+  });
+};
+
 module.exports.labsView = function(req, res) {  
   res.render('admin/labs', {
     lab: {name: '', type: '', /*cpu: '', */memory: '',storage: ''},
