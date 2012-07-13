@@ -1,8 +1,9 @@
-var Metadata = load.model('Metadata');
-var Count = load.model('Count');
-var User = load.model('User');
-var Role = load.model('Role');
-var LabDef = load.model('LabDef');
+var mongoose = require('mongoose');
+var Metadata = mongoose.model('Metadata');
+var Count = mongoose.model('Count');
+var User = mongoose.model('User');
+var Role = mongoose.model('Role');
+var LabDef = mongoose.model('LabDef');
 
 module.exports = function(config) {
   var self = this;

@@ -1,14 +1,14 @@
+var async = require('async');
+
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
-var async = require('async');
-
-var Count = load.model('Count');
-var Course = load.model('Course');
-var Chapter = load.model('Chapter');
-var User = load.model('User');
-var Lesson = load.model('Lesson');
+var Count = mongoose.model('Count');
+var Course = mongoose.model('Course');
+var Chapter = mongoose.model('Chapter');
+var User = mongoose.model('User');
+var Lesson = mongoose.model('Lesson');
 
 
 var CourseProgressSchema = new Schema({

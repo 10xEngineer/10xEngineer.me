@@ -1,9 +1,10 @@
-var Progress = load.model('Progress');
-var User = load.model('User');
-var Course = load.model('Course');
-var Chapter = load.model('Chapter');
-var User = load.model('User');
-var Lesson = load.model('Lesson');
+var mongoose = require('mongoose');
+var Progress = mongoose.model('Progress');
+var User = mongoose.model('User');
+var Course = mongoose.model('Course');
+var Chapter = mongoose.model('Chapter');
+var User = mongoose.model('User');
+var Lesson = mongoose.model('Lesson');
 var async = require('async');
 
 module.exports = function() {};

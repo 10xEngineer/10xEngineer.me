@@ -1,7 +1,7 @@
 var _ = require('underscore');
 var async = require('async');
-
-var Role = load.model('Role');
+var mongoose = require('mongoose');
+var Role = mongoose.model('Role');
 
 module.exports.can = function(roles, entity, target, action, callback) {
   var matched = false;

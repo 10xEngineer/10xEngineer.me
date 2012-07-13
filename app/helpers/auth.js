@@ -1,6 +1,7 @@
 var everyauth = require('everyauth');
-var User = load.model('User');
-var progress = load.helper('progress');
+var mongoose = require('mongoose');
+var User = mongoose.model('User');
+var progress = require('./progress');
 
 
 // TODO: Debug flag. Turn off for production use.

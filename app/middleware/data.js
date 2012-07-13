@@ -1,9 +1,11 @@
+var mongoose = require('mongoose');
 var async = require('async');
-var User = load.model('User');
-var Course = load.model('Course');
-var Chapter = load.model('Chapter');
-var Lesson = load.model('Lesson');
-var LabDef = load.model('LabDef');
+
+var User = mongoose.model('User');
+var Course = mongoose.model('Course');
+var Chapter = mongoose.model('Chapter');
+var Lesson = mongoose.model('Lesson');
+var LabDef = mongoose.model('LabDef');
 
 module.exports = function(app) {
 

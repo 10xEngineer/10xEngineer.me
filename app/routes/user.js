@@ -1,5 +1,7 @@
-var User = load.model('User');
-var Progress = load.model('Progress');
+var mongoose = require('mongoose');
+
+var User = mongoose.model('User');
+var Progress = mongoose.model('Progress');
 
 module.exports = function() {};
 

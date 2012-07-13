@@ -1,12 +1,13 @@
+var mongoose = require('mongoose');
 var async = require('async');
 var request = require('request');
-var progressHelper = load.helper('progress');
+
+var Lesson = mongoose.model('Lesson');
+
+var progressHelper = require('../app/helpers/progress');
+var util = require('../app/helpers/util');
+
 var wsdlurl = 'http://ideone.com/api/1/service.json';
-
-var util = load.helper('util');
-
-var Lesson = load.model('Lesson');
-
 var languages = {
   'javascript': 112
 };

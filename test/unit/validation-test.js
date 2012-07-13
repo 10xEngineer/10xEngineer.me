@@ -1,11 +1,5 @@
-var mocha = require('mocha')
-  , Context = mocha.Context
-  , Suite = mocha.Suite
-  , Test = mocha.Test;
-
-var app = require('../../server.js');
 var assert = require('assert')
-  , validation = load.helper('validation');
+  , validation = require('../../app/helpers/validation');
 
 describe('Validation', function() {
 

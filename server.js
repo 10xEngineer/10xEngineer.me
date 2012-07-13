@@ -1,14 +1,13 @@
 var mongoose = require('mongoose');
+var winston = require('winston');
 
-var log4js = require('log4js');
-appRoot = process.cwd();
+// Configure logs
+var consoleTransport = new (winston.transports.Console)({ colorize: true, timestamp: true, handleExceptions: true });
+var logger = new (winston.Logger)({ transports: [ consoleTransport ], exitOnError: false });
 
-// Global variables
-log = log4js.getLogger('app');
-_ = require('underscore');
+console.log(JSON.stringify(logger));
 
-// Module loader
-load = require(appRoot + '/app/loader')(appRoot);
+global.log = logger;
 
 var init = exports.init = function(config) {
 
@@ -40,7 +39,7 @@ var init = exports.init = function(config) {
 
   // Migrate database schema
   // TODO: Find a way to wait before this finishes executing
-  load.helper('dbMigrator')(config);
+  require('./app/helpers/dbMigrator')(config);
 
 
   // ----------------
@@ -57,16 +56,17 @@ if(!module.parent) {
   var config = require('./app/config/config');
   var app = init(config);
   app.listen(config.get('site:port'));
-  log.info("Server listening on port %d in %s mode", app.address().port, app.settings.env);
+  log.info("Server listening on port " + app.address().port + " in " + app.settings.env + " mode");
 
 
   // Sample code to test database connection
   // TODO: Remove it when not needed
-  var Count = load.model('Count');
+  var Count = mongoose.model('Count');
   Count.getNext('saves', function(error, count) {
     if (error) {
       log.warn('Could not determine count');
     }
     log.info('Run ' + count + ' times.');
   });
+
 }
