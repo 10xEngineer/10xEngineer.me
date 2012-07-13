@@ -19,7 +19,12 @@
             label(for='#{user.id}', style='display:inline') #{user.name} 
           - else
             label(for='#{user.id}', style='display:inline') #{user.email} 
-          p(style="display:inline; margin-right: 5px;color:gray")  ( #{user.roles.join(', ')} )
+          p(style="display:inline; margin-right: 5px;")  ( 
+            each role,roleIndex in user.roles
+              if(roleIndex != 0) 
+                | ,
+              span(class='#{role}') #{role} 
+            | )
           .roles.pull-right
             a.btn.btn-success(href="/admin/user/#{user.id}/roles", id='#{user.id}', style="margin-right:5px")
               i.icon-edit.icon-white
@@ -27,3 +32,20 @@
             a.btn.btn-danger(href="/admin/user/#{user.id}/remove")
               i.icon-trash.icon-white 
               |  Delete User
+script(type='text/javascript')
+  $('doucment').ready(function(){
+    var classes = [], colors = [];
+    $('p span').each(function(index, item){
+      var classInstance = $(item).attr('class');
+      var index = $.inArray(classInstance, classes);
+      if(index == -1){
+        var color ='#' + Math.floor(Math.random()*16777215).toString(16);
+        $(item).css("color", color);
+        classes.push(classInstance);
+        colors.push(color);
+      }
+      else {
+        $(item).css("color", colors[index]);
+      }
+    });
+  });
