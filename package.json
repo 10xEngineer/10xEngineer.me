@@ -17,6 +17,7 @@
     , "connect-redis": "1.x"
     , "cookie": "0.0.3"
     , "debug": "0.6.x"
+    , "emailjs": "0.1.x"
     , "everyauth": "0.2.32"
     , "express": "2.5.x"
     , "eyes": "0.1.x"

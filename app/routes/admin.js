@@ -6,6 +6,8 @@ var importer = load.helper('importer');
 var _ = require('underscore');
 var fs = require('fs');
 var async = require('async');
+var email   = require("emailjs/email");
+var path = require('path');
 
 
 
@@ -34,8 +36,43 @@ module.exports.approveView = function(req, res) {
 
 module.exports.approve = function(req, res) {  
   var length = req.extUser.roles.length;
-  req.extUser.roles[length++] = 'user';
   var user = req.extUser;
+
+  var server  = email.server.connect({
+    user:     "fake.user.testing@gmail.com", 
+    password: "fakeuser123", 
+    host:     "smtp.gmail.com", 
+    ssl:      true
+  });
+
+  var headers = {
+    text:       "i hope this works", 
+    from:       "fake user <fake.user.testing@gmail.com>", 
+    to:         user.name + " <" + user.email + ">",
+    subject:    "10xengineer : Approved for Beta version"
+  };
+
+  // create the message
+  var message = email.message.create(headers);
+
+  // attach an alternative html email for those with advanced email clients
+  var pathVar = path.resolve('./Samples/emailTemplet/approvalForBeta.html');
+  log.info(pathVar);
+  message.attach_alternative(fs.readFileSync(pathVar).toString());
+
+  log.info("Message :: ", message);
+
+  // send the message and get a callback with an error or details of the message that was sent
+  server.send(message, function(err, message) {
+    console.log("Get Callback : ", err || message);
+  });
+
+  // you can continue to send more messages with successive calls to 'server.send', 
+  // they will be queued on the same smtp connection
+
+  // or you can create a new server connection with 'email.server.connect' 
+  // to asynchronously send individual emails instead of a queue
+  req.extUser.roles[length++] = 'user';
   user.markModified('roles');
   user.save(function(error){
     if(error) {
