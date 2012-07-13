@@ -6,7 +6,7 @@ var importer = load.helper('importer');
 var _ = require('underscore');
 var fs = require('fs');
 var async = require('async');
-var email   = require("emailjs/email");
+var nodemailer = require("nodemailer");
 var path = require('path');
 
 
@@ -38,49 +38,67 @@ module.exports.approve = function(req, res) {
   var length = req.extUser.roles.length;
   var user = req.extUser;
 
-  var server  = email.server.connect({
-    user:     "fake.user.testing@gmail.com", 
-    password: "fakeuser123", 
-    host:     "smtp.gmail.com", 
-    ssl:      true
-  });
 
-  var headers = {
-    text:       "i hope this works", 
-    from:       "fake user <fake.user.testing@gmail.com>", 
-    to:         user.name + " <" + user.email + ">",
-    subject:    "10xengineer : Approved for Beta version"
-  };
 
-  // create the message
-  var message = email.message.create(headers);
+  var templetPath = path.resolve('./Samples/emailTemplet/approvalForBeta.html');
+  getHtmlTemplate("approvalForBeta", { "name" : user.name }, function(error, htmlText){
 
-  // attach an alternative html email for those with advanced email clients
-  var pathVar = path.resolve('./Samples/emailTemplet/approvalForBeta.html');
-  log.info(pathVar);
-  message.attach_alternative(fs.readFileSync(pathVar).toString());
-
-  log.info("Message :: ", message);
-
-  // send the message and get a callback with an error or details of the message that was sent
-  server.send(message, function(err, message) {
-    console.log("Get Callback : ", err || message);
-  });
-
-  // you can continue to send more messages with successive calls to 'server.send', 
-  // they will be queued on the same smtp connection
-
-  // or you can create a new server connection with 'email.server.connect' 
-  // to asynchronously send individual emails instead of a queue
-  req.extUser.roles[length++] = 'user';
-  user.markModified('roles');
-  user.save(function(error){
-    if(error) {
+    if(error){
       log.error(error);
+      res.redirect('/admin/approve');
     }
-    res.redirect('/admin/approve');
-  })
+    // create reusable transport method (opens pool of SMTP connections)
+    var smtpTransport = nodemailer.createTransport("SMTP",{
+      service: "Gmail",
+      auth: {
+          user: "",  // Sender mail id here
+          pass: ""   // password
+      }
+    });
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+      from: "", // sender address
+      to: user.name + " <" + user.email + ">", // list of receivers
+      subject: "10xEngineer : Notification for beta version release", // Subject line
+      text: "", // plaintext body
+      html: htmlText //fs.readFileSync(templetPath).toString() // html body
+    }
+
+    // send mail with defined transport object
+    smtpTransport.sendMail(mailOptions, function(error, response){
+        if(error){
+            console.log(error);
+        }else{
+            console.log("Message sent: " + response.message);
+        }
+
+        // if you don't want to use this transport object anymore, uncomment following line
+        //smtpTransport.close(); // shut down the connection pool, no more messages
+    });
+    
+    req.extUser.roles[length++] = 'user';
+    user.markModified('roles');
+    user.save(function(error){
+      if(error) {
+        log.error(error);
+      }
+      res.redirect('/admin/approve');
+    })
+
+  });
 };
+
+var getHtmlTemplate = function(templateName, jsonObject, callback){
+  var templatePath = path.resolve('./Samples/emailTemplet/' + templateName + '.html');
+  var template = fs.readFileSync(templatePath).toString();
+  for(var key in jsonObject) {
+    if(jsonObject.hasOwnProperty(key)) {
+      var regEx = new RegExp("#{" + key + "}", "g");
+      template = template.replace(regEx, jsonObject[key]);
+    }
+  }
+  callback(null, template);
+}
 
 module.exports.usersImportView = function(req, res) {  
   res.render('admin/usersImport');
