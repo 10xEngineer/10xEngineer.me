@@ -1,16 +1,18 @@
 .container
   h1= title
-  p
+  .row-fluid
     a.btn.pull-right(href="/admin/usersImport") 
       i.icon-download-alt
       | Import User Email
-  .admin_view_header
-    a.btn(href="/admin/roles", style="margin-right: 5px;") Roles
-    a.btn(href="/admin/labs", style="margin-right: 5px;") Labs 
-    a.btn(href='/admin/clearProgress', id='#{user.id}', style="margin-right: 5px;") Clear Progress           
-    a.btn(href="/admin/approve") Approve
-    .counts.pull-right
-      code(style="padding:10px;")  Total Users- #{users.length} 
+  .row-fluid
+    .admin_view_header.spam10
+      a.btn(href="/admin/roles") Roles
+      a.btn(href="/admin/labs") Labs 
+      a.btn(href='/admin/clearProgress', id='#{user.id}') Clear Progress           
+      a.btn(href="/admin/approve") Approve
+      .counts.pull-right
+        label [Total - #{users.length}]
+
   .actions 
     ul.admin_view_list_items
       each user in users

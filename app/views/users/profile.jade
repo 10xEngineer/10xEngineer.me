@@ -33,10 +33,10 @@
         h5 Attented Courses :
 
         each progress in progresses
-          -if(progress.courseTitle!=null)
-            div.chapterPerogressbox
-              div #{progress.courseTitle} 
-              .courseProgress
-                .bar(style="width:#{progress.progress}%;")
+          -if(!progress.courseTitle)
+            div.chapterPerogressbox(style="min-height: 75px")
+              div.courseName #{progress.course.title} 
               - if (progress.progress != 100)
-                  a.btn.btn-primary.btn-large.chapterContinue(href='/course/#{progress.courseId}/start') Continue
+                  a.btn.btn-primary.btn-large.chapterContinue.pull-right(href='/course/#{progress.course.id}/start') Continue
+              .courseProgress.pull-right
+                .bar(style="width:#{progress.progress}%;")
