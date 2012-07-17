@@ -16,14 +16,15 @@ var methods = {
           callback(error, chapter);
         }
         var lessonsLength = chapter.lessons.length;
-        for(var lessonIndex = 0 ; lessonIndex < lessonsLength ; lessonIndex++) {
-          chapter.lessons[lessonIndex].status = "published";
-          chapter.lessons[lessonIndex].save(function(error){
-            if(error) {
-              log.error(error);
-            }
-          });
-        }
+        async.forEach(chapter.lessons,
+          function(lessonInst, innerCallback) {
+            lessonInst.status = "published";
+            lessonInst.save(innerCallback(error));
+          },
+          function(error){
+            log.error(error);
+          }
+        );
         chapter.status = 'published';
         chapter.markModified('lessons');
 
@@ -65,26 +66,25 @@ var methods = {
             callback(error);
           }
 
-          for (var i = 0 ; i < course.chapters.length; i++) {
-            if(course.chapters[i].toString() == chapter._id.toString()) {
-              
-              course.chapters.splice(i,1);
-              
-              course.markModified('chapters');
-              course.save(function(error) {
-                if(error) {
-                  log.error(error);
-                }
-              });
-            }
-          }
-        });
+          async.forEach(
+            course.chapters,
+            function(chapterInst, innerCallback) {
+              if(chapterInst.toString() == chapter._id.toString()) {
+                course.chapters.splice(i,1);
+                course.markModified('chapters');
+                course.save(innerCallback(error));
+              }
+            },
+            function(error){
+              log.error(error);
+          });
 
-        chapter.remove(function(error) {
-          if(error) {
-            callback(error);
-          }
-          callback();
+          chapter.remove(function(error) {
+            if(error) {
+              callback(error);
+            }
+            callback();
+          });
         });
       });      
     });

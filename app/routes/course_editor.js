@@ -1,5 +1,6 @@
 var fs = require('fs');
 var mongoose = require('mongoose');
+var async = require('async');
 
 var Course = mongoose.model('Course');
 var Chapter = mongoose.model('Chapter');
@@ -125,20 +126,33 @@ module.exports.import = function(req, res, next) {
       res.redirect('/course_editor');
     }
 
-    var chapterLength = chapters.length;
-    for(var index = 0; index < chapterLength; index++) {
-      var chapterData = chapters[index];
-
-      importer.chapter(chapterData, course._id, function(error, chapter, lessons) {
-
-        var lessonLength = lessons.length;
-        for(var index2 = 0; index2 < lessonLength; index2++) {
-          var lessonData = lessons[index2];
-          importer.lesson(lessonData, chapter._id);          
-        }
-      });
-    }
-
+    async.forEach(
+      chapters,
+      function(chapter, callback){
+        importer.chapter(chapter, course._id, function(error, chapter, lessons) {
+          if(error){
+            callback(error);
+          }
+          async.forEach(
+            lessons, 
+            function(lesson, callbackInner) {
+              importer.lesson(lesson, chapter._id, function(error){
+                if(error){
+                  callbackInner(error);
+                }
+                callbackInner();
+              });
+            },
+            function(error){
+              callback(error);
+            }
+          );
+        });
+      }, 
+      function(error){
+        next(error);
+      }
+    );
     // Success
     req.session.message = "Import Sucessfully Course.";
     res.redirect('/course_editor');
