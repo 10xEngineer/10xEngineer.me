@@ -96,7 +96,7 @@ var methods = {
 
 
 model.init('Course', CourseSchema, {
-  plugins: ['id', 'timestamp'],
+  plugins: ['id', 'timestamp', 'course'],
   methods: methods
 });
 
