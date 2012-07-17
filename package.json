@@ -25,6 +25,7 @@
     , "mime": "1.2.x"
     , "mongoose": "2.6.x"
     , "nconf": "0.6.x"
+    , "nodemailer": "0.3.x"
     , "redis": "0.7.x"
     , "reparse": "0.1.x"
     , "request": "2.9.x"

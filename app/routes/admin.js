@@ -1,7 +1,10 @@
 var fs = require('fs');
+var path = require('path');
+
 var mongoose = require('mongoose');
 var _ = require('underscore');
 var async = require('async');
+var nodemailer = require("nodemailer");
 
 var User = mongoose.model('User');
 var Role = mongoose.model('Role');
@@ -35,16 +38,70 @@ module.exports.approveView = function(req, res) {
 
 module.exports.approve = function(req, res) {  
   var length = req.extUser.roles.length;
-  req.extUser.roles[length++] = 'user';
   var user = req.extUser;
-  user.markModified('roles');
-  user.save(function(error){
-    if(error) {
+
+
+
+  var templetPath = path.resolve('./Samples/emailTemplet/approvalForBeta.html');
+  getHtmlTemplate("approvalForBeta", { "name" : user.name }, function(error, htmlText){
+
+    if(error){
       log.error(error);
+      res.redirect('/admin/approve');
     }
-    res.redirect('/admin/approve');
+
+    // create reusable transport method (opens pool of SMTP connections)
+    var smtpTransport = nodemailer.createTransport("SMTP",{
+      service: "Gmail",
+      auth: {
+          user: "",  // Sender mail id here
+          pass: ""   // password
+      }
+    });
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+      from: "", // sender address
+      to: user.name + " <" + user.email + ">", // list of receivers
+      subject: "10xEngineer : Notification for beta version release", // Subject line
+      text: "", // plaintext body
+      html: htmlText //fs.readFileSync(templetPath).toString() // html body
+    }
+
+    // send mail with defined transport object
+    smtpTransport.sendMail(mailOptions, function(error, response){
+        if(error){
+            console.log(error);
+        }else{
+            console.log("Message sent: " + response.message);
+        }
+
+        // if you don't want to use this transport object anymore, uncomment following line
+        //smtpTransport.close(); // shut down the connection pool, no more messages
+    });
+    
+    req.extUser.roles[length++] = 'user';
+    user.markModified('roles');
+    user.save(function(error){
+      if(error) {
+        log.error(error);
+      }
+      res.redirect('/admin/approve');
+    })
+
   });
 };
+
+var getHtmlTemplate = function(templateName, jsonObject, callback){
+  var templatePath = path.resolve('./Samples/emailTemplet/' + templateName + '.html');
+  var template = fs.readFileSync(templatePath).toString();
+  for(var key in jsonObject) {
+    if(jsonObject.hasOwnProperty(key)) {
+      var regEx = new RegExp("#{" + key + "}", "g");
+      template = template.replace(regEx, jsonObject[key]);
+    }
+  }
+  callback(null, template);
+}
 
 module.exports.usersImportView = function(req, res) {  
   res.render('admin/usersImport');
