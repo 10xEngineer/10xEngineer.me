@@ -1,6 +1,4 @@
-
 var model = require('./index');
-var VMDefSchema = require('./schema/vmDef');
 
 var methods = {
   removeLabDef: function(callback) {
@@ -13,11 +11,15 @@ var methods = {
       }
       callback();
     });
-  };
-}
+  }
+};
 
 
-model.init('VMDef', VMDefSchema, {
-  plugins: ['id', 'timestamp'],
-  methods: methods
-});
+module.exports = {
+  name: 'VMDef',
+  schema: require('./schema/vmDef'),
+  options: {
+    methods: methods,
+    plugins: ['id', 'timestamp']
+  }
+};

@@ -1,7 +1,6 @@
 var async = require('async');
 
 var model = require('./index');
-var ChapterSchema = require('./schema/chapter');
 
 
 var methods = {
@@ -154,9 +153,12 @@ var methods = {
   }
 };
 
-
-model.init('Chapter', ChapterSchema, {
-  plugins: ['id', 'timestamp', 'chapter'],
-  methods: methods
-});
+module.exports = {
+  name: 'Chapter',
+  schema: require('./schema/chapter'),
+  options: {
+    methods: methods,
+    plugins: ['id', 'timestamp', 'chapter']    
+  }
+};
 

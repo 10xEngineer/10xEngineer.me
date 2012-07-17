@@ -1,13 +1,11 @@
-var mongoose = require('mongoose');
-
-var User = mongoose.model('User');
-var Progress = mongoose.model('Progress');
-var Course = mongoose.model('Course');
+var model = require('../models');
 
 module.exports = function() {};
 
 
 module.exports.profile = function(req, res){
+  var Course = model.Course;
+  
   var progress = req.session.progress;
   var courseIds = [];
   var count = 0;

@@ -1,14 +1,11 @@
 var fs = require('fs');
 var path = require('path');
 
-var mongoose = require('mongoose');
 var _ = require('underscore');
 var async = require('async');
 var nodemailer = require("nodemailer");
 
-var User = mongoose.model('User');
-var Role = mongoose.model('Role');
-var LabDef = mongoose.model('LabDef');
+var model = require('../models');
 
 var importer = require('../helpers/importer');
 
@@ -16,6 +13,9 @@ var importer = require('../helpers/importer');
 module.exports = function() {};
 
 module.exports.show = function(req, res) {
+  var User = model.User;
+  var Role = model.Role;
+
   User.find(function(error, users) {
     Role.find(function(error, roles) {
       res.render('admin', {
@@ -28,6 +28,8 @@ module.exports.show = function(req, res) {
 };
 
 module.exports.approveView = function(req, res) {
+  var User = model.User;
+
   User.find({ roles : { $ne : 'user' } } ,function(error, users) {
     res.render('admin/approve', {
       title: '10xengineer.me Beta Approval',
@@ -39,8 +41,6 @@ module.exports.approveView = function(req, res) {
 module.exports.approve = function(req, res) {  
   var length = req.extUser.roles.length;
   var user = req.extUser;
-
-
 
   var templetPath = path.resolve('./Samples/emailTemplet/approvalForBeta.html');
   getHtmlTemplate("approvalForBeta", { "name" : user.name }, function(error, htmlText){
@@ -65,7 +65,7 @@ module.exports.approve = function(req, res) {
       subject: "10xEngineer : Notification for beta version release", // Subject line
       text: "", // plaintext body
       html: htmlText //fs.readFileSync(templetPath).toString() // html body
-    }
+    };
 
     // send mail with defined transport object
     smtpTransport.sendMail(mailOptions, function(error, response){
@@ -86,7 +86,7 @@ module.exports.approve = function(req, res) {
         log.error(error);
       }
       res.redirect('/admin/approve');
-    })
+    });
 
   });
 };
@@ -101,7 +101,7 @@ var getHtmlTemplate = function(templateName, jsonObject, callback){
     }
   }
   callback(null, template);
-}
+};
 
 module.exports.usersImportView = function(req, res) {  
   res.render('admin/usersImport');
@@ -216,8 +216,9 @@ module.exports.labEdit = function(req, res) {
 };
 
 module.exports.labs = function(req, res) {  
-  
-  var labDef = new LabDef();
+  var VMDef = model.VMDef;
+
+  var labDef = new VMDef();
   labDef.name = req.body.name;
   labDef.type = req.body.type;
   //labDef.cpu = req.body.cpu;
@@ -234,9 +235,10 @@ module.exports.labs = function(req, res) {
 };
 
 module.exports.showLabsView = function(req, res) {  
+  var VMDef = model.VMDef;
   var config = req.app.set('config');
 
-  LabDef.find(function (error, lab) {
+  VMDef.find(function (error, lab) {
 
     var vmList = config.get('vms');
     res.render('admin/showLabs', {
@@ -264,6 +266,8 @@ module.exports.labRemove = function(req, res) {
 
 
 module.exports.rolesView = function(req, res) {
+  var Role = model.Role;
+
   Role.find(function (error, roles) {
     res.render('admin/roles', {
       roles: roles
@@ -272,6 +276,8 @@ module.exports.rolesView = function(req, res) {
 };
 
 module.exports.showUserRoles = function(req, res){
+  var Role = model.Role;
+
   Role.find(function (error, roles) {
     res.render('admin/user_roles', {
       roles : roles
@@ -280,6 +286,8 @@ module.exports.showUserRoles = function(req, res){
 };
 
 module.exports.updateUserRoles = function(req, res) {
+  var Role = model.Role;
+
   req.extUser.updateUserRoles(req.body.chngRoles, function(error){
     if(error){
       log.error(error);
@@ -313,8 +321,9 @@ module.exports.createRoleView = function(req, res) {
 };
 
 module.exports.editRoleView = function(req, res) {
+  var Role = model.Role;
 
-  var roleId = parseInt(req.route.params['roleId'], 10);
+  var roleId = parseInt(req.route.params.roleId, 10);
 
   Role.findOne({ id: roleId }, function(error, role){
     var roleName = role.name;
@@ -371,7 +380,7 @@ module.exports.editRoleView = function(req, res) {
 module.exports.editRole = function(req, res) {
 
   var modifiedRoleName = req.body.name;
-  var roleId = parseInt(req.route.params['roleId'], 10);
+  var roleId = parseInt(req.route.params.roleId, 10);
   getPermissionListForRole(req, function(error, modifiedRolePermits){
     if(!error){
       Role.findOne({ id : roleId }, function(error, role){
@@ -391,7 +400,7 @@ module.exports.createRole = function(req, res) {
   var newRoleName = req.body.name;
 
   getPermissionListForRole(req, function(error, newRolePermits){
-    Role.generateRole(newRoleName, newRolePermits, function(error, role){
+    Role.createRole(newRoleName, newRolePermits, function(error, role){
       if(error){
         log.error(error);
       }
@@ -403,7 +412,9 @@ module.exports.createRole = function(req, res) {
 };
 
 module.exports.removeRole = function(req, res) {
-  var roleId = parseInt(req.route.params['roleId'], 10);
+  var Role = model.Role;
+
+  var roleId = parseInt(req.route.params.roleId, 10);
   Role.findOne({ id : roleId}, function(error, role){
     if(error){
       log.error(error);
@@ -420,6 +431,8 @@ module.exports.removeRole = function(req, res) {
 };
 
 module.exports.assignRole = function(req, res) {
+  var Role = model.Role;
+
   var user = req.extUser;
   var roleId = req.params.roleId;
 

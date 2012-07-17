@@ -2,8 +2,6 @@ var async = require('async');
 var _ = require('underscore');
 
 var model = require('./index');
-var CourseProgressSchema = require('./schema/progress');
-
 
 var statics = {
   userChapterProgress: function(user, callback) {
@@ -57,7 +55,7 @@ var statics = {
   }
 };
 
-var methods {
+var methods = {
   getNextLesson: function(callback) {
     var progress = this;
 
@@ -170,12 +168,16 @@ var methods {
       callback();
     });
   }
-}
+};
 
 
-model.init('Progress', CourseProgressSchema, {
-  plugins: ['timestamp', 'progress'],
-  methods: methods,
-  statics: statics
-});
+module.exports = {
+  name: 'Progress',
+  schema: require('./schema/progress'),
+  options: {
+    methods: methods,
+    statics: statics,
+    plugins: ['timestamp', 'progress']  
+  }
+};
 

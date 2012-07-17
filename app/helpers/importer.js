@@ -1,13 +1,11 @@
-var mongoose = require('mongoose');
-var Course = mongoose.model('Course');
-var Chapter = mongoose.model('Chapter');
-var Lesson = mongoose.model('Lesson');
-var User = mongoose.model('User');
+var model = require('../models');
 
 
 module.exports = function() {};
 
 module.exports.course = function(data, callback) {
+  var Course = model.Course;
+
   var course = new Course();
   course.title = data.title;
   course.desc = data.desc;
@@ -33,6 +31,8 @@ module.exports.course = function(data, callback) {
 };
 
 module.exports.chapter = function(data, courseId, callback) {
+  var Chapter = model.Chapter;
+
   var chapter = new Chapter();
   chapter.title = data.title;
   chapter.desc = data.desc;
@@ -56,6 +56,8 @@ module.exports.chapter = function(data, courseId, callback) {
 };
 
 module.exports.lesson = function(data, chapterId, callback) {
+  var Lesson = model.Lesson;
+
   var lesson = new Lesson();
   lesson.title = data.title;
   lesson.desc = data.desc;
@@ -88,6 +90,8 @@ module.exports.lesson = function(data, chapterId, callback) {
 
 
 module.exports.users = function(email, callback) {
+  var User = model.User;
+  
   User.findOne({email: email}, function(error, dbUser) {
     if (error) {
       callback(error);

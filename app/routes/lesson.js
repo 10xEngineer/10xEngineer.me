@@ -1,13 +1,8 @@
 var fs = require('fs');
 
-var mongoose = require('mongoose');
 var _ = require('underscore');
 
-var Progress = mongoose.model('Progress');
-var Chapter = mongoose.model('Chapter');
-var Lesson = mongoose.model('Lesson');
-var LabDef = mongoose.model('LabDef');
-var _ = require('underscore');
+var model = require('../models');
 
 var cdn = require('../helpers/cdn');
 var progressHelper = require('../helpers/progress');
@@ -18,8 +13,9 @@ module.exports = function() {};
 
 // Display create lesson page
 module.exports.createView = function(req, res) {
-  
-  LabDef.find(function (error, lab) {
+  var VMDef = model.VMDef;
+
+  VMDef.find(function (error, lab) {
     res.render('lessons/lesson_create', {
       title: req.chapter.title,
       lesson: {title: '', desc: ''},
@@ -31,6 +27,8 @@ module.exports.createView = function(req, res) {
 
 // Create a lesson
 module.exports.create = function(req, res, next) {
+  var Lesson = model.Lesson;
+
   var lesson = new Lesson();
   lesson.chapter = req.chapter._id;
   lesson.title   = req.body.title;
@@ -174,6 +172,7 @@ module.exports.create = function(req, res, next) {
 
 // Display a lesson
 module.exports.showView = function(req, res) {
+  var Lesson = model.Lesson;
 
   var lesson =  req.lesson;
 
@@ -241,7 +240,8 @@ module.exports.showView = function(req, res) {
 };
 
 module.exports.show = function(req, res, next){
-  
+  var Lesson = model.Lesson;
+
   var lesson = req.lesson;
 
   // For Session Progres Update
@@ -331,7 +331,8 @@ module.exports.editView = function(req, res) {
 
 // Save edited chapter
 module.exports.edit = function(req, res){
-  
+  var Lesson = model.Lesson;
+
   var lesson = req.lesson;
   lesson.title   = req.body.title;
   lesson.desc    = req.body.description;
@@ -417,6 +418,8 @@ module.exports.edit = function(req, res){
 
 // Lesson Completes
 module.exports.complete = function(req, res) {
+  var Progress = model.Progress;
+
   res.contentType('text/plain');
   Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
     if(error) {
@@ -433,41 +436,17 @@ module.exports.complete = function(req, res) {
       }
       res.end("true");
     });
-  
   });
-
-};
-
-// Lesson Update Progress
-module.exports.updateProgress = function(req, res) {
-  res.contentType('text/plain');
-  var seconds = req.query.seconds;
-  Progress.findOne({ user: req.user._id, course: req.course._id}, function(error, progress) {
-    if(error) {
-      log.error(error);
-      res.end("false");
-    }
-    var lessonVideo = {};
-    lessonVideo.chapter = req.chapter.id;
-    lessonVideo.lesson  = req.lesson.id;
-    progress.updateProgress(lessonVideo, seconds, function(error){
-      if(error) {
-        log.error(error);
-        res.end("false");
-      }
-      res.end("true");
-    });
-  
-  });
-
 };
 
 // Lesson ServerInfo
 module.exports.serverInfo = function(req, res) {
+  var VMDef = model.VMDef;
+  
   res.contentType('text/plain');
   var id = req.query.id;
 
-  LabDef.findById(id, function (error, lab) {
+  VMDef.findById(id, function (error, lab) {
     if(error) {
       log.error(error);
       res.end("false");

@@ -1,12 +1,43 @@
+var fs = require('fs');
+
 var async = require('async');
 var mongoose = require('mongoose');
 var _ = require('underscore');
 
-var model = module.exports = function() {
-  var models = {};
+module.exports = exports = function(callback) {
+  exports.models = {};
+
+  exports.__proto__ = exports.models;
+
+  var regExp = new RegExp('.model.js$');
+  var files = fs.readdirSync('./app/models');
+
+  // Initialize all the models
+  async.forEach(files, function(modelFile, callback) {
+    if(regExp.test(modelFile)) {
+      var model = require('./' + modelFile);
+
+      if(model.name) {
+        exports.init(model.name, model.schema, model.options, callback);
+      } else {
+        log.error(modelFile + ' is not a valid model.');
+        callback('Not a valid model');
+      }
+    } else {
+      callback();
+    }
+  },
+  function(error) {
+    if(error) {
+      return callback(error);
+    }
+
+    callback();
+  });
 };
 
-module.exports.init = function(name, schema, options) {
+module.exports.init = function(name, schema, options, callback) {
+  var self = this;
   async.parallel([
     // Apply plugins
     function(callback) {
@@ -21,6 +52,8 @@ module.exports.init = function(name, schema, options) {
           schema.plugin(plugin);
           callback();
         }, callback);
+      } else {
+        callback();
       }
     },
     // Apply methods
@@ -29,9 +62,16 @@ module.exports.init = function(name, schema, options) {
         var methods = options.methods;
         var methodNames = _.keys(methods);
 
+        if(methodNames.length === 0) {
+          return callback();
+        }
+
         async.forEach(methodNames, function(methodName, callback) {
           schema.methods[methodName] = methods[methodName];
+          callback();
         }, callback);
+      } else {
+        callback();
       }
     },
     // Apply statics
@@ -40,32 +80,30 @@ module.exports.init = function(name, schema, options) {
         var statics = options.statics;
         var staticNames = _.keys(statics);
 
+        if(staticNames.length === 0) {
+          return callback();
+        }
+
         async.forEach(staticNames, function(staticName, callback) {
           schema.statics[staticName] = statics[staticName];
+          callback();
         }, callback);
+      } else {
+        callback();
       }
     }
   ],
   function(error) {
     if(error) {
-      throw error;
+      callback(error);
     }
-    
+
     // Register model
     mongoose.model(name, schema);
 
     // Cache the model in models object
-    self.models[name] = mongoose.model(name);
+    module.exports.models[name] = mongoose.model(name);
+
+    callback();
   });
 };
-
-// Initialize all the models
-require('./metadata');
-require('./count');
-require('./user');
-require('./role');
-require('./course');
-require('./chapter');
-require('./lesson');
-require('./progress');
-require('./vmDef');

@@ -1,8 +1,7 @@
-var mongoose = require('mongoose');
 var async = require('async');
 var request = require('request');
 
-var Lesson = mongoose.model('Lesson');
+var model = require('../app/models');
 
 var progressHelper = require('../app/helpers/progress');
 var util = require('../app/helpers/util');
@@ -52,6 +51,7 @@ module.exports = function(io) {
     .on('connection', function (socket) {
     
     socket.on('submitcode', function(data){
+      var Lesson = model.Lesson;
       log.info(data);
 
       Lesson.findOne({ id: data.lessonId }, function(error, lesson) {

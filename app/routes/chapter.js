@@ -1,6 +1,4 @@
-var mongoose = require('mongoose');
-
-var Chapter = mongoose.model('Chapter');
+var model = require('../models');
 
 module.exports = function() {};
 
@@ -14,6 +12,8 @@ module.exports.createView = function(req, res){
 
 // Create a new chapter
 module.exports.create = function(req, res){
+  var Chapter = model.Chapter;
+  
   var chapter = new Chapter();
   chapter.title = req.body.title;
   chapter.desc = req.body.description;

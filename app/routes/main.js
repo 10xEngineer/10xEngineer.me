@@ -1,6 +1,4 @@
-var mongoose = require('mongoose');
-
-var User = mongoose.model('User');
+var model = require('../models');
 
 var util = require('../helpers/util');
 
@@ -44,6 +42,8 @@ module.exports.registerView = function(req, res) {
 };
 
 module.exports.register = function(req, res, next) {
+  var user = model.User;
+  
   var email = req.body.email;
 
   // Check for existing accounts based on current email

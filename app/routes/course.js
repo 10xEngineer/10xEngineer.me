@@ -1,14 +1,8 @@
-var mongoose = require('mongoose');
 var request = require('request');
 var fs = require('fs');
 var path = require('path');
 
-// Load models
-var Course = mongoose.model('Course');
-var User = mongoose.model('User');
-var Chapter = mongoose.model('Chapter');
-var Lesson = mongoose.model('Lesson');
-var Progress = mongoose.model('Progress');
+var model = require('../models');
 
 var progressHelper = require('../helpers/progress');
 var importer = require('../helpers/importer');
@@ -18,6 +12,9 @@ module.exports = function() {};
 
 // List existing all courses
 module.exports.allList = function(req, res){
+  var Course = model.Course;
+  var Progress = model.Progress;
+
   var formatedProgress = {};
   Course.find({}, function(error, courses){
     Progress.find({ user: req.user._id }, function(error, progresses){
@@ -36,6 +33,9 @@ module.exports.allList = function(req, res){
 
 // List existing featured courses
 module.exports.featuredList = function(req, res){
+  var Course = model.Course;
+  var Progress = model.Progress;
+  
   var formatedProgress = {};
   Course.find({ featured : true }, function(error, courses){
     Progress.find({ user: req.user._id }, function(error, progresses){
@@ -62,6 +62,8 @@ module.exports.createView = function(req, res){
 
 // Create a new course
 module.exports.create = function(req, res, next){
+  var Course = model.Course;
+
   var course = new Course();
   course.title = req.body.title;
   course.desc = req.body.description;
@@ -149,8 +151,8 @@ module.exports.import = function(req, res, next) {
 // Register for a course (if not already registered, and Go to the last viewed or first lesson. 
 module.exports.start = function(req, res, next){
   // Check if user has already started the course
-
-
+  var Progress = model.Progress;
+  
   Progress.startOrContinue(req.user, req.course, function(error, progress) {
     if(error) {
       log.error(error);

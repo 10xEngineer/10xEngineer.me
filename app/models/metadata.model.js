@@ -1,9 +1,5 @@
 
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema;
-
 var model = require('./index');
-var MetadataSchema = require('./schema/metadata');
 
 var statics = {
   getValue: function(key, callback) {
@@ -16,7 +12,7 @@ var statics = {
     });
   },
 
-  setValue: function(key, value) {
+  setValue: function(key, value, callback) {
     getDocument(function(error, doc) {
       if(error) {
         log.error(error);
@@ -25,7 +21,7 @@ var statics = {
       doc[key] = value;
       doc.markModified(key);
       
-      doc.save();
+      doc.save(callback);
     });
   }
 };
@@ -49,6 +45,10 @@ var getDocument = function(callback) {
 };
 
 
-model.init('Metadata', MetadataSchema, {
-  statics: statics
-});
+module.exports = {
+  name: 'Metadata',
+  schema: require('./schema/metadata'),
+  options: {
+    statics: statics  
+  }
+};

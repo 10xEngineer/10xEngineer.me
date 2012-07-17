@@ -1,7 +1,6 @@
 var cdn = require('../helpers/cdn');
 
 var model = require('./index');
-var CourseSchema = require('./schema/course');
 
 
 var methods = {
@@ -20,11 +19,11 @@ var methods = {
         cdn.unlinkFile(course.iconImage, function(error){
           if (error) {
             callback(error);
-          };
+          }
           cdn.unlinkFile(course.wallImage, function(error){
             if (error) {
               callback(error);
-            };
+            }
             course.remove(function(error) {
               if(error) {
                 callback(error);
@@ -34,17 +33,17 @@ var methods = {
           });
         });
       });
-    };
+    }
 
     // Remove images
     cdn.unlinkFile(course.iconImage, function(error){
       if (error) {
         callback(error);
-      };
+      }
       cdn.unlinkFile(course.wallImage, function(error){
         if (error) {
           callback(error);
-        };
+        }
         course.remove(function(error) {
           if(error) {
             callback(error);
@@ -91,12 +90,15 @@ var methods = {
       }
       callback();
     });
-  };
+  }
 };
 
 
-model.init('Course', CourseSchema, {
-  plugins: ['id', 'timestamp', 'course'],
-  methods: methods
-});
-
+module.exports = {
+  name: 'Course',
+  schema: require('./schema/course'),
+  options: {
+    methods: methods,
+    plugins: ['id', 'timestamp', 'course']    
+  }
+};

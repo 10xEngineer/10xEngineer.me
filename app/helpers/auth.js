@@ -1,6 +1,6 @@
 var everyauth = require('everyauth');
-var mongoose = require('mongoose');
-var User = mongoose.model('User');
+
+var model = require('../models');
 var progress = require('./progress');
 
 
@@ -28,6 +28,8 @@ module.exports = function (config) {
     .entryPath('/auth/google')
     .callbackPath('/auth/google/callback')
     .findOrCreateUser( function (session, accessToken, extra, googleUser) {
+      var User = model.User;
+
       googleUser.refreshToken = extra.refresh_token;
       googleUser.expiresIn = extra.expires_in;
 
@@ -60,6 +62,7 @@ module.exports = function (config) {
     .entryPath('/auth/twitter')
     .callbackPath('/auth/twitter/callback')
     .findOrCreateUser( function (session, accessToken, accessSecret, twitUser) {
+      var User = model.User;
       var promise = this.Promise();
       
       if(session.auth && session.auth.loggedIn) {
@@ -98,6 +101,7 @@ module.exports = function (config) {
     .entryPath('/auth/fb')
     .callbackPath('/auth/fb/callback')
     .findOrCreateUser( function (session, accessToken, accessTokenExtra, fbUserMetadata) {
+      var User = model.User;
       var promise = this.Promise();
       
       if(session.auth && session.auth.loggedIn) {
@@ -122,6 +126,7 @@ module.exports = function (config) {
 
   // To inject user object through express middleware
   everyauth.everymodule.findUserById( function (userId, callback) {
+    var User = model.User;
     User.findById(userId, callback);
   });
 

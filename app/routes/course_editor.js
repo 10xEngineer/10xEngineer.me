@@ -1,12 +1,8 @@
 var fs = require('fs');
-var mongoose = require('mongoose');
+
 var async = require('async');
 
-var Course = mongoose.model('Course');
-var Chapter = mongoose.model('Chapter');
-var Lesson = mongoose.model('Lesson');
-var Progress = mongoose.model('Progress');
-var LabDef = mongoose.model('LabDef');
+var model = require('../models');
 
 var importer = require('../helpers/importer');
 var cdn = require('../helpers/cdn');
@@ -27,6 +23,8 @@ var util = require('../helpers/util');
 ** Show Main Page of Course Editor **
 ************************************/
 module.exports.coursesList = function(req, res){
+  var Course = model.Course;
+
   Course.find({})
     .populate('created_by')
     .run(function(error, courses) {
@@ -51,6 +49,8 @@ module.exports.createView = function(req, res){
 ** Submit created course           **
 ************************************/
 module.exports.create = function(req, res, next){
+  var Course = model.Course;
+
   var course = new Course();
   course.title = req.body.title;
   course.desc = req.body.description;
@@ -117,7 +117,7 @@ module.exports.import = function(req, res, next) {
 
   // Create a new course based on the parsed file
 
-  parsedCourse['created_by'] = req.user._id;
+  parsedCourse.created_by = req.user._id;
   importer.course(parsedCourse, function(error, course) {
 
     // Add chapters
@@ -154,7 +154,7 @@ module.exports.import = function(req, res, next) {
       }
     );
     // Success
-    req.session.message = "Import Sucessfully Course.";
+    req.session.message = "Course sucessfully imported.";
     res.redirect('/course_editor');
   });
 };
@@ -190,7 +190,8 @@ module.exports.update = function(req, res, next){
 
 
 module.exports.remove = function(req, res, next){
-  
+  var Progress = model.Progress;
+
   var course = req.course;
   var course_id = course._id;
 
@@ -269,11 +270,9 @@ module.exports.unfeatured = function(req, res) {
 
 
 /*********************************************
-**********************************************
 **                                          **
 **  Chapter Operations                      **
 **                                          **
-**********************************************
 *********************************************/
 
 module.exports.chapterView = function (req, res) {
@@ -316,6 +315,8 @@ module.exports.chapterCreateView = function(req, res){
 
 // Create a new chapter
 module.exports.chapterCreate = function(req, res){
+  var Chapter = model.Chapter;
+
   var chapter = new Chapter();
   chapter.title = req.body.title;
   chapter.desc = req.body.description;
@@ -414,8 +415,9 @@ module.exports.chapterDown = function(req, res, next){
 **********************************************
 *********************************************/
 module.exports.lessonCreateView = function(req, res) {
-  
-  LabDef.find(function (error, lab) {
+  var VMDef = model.VMDef;
+
+  VMDef.find(function (error, lab) {
     res.render('course_editor/lesson/lesson_create', {
       title: req.chapter.title,
       lesson: {title: '', desc: ''},
@@ -423,13 +425,13 @@ module.exports.lessonCreateView = function(req, res) {
       lab: lab
     }); 
   });
-
-
-  
 };
 
 // Create a lesson
 module.exports.lessonCreate = function(req, res, next) {
+  var Lesson = model.Lesson;
+  var VMDef = model.VMDef;
+
   var lesson = new Lesson();
   lesson.chapter = req.chapter._id;
   lesson.title   = req.body.title;
@@ -441,7 +443,7 @@ module.exports.lessonCreate = function(req, res, next) {
   if(lesson.type == 'video') {
     lesson.video.type    = req.body.videoType;
     lesson.video.content = req.body.videoContent;
-    f = req.files['videofile'];
+    f = req.files.videofile;
     lesson.save(function(error) {
       if(error) {
         log.error(error);
@@ -516,7 +518,7 @@ module.exports.lessonCreate = function(req, res, next) {
 
   // For sysAdmin Lesson
   if(lesson.type == 'sysAdmin') {
-    f = req.files['verificationFile'];
+    f = req.files.verificationFile;
     var serverInfoArray = [];
     var vmTamplateIdList = req.body.serverName;
     var vmNameList = req.body.vmNames;
@@ -526,19 +528,19 @@ module.exports.lessonCreate = function(req, res, next) {
     if(typeof(vmNameList) == 'string') vmNameList = [vmNameList];
     if(typeof(vmHostNameList) == 'string') vmHostNameList = [vmHostNameList];
 
-    LabDef.find({_id : { $in : vmTamplateIdList}}, function (error, lab) {
+    VMDef.find({_id : { $in : vmTamplateIdList}}, function (error, lab) {
       for(var index = 0; index < vmTamplateIdList.length; index++) {
         var tmpJSON = {};
-        tmpJSON['vm_name'] = vmNameList[index];
-        tmpJSON['hostname'] = vmHostNameList[index];
-        tmpJSON['ref'] = vmTamplateIdList[index];
+        tmpJSON.vm_name = vmNameList[index];
+        tmpJSON.hostname = vmHostNameList[index];
+        tmpJSON.ref = vmTamplateIdList[index];
         for(labIndex = 0; labIndex < lab.length; labIndex++) {
           if(vmTamplateIdList[index] == lab[labIndex]._id) {
-            tmpJSON['vm_type'] = lab[labIndex].type;
-            tmpJSON['runlist'] = lab[labIndex].runList;
-            tmpJSON['vm_attrs'] = {};
-            tmpJSON['vm_attrs']['memory'] = lab[labIndex].memory;
-            tmpJSON['vm_attrs']['storage'] = lab[labIndex].storage;
+            tmpJSON.vm_type = lab[labIndex].type;
+            tmpJSON.runlist = lab[labIndex].runList;
+            tmpJSON.vm_attrs = {};
+            tmpJSON.vm_attrs.memory = lab[labIndex].memory;
+            tmpJSON.vm_attrs.storage = lab[labIndex].storage;
           }
         }
         vms.push(tmpJSON);
@@ -565,13 +567,8 @@ module.exports.lessonCreate = function(req, res, next) {
           saveLesson(lesson, req, res);
 
         });
-
     });
-  
-
-
   }
-
 };
 
 var saveLesson = function(lesson, req, res){
@@ -589,13 +586,14 @@ var saveLesson = function(lesson, req, res){
 };
 
 var request = function(config, callback) {
-  var actualObj = config.multipart[0].body['vms'];
+  var actualObj = config.multipart[0].body.vms;
   callback(null, actualObj, config);
 };
 
 // Lesson Edit
 module.exports.lessonEditView = function(req, res) {
-  
+  var VMDef = model.VMDef;
+
   var lesson = req.lesson;
   var answersJSON = {};
   if(lesson.type == 'quiz') {
@@ -618,7 +616,7 @@ module.exports.lessonEditView = function(req, res) {
       }
     }
   }
-  LabDef.find(function (error, lab) {
+  VMDef.find(function (error, lab) {
     res.render('course_editor/lesson/edit', {
       title: req.lesson.title,
       description: req.lesson.desc,
@@ -632,6 +630,7 @@ module.exports.lessonEditView = function(req, res) {
 
 // Save edited chapter
 module.exports.lessonEdit = function(req, res){
+  var Lesson = model.Lesson;
   
   var lesson = req.lesson;
   lesson.title   = req.body.title;
@@ -644,7 +643,7 @@ module.exports.lessonEdit = function(req, res){
       lesson.video.content = req.body.videoContent;
     }
     if(req.files.videofile.name !== '' ) {
-      var f = req.files['videofile'];
+      var f = req.files.videofile;
     }
   }
 
@@ -687,7 +686,7 @@ module.exports.lessonEdit = function(req, res){
     var serverInfoArray = [];
     var serverName = req.body.serverName;
     lesson.sysAdmin.serverInfo = serverName;
-    var f = req.files['videofile'];
+    var f = req.files.videofile;
   }
 
   // Save edited lesson

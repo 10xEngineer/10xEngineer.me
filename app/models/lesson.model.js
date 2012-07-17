@@ -3,7 +3,6 @@ var async = require('async');
 var cdn = require('../helpers/cdn');
 
 var model = require('./index');
-var LessonSchema = require('./schema/lesson');
 
 var methods = {
   removeLesson: function(callback) {
@@ -24,8 +23,7 @@ var methods = {
         },
         function(error){
           callback(error);
-        }
-      );
+      });
 
       if(lesson.type == "video" && lesson.video.type == "upload"){
         cdn.unlinkFile(lesson.video.content, function(error){
@@ -250,7 +248,7 @@ var getChapterContent = function(index, chapter, callback) {
         } else if(index == 'previous') {
 
              // For first chapter 
-            if(i == 0){
+            if(i === 0){
               moveChapterId = null; 
               flag = false;
             } else { 
@@ -263,9 +261,9 @@ var getChapterContent = function(index, chapter, callback) {
 
       }
     } //end For 
-    if(flag == false) {
+    if(flag === false) {
       callback(null ,moveChapterId);
-    } else if (flag == true) {
+    } else {
       callback(null ,moveChapterId);
     }
            
@@ -280,8 +278,8 @@ var callbackFunction = function(index, error, moveChapterId, callback){
     log.error(error);
   }
 
-  if(moveChapterId == null) {
-      callback(error, null);
+  if(!moveChapterId) {
+      callback("Chapter Id not specified.");
   } else {
     
     Chapter.findById(moveChapterId, function(error, moveChapter) {
@@ -292,7 +290,7 @@ var callbackFunction = function(index, error, moveChapterId, callback){
      
       moveLessonId = (moveChapter.lessons.length>0) ? moveChapter.lessons[0] : null ;
 
-      if(moveLessonId == null) {
+      if(!moveLessonId) {
          
         getChapterContent(index,moveChapter, function(error, moveChapterId) {
           process.nextTick(function() {
@@ -316,7 +314,11 @@ var callbackFunction = function(index, error, moveChapterId, callback){
 };
 
 
-model.init('Lesson', LessonSchema, {
-  plugins: ['id', 'timestamp', 'lesson'],
-  methods: methods
-});
+module.exports = {
+  name: 'Lesson',
+  schema: require('./schema/lesson'),
+  options: {
+    methods: methods,
+    plugins: ['id', 'timestamp', 'lesson']  
+  }
+};

@@ -1,5 +1,4 @@
 var model = require('./index');
-var CountSchema = require('./schema/count');
 
 var statics = {
   getNext: function (type, callback) {
@@ -10,9 +9,12 @@ var statics = {
       callback(null, result.count);
     });
   }
-}
+};
 
-
-model.init('Count', CountSchema, {
-  statics: statics
-});
+module.exports = {
+  name: 'Count',
+  schema: require('./schema/count'),
+  options: {
+    statics: statics
+  }
+};
