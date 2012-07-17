@@ -14,19 +14,18 @@ var methods = {
    
     // For Remove Lession _Id from Chapter Table
     Chapter.findById(chapter, function(error, chapter){
-      for (var i = 0 ; i < chapter.lessons.length; i++) {
-        if(chapter.lessons[i].toString() == lesson._id.toString()) {
-          
-          chapter.lessons.splice(i,1);
-          
-          chapter.markModified('lessons');
-          chapter.save(function(error) {
-            if(error) {
-              log.error(error);
-            }
-          });
+      async.forEach(chapter.lessons,
+        function(lessonInst, innerCallback) {
+          if(lessonInst.toString() == lesson._id.toString()) {
+            chapter.lessons.splice(i,1);
+            chapter.markModified('lessons');
+            chapter.save(innerCallback(error));
+          }
+        },
+        function(error){
+          callback(error);
         }
-      }
+      );
 
       if(lesson.type == "video" && lesson.video.type == "upload"){
         cdn.unlinkFile(lesson.video.content, function(error){
