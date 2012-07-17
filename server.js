@@ -5,8 +5,6 @@ var winston = require('winston');
 var consoleTransport = new (winston.transports.Console)({ colorize: true, timestamp: true, handleExceptions: true });
 var logger = new (winston.Logger)({ transports: [ consoleTransport ], exitOnError: false });
 
-console.log(JSON.stringify(logger));
-
 global.log = logger;
 
 var init = exports.init = function(config) {

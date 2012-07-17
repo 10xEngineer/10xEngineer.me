@@ -1,5 +1,7 @@
 var fs = require('fs');
+
 var mongoose = require('mongoose');
+var _ = require('underscore');
 
 var Progress = mongoose.model('Progress');
 var Chapter = mongoose.model('Chapter');
@@ -24,9 +26,6 @@ module.exports.createView = function(req, res) {
       lab: lab
     }); 
   });
-
-
-  
 };
 
 // Create a lesson
