@@ -7,6 +7,7 @@ var Progress = mongoose.model('Progress');
 var Chapter = mongoose.model('Chapter');
 var Lesson = mongoose.model('Lesson');
 var LabDef = mongoose.model('LabDef');
+var _ = require('underscore');
 
 var cdn = require('../helpers/cdn');
 var progressHelper = require('../helpers/progress');
@@ -242,7 +243,7 @@ module.exports.showView = function(req, res) {
 module.exports.show = function(req, res, next){
   
   var lesson = req.lesson;
-  
+
   // For Session Progres Update
   var progress = req.session.progress[lesson.chapter.course];
   if(progress.status != 'completed') {
