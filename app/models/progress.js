@@ -1,4 +1,5 @@
 var async = require('async');
+var _ = require('underscore');
 
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
