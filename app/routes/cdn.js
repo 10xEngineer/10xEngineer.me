@@ -41,13 +41,22 @@ module.exports.load = function(req, res) {
     seekLength = parseInt(parsedRange[1], 10);
     if(parsedRange[2]) {
       readBytes = parseInt(parsedRange[2], 10);
+      if(readBytes <= seekLength){
+        log.error("Invalid Range");
+        res.statusCode = 416;
+        return res.end();
+      }
     }
   }
 
   cdn.load(fileName, seekLength, function(error, data, contentType, length) {
     if(error) {
       log.error(error);
-      res.statusCode = 404;
+      if(error=="Invalid Range"){
+        res.statusCode = 416;
+      } else {
+        res.statusCode = 404;
+      }
       res.end();
       return;
     }
