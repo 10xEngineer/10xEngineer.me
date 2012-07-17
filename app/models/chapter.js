@@ -1,14 +1,12 @@
 var async = require('async');
-var mongoose = require('mongoose');
 
-var Count = mongoose.model('Count');
-var Course = mongoose.model('Course');
-
+var model = require('./index');
 var ChapterSchema = require('./schema/chapter');
 
 
-var chapterMethods = {
+var methods = {
   publish: function(publish, callback) {
+    var Chapter = model.Chapter;
     var chapter = this;
     if(publish) {
       Chapter.findById(chapter._id)
@@ -50,12 +48,15 @@ var chapterMethods = {
   },
 
   removeChapter: function(callback) {
+    var Chapter = model.Chapter;
+    var Course = model.Course;
+
     // TODO: Remove all child 
     Chapter.findById(this._id).populate('lessons').run(function(error, chapter){
 
       chapter.lessons[0].removeAllLessonsFromThisChapter(function(error){
         if(error){
-          callback(error)
+          callback(error);
         }
 
         // For Remove Chapter _Id from Course Table
@@ -77,7 +78,7 @@ var chapterMethods = {
               });
             }
           }
-        })
+        });
 
         chapter.remove(function(error) {
           if(error) {
@@ -90,7 +91,7 @@ var chapterMethods = {
   },
 
   removeAllChapterFromThisCourse: function(callback) {
-
+    var Chapter = model.Chapter;
     var refChapter = this;
 
     Chapter.find({course:refChapter.course}).populate('lessons').run(function(error, chapters){
@@ -129,7 +130,7 @@ var chapterMethods = {
     var course = chapter.course;
     for (var i = 0 ; i < course.chapters.length; i++) {
       if(course.chapters[i].toString() == chapter._id.toString()) {
-        if(index == 0) {
+        if(index === 0) {
           if(i-1 >= 0) {
               temp = course.chapters[i];
               course.chapters[i] = course.chapters[i-1];
@@ -155,8 +156,7 @@ var chapterMethods = {
 
 
 model.init('Chapter', ChapterSchema, {
-  plugins: ['id', 'timestamp'],
-  methods: chapterMethods,
-  statics: chapterStatics
+  plugins: ['id', 'timestamp', 'chapter'],
+  methods: methods
 });
 

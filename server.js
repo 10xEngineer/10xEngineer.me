@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 var winston = require('winston');
 
 // Configure logs
-var consoleTransport = new (winston.transports.Console)({ colorize: true, timestamp: true, handleExceptions: true });
-var logger = new (winston.Logger)({ transports: [ consoleTransport ], exitOnError: false });
+var consoleTransport = new (winston.transports.Console)({ colorize: true, timestamp: true });
+var logger = new (winston.Logger)({ transports: [ consoleTransport ] });
 
 global.log = logger;
 

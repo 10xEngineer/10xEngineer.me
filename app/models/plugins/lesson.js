@@ -1,3 +1,5 @@
+var model = require('../index');
+
 module.exports = function(name) {
   return function(schema, options) {
     schema.pre('save', function (next) {
@@ -6,25 +8,25 @@ module.exports = function(name) {
     });
 
     schema.post('save', function() {
-      var self = this;
-      var id = parseInt(self.id.toString());
-      var Course = mongoose.model('Course');
+      var Chapter = model.Chapter;
+      var lesson = this;
+      var id = parseInt(lesson.id.toString());
 
-      // Add chapter to the course
-      if (self._wasNew) {
-        schema.collection.findOne({ id: id }, function(error, chapter) {
+      // Add lesson to the chapter
+      if (lesson._wasNew) {
+        lesson.collection.findOne({ id: id }, function(error, lesson) {
           if(error) {
             log.error(error);
           }
 
-          Course.findById(chapter.course, function(error, course) {
+          Chapter.findById(lesson.chapter, function(error, chapter) {
             if(error) {
               log.error(error);
             }
 
-            course.chapters.push(chapter._id);
+            chapter.lessons.push(lesson._id);
 
-            course.save(function(error) {
+            chapter.save(function(error) {
               if(error) {
                 log.error(error);
               }
@@ -33,8 +35,5 @@ module.exports = function(name) {
         });
       }
     });
-
   };
 };
-
-

@@ -1,46 +1,7 @@
 var async = require('async');
 var _ = require('underscore');
 
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId;
 
-var Count = mongoose.model('Count');
-var Course = mongoose.model('Course');
-var Chapter = mongoose.model('Chapter');
-var User = mongoose.model('User');
-var Lesson = mongoose.model('Lesson');
-
-
-var CourseProgressSchema = new Schema({
-  _id: { type: ObjectId },
-  user: { type: ObjectId, ref: 'User' },
-  course: { type: ObjectId, ref: 'Course' },
-  status: { type: String, enum: ['ongoing', 'completed'], default: 'ongoing'},
-  progress: Number,
-  chapters: [ ChapterProgressSchema ]
-}, {
-  collection: 'progress'
-});
-
-var ChapterProgressSchema = new Schema({
-  _id: { type: Number },
-  id: Number,
-  seq: Number,
-  status: { type: String, enum: ['not-started', 'ongoing', 'completed'], default: 'not-started', required: true },
-  progress: Number,
-  lessons: [ LessonProgressSchema ]
-});
-
-var LessonProgressSchema = new Schema({
-  _id: Number,
-  id: Number,
-  status: { type: String, enum: ['not-started', 'ongoing', 'completed'], default: 'not-started'},
-  quiz: {
-    answers :{ type: {} }
-  },
-  videoProgress : { type: String}
-});
 
 
 // Calculate Progress

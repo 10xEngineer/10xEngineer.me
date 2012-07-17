@@ -68,12 +68,18 @@ module.exports = function(config) {
   });
 
   app.configure('development', function(){
+    log.exitOnError = true;
     log.transports.console.level = 'silly';
     log.transports.console.prettyPrint = true;
+    log.transports.console.handleExceptions = false;
     app.use(require('./app/middleware/errorHandler')({ dumpExceptions: true, showStack: true }));
   });
 
   app.configure('production', function(){
+    log.exitOnError = false;
+    log.transports.console.level = 'silly';
+    log.transports.console.prettyPrint = true;
+    log.transports.console.handleExceptions = true;
     log.add(log.transports.File, { filename: 'app.log', level: 'info', handleExceptions: true, timestamp: true });
     app.use(require('./middleware/errorHandler')({}));
   });

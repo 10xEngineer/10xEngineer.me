@@ -2,41 +2,36 @@
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema;
 
-var MetadataSchema = new Schema({
-  _id: { type: Number, default: 0 },
-  schemaVersion: { type: Number, default: 1 }
-}, {
-  collection: 'metadata'
-});
+var model = require('./index');
+var MetadataSchema = require('./schema/metadata');
 
-MetadataSchema.statics.getValue = function(key, callback) {
-  getDocument(function(error, doc) {
-    if(error) {
-      callback(error);
-    }
+var statics = {
+  getValue: function(key, callback) {
+    getDocument(function(error, doc) {
+      if(error) {
+        callback(error);
+      }
 
-    callback(null, doc[key]);
-  });
+      callback(null, doc[key]);
+    });
+  },
+
+  setValue: function(key, value) {
+    getDocument(function(error, doc) {
+      if(error) {
+        log.error(error);
+      }
+
+      doc[key] = value;
+      doc.markModified(key);
+      
+      doc.save();
+    });
+  }
 };
-
-MetadataSchema.statics.setValue = function(key, value) {
-  getDocument(function(error, doc) {
-    if(error) {
-      log.error(error);
-    }
-
-    doc[key] = value;
-    doc.markModified(key);
-    
-    doc.save();
-  });
-};
-
-mongoose.model('Metadata', MetadataSchema);
-
-var Metadata = mongoose.model('Metadata');
 
 var getDocument = function(callback) {
+  var Metadata = model.Metadata;
   Metadata.findOne(function(error, doc) {
     if(error) {
       callback(error);
@@ -52,3 +47,8 @@ var getDocument = function(callback) {
     }
   });
 };
+
+
+model.init('Metadata', MetadataSchema, {
+  statics: statics
+});

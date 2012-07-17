@@ -1,9 +1,12 @@
+var async = require('async');
+var mongoose = require('mongoose');
+var _ = require('underscore');
 
 var model = module.exports = function() {
   var models = {};
 };
 
-model.init = function(name, schema, options) {
+module.exports.init = function(name, schema, options) {
   async.parallel([
     // Apply plugins
     function(callback) {
@@ -50,5 +53,19 @@ model.init = function(name, schema, options) {
     
     // Register model
     mongoose.model(name, schema);
+
+    // Cache the model in models object
+    self.models[name] = mongoose.model(name);
   });
 };
+
+// Initialize all the models
+require('./metadata');
+require('./count');
+require('./user');
+require('./role');
+require('./course');
+require('./chapter');
+require('./lesson');
+require('./progress');
+require('./vmDef');
