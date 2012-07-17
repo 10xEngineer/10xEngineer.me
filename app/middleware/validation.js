@@ -1,4 +1,5 @@
-var helper = load.helper('validation');
+
+var helper = require('../helpers/validation');
 
 module.exports = function() {};
 

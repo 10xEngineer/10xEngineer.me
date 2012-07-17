@@ -1,3 +1,5 @@
+var async = require('async');
+
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
@@ -5,12 +7,8 @@ var mongoose = require('mongoose')
 var Count = mongoose.model('Count');
 var Chapter = mongoose.model('Chapter');
 var Course = mongoose.model('Course');
-var async = require('async');
-var cdn = load.helper('cdn');
 
-var Chapter = load.model('Chapter');
-var Course = load.model('Course');
-
+var cdn = require('../helpers/cdn');
 
 var LessonSchema = new Schema({
   _id: { type: ObjectId },
@@ -301,7 +299,7 @@ LessonSchema.methods.getPrevious = function(callback){
 
 mongoose.model('Lesson', LessonSchema);
 
-var Lesson = load.model('Lesson');
+var Lesson = mongoose.model('Lesson');
 
 var getLessonContent =function(lessonId,callback){
   Lesson.findById(lessonId, function(error, lessonContent) {

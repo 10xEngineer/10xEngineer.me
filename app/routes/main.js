@@ -1,5 +1,8 @@
-var User = load.model('User');
-var util = load.helper('util');
+var mongoose = require('mongoose');
+
+var User = mongoose.model('User');
+
+var util = require('../helpers/util');
 
 module.exports = function() {};
 

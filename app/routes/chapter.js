@@ -1,4 +1,6 @@
-var Chapter = load.model('Chapter');
+var mongoose = require('mongoose');
+
+var Chapter = mongoose.model('Chapter');
 
 module.exports = function() {};
 
@@ -53,7 +55,7 @@ module.exports.edit = function(req, res){
   chapter.save(function(error) {
     if(error) {
       log.error(error);
-      req.session.error = "Can not updated chapter.";
+      req.session.error = "Can not update chapter.";
     }
     req.session.message = "Chaper updated sucessfully.";
     res.redirect('/chapter/' + chapter.id);

@@ -1,16 +1,18 @@
+var mongoose = require('mongoose');
 var request = require('request');
 var fs = require('fs');
-var path = require('path')
+var path = require('path');
 
 // Load models
-var Course = load.model('Course');
-var User = load.model('User');
-var Chapter = load.model('Chapter');
-var Lesson = load.model('Lesson');
-var Progress = load.model('Progress');
-var progressHelper = load.helper('progress');
+var Course = mongoose.model('Course');
+var User = mongoose.model('User');
+var Chapter = mongoose.model('Chapter');
+var Lesson = mongoose.model('Lesson');
+var Progress = mongoose.model('Progress');
 
-var importer = load.helper('importer');
+var progressHelper = require('../helpers/progress');
+var importer = require('../helpers/importer');
+var util = require('../helpers/util');
 
 module.exports = function() {};
 
@@ -29,7 +31,7 @@ module.exports.allList = function(req, res){
         progress : formatedProgress
       });
     });
-  })
+  });
 };
 
 // List existing featured courses
@@ -47,21 +49,20 @@ module.exports.featuredList = function(req, res){
         progress : formatedProgress
       });
     });
-  })
+  });
 };
 
 // Create new course form
 module.exports.createView = function(req, res){
   res.render('courses/create', {
     title: 'New Course',
-    course: {_id:'',title:'',description:''},
+    course: {_id:'',title:'',description:''}
   });
 };
 
 // Create a new course
 module.exports.create = function(req, res, next){
   var course = new Course();
-  var util = load.helper('util');
   course.title = req.body.title;
   course.desc = req.body.description;
   course.image = req.body.image;

@@ -1,14 +1,13 @@
 var express = require('express');
 var RedisStore = require('connect-redis')(express);
-var log4js = require('log4js');
 
 module.exports = function(config) {
-  var appRoot = config.appRoot || process.cwd();
+  var appRoot = process.cwd();
   var tmpFileUploadDir = appRoot + '/app/upload';
   var sessionStore = new RedisStore();
 
   // Authentication Middleware
-  var authMiddleware = load.helper('auth')(config);
+  var authMiddleware = require('./app/helpers/auth')(config);
 
   var app = express.createServer();
 
@@ -17,6 +16,11 @@ module.exports = function(config) {
     // Views
     app.set('views', __dirname + '/app/views');
     app.set('view engine', 'jade');
+
+    // Set app-level config in express
+    app.set('appRoot', appRoot);
+    app.set('tmpDir', tmpFileUploadDir);
+    app.set('config', config);
 
     // Body parser
     app.use(express.bodyParser({uploadDir: tmpFileUploadDir, keepExtensions: true }));
@@ -58,23 +62,27 @@ module.exports = function(config) {
   });
 
   // Express environment config
+  app.configure('test', function(){
+    console.log('Im here');
+    app.use(require('./app/middleware/errorHandler')({ dumpExceptions: true, showStack: true }));
+  });
+
   app.configure('development', function(){
-    app.use(log4js.connectLogger(log, { level: log4js.levels.INFO }));
-    log.setLevel('TRACE');
-    app.use(load.middleware('errorHandler')({ dumpExceptions: true, showStack: true }));
+    log.transports.console.level = 'silly';
+    log.transports.console.prettyPrint = true;
+    app.use(require('./app/middleware/errorHandler')({ dumpExceptions: true, showStack: true }));
   });
 
   app.configure('production', function(){
-    log4js.addAppender(log4js.fileAppender('app.log'), 'app');
-    log.setLevel('INFO');
-    app.use(load.middleware('errorHandler')({}));
+    log.add(log.transports.File, { filename: 'app.log', level: 'info', handleExceptions: true, timestamp: true });
+    app.use(require('./middleware/errorHandler')({}));
   });
 
   // Everyauth view helper
   authMiddleware.helpExpress(app);
 
   // Routes
-  load.routes()(app);
+  require('./app/routes')(app);
 
   return app;
 };

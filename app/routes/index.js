@@ -1,15 +1,18 @@
-var main = load.controller('main');
-var course = load.controller('course');
-var course_editor = load.controller('course_editor');
-var chapter = load.controller('chapter');
-var lesson = load.controller('lesson');
-var quiz = load.controller('quiz');
-var admin = load.controller('admin');
-var user = load.controller('user');
-var cdn = load.controller('cdn');
-var validation = load.middleware('validation');
-var ability = load.helper('ability');
-var validationConfig = load.helper('validationConfig');
+var _ = require('underscore');
+
+var main = require('./main');
+var course = require('./course');
+var course_editor = require('./course_editor');
+var chapter = require('./chapter');
+var lesson = require('./lesson');
+var quiz = require('./quiz');
+var admin = require('./admin');
+var user = require('./user');
+var cdn = require('./cdn');
+
+var validation = require('../middleware/validation');
+var ability = require('../helpers/ability');
+var validationConfig = require('../helpers/validationConfig');
 
 
 // ---------------------
@@ -91,7 +94,7 @@ module.exports = function(app) {
   });
 
   // Load Express data middleware
-  load.middleware('data')(app);
+  require('../middleware/data')(app);
 
 
 

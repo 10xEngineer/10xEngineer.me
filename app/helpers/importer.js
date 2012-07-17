@@ -1,7 +1,8 @@
-var Course = load.model('Course');
-var Chapter = load.model('Chapter');
-var Lesson = load.model('Lesson');
-var User = load.model('User');
+var mongoose = require('mongoose');
+var Course = mongoose.model('Course');
+var Chapter = mongoose.model('Chapter');
+var Lesson = mongoose.model('Lesson');
+var User = mongoose.model('User');
 
 
 module.exports = function() {};

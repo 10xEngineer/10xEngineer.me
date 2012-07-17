@@ -1,9 +1,10 @@
-var User = load.model('User');
-var Progress = load.model('Progress');
-var Course = load.model('Course');
+var mongoose = require('mongoose');
+
+var User = mongoose.model('User');
+var Progress = mongoose.model('Progress');
+var Course = mongoose.model('Course');
 
 module.exports = function() {};
-
 
 
 module.exports.profile = function(req, res){

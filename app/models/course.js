@@ -1,16 +1,17 @@
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId;
-
-var Count = mongoose.model('Count');
-var cdn = load.helper('cdn');
-var util = load.helper('util');
 var fs = require('fs');
 var path = require('path')
 var gm = require('gm');
 var mime = require('mime');
 var async = require('async');
 
+var mongoose = require('mongoose')
+  , Schema = mongoose.Schema
+  , ObjectId = Schema.ObjectId;
+
+var Count = mongoose.model('Count');
+
+var cdn = require('../helpers/cdn');
+var util = require('../helpers/util');
 
 
 var CourseSchema = new Schema({

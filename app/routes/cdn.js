@@ -1,4 +1,5 @@
-var cdn = load.helper('cdn');
+
+var cdn = require('../helpers/cdn');
 
 module.exports = function() {};
 

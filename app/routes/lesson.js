@@ -1,15 +1,16 @@
 var fs = require('fs');
-var cdn = load.helper('cdn');
-var Progress = load.model('Progress');
-var progressHelper = load.helper('progress');
+var mongoose = require('mongoose');
+
+var Progress = mongoose.model('Progress');
+var Chapter = mongoose.model('Chapter');
+var Lesson = mongoose.model('Lesson');
+var LabDef = mongoose.model('LabDef');
+
+var cdn = require('../helpers/cdn');
+var progressHelper = require('../helpers/progress');
 
 
 module.exports = function() {};
-
-// Load Model
-var Chapter = load.model('Chapter');
-var Lesson = load.model('Lesson');
-var LabDef = load.model('LabDef');
 
 
 // Display create lesson page

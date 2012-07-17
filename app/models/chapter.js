@@ -1,10 +1,11 @@
+var async = require('async');
+
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
 var Count = mongoose.model('Count');
 var Course = mongoose.model('Course');
-var async = require('async');
 
 var ChapterSchema = new Schema({
   _id: { type: ObjectId },
@@ -192,7 +193,7 @@ ChapterSchema.methods.move = function(index,callback){
 
 mongoose.model('Chapter', ChapterSchema);
 
-var Chapter = load.model('Chapter');
+var Chapter = mongoose.model('Chapter');
 
 var publishChapter = function(chapter, callback) {
 

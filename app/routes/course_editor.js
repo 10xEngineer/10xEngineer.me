@@ -1,12 +1,15 @@
-var Course = load.model('Course');
-var importer = load.helper('importer');
 var fs = require('fs');
-var Chapter = load.model('Chapter');
-var Lesson = load.model('Lesson');
-var Progress = load.model('Progress');
-var LabDef = load.model('LabDef');
-var cdn = load.helper('cdn');
-//var request = require('request');
+var mongoose = require('mongoose');
+
+var Course = mongoose.model('Course');
+var Chapter = mongoose.model('Chapter');
+var Lesson = mongoose.model('Lesson');
+var Progress = mongoose.model('Progress');
+var LabDef = mongoose.model('LabDef');
+
+var importer = require('../helpers/importer');
+var cdn = require('../helpers/cdn');
+var util = require('../helpers/util');
 
 
 
@@ -26,11 +29,11 @@ module.exports.coursesList = function(req, res){
   Course.find({})
     .populate('created_by')
     .run(function(error, courses) {
-  	  res.render('course_editor', {
-  	  	courses : courses,
+      res.render('course_editor', {
+        courses : courses,
         user: req.user
-  	  });
-	});
+      });
+  });
 };
 
 /************************************
@@ -39,7 +42,7 @@ module.exports.coursesList = function(req, res){
 module.exports.createView = function(req, res){
   res.render('course_editor/course/create', {
     title: 'New Course',
-    course: {_id:'',title:'',description:''},
+    course: {_id:'',title:'',description:''}
   });
 };
 
@@ -48,7 +51,6 @@ module.exports.createView = function(req, res){
 ************************************/
 module.exports.create = function(req, res, next){
   var course = new Course();
-  var util = load.helper('util');
   course.title = req.body.title;
   course.desc = req.body.description;
   course.iconImage = req.body.iconImage;
@@ -84,7 +86,7 @@ module.exports.course = function(req, res, next){
   res.render('course_editor/course', {
     title: req.course.title,
     chapter: undefined,
-    index :0,
+    index :0
   });
 };
 
@@ -264,7 +266,7 @@ module.exports.chapterView = function (req, res) {
   res.render('course_editor/chapter', {
     title: req.chapter.title
   });
-}
+};
 
 module.exports.chapterEditView = function(req, res) {
   res.render('course_editor/chapter/edit', {
@@ -500,7 +502,7 @@ module.exports.lessonCreate = function(req, res, next) {
 
   // For sysAdmin Lesson
   if(lesson.type == 'sysAdmin') {
-    var f = req.files['verificationFile'];
+    f = req.files['verificationFile'];
     var serverInfoArray = [];
     var vmTamplateIdList = req.body.serverName;
     var vmNameList = req.body.vmNames;
@@ -570,12 +572,12 @@ var saveLesson = function(lesson, req, res){
     req.session.message = "Lesson created successfully.";
     res.redirect('/course_editor/lesson/' + id);
   });
-}
+};
 
 var request = function(config, callback) {
   var actualObj = config.multipart[0].body['vms'];
   callback(null, actualObj, config);
-}
+};
 
 // Lesson Edit
 module.exports.lessonEditView = function(req, res) {
@@ -612,7 +614,7 @@ module.exports.lessonEditView = function(req, res) {
       lesson : req.lesson
     });
   });
-}
+};
 
 // Save edited chapter
 module.exports.lessonEdit = function(req, res){
@@ -794,9 +796,8 @@ module.exports.lessonView = function(req, res) {
         lesson: lesson,
         labs : labdeflist
       });
-    })
-  }
-  else {
+    });
+  } else {
     res.render('course_editor/lesson/' + req.lesson.type, {
       lesson : lesson
     });
