@@ -6,5 +6,6 @@ module.exports = function(schema, options) {
     if(!user.roles || user.roles.length == 0) {
       user.roles.push('default');
     }
+    next();
   });
 };

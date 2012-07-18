@@ -73,7 +73,7 @@ module.exports.register = function(req, res, next) {
       delete userObj._id;
       delete userObj.id;
 
-      currentUser = util.merge(currentUser, userObj);
+      currentUser = util.json.merge(currentUser, userObj);
       currentUser.save(function(error) {
         if(error) {
           log.error(error);

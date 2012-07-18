@@ -1,3 +1,5 @@
+var model = require('../index');
+
 module.exports = function(schema, options) {
   schema.pre('save', function (next) {
     this._wasNew = this.isNew;
@@ -7,11 +9,12 @@ module.exports = function(schema, options) {
   schema.post('save', function() {
     var self = this;
     var id = parseInt(self.id.toString());
-    var Course = mongoose.model('Course');
+    var Course = model.Course;
+    var Chapter = model.Chapter;
 
     // Add chapter to the course
     if (self._wasNew) {
-      schema.collection.findOne({ id: id }, function(error, chapter) {
+      Chapter.findOne({ id: id }, function(error, chapter) {
         if(error) {
           log.error(error);
         }

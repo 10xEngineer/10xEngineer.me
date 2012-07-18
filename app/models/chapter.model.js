@@ -56,39 +56,40 @@ var methods = {
       .populate('lessons')
       .exec(function(error, chapter){
 
-      chapter.lessons[0].removeAllLessonsFromThisChapter(function(error){
-        if(error){
-          callback(error);
-        }
-
         // For Remove Chapter _Id from Course Table
         Course.findById(chapter.course, function(error, course){
           if (error) {
             callback(error);
           }
 
-          async.forEach(
-            course.chapters,
-            function(chapterInst, innerCallback) {
-              if(chapterInst.toString() == chapter._id.toString()) {
-                course.chapters.splice(i,1);
-                course.markModified('chapters');
-                course.save(innerCallback(error));
-              }
-            },
-            function(error){
-              log.error(error);
-          });
+          course.chapters.splice(course.chapters.indexOf(chapter._id),1);
+          course.markModified('chapters');
+          course.save(function(error){
 
-          chapter.remove(function(error) {
-            if(error) {
-              callback(error);
+            if(chapter.lessons.length>0){     
+              chapter.lessons[0].removeAllLessonsFromThisChapter(function(error){
+                if(error){
+                  callback(error);
+                }
+      
+                chapter.remove(function(error) {
+                  if(error) {
+                    callback(error);
+                  }
+                  callback();
+                });
+              });      
             }
-            callback();
+
+            chapter.remove(function(error) {
+              if(error) {
+                callback(error);
+              }
+              callback();
+            });
           });
         });
-      });      
-    });
+      });
   },
 
   removeAllChapterFromThisCourse: function(callback) {

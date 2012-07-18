@@ -6,41 +6,52 @@ var model = require('./index');
 
 var methods = {
   removeLesson: function(callback) {
+
+    var Chapter = model.Chapter;
    
     var lesson = this;
     var chapter = lesson.chapter;
    
     // For Remove Lession _Id from Chapter Table
     Chapter.findById(chapter, function(error, chapter){
-      async.forEach(chapter.lessons,
-        function(lessonInst, innerCallback) {
-          if(lessonInst.toString() == lesson._id.toString()) {
-            chapter.lessons.splice(i,1);
-            chapter.markModified('lessons');
-            chapter.save(innerCallback(error));
-          }
-        },
-        function(error){
-          callback(error);
-      });
 
-      if(lesson.type == "video" && lesson.video.type == "upload"){
-        cdn.unlinkFile(lesson.video.content, function(error){
-          if(error){
-            callback(error);
-          }
-          lesson.remove(function(error) {
-            if(error) {
+      if(error){
+        callback(error);
+      }
+
+      chapter.lessons.splice(chapter.lessons.indexOf(lesson._id), 1);
+      chapter.markModified('lessons');
+      chapter.save(function(error) {
+
+        if(error){
+          callback(error);
+        }
+
+        if(lesson.type == "video" && lesson.video.type == "upload"){
+          cdn.unlinkFile(lesson.video.content, function(error){
+            if(error){
               callback(error);
             }
-            callback();
+            lesson.remove(function(error) {
+              if(error) {
+                callback(error);
+              }
+              callback();
+            });
           });
+        }
+        lesson.remove(function(error) {
+          if(error) {
+            callback(error);
+          }
+          callback();
         });
-      }
+      });
     });
   },
 
   removeAllLessonsFromThisChapter: function(callback){
+    Lesson = model.Lesson;
 
     var refLesson = this;
 
