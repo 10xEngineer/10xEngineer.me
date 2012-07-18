@@ -9,7 +9,6 @@ var methods = {
    
     var lesson = this;
     var chapter = lesson.chapter;
-    
    
     // For Remove Lession _Id from Chapter Table
     Chapter.findById(chapter, function(error, chapter){
@@ -128,6 +127,7 @@ var methods = {
     var flag         = true;
     var lesson       = this;
     var chapterId    = lesson.chapter;
+    var Chapter      = model.Chapter;
 
     Chapter.findById(chapterId, function(error, chapter) {
       if(error) {
@@ -171,6 +171,7 @@ var methods = {
     var flag         = true;
     var lesson       = this;
     var chapterId    = lesson.chapter;
+    var Chapter      = model.Chapter;
 
     Chapter.findById(chapterId, function(error, chapter) {
       if(error) {

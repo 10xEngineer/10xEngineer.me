@@ -42,6 +42,21 @@ var statics = {
     });
   },
 
+  getProgress: function(user, course, callback) {
+    var Progress = this;
+
+    Progress.findOne({ user: user._id, course: course._id }, function(error, progress) {
+      if(error) {
+        callback(error);
+      }
+      if(!progress) {
+        callback(error); 
+      } else {
+        callback(null, progress);
+      }
+    });
+  },
+
   removeCourseProgress: function(course_Id, callback) {
     Progress = this;
 
@@ -89,24 +104,26 @@ var methods = {
   },
 
   startLesson: function(lesson, callback) {
+    
     var progress = this;
     var lessonId  = lesson._id;
     var chapterId = lesson.chapter._id;
-
-    log.info('Progress: ', progress.toObject());
-
-    for (var chapterIndex in progress.chapters) {
-      var chapter = progress.chapters[chapterIndex];
-      if(chapter.id == chapterId){
+    var chapters = progress.chapters;
+    var progressChapterLength = chapters.length;
+    
+    for (var chapterIndex = 0; chapterIndex < progressChapterLength; chapterIndex++) {
+      var chapter = chapters[chapterIndex];
+      if(chapter._id.toString() == chapterId.toString()){
         for(var lessonIndex in chapter.lessons) {
           var lesson = chapter.lessons[lessonIndex];
-          if(lesson.id == lessonId) {
+          if(lesson._id.toString() == lessonId.toString()) {
             lesson.status = 'ongoing';
             break;
           }
         }
       }
     }
+    
     progress.markModified('chapters');
     progress.save(function(error) {
       if(error) {

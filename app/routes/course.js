@@ -166,13 +166,21 @@ module.exports.start = function(req, res, next){
 
 // Load specific course and display chapter index
 module.exports.show = function(req, res, next){
-    var progress = req.session.progress[req.course._id];
+    
+  var Progress = model.Progress;
+
+  // Find Progres For Start / COntinue Button
+  Progress.getProgress(req.user, req.course, function(error, progress) {
+    if(error) {
+      log.error(error);
+    }
     res.render('courses/courseDetails', {
       title: req.course.title,
       chapter: undefined,
       index :0,
       progress : progress
     });
+  });
 };
 
 // Edit course
