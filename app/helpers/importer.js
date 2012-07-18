@@ -1,5 +1,6 @@
 var model = require('../models');
 
+var util = require('./util');
 
 module.exports = function() {};
 
@@ -89,25 +90,35 @@ module.exports.lesson = function(data, chapterId, callback) {
 };
 
 
-module.exports.users = function(email, callback) {
+module.exports.usersFromUnbounce = function(userRow, callback) {
   var User = model.User;
   
-  User.findOne({email: email}, function(error, dbUser) {
-    if (error) {
-      callback(error);
-    }
-    if(dbUser == null) {
-      user = new User();
-      user.email = email;
-      user.roles = ['default'];
-      user.save(function(error){
-        if(error) {
-          log.error(error);
-          callback(error);
-        }
-        callback(null);
-      });
-    }
-    callback(null);
-  });
+  var fields = userRow.split(',');
+  var email = fields[5];
+  if(email && email !== 'email') {
+    email = util.string.trim(email);
+
+    User.findOne({email: email}, function(error, dbUser) {
+      if (error) {
+        return callback(error);
+      }
+
+      if(!dbUser) {
+        user = new User();
+        user.email = email;
+        user.roles = ['default'];
+        user.save(function(error){
+          if(error) {
+            return callback(error);
+          }
+
+          callback();
+        });
+      } else {
+        callback();
+      }
+    });
+  } else {
+    callback();
+  }
 }

@@ -8,6 +8,7 @@ var nodemailer = require("nodemailer");
 var model = require('../models');
 
 var importer = require('../helpers/importer');
+var util = require('../helpers/util');
 
 
 module.exports = function() {};
@@ -107,47 +108,23 @@ module.exports.usersImportView = function(req, res) {
   res.render('admin/usersImport');
 };
 
-module.exports.usersImport = function(req, res) {  
+module.exports.usersImport = function(req, res, next) {  
   
   var f = req.files['users-file'];
   var fileContent = fs.readFileSync(f.path);
   
   fileContent = fileContent.toString();
   var fileContentArray = fileContent.split('\n');
-  var length = fileContentArray.length;
   
-  function isWhitespace(charToCheck) {
-    var whitespaceChars = " \t\n\r\f";
-    return (whitespaceChars.indexOf(charToCheck) != -1);
-  }
-  function ltrim(str) { 
-    for(var k = 0; k < str.length && isWhitespace(str.charAt(k)); k++);
-    return str.substring(k, str.length);
-  }
-  function rtrim(str) {
-    for(var j=str.length-1; j>=0 && isWhitespace(str.charAt(j)) ; j--) ;
-    return str.substring(0,j+1);
-  }
-  function trim(str) {
-    return ltrim(rtrim(str));
-  }
-  
-  var emails = [];
-  var count = 0 ;
-  for (var index = 1; index < (length-1); index++) {
-    var LineArray = fileContentArray[index].split(',');
-    emails[count++] = trim(LineArray[5]);
-  }
-
-  
-  async.forEach(emails, importer.users, function(error){
+  async.forEach(fileContentArray, importer.usersFromUnbounce, function(error){
     if(error) {
       log.error(error);
+      return next(error);
     }
-  });
 
-  req.session.message = "Import Sucessfully Course.";
-  res.redirect('/admin');
+    req.session.message = "Users imported successfully.";
+    res.redirect('/admin');
+  });
 };
 
 module.exports.removeUser = function(req, res, next) {
