@@ -184,10 +184,6 @@ module.exports.showView = function(req, res) {
   var quizQuestions = lesson.quiz.questions;
   var quizQuestionsLength = lesson.quiz.questions.length;
 
-  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
-    randomOption(quizQuestions[questionsIndex].options);
-  }
-
   // For random the options
   var randomOption =function (options) {
     var temp;
@@ -202,7 +198,10 @@ module.exports.showView = function(req, res) {
 
     }
   };
-  
+
+  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
+    randomOption(quizQuestions[questionsIndex].options);
+  }  
   
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
@@ -272,6 +271,7 @@ module.exports.show = function(req, res) {
   
   var Lesson = model.Lesson;
   var lesson = req.lesson;
+  var Progress = model.Progress;
 
   var quizQuestions = req.lesson.quiz.questions;
   var attemptedAnswers = req.body.question;
@@ -307,6 +307,7 @@ module.exports.show = function(req, res) {
     }
   }
 
+  lesson.attemptedAnswers = answersJSON;
 
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
@@ -343,7 +344,7 @@ module.exports.show = function(req, res) {
         });
       });    
     }
-  };
+  });
 };
 
 // Lesson Edit
