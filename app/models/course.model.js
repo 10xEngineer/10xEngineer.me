@@ -2,6 +2,8 @@ var cdn = require('../helpers/cdn');
 
 var model = require('./index');
 
+var async = require('async');
+
 
 var methods = {
   removeCourse: function(callback) {
@@ -58,14 +60,16 @@ var methods = {
     var course = this;
     if(publish) {
       var chaptersLength = course.chapters.length;
-      for(var chapterIndex = 0 ; chapterIndex < chaptersLength ; chapterIndex++) {
-        var chapter = course.chapters[chapterIndex];
-        chapter.publish(true, function(error){
+      async.forEach(course.chapters,
+        function(chapterInst, innerCallback) {
+          chapterInst.publish(true, innerCallback);
+        },
+        function(error){
           if(error){
-            log.error(error);
+            callback(error);
           }
-        });
-      }
+        }
+      );
       course.status = 'published';
     } else {
       course.status = 'draft';
@@ -73,7 +77,7 @@ var methods = {
     course.markModified('chapters');
     course.save(function(error) {
       if(error) {
-        log.error(error);
+        callback(error);
       }
       callback();
     });
