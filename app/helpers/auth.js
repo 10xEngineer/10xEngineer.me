@@ -1,7 +1,6 @@
 var everyauth = require('everyauth');
 
 var model = require('../models');
-var progress = require('./progress');
 
 
 // TODO: Debug flag. Turn off for production use.
@@ -10,14 +9,7 @@ everyauth.debug = true;
 
 module.exports = function (config) {
   var redirectAction = function(res, data){
-    var session = data.session;
-    progress.get(session.auth.userId, function(error, progress){
-      if(error) {
-        log.error(error);
-      }
-      session.progress = progress;
-      res.redirect('/register');
-    });
+    res.redirect('/register');
   };
   
   // Google

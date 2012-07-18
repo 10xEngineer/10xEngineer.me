@@ -66,6 +66,9 @@ module.exports.showView = function(req, res) {
             for (var lenssonIndex = 0; lenssonIndex < lessonsLength; lenssonIndex++) {
               if(lessons[lenssonIndex]._id.toString() == lesson._id.toString()) {
                 if(typeof(lessons[lenssonIndex].video) != undefined) {
+                  if(! lessons[lenssonIndex].video) {
+                    lessons[lenssonIndex].video = {};
+                  }
                   videoStartTime = lessons[lenssonIndex].video.videoProgress;
                   break;
                 }
@@ -153,7 +156,6 @@ module.exports.show = function(req, res) {
     if(error) {
       log.error(error);
     }
-
     if(progress.status != 'completed') {
 
       // Start the Lesson : Change status of lesson to 'ongoing'

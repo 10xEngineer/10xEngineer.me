@@ -117,7 +117,7 @@ module.exports = function(io) {
 };
 
 var callIdeoneService = function(method, params, callback) {
-  params = util.merge(defaultParams, params);  
+  params = util.json.merge(defaultParams, params);  
   request({
     method: 'GET',
     uri: wsdlurl,

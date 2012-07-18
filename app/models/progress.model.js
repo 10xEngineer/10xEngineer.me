@@ -213,7 +213,9 @@ var methods = {
         for(var lessonIndex in chapter.lessons) {
           var lesson = chapter.lessons[lessonIndex];
           if(lesson._id.toString() == lessonId.toString()) {
-            lesson.status = 'ongoing';
+            if(lesson.status != 'completed') {
+              lesson.status = 'ongoing';
+            }
             break;
           }
         }
