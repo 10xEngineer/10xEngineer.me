@@ -3,7 +3,6 @@ var _ = require('underscore');
 var main = require('./main');
 var course = require('./course');
 var course_editor = require('./course_editor');
-var chapter = require('./chapter');
 var lesson = require('./lesson');
 var quiz = require('./quiz');
 var admin = require('./admin');
