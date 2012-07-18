@@ -263,6 +263,7 @@ module.exports.showUserRoles = function(req, res){
 };
 
 module.exports.updateUserRoles = function(req, res) {
+  var User = model.User;
   var Role = model.Role;
 
   req.extUser.updateUserRoles(req.body.chngRoles, function(error){
@@ -355,6 +356,7 @@ module.exports.editRoleView = function(req, res) {
 };
 
 module.exports.editRole = function(req, res) {
+  var Role = model.Role;
 
   var modifiedRoleName = req.body.name;
   var roleId = parseInt(req.route.params.roleId, 10);
@@ -373,6 +375,7 @@ module.exports.editRole = function(req, res) {
 };
 
 module.exports.createRole = function(req, res) {
+  var Role = model.Role;
 
   var newRoleName = req.body.name;
 
