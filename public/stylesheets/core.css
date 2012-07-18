@@ -6,10 +6,6 @@ footer {
 	margin-top: 30px;
 }
 
-#headerMenu {
-	max-width: 1170px;
-}
-
 /* helper */
 img.repsonsive { max-width:100%; }
 
