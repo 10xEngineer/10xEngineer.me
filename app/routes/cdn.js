@@ -24,7 +24,6 @@ module.exports.head = function(req, res) {
 };
 
 
-// TODO: Reply with http status 416 (http://tools.ietf.org/html/rfc2616#section-10.4.17) upon invalid range
 module.exports.load = function(req, res) {
   var fileName = req.params.fileName;
 
