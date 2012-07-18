@@ -173,6 +173,7 @@ module.exports.create = function(req, res, next) {
 // Display a lesson
 module.exports.showView = function(req, res) {
   var Lesson = model.Lesson;
+  var Progress = model.Progress;
 
   var lesson =  req.lesson;
 
@@ -201,40 +202,42 @@ module.exports.showView = function(req, res) {
   // For Progress
   var videoStartTime = 0;
   var progressFlag = false;
-  var progress = req.session.progress[lesson.chapter.course];
-  if(progress.status != 'completed') {
-    
-    // For Session Progres Update
-    progressHelper.start(lesson, req.session);
-    
-    var chapters = progress.chapters;
-    var chaptersLength = chapters.length;
-    
-    for (var index = 0; index < chaptersLength; index++) {
-      if(chapters[index]._id == lesson.chapter._id) {
-        var lessons = chapters[index].lessons;
-        var lessonsLength = lessons.length;
-        for (var lenssonIndex = 0; lenssonIndex < lessonsLength; lenssonIndex++) {
-          if(lessons[lenssonIndex]._id == lesson._id) {
-            if(typeof(lessons[lenssonIndex].videoProgress) != 'undefined') {
-              videoStartTime = lessons[lenssonIndex].videoProgress;
+
+  Progress.startOrContinue(req.user._id, lesson.chapter.course, function(error, progress) {
+    if(progress.status != 'completed') {
+      
+      // For Session Progres Update
+      progress.startLesson(lesson, function(error) {
+        var chapters = progress.chapters;
+        var chaptersLength = chapters.length;
+        
+        for (var index = 0; index < chaptersLength; index++) {
+          if(chapters[index]._id == lesson.chapter._id) {
+            var lessons = chapters[index].lessons;
+            var lessonsLength = lessons.length;
+            for (var lenssonIndex = 0; lenssonIndex < lessonsLength; lenssonIndex++) {
+              if(lessons[lenssonIndex]._id == lesson._id) {
+                if(typeof(lessons[lenssonIndex].videoProgress) != 'undefined') {
+                  videoStartTime = lessons[lenssonIndex].videoProgress;
+                }
+              }
             }
           }
         }
-      }
+        progressFlag = true;
+      });
     }
-    progressFlag = true;
-  }
 
-  // Render based on the type
-  Lesson.find({}, function(error, allLessons){
-    res.render('lessons/' + req.lesson.type, {
-      title: req.lesson.title,
-      quiz: req.lesson.quiz,
-      videoStartTime: videoStartTime,
-      userId: req.user._id,
-      allLessons : allLessons,
-      progressFlag : progressFlag
+    // Render based on the type
+    Lesson.find({}, function(error, allLessons){
+      res.render('lessons/' + req.lesson.type, {
+        title: req.lesson.title,
+        quiz: req.lesson.quiz,
+        videoStartTime: videoStartTime,
+        userId: req.user._id,
+        allLessons : allLessons,
+        progressFlag : progressFlag
+      });
     });
   });
 };

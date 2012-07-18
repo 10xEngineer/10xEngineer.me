@@ -9,7 +9,7 @@ var statics = {
 
     Progress.find({ user: user._id })
       .populate('course')
-      .run(function(error, progress) {
+      .exec(function(error, progress) {
       if(error) {
         callback(error);
       }
@@ -88,10 +88,13 @@ var methods = {
     callback(null, nextLesson.id);
   },
 
-  startLesson: function(lessonJSON, callback) {
+  startLesson: function(lesson, callback) {
     var progress = this;
-    chapterId = lessonJSON.chapter;
-    lessonId  = lessonJSON.lesson;
+    var lessonId  = lesson._id;
+    var chapterId = lesson.chapter._id;
+
+    log.info('Progress: ', progress.toObject());
+
     for (var chapterIndex in progress.chapters) {
       var chapter = progress.chapters[chapterIndex];
       if(chapter.id == chapterId){
@@ -107,9 +110,9 @@ var methods = {
     progress.markModified('chapters');
     progress.save(function(error) {
       if(error) {
-        callback(lesson, error);
+        callback(error);
       }
-      callback(lesson);
+      callback();
     });
   },
 

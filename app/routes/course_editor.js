@@ -27,7 +27,7 @@ module.exports.coursesList = function(req, res){
 
   Course.find({})
     .populate('created_by')
-    .run(function(error, courses) {
+    .exec(function(error, courses) {
       res.render('course_editor', {
         courses : courses,
         user: req.user

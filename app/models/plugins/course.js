@@ -7,33 +7,31 @@ var async = require('async');
 
 var util = require('../../helpers/util');
 
-module.exports = function(name) {
-  return function(schema, options) {
-    schema.pre('save', function(next) {
-      var course = this;
-      var regex = new RegExp('^/cdn/');
-      var options = {processIcon: false, processWall: false};
+module.exports = function(schema, options) {
+  schema.pre('save', function(next) {
+    var course = this;
+    var regex = new RegExp('^/cdn/');
+    var options = {processIcon: false, processWall: false};
 
-      if(!regex.test(course.iconImage)) {
-        options.processIcon = true;
+    if(!regex.test(course.iconImage)) {
+      options.processIcon = true;
+    }
+    if(!regex.test(course.wallImage)) {
+      options.processWall = true;
+    }
+
+    log.info(options);
+
+    // Save image
+    processImages(course, options, function(error) {
+      if(error) {
+        next(error);
       }
-      if(!regex.test(course.wallImage)) {
-        options.processWall = true;
-      }
 
-      log.info(options);
-
-      // Save image
-      processImages(course, options, function(error) {
-        if(error) {
-          next(error);
-        }
-
-        next();
-      });
+      next();
     });
+  });
 
-  };
 };
 
 

@@ -14,7 +14,7 @@ var CourseProgressSchema = module.exports = new Schema({
 });
 
 var ChapterProgressSchema = new Schema({
-  _id: { type: Number },
+  _id: { type: ObjectId },
   id: Number,
   seq: Number,
   status: { type: String, enum: ['not-started', 'ongoing', 'completed'], default: 'not-started', required: true },
@@ -23,7 +23,7 @@ var ChapterProgressSchema = new Schema({
 });
 
 var LessonProgressSchema = new Schema({
-  _id: Number,
+  _id: { type: ObjectId },
   id: Number,
   status: { type: String, enum: ['not-started', 'ongoing', 'completed'], default: 'not-started'},
   quiz: {

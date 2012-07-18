@@ -4,13 +4,14 @@ var model = require('../models');
 
 module.exports = function(app) {
   var Course = model.Course;
+  var Chapter = model.Chapter;
 
   // Course
   app.param('courseId', function(req, res, next, id){
     Course.findOne({ id: id })
       .populate('chapters')
       .populate('created_by')
-      .run(function(error, course) {
+      .exec(function(error, course) {
       if(error) {
         next(error);
       }
@@ -21,7 +22,7 @@ module.exports = function(app) {
         async.map(course.chapters, function(chapter, callback) {
           Chapter.findById(chapter._id)
             .populate('lessons')
-            .run(function(error, populatedChapter) {
+            .exec(function(error, populatedChapter) {
             if(error) {
               callback(error);
             }
@@ -54,7 +55,7 @@ module.exports = function(app) {
     Chapter.findOne({ id: id })
       .populate('course')
       .populate('lessons')
-      .run(function(error, chapter) {
+      .exec(function(error, chapter) {
       if(error) {
         next(error);
       }
@@ -81,7 +82,7 @@ module.exports = function(app) {
 
     Lesson.findOne({ id: id })
       .populate('chapter')
-      .run(function(error, lesson) {
+      .exec(function(error, lesson) {
       if(error) {
         next(error);
       }
@@ -89,10 +90,10 @@ module.exports = function(app) {
       if(lesson) {
         Course.findById(lesson.chapter.course)
           .populate('chapters')
-          .run(function(error, course) {
+          .exec(function(error, course) {
           Chapter.findById(lesson.chapter._id)
           .populate('lessons')
-          .run(function(error, chapter) {
+          .exec(function(error, chapter) {
             lesson.id = parseInt(lesson.id.toString(), 10);
             req.lesson = lesson;
             req.chapter = chapter;
@@ -135,8 +136,7 @@ module.exports = function(app) {
   app.param('labDefId', function(req, res, next, id){
     var VMDef = model.VMDef;
     
-    VMDef.findOne({ id: id })
-    .run(function(error, labDef) {
+    VMDef.findOne({ id: id }, function(error, labDef) {
       if(error) {
         next(error);
       }

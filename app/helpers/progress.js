@@ -1,4 +1,4 @@
-var model = require('../models');
+/*var model = require('../models');
 var async = require('async');
 var _ = require('underscore');
 
@@ -175,7 +175,7 @@ var progressCalculate = function(session, courseId) {
     // Load course
     Course.findById(progress.course)
       .populate('chapters')
-      .run(function(error, course) {
+      .exec(function(error, course) {
 
       var chapters;
 
@@ -299,3 +299,4 @@ var progressCalculate = function(session, courseId) {
 var saveSession = function(session, callback) {
   session.save(callback);
 };
+*/

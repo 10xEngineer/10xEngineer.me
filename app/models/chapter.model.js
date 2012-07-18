@@ -10,7 +10,7 @@ var methods = {
     if(publish) {
       Chapter.findById(chapter._id)
       .populate('lessons')
-      .run(function(error, chapter) {
+      .exec(function(error, chapter) {
         if(error) {
           callback(error, chapter);
         }
@@ -52,7 +52,9 @@ var methods = {
     var Course = model.Course;
 
     // TODO: Remove all child 
-    Chapter.findById(this._id).populate('lessons').run(function(error, chapter){
+    Chapter.findById(this._id)
+      .populate('lessons')
+      .exec(function(error, chapter){
 
       chapter.lessons[0].removeAllLessonsFromThisChapter(function(error){
         if(error){
@@ -93,7 +95,10 @@ var methods = {
     var Chapter = model.Chapter;
     var refChapter = this;
 
-    Chapter.find({course:refChapter.course}).populate('lessons').run(function(error, chapters){
+    Chapter.find({course:refChapter.course})
+      .populate('lessons')
+      .exec(function(error, chapters){
+        
       if(chapters.length>0){
         async.forEach(
           chapters, 

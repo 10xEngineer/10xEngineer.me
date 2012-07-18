@@ -49,7 +49,12 @@ module.exports.init = function(name, schema, options, callback) {
             return callback(new Error('Invalid Plugin'));
           }
 
-          schema.plugin(plugin);
+          if(pluginName == 'id') {
+            schema.plugin(plugin(name));
+          } else {
+            schema.plugin(plugin);
+          }
+          
           callback();
         }, callback);
       } else {

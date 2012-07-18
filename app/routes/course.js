@@ -146,8 +146,6 @@ module.exports.import = function(req, res, next) {
 };
 
 
-//TODO : Go to the last lesson if course already started
-//TODO : Also add this course to the users registered courses
 // Register for a course (if not already registered, and Go to the last viewed or first lesson. 
 module.exports.start = function(req, res, next){
   // Check if user has already started the course
@@ -158,28 +156,11 @@ module.exports.start = function(req, res, next){
       log.error(error);
       next(error);
     }
-    if(!req.session.progress || !req.session.progress[req.course._id])
-    {
-      // TODO: Refactor to use less db calls
-      // Refresh progress
-      delete req.session.progress;
-      progressHelper.get(req.session.auth.userId, function(error,progressObject){
-        if(error) {
-          log.error(error);
-        }
-        req.session.progress = progressObject;
-        // Redirect the user to first unfinished lesson
-        progress.getNextLesson(function(error, nextLesson) {
-          res.redirect('/lesson/' + nextLesson);
-        });
-      });
 
-    } else {
-      // Redirect the user to first unfinished lesson
-      progress.getNextLesson(function(error, nextLesson) {
-        res.redirect('/lesson/' + nextLesson);
-      });
-    }
+    // Redirect the user to first unfinished lesson
+    progress.getNextLesson(function(error, nextLesson) {
+      res.redirect('/lesson/' + nextLesson);
+    });
   });
 };
 

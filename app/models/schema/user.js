@@ -5,14 +5,11 @@ var mongoose = require('mongoose')
 // Make _id a Numver once old schemas are migrated from version 1 to 2
 var UserSchema = module.exports = new Schema({
   _id: { type: ObjectId },
-  id: { type: Number, unique: true, index: true },
   email: { type: String, index: true, trim: true },
   name: { type: String, trim: true },
   image: { type: String },
   courses: [{ type: ObjectId, ref: 'Course'}],
   roles: [{ type: String }],
-  created_at: { type: Date, default: Date.now },
-  modified_at: { type: Date, default: Date.now },
   google: {
     name: String,
     email: String,
