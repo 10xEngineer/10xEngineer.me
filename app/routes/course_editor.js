@@ -1,6 +1,7 @@
 var fs = require('fs');
 
 var async = require('async');
+var _ = require('underscore');
 
 var model = require('../models');
 
@@ -801,13 +802,14 @@ module.exports.lessonDown = function(req, res, next){
 
 
 module.exports.lessonView = function(req, res) {
+  var VMDef = model.VMDef;
   //For random the options
   var lesson = req.lesson;
   if(lesson.type=='sysAdmin'){
-    LabDef.find({_id: { $in : lesson.sysAdmin.serverInfo}}, function(error, labdeflist){
+    VMDef.find({_id: { $in : lesson.sysAdmin.serverInfo}}, function(error, VMDeflist){
       res.render('course_editor/lesson/' + req.lesson.type, {
         lesson: lesson,
-        labs : labdeflist
+        labs : VMDeflist
       });
     });
   } else {
