@@ -172,13 +172,19 @@ module.exports.create = function(req, res, next) {
 
 // Display a lesson
 module.exports.showView = function(req, res) {
+  
   var Lesson = model.Lesson;
   var Progress = model.Progress;
+  var lesson = req.lesson;
 
-  var lesson =  req.lesson;
+  // For Progress
+  var videoStartTime = 0;
+  var progressFlag = false;
 
-  //For random the options
+  var quizQuestions = lesson.quiz.questions;
+  var quizQuestionsLength = lesson.quiz.questions.length;
 
+  // For random the options
   var randomOption =function (options) {
     var temp;
     var optionLength = Math.floor(options.length/2)+1;
@@ -193,21 +199,24 @@ module.exports.showView = function(req, res) {
     }
   };
 
-  var quizQuestions = req.lesson.quiz.questions;
-  var quizQuestionsLength = req.lesson.quiz.questions.length;
   for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
     randomOption(quizQuestions[questionsIndex].options);
-  }
+  }  
   
-  // For Progress
-  var videoStartTime = 0;
-  var progressFlag = false;
+  // Check if progress has already status completed  
+  Progress.getProgress(req.user, req.course, function(error, progress) {
+    if(error) {
+      log.error(error);
+    }
 
-  Progress.startOrContinue(req.user._id, lesson.chapter.course, function(error, progress) {
     if(progress.status != 'completed') {
-      
-      // For Session Progres Update
+
+      // Start the Lesson : Change status of lesson to 'ongoing'
       progress.startLesson(lesson, function(error) {
+        if(error) {
+          log.error(error);
+        }
+
         var chapters = progress.chapters;
         var chaptersLength = chapters.length;
         
@@ -219,39 +228,50 @@ module.exports.showView = function(req, res) {
               if(lessons[lenssonIndex]._id == lesson._id) {
                 if(typeof(lessons[lenssonIndex].videoProgress) != 'undefined') {
                   videoStartTime = lessons[lenssonIndex].videoProgress;
+                  break;
                 }
               }
             }
           }
         }
+        
         progressFlag = true;
-      });
-    }
+        Lesson.find({}, function(error, allLessons) {
+          res.render('lessons/' + lesson.type, {
+            title: lesson.title,
+            quiz: lesson.quiz,
+            videoStartTime: videoStartTime,
+            allLessons: allLessons,
+            userId: req.user._id,
+            progressFlag : progressFlag
+          });
+        });
+        
 
-    // Render based on the type
-    Lesson.find({}, function(error, allLessons){
-      res.render('lessons/' + req.lesson.type, {
-        title: req.lesson.title,
-        quiz: req.lesson.quiz,
-        videoStartTime: videoStartTime,
-        userId: req.user._id,
-        allLessons : allLessons,
-        progressFlag : progressFlag
       });
-    });
+
+    } else {
+
+      Lesson.find({}, function(error, allLessons) {
+        res.render('lessons/' + lesson.type, {
+          title: lesson.title,
+          quiz: lesson.quiz,
+          videoStartTime: videoStartTime,
+          allLessons: allLessons,
+          userId: req.user._id,
+          progressFlag : progressFlag
+        });
+      });
+
+    }
   });
 };
 
-module.exports.show = function(req, res, next){
+module.exports.show = function(req, res) {
+  
   var Lesson = model.Lesson;
-
   var lesson = req.lesson;
-
-  // For Session Progres Update
-  var progress = req.session.progress[lesson.chapter.course];
-  if(progress.status != 'completed') {
-    progressHelper.completed(lesson, req.session);
-  }
+  var Progress = model.Progress;
 
   var quizQuestions = req.lesson.quiz.questions;
   var attemptedAnswers = req.body.question;
@@ -264,7 +284,6 @@ module.exports.show = function(req, res, next){
       if(!answersJSON[index]) {
         answersJSON[index] = {};
       }
-
       answersJSON[index][answers[indexAnswers]] = 'true';
     }
   }
@@ -288,13 +307,43 @@ module.exports.show = function(req, res, next){
     }
   }
 
-  // Render based on the type
-  Lesson.find({}, function(error, allLessons){
-    res.render('lessons/' + lesson.type, {
-      title: req.lesson.title,
-      attemptedAnswers: answersJSON,
-      allLessons : allLessons
-    });
+  lesson.attemptedAnswers = answersJSON;
+
+  // Check if progress has already status completed  
+  Progress.getProgress(req.user, req.course, function(error, progress) {
+    if(error) {
+      log.error(error);
+    }
+
+    if(progress.status != 'completed') {
+
+      // Start the Lesson : Change status of lesson to 'ongoing'
+      progress.completeLesson(lesson, function(error) {
+      
+        if(error) {
+          log.error(error);
+        }
+        // Render based on the type
+        Lesson.find({}, function(error, allLessons){
+          res.render('lessons/' + lesson.type, {
+            title: req.lesson.title,
+            attemptedAnswers: answersJSON,
+            allLessons : allLessons
+          });
+        });
+      });
+
+    } else {
+
+      // Render based on the type
+      Lesson.find({}, function(error, allLessons){
+        res.render('lessons/' + lesson.type, {
+          title: req.lesson.title,
+          attemptedAnswers: answersJSON,
+          allLessons : allLessons
+        });
+      });    
+    }
   });
 };
 

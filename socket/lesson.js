@@ -2,7 +2,7 @@ var async = require('async');
 var request = require('request');
 
 var model = require('../app/models');
-
+var Progress = model.Progress;
 var progressHelper = require('../app/helpers/progress');
 var util = require('../app/helpers/util');
 
@@ -30,7 +30,12 @@ module.exports = function(io) {
       
       // Video Progress
       socket.on('change', function(data){
-        progressHelper.lessonUpdateProgress(data, socket.handshake.session);
+        /*progressHelper.lessonUpdateProgress(data, socket.handshake.session);*/
+        Progress.updateProgress(data, function(error){
+          if(error) {
+            log.error(error);
+          }
+        });
       });
       
       // Video Completed
