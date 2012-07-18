@@ -18,7 +18,7 @@ var statics = {
       }
 
       if(!dbUser) {
-        log.trace('Could not find user!');
+        log.silly('Could not find user!');
 
         // if no, add a new user with specified info
         createNew(source, userData, function(error, dbUser) {
@@ -71,7 +71,10 @@ var methods = {
 
 // Support functions
 var createNew = function(source, userData, callback) {
+  var User = model.User;
+  
   var newUser = new User();
+  
   if(userData.name) {
     newUser.name = userData.name;
   }
