@@ -6,6 +6,7 @@ var mime = require('mime');
 var async = require('async');
 
 var util = require('../../helpers/util');
+var cdn = require('../../helpers/cdn');
 
 module.exports = function(schema, options) {
   schema.pre('save', function(next) {
