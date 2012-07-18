@@ -104,12 +104,7 @@ var methods = {
         async.forEach(
           chapters, 
           function(chapter, forEachCallback){
-            chapter.lessons[0].removeAllLessonsFromThisChapter(function(error){
-              if(error){
-                forEachCallback(error);
-              }
-              forEachCallback();
-            });
+            chapter.removeChapter(forEachCallback);
           },
           function(error){
             if(error){

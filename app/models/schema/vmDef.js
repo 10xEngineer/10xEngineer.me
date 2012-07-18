@@ -2,7 +2,7 @@ var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
-var LebDefSchema = module.exports = new Schema({
+var VMDefSchema = module.exports = new Schema({
   _id: { type: ObjectId },
   name: { type: String, index: true, trim: true, required: true },
   type: { type: String, trim: true },
