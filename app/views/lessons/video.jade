@@ -61,8 +61,6 @@
 
           // Change the Status at end of Video
           mediaElement.addEventListener('ended', function(e) {
-            
-
             if(#{progressFlag}) {  
               // Send Complete Status of Video to Server Using Socket.
               var courseId =  '#{lesson.chapter.course}';
@@ -70,16 +68,6 @@
               var lessonId =  '#{lesson._id}';
               progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId});
             }
-
-            /*$.ajax({
-              url: '/lesson/#{lesson.id}/complete/',
-              success: function(data) {
-                $('.lessonBar .btn-success').addClass('btn-large');
-              },
-              error: function(error, status, xhr) {
-                console.log(JSON.stringify(error) + "Status: " + status);
-              }
-            });*/
           }, false);
 
           $('#mep_0').css("margin-left", "auto");

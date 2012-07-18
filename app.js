@@ -63,7 +63,6 @@ module.exports = function(config) {
 
   // Express environment config
   app.configure('test', function(){
-    console.log('Im here');
     app.use(require('./app/middleware/errorHandler')({ dumpExceptions: true, showStack: true }));
   });
 

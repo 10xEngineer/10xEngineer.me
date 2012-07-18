@@ -1,0 +1,47 @@
+{
+  "site": {
+    "port": 3000,
+    "site_name": "10xEngineer.me",
+    "site_email": "10xengineer@gmail.com"
+  },
+  "auth": {
+    "twitter": {
+      "consumerKey": "zCowcooSHUM17tQJBltFA",
+      "consumerSecret": "RqS6AEirMStp6Zo3zfnqCE6RVSICuk9KC5TbjP2Ar0"
+    },
+    "facebook": {
+      "appId": "321944991192647",
+      "appSecret": "ed46675a72f71e846213f25c3d2aa60c"
+    },
+    "google": {
+      "clientId": "1041276452869.apps.googleusercontent.com",
+      "clientSecret": "7fMR8QidXiToK0IauOyL2Jgj"
+    }
+  },
+  "db": {
+    "address": "mongodb://localhost/",
+    "database": "10xengineer",
+    "schemaVersion": 5
+  },
+  "mail": {
+    "host": "smtp.gmail.com",
+    "username": "10xengineer@gmail.com",
+    "password": "password"
+  },
+  "code": {
+    "user": "user",
+    "password": "password",
+    "source_language": "1",
+    "run": true,
+    "is_private": true
+  },
+  "admin": {
+    "twitter": "steve_messina"
+  },
+  "vms": [ 
+    "mysql",
+    "apache2",
+    "tomcat",
+    "apt"
+  ]
+}
