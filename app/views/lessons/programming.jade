@@ -302,12 +302,13 @@
         var courseId =  '#{lesson.chapter.course}';
         var chapterId =  '#{lesson.chapter._id}';
         var lessonId =  '#{lesson._id}';
+        var userId = '#{userId}';
         
         codeSocket.on('codePassed', function(data) {
           displayMessage('success', 'Congratulations, your code executed successfully.');
 
           // TODO: Save code and change lesson status to completed
-          progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId, data : data});
+          progressSocket.emit('status', { status: 'completed', userId: userId, courseId: courseId, chapterId: chapterId, lessonId: lessonId, data : data});
 
         });
 
@@ -317,7 +318,7 @@
 
           // TODO: Save code
           // For Sending Current Code to Server Using Socket.
-          progressSocket.emit('change', { type:"programming", data: data, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          progressSocket.emit('change', { type:"programming", userId: userId, data: data, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
           
         });
 

@@ -2,7 +2,6 @@ var async = require('async');
 var request = require('request');
 
 var model = require('../app/models');
-var Progress = model.Progress;
 var progressHelper = require('../app/helpers/progress');
 var util = require('../app/helpers/util');
 
@@ -30,7 +29,7 @@ module.exports = function(io) {
       
       // Video Progress
       socket.on('change', function(data){
-        /*progressHelper.lessonUpdateProgress(data, socket.handshake.session);*/
+        var Progress = model.Progress;
         Progress.updateProgress(data, function(error){
           if(error) {
             log.error(error);
@@ -40,8 +39,12 @@ module.exports = function(io) {
       
       // Video Completed
       socket.on('status', function(data){
-        log.info('Data :', data);
-        progressHelper.lessonCompleted(data, socket.handshake.session);
+        var Progress = model.Progress;
+        Progress.completedLesson(data, function(error){
+          if(error) {
+            log.error(error);
+          }
+        });
       });
 
       // Persists current user session in mongodb
@@ -57,14 +60,12 @@ module.exports = function(io) {
     
     socket.on('submitcode', function(data){
       var Lesson = model.Lesson;
-      log.info(data);
 
       Lesson.findOne({ id: data.lessonId }, function(error, lesson) {
         if(error) {
           log.error(error);
         }
 
-        log.info(lesson);
 
         async.waterfall([
           function(callback) {
@@ -101,7 +102,6 @@ module.exports = function(io) {
           }
         ],
         function(error, result) {
-          log.info(result);
 
           if(result.output == (lesson.programming.output + '\n')) {
             socket.volatile.emit('codePassed', result);
@@ -133,7 +133,6 @@ var callIdeoneService = function(method, params, callback) {
       log.error(error);
       return callback(error);
     }
-    log.info(res.request.body.toString());
     if(body.result.error != 'OK') {
       log.error(body.result.error);
       return callback(body.result.error);

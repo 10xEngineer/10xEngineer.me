@@ -66,7 +66,8 @@
               var courseId =  '#{lesson.chapter.course}';
               var chapterId =  '#{lesson.chapter._id}';
               var lessonId =  '#{lesson._id}';
-              progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId});
+              var userId = '#{userId}';
+              progressSocket.emit('status', { type: 'video', status: 'completed', userId: userId, courseId: courseId, chapterId: chapterId, lessonId: lessonId});
             }
           }, false);
 
@@ -90,7 +91,8 @@
           var courseId =  '#{lesson.chapter.course}';
           var chapterId =  '#{lesson.chapter.id}';
           var lessonId =  '#{lesson.id}';
-          progressSocket.emit('change', { type: 'video', data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          var userId = '#{userId}';
+          progressSocket.emit('change', { type: 'video', userId: userId, data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
           
         }
       }, 5000);

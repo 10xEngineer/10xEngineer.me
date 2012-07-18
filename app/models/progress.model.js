@@ -67,6 +67,102 @@ var statics = {
       callback();
     });
 
+  },
+
+  updateProgress: function(data, callback) {
+    
+    Progress = this;
+    var courseId = data.courseId;
+    var chapterId = data.chapterId;
+    var lessonId = data.lessonId;
+    var userId = data.userId;
+
+    Progress.findOne({ user: userId, course: courseId }, function(error, progress) {
+      if(error) {
+        callback(error);
+      }
+      if(!progress) {
+        callback(error); 
+      } else {
+        
+        var chapters = progress.chapters;
+        var progressChapterLength = chapters.length;
+        
+        for (var chapterIndex = 0; chapterIndex < progressChapterLength; chapterIndex++) {
+          var chapter = chapters[chapterIndex];
+          if(chapter.id.toString() == chapterId){
+            for(var lessonIndex in chapter.lessons) {
+              var lesson = chapter.lessons[lessonIndex];
+              if(lesson.id.toString() == lessonId) {
+                if(data.type == "video") {
+                  if(!lesson.video) {
+                    lesson.video = {};
+                  }
+                  lesson.video.videoProgress = data.data;
+                } else if(data.type == "programming") {
+                  if(!lesson.programming) {
+                    lesson.programming = {};
+                  }
+                  lesson.programming.code = data.data;
+                }
+                break;
+              }
+            }
+          }
+        }
+        
+        progress.markModified('chapters');
+        progress.save(function(error) {
+          if(error) {
+            callback(error);
+          }
+          callback();
+        });
+      }
+    });
+  },
+
+  completedLesson: function(data, callback) {
+    
+    Progress = this;
+    var courseId = data.courseId;
+    var chapterId = data.chapterId;
+    var lessonId = data.lessonId;
+    var userId = data.userId;
+
+    Progress.findOne({ user: userId, course: courseId }, function(error, progress) {
+      if(error) {
+        callback(error);
+      }
+      if(!progress) {
+        callback(error); 
+      } else {
+        
+        var chapters = progress.chapters;
+        var progressChapterLength = chapters.length;
+        
+        for (var chapterIndex = 0; chapterIndex < progressChapterLength; chapterIndex++) {
+          var chapter = chapters[chapterIndex];
+          if(chapter._id.toString() == chapterId){
+            for(var lessonIndex in chapter.lessons) {
+              var lesson = chapter.lessons[lessonIndex];
+              if(lesson._id.toString() == lessonId) {
+                lesson.status = 'completed';
+                break;
+              }
+            }
+          }
+        }
+        
+        progress.markModified('chapters');
+        progress.save(function(error) {
+          if(error) {
+            callback(error);
+          }
+          callback();
+        });
+      }
+    });
   }
 };
 
@@ -150,9 +246,7 @@ var methods = {
       if(chapter._id.toString() == chapterId){
         for(var lessonIndex in chapter.lessons) {
           var lesson = chapter.lessons[lessonIndex];
-          if(lesson._id.toString() == lessonId) {
-            log.info("Lesson ID >> ", lesson._id.toString());
-            log.info("Lesson ID >> ", lesson.Id);
+          if(lesson._id.toString() == lessonId) {           
             if(quiz) {
               if(!lesson.quiz) {
                 lesson.quiz = {};
@@ -173,49 +267,8 @@ var methods = {
       }
       callback();
     });
-  },
-
-  updateProgress: function(data, callback) {
-    
-    var progress = this;
-    var courseId = data.courseId;
-    var chapterId = data.chapterId;
-    var lessonId = data.lessonId;
-    var progressChapterLength = chapters.length;
-    
-    for (var chapterIndex = 0; chapterIndex < progressChapterLength; chapterIndex++) {
-      var chapter = chapters[chapterIndex];
-      if(chapter._id.toString() == chapterId){
-        for(var lessonIndex in chapter.lessons) {
-          var lesson = chapter.lessons[lessonIndex];
-          if(lesson._id.toString() == lessonId) {
-            if(data.type == "video") {
-              if(!lesson.video) {
-                lesson.video = {};
-              }
-              lesson.video.videoProgress = data.data;
-            } else if(data.type == "programming") {
-              if(!lesson.programming) {
-                lesson.programming = {};
-              }
-              lesson.programming.code = data.data;
-            }
-            break;
-          }
-        }
-      }
-    }
-    
-    progress.markModified('chapters');
-    progress.save(function(error) {
-      if(error) {
-        callback(error);
-      }
-      callback();
-    });
   }
 };
-
 
 module.exports = {
   name: 'Progress',

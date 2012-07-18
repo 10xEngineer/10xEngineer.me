@@ -216,18 +216,17 @@ module.exports.showView = function(req, res) {
         if(error) {
           log.error(error);
         }
-
         var chapters = progress.chapters;
         var chaptersLength = chapters.length;
         
         for (var index = 0; index < chaptersLength; index++) {
-          if(chapters[index]._id == lesson.chapter._id) {
+          if(chapters[index]._id.toString() == lesson.chapter._id.toString()) {
             var lessons = chapters[index].lessons;
             var lessonsLength = lessons.length;
             for (var lenssonIndex = 0; lenssonIndex < lessonsLength; lenssonIndex++) {
-              if(lessons[lenssonIndex]._id == lesson._id) {
-                if(typeof(lessons[lenssonIndex].videoProgress) != 'undefined') {
-                  videoStartTime = lessons[lenssonIndex].videoProgress;
+              if(lessons[lenssonIndex]._id.toString() == lesson._id.toString()) {
+                if(typeof(lessons[lenssonIndex].video) != undefined) {
+                  videoStartTime = lessons[lenssonIndex].video.videoProgress;
                   break;
                 }
               }
