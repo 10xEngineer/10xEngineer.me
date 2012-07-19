@@ -20,7 +20,10 @@ module.exports.signup = function(req, res){
 };
 
 module.exports.registerView = function(req, res, next) {
-  res.render('users/register');
+
+  res.render('users/register',{
+    formHeading : "We requier some more information"
+  });
 };
 
 module.exports.register = function(req, res, next) {
