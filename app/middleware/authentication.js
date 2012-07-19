@@ -124,7 +124,45 @@ module.exports.facebookCallback = function(req, res, next) {
   passport.authenticate('facebook', {
     successRedirect: '/',
     failureRedirect: '/auth'
-  }, loginOrRegisterUser)(req, res, next);
+  },
+  function(error, profile, info) {
+    if(error) {
+      return next(error);
+    }
+
+    var User = model.User;
+
+    var email = profile._json.email;
+    // Find out if the user is already registered
+    User.findOne({ email: email }, function(error, user) {
+      if(error) {
+        return callback(error);
+      }
+
+      if(!user) {
+        // User is not registered, save the profile in session and redirect to registration page
+        req.session.newUser = {
+          name: profile.displayName,
+          email: email
+        };
+        res.redirect('/register');
+
+      } else {
+        user.facebook = profile;
+
+        user.save(function(error) {
+          // Establish a session
+          req.logIn(user, function(error) {
+            if(error) {
+              return next(error);
+            }
+
+            util.redirectBackOrHome(req, res);
+          });
+        });
+      }
+    });
+  })(req, res, next);
 };
 
 module.exports.twitter = function(req, res, next) {
@@ -132,49 +170,46 @@ module.exports.twitter = function(req, res, next) {
 };
 
 module.exports.twitterCallback = function(req, res, next) {
-  log.info('wah')
   passport.authenticate('twitter', {
     successRedirect: '/',
     failureRedirect: '/auth'
-  }, loginOrRegisterUser)(req, res, next);
-};
-
-var loginOrRegisterUser = function(error, profile, info) {
-  if(error) {
-    return next(error);
-  }
-
-  log.info('Profile: ', profile);
-  var User = model.User;
-
-  var email = profile._json.email;
-  // Find out if the user is already registered
-  User.findOne({ email: email }, function(error, user) {
+  },
+  function(error, profile, info) {
     if(error) {
-      return callback(error);
+      return next(error);
     }
 
-    if(!user) {
-      // User is not registered, save the profile in session and redirect to registration page
-      req.session.newUser = {
-        name: profile.displayName,
-        email: email
-      };
-      res.redirect('/register');
+    var User = model.User;
 
-    } else {
-      user.google = profile;
+    var email = profile._json.email;
+    // Find out if the user is already registered
+    User.findOne({ email: email }, function(error, user) {
+      if(error) {
+        return callback(error);
+      }
 
-      user.save(function(error) {
-        // Establish a session
-        req.logIn(user, function(error) {
-          if(error) {
-            return next(error);
-          }
+      if(!user) {
+        // User is not registered, save the profile in session and redirect to registration page
+        req.session.newUser = {
+          name: profile.displayName,
+          email: email
+        };
+        res.redirect('/register');
 
-          util.redirectBackOrHome(req, res);
+      } else {
+        user.twitter = profile;
+
+        user.save(function(error) {
+          // Establish a session
+          req.logIn(user, function(error) {
+            if(error) {
+              return next(error);
+            }
+
+            util.redirectBackOrHome(req, res);
+          });
         });
-      });
-    }
-  });
+      }
+    });
+  })(req, res, next);
 };
