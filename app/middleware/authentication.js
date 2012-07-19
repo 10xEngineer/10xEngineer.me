@@ -62,7 +62,7 @@ module.exports.getMiddleware = function(config) {
       consumerSecret: config.get('auth:twitter:consumerSecret'),
       callbackURL: hostname + '/auth/twitter/callback'
     },
-    function(token, tokenSecret, profile, done) {
+    function(token, tokenSecret, profile, callback) {
       profile.token = token;
       profile.tokenSecret = tokenSecret;
 
@@ -123,7 +123,7 @@ module.exports.googleCallback = function(req, res, next) {
     // Find out if the user is already registered
     User.findOne({ email: email }, function(error, user) {
       if(error) {
-        return callback(error);
+        return next(error);
       }
 
       if(!user) {
@@ -174,7 +174,7 @@ module.exports.facebookCallback = function(req, res, next) {
     // Find out if the user is already registered
     User.findOne({ email: email }, function(error, user) {
       if(error) {
-        return callback(error);
+        return next(error);
       }
 
       if(!user) {
@@ -224,7 +224,7 @@ module.exports.twitterCallback = function(req, res, next) {
     // Find out if the user is already registered
     User.findOne({ email: email }, function(error, user) {
       if(error) {
-        return callback(error);
+        return next(error);
       }
 
       if(!user) {
