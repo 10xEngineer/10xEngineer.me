@@ -18,17 +18,17 @@
       each user in users
         li
           - if(user.name) 
-            label(for='#{user.id}', style='display:inline') #{user.name} 
+            label(for='#{user.id}') #{user.name} 
           - else
-            label(for='#{user.id}', style='display:inline') #{user.email} 
-          p(style="display:inline; margin-right: 5px;")  ( 
+            label(for='#{user.id}') #{user.email} 
+          p ( 
             each role,roleIndex in user.roles
               if(roleIndex != 0) 
                 | ,
               span(class='#{role}') #{role} 
             | )
           .roles.pull-right
-            a.btn.btn-success(href="/admin/user/#{user.id}/roles", id='#{user.id}', style="margin-right:5px")
+            a.btn.btn-success(href="/admin/user/#{user.id}/roles", id='#{user.id}')
               i.icon-edit.icon-white
               |  Edit Roles
             a.btn.btn-danger(href="/admin/user/#{user.id}/remove")

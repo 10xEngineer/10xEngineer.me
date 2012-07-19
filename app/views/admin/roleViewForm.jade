@@ -1,20 +1,20 @@
 .container
 	h1 Create New Role
 
-	form(method="post")
+	form#createRoleForm(method="post")
 		p
 			label(for="name") Name
 
 			-if(typeof(role) != 'undefined' && typeof(role.name) != 'undefined')
-				input#name(type="text", name="name", style="width:200px;", value='#{role.name}')
+				input#name(type="text", name="name", value='#{role.name}')
 			-else
-				input#name(type="text", name="name", style="width:200px;")
+				input#name(type="text", name="name")
 
 		p
 			label Permissions
 
 		p
-			table#permissionTable.table.table-bordered(style="width:50%")
+			table#permissionTable.table.table-bordered
 				tr.permission
 					th Entity\\Permission
 					th Read
