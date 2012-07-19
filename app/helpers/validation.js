@@ -3,58 +3,6 @@ var util = require('./util');
 module.exports = {
 
 	required : function (value, checkFor) {
-
-		function validateString(obj){
-			if(util.string.trim(obj)!='')
-				return true;
-			else 
-				return "is required";
-		}
-
-		function validateObject(obj, num){
-			var length = obj.length;
-			var validCount = 0;
-			var validation = true;
-			for(index = 0; index < length; index++){
-				if(typeof(obj[index])=='string'){
-					if(validateString(obj[index])===true){
-						validCount++;
-					}
-					else{
-					}
-				}
-				else if(typeof(obj[index])=='object'){
-					if(validation == true) validation = false;
-					if(validateObject(obj[index], num)===true){
-						validCount++;
-					}
-					else{
-					}
-				}
-				else {
-					continue;
-				}
-			}
-
-			if(validation){
-				if(validCount >= num){
-					return true;
-				}
-				else if(validCount == 0){
-					return 0;
-				}
-				else{
-					return " is invalid";
-				}
-			}
-			else if(validCount>0){
-				return true;
-			}
-			else {
-				return "Invalid";
-			}
-		}
-
 		if(typeof(value) != 'undefined') {
 			if(typeof(value) == 'string') {
 				return validateString(value);
@@ -95,4 +43,51 @@ module.exports = {
 		}
 	}
 
+};
+
+var validateObject = function(obj, num) {
+
+	var length = obj.length;
+	var validCount = 0;
+	var validation = true;
+
+	for(index = 0; index < length; index++){
+		if(typeof(obj[index]) == 'string'){
+			if(validateString(obj[index])===true) {
+				validCount++;
+			}
+		} else if(typeof(obj[index]) == 'object') {
+			if(validation == true) {
+				validation = false;
+			}
+			if(validateObject(obj[index], num) === true) {
+				validCount++;
+			}
+		} else {
+			continue;
+		}
+	}
+
+	if(validation) {
+		if(validCount >= num) {
+			return true;
+		} else if(validCount == 0) {
+			return 0;
+		} else {
+			return " is invalid";
+		}
+	} else if (validCount>0) {
+		return true;
+	} else {
+		return "Invalid";
+	}
+};
+
+var validateString = function(obj){
+	if(util.string.trim(obj)!='') {
+		return true;
+	}
+	else {
+		return "is required";
+	}
 };
