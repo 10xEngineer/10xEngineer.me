@@ -24,8 +24,8 @@ module.exports.registerView = function(req, res, next) {
   var user = { name: '', email: '' };
 
   if(req.session.newUser) {
-    user.name = req.session.name || user.name;
-    user.email = req.session.email || user.email;
+    user.name = req.session.newUser.name || user.name;
+    user.email = req.session.newUser.email || user.email;
   }
 
   res.render('users/register',{
