@@ -62,7 +62,7 @@ module.exports.getMiddleware = function(config) {
       consumerSecret: config.get('auth:twitter:consumerSecret'),
       callbackURL: hostname + '/auth/twitter/callback'
     },
-    function(token, tokenSecret, profile, done) {
+    function(token, tokenSecret, profile, callback) {
       profile.token = token;
       profile.tokenSecret = tokenSecret;
 
@@ -111,8 +111,46 @@ module.exports.google = function(req, res, next) {
 module.exports.googleCallback = function(req, res, next) {
   passport.authenticate('google', { 
     failureRedirect: '/auth'
-  }, loginOrRegisterUser)(req, res, next);
-};
+  },
+  function(error, profile, info) {
+    if(error) {
+      return next(error);
+    }
+
+    var User = model.User;
+
+    var email = profile._json.email;
+    // Find out if the user is already registered
+    User.findOne({ email: email }, function(error, user) {
+      if(error) {
+        return next(error);
+      }
+
+      if(!user) {
+        // User is not registered, save the profile in session and redirect to registration page
+        req.session.newUser = {
+          name: profile.displayName,
+          email: email
+        };
+        res.redirect('/register');
+
+      } else {
+        user.google = profile;
+        user.markModified('google');
+
+        user.save(function(error) {
+          // Establish a session
+          req.logIn(user, function(error) {
+            if(error) {
+              return next(error);
+            }
+
+            util.redirectBackOrHome(req, res);
+          });
+        });
+      }
+    });
+  })(req, res, next);};
 
 module.exports.facebook = function(req, res, next) {
   passport.authenticate('facebook', {
@@ -136,7 +174,7 @@ module.exports.facebookCallback = function(req, res, next) {
     // Find out if the user is already registered
     User.findOne({ email: email }, function(error, user) {
       if(error) {
-        return callback(error);
+        return next(error);
       }
 
       if(!user) {
@@ -149,6 +187,7 @@ module.exports.facebookCallback = function(req, res, next) {
 
       } else {
         user.facebook = profile;
+        user.markModified('facebook');
 
         user.save(function(error) {
           // Establish a session
@@ -185,7 +224,7 @@ module.exports.twitterCallback = function(req, res, next) {
     // Find out if the user is already registered
     User.findOne({ email: email }, function(error, user) {
       if(error) {
-        return callback(error);
+        return next(error);
       }
 
       if(!user) {
@@ -198,6 +237,7 @@ module.exports.twitterCallback = function(req, res, next) {
 
       } else {
         user.twitter = profile;
+        user.markModified('twitter');
 
         user.save(function(error) {
           // Establish a session

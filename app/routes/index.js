@@ -112,7 +112,7 @@ module.exports = function(app) {
   app.get('/logout', auth.logout);
 
   app.get('/auth/twitter', auth.twitter);
-  app.get('/auth/twitter/callback', auth.twiiterCallback);
+  app.get('/auth/twitter/callback', auth.twitterCallback);
   app.get('/auth/google', auth.google);
   app.get('/auth/google/callback', auth.googleCallback);
   app.get('/auth/fb', auth.facebook);
