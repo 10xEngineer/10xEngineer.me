@@ -1,27 +1,15 @@
-!!! 5
-.container.auth-page
-	-if(typeof(error) != 'undefined') 
-		div.alert.alert-block
-			a.close(data-dismiss='alert',href='#') x
-			h4.alert-heading Warning
-			#{error}
-	-else if(typeof(message) != 'undefined') 
-		div.alert.alert-info
-			a.close(data-dismiss='alert',href='#') x
-			h4.alert-heading Information 
-			#{message}
-	.container
-		.span12
-			h2	 #{formHeading}
-			form.form-horizontal(method='POST')
-				p
-					label  Name
-					input.required(id='name', name='name')  
-				p
-					label  Email
-					input.required(id='email', name='email')  
-				p
-					label  Password
-					input.required(id='pass', name='pass', type="password")  
-				p
-					input.btn-large.btn-primary.regBtn(type='submit', name='submit', value='Finish')
+.container
+	.span12
+		h2	 #{formHeading}
+		form.form-horizontal(method='POST')
+			p
+				label  Name
+				input.required(id='name', name='name', value='#{user.name}')  
+			p
+				label  Email
+				input.required(id='email', name='email', value='#{user.email}')  
+			p
+				label  Password
+				input.required(id='pass', name='pass', type="password")  
+			p
+				input.btn-large.btn-primary.regBtn(type='submit', name='submit', value='Finish')

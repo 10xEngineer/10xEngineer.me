@@ -9,6 +9,7 @@ var admin = require('./admin');
 var user = require('./user');
 var cdn = require('./cdn');
 
+var auth = require('../middleware/authentication');
 var validation = require('../middleware/validation');
 var ability = require('../helpers/ability');
 var validationConfig = require('../helpers/validationConfig');
@@ -66,10 +67,10 @@ module.exports = function(app) {
 
   // Interceptors
   app.all('/*', function(req, res, next) {
-    
     if(req.isAuthenticated()) {
       res.local('isLoggedIn', true);
       res.local('isAdmin', _.include(req.user.roles, 'admin'));
+      res.local('user', req.user);
     } else {
       res.local('isLoggedIn', false);
       res.local('isAdmin', false);
@@ -107,20 +108,11 @@ module.exports = function(app) {
 
   // User
   app.get('/auth', accessPermission, user.login);
-  app.get('/auth/google',
-    passport.authenticate('google', { 
-      scope: [
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/userinfo.email'
-      ]
-    })
-  );
-  app.get('/auth/google/callback',
-    passport.authenticate('google', { 
-      failureRedirect: '/login'
-    }),
-    user.googleAuthCallback
-  );
+  app.post('/auth', accessPermission, auth.local);
+  app.get('/logout', auth.logout);
+
+  app.get('/auth/google', auth.google);
+  app.get('/auth/google/callback', auth.googleCallback);
 
   app.get('/signup', accessPermission, user.signup);
   app.get('/register', accessPermission, user.registerView);

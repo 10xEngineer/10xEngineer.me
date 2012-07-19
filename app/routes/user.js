@@ -21,8 +21,16 @@ module.exports.signup = function(req, res){
 
 module.exports.registerView = function(req, res, next) {
 
+  var user = { name: '', email: '' };
+
+  if(req.session.newUser) {
+    user.name = req.session.name || user.name;
+    user.email = req.session.email || user.email;
+  }
+
   res.render('users/register',{
-    formHeading : "We requier some more information"
+    formHeading : "Register",
+    user: user
   });
 };
 
@@ -40,10 +48,6 @@ module.exports.register = function(req, res, next) {
     req.session.message = "Thank you for registering.";
     util.redirectBackOrHome(req, res);
   });
-};
-
-module.exports.googleAuthCallback = function(req, res, next) {
-  // TODO: Verify
 };
 
 module.exports.profile = function(req, res){

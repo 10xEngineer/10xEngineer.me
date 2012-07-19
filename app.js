@@ -1,13 +1,15 @@
 var express = require('express');
 var RedisStore = require('connect-redis')(express);
 
+var auth = require('./app/middleware/authentication');
+
 module.exports = function(config) {
   var appRoot = process.cwd();
   var tmpFileUploadDir = appRoot + '/app/upload';
   var sessionStore = new RedisStore();
 
   // Authentication Middleware
-  var authMiddleware = require('./app/middleware/authentication')(config);
+  var authMiddleware = auth.getMiddleware(config);
 
   var app = express.createServer();
 
