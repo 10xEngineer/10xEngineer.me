@@ -1,6 +1,7 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var FacebookStrategy = require('passport-facebook').Strategy;
 
 var model = require('../models');
 
@@ -30,7 +31,7 @@ module.exports.getMiddleware = function(config) {
   passport.use(new GoogleStrategy({
       clientID: config.get('auth:google:clientId'),
       clientSecret: config.get('auth:google:clientSecret'),
-      callbackURL: hostname + "/auth/google/callback"
+      callbackURL: hostname + '/auth/google/callback'
     },
     function(accessToken, refreshToken, profile, callback) {
       profile.accessToken = accessToken;
@@ -39,6 +40,21 @@ module.exports.getMiddleware = function(config) {
       callback(null, profile);
     }
   ));
+
+  // Facebook
+  passport.use(new FacebookStrategy({
+      clientID: config.get('auth:facebook:appId'),
+      clientSecret: config.get('auth:facebook:appSecret'),
+      callbackURL: hostname + '/auth/fb/callback'
+    },
+    function(accessToken, refreshToken, profile, callback) {
+      profile.accessToken = accessToken;
+      profile.refreshToken = refreshToken;
+
+      callback(null, profile);
+    }
+  ));
+
 
   // Serialize user on login
   passport.serializeUser(function(user, callback) {
@@ -64,7 +80,7 @@ module.exports.logout = function(req, res, next) {
 module.exports.local = function(req, res, next) {
   passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/login',
+    failureRedirect: '/auth',
     failureFlash: true
   })(req, res, next);
 };
@@ -80,7 +96,7 @@ module.exports.google = function(req, res, next) {
 
 module.exports.googleCallback = function(req, res, next) {
   passport.authenticate('google', { 
-    failureRedirect: '/login'
+    failureRedirect: '/auth'
   },
   function(error, profile, info) {
     if(error) {
@@ -120,4 +136,63 @@ module.exports.googleCallback = function(req, res, next) {
       }
     });
   })(req, res, next);
+};
+
+module.exports.facebook = function(req, res, next) {
+  passport.authenticate('facebook', {
+    scope: 'email'
+  })(req, res, next);
+};
+
+module.exports.facebookCallback = function(req, res, next) {
+  passport.authenticate('facebook', {
+    successRedirect: '/',
+    failureRedirect: '/auth'
+  },
+  function(error, profile, info) {
+    if(error) {
+      return next(error);
+    }
+
+    var User = model.User;
+
+    var email = profile._json.email;
+    // Find out if the user is already registered
+    User.findOne({ email: email }, function(error, user) {
+      if(error) {
+        return callback(error);
+      }
+
+      if(!user) {
+        // User is not registered, save the profile in session and redirect to registration page
+        req.session.newUser = {
+          name: profile.displayName,
+          email: email
+        };
+        res.redirect('/register');
+
+      } else {
+        user.google = profile;
+
+        user.save(function(error) {
+          // Establish a session
+          req.logIn(user, function(error) {
+            if(error) {
+              return next(error);
+            }
+
+            util.redirectBackOrHome(req, res);
+          });
+        });
+      }
+    });
+  })(req, res, next);
+};
+
+module.exports.twitter = function(req, res, next) {
+
+};
+
+module.exports.twitterCallback = function(req, res, next) {
+
 };
