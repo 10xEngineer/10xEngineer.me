@@ -20,16 +20,6 @@ var validationConfig = require('../helpers/validationConfig');
 // ---------------------
 
 
-var validUser = function(req, res, next) { 
-  if(req.user === undefined && req.url != '/courses'){
-    req.session.redirectTo = req.url;
-    res.redirect('/auth');
-    return;
-  }
-  
-  next();
-};
-
 var verifyPermission = function(entity, action){
   return function(req, res, next){
     var target = req[entity] ? req[entity].id : null;
@@ -77,11 +67,6 @@ module.exports = function(app) {
       res.local('isAdmin', false);
     }
 
-    next();
-  });
-
-  //filter for checking if the users have login
-  app.all('/courses/:op?/*', validUser, function(req, res, next){
     next();
   });
 

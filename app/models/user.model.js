@@ -69,28 +69,6 @@ var methods = {
   }
 };
 
-// Support functions
-var findBySource = function(source, userData, callback) {
-  var User = model.User;
-  var select = {};
-
-  if(source === 'twitter') {
-    select['twitter.screen_name'] = userData.screen_name;
-  } else if (source === 'google') {
-    select.email = userData.email;
-  } else if (source === 'facebook') {
-    select.email = userData.email;
-  }
-
-  User.findOne(select, function(error, dbUser) {
-    if (error) {
-      callback(error);
-    }
-
-    callback(null, dbUser);
-  });
-};
-
 
 module.exports = {
   name: 'User',
