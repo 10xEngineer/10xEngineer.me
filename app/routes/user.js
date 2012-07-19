@@ -37,8 +37,15 @@ module.exports.registerView = function(req, res, next) {
 module.exports.register = function(req, res, next) {
   var User = model.User;
   var data = req.body;
+  var newUser = req.session.newUser;
 
-  User.create(data, function(error, user) {
+  if(newUser) {
+    var provider = newUser.provider;
+    data.provider = provider;
+    data.profile = newUser.profile;
+  }
+
+  User.createOrUpdate(data, function(error, user) {
     if(error) {
       log.error(error);
       req.session.error = "An error occured while registering.";

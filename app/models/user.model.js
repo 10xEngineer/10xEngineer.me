@@ -3,31 +3,47 @@ var bcrypt = require('bcrypt');
 var model = require('./index');
 
 var statics = {
-  create: function(data, callback) {
+  createOrUpdate: function(data, callback) {
     var User = this;
 
     if(!data || !data.email || !data.password) {
       return callback(new Error('Missing required fields'));
     }
 
-    bcrypt.genSalt(10, function(err, salt) {
-      bcrypt.hash(data.password, salt, function(error, hash) {
-        var newUser = new User();
-        newUser.email = data.email;
-        newUser.hash = hash;
-        
-        if(data.name) {
-          newUser.name = data.name;
-        }
-
-        newUser.save(function(error) {
-          if(error) {
-            callback(error);
+    User.findOne({ email: data.email }, function(error, dbUser) {
+      bcrypt.genSalt(10, function(err, salt) {
+        bcrypt.hash(data.password, salt, function(error, hash) {
+          var newUser;
+          if(dbUser) {
+            newUser = dbUser;
           } else {
-            callback(null, newUser);
+            newUser = new User();
           }
+          
+          newUser.email = data.email;
+          newUser.hash = hash;
+
+          if(data.provider) {
+            log.info('provider', data.profile);
+
+            newUser[data.provider] = data.profile;
+            newUser.markModified(data.provider);
+          }
+          
+          if(data.name) {
+            newUser.name = data.name;
+          }
+
+          newUser.save(function(error) {
+            if(error) {
+              callback(error);
+            } else {
+              User.findOne({ id: newUser.id }, callback);
+            }
+          });
         });
       });
+      
     });
   },
 
@@ -65,6 +81,8 @@ var methods = {
   },
 
   verifyPassword: function(password, callback) {
+    var user = this;
+    log.info(password, user);
     bcrypt.compare(password, this.hash, callback);
   }
 };

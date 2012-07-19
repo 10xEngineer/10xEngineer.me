@@ -22,9 +22,7 @@ module.exports.getMiddleware = function(config) {
     function(email, password, callback) {
       var User = model.User;
 
-      User.authenticate(email, password, function(error, user) {
-        return callback(error, user);
-      });
+      User.authenticate(email, password, callback);
     }
   ));
 
@@ -130,7 +128,9 @@ module.exports.googleCallback = function(req, res, next) {
         // User is not registered, save the profile in session and redirect to registration page
         req.session.newUser = {
           name: profile.displayName,
-          email: email
+          email: email,
+          provider: 'google',
+          profile: profile._json
         };
         res.redirect('/register');
 
@@ -181,7 +181,9 @@ module.exports.facebookCallback = function(req, res, next) {
         // User is not registered, save the profile in session and redirect to registration page
         req.session.newUser = {
           name: profile.displayName,
-          email: email
+          email: email,
+          provider: 'facebook',
+          profile: profile._json
         };
         res.redirect('/register');
 
@@ -220,18 +222,19 @@ module.exports.twitterCallback = function(req, res, next) {
 
     var User = model.User;
 
-    var email = profile._json.email;
+    var username = profile.username;
     // Find out if the user is already registered
-    User.findOne({ email: email }, function(error, user) {
+    User.findOne({ 'twitter.screen_name': username }, function(error, user) {
       if(error) {
         return next(error);
       }
 
-      if(!user) {
+      if(!user || !user.email) {
         // User is not registered, save the profile in session and redirect to registration page
         req.session.newUser = {
           name: profile.displayName,
-          email: email
+          provider: 'twitter',
+          profile: profile._json
         };
         res.redirect('/register');
 
