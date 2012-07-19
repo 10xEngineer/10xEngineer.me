@@ -4,45 +4,17 @@ module.exports = function() {};
 
 
 module.exports.profile = function(req, res){
-  var Course = model.Course;
-  
-  var progress = req.session.progress;
-  var courseIds = [];
-  var count = 0;
-  for(var key in progress) {
-    if(progress.hasOwnProperty(key)) {
-      courseIds[count++] = key;
-    }
-  }
-  Course.find({ _id : { $in : courseIds }}, [ 'title'] ,function(error,courses){
-
+  var Progress = model.Progress;
+  Progress.userChapterProgress(req.user, function(error, progress) {
     if(error) {
       log.error(error);
+      req.session.error = "Can not fetch a progress report of user.";
     }
-
-    var length = courses.length;
-    var formattedProgress = [];
-    
-    for (var index = 0; index < courses.length; index++) {
-
-      var instanceProgress = {
-        courseId     : '',
-        courseTitle  : '',
-        progress     : ''
-      };
-      instanceProgress.courseId = courses[index]._id;
-      instanceProgress.courseTitle = courses[index].title;
-      instanceProgress.progress = progress[courses[index]._id].progress;
-      formattedProgress.push(instanceProgress);
-    };
-
     res.render('users/profile', {
       user: req.user,
-      progresses : formattedProgress
-    }); 
-    
-  });
-   
+      progressObject : progress
+    });
+  }); 
 };
 
 module.exports.settingsView = function(req, res){

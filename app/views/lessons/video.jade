@@ -26,11 +26,9 @@
     var videoW = 840;
     $(document).ready(function(){
       var rowWidth = $('.row-fluid').width();
-      console.log("RowWidth" + rowWidth);
       if(rowWidth < 900) {
         videoW = rowWidth;
         videoH = parseInt(rowWidth / 840 * 475);
-        console.log("Dim : [" + videoW + "x" + videoH + "]");
       }
       $('video').attr("width", videoW);
       $('video').attr("height", videoH);
@@ -100,7 +98,6 @@
 
     // Script for hide sidebar
     $(window).resize(function(){
-      console.log("Condition :: ", parseInt($('video').attr("width")));
       if($('.row-fluid').width() <= 250+parseInt($('video').attr("width"))) {
         removeSideBar();
       }

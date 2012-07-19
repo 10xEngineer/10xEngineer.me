@@ -31,9 +31,8 @@
           img(src="/images/twitter.png",class="img")
     p
         h5 Attented Courses :
-
-        each progress in progresses
-          -if(!progress.courseTitle)
+        each progress in progressObject 
+          -if(progress.course!=null)
             div.chapterPerogressbox(style="min-height: 75px")
               div.courseName #{progress.course.title} 
               - if (progress.progress != 100)
