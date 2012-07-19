@@ -42,12 +42,13 @@ img.repsonsive {
     width: 1170px;
   }
 }
-#footer,
-background-color: black,
-color: white,
-padding: 10px0,
-/* Per page style */,
-/** Main Page **/,
+#footer {
+  background-color: #000;
+  color: #fff;
+  padding: 10px 0;
+}
+/* Per page style */
+/** Main Page **/
 .main-page .page-header {
   width: 100%;
 }
@@ -661,10 +662,12 @@ ul.auth-service {
 .sysAdminIcon,
 .not-started,
 .ongoing,
-.completed,
-display: inline-block,
-#detailsAccordion .accordion-group .accordion-body .accordion-inner a,
-padding-left: 10px,
+.completed {
+  display: inline-block;
+}
+#detailsAccordion .accordion-group .accordion-body .accordion-inner a {
+  padding-left: 10px;
+}
 a {
   outline: none;
   border: none;
@@ -793,6 +796,15 @@ ul.chapters li.chapter a.pull-right {
 /** Courses Completed **/
 /** USERS **/
 /**=======**/
+.span12.center.SignUpBtnContainer {
+  margin: 30px 0px 15px 0px;
+}
+.span12.center.SignUpBtnContainer .SignUpBtn {
+  border-radius: 30px;
+}
+.span12.center.SignUpBtnContainer .SignUpBtn h2 {
+  margin: auto 15px;
+}
 form p .chapterPerogressbox {
   min-height: 75px;
 }
