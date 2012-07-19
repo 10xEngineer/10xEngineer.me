@@ -16,19 +16,19 @@
 			//form.navbar-search.pull-right(action='')
 			//	input.search-query.span3(type='text', placeholder='Search Contents')
 			ul.nav.pull-right.nav-collapse
-				-if(!everyauth.loggedIn)
+				-if(!isLoggedIn)
 					li
 						a(href='/auth')
 							i.icon-user.icon-white
 							|  Sign In
-				-if(everyauth.loggedIn)
+				-if(isLoggedIn)
 					li
 						a(href='/user/profile')
 							- if(isAdmin)
 								i.icon-eye-open.icon-white
 							- else
 								i.icon-user.icon-white 
-							|  #{everyauth.user.name} 
+							|  #{user.name} 
 					- if(isAdmin)
 						li
 							a(href="/admin", style='color:yellow') ( admin )

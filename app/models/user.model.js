@@ -1,6 +1,55 @@
+var bcrypt = require('bcrypt');
+
 var model = require('./index');
 
 var statics = {
+  create: function(data, callback) {
+    var User = this;
+
+    if(!data || !data.email || !data.password) {
+      return callback(new Error('Missing required fields'));
+    }
+
+    bcrypt.hash(data.password, salt, function(error, hash) {
+      var newUser = new User();
+      newUser.email = data.email;
+      newUser.hash = hash;
+      
+      if(data.name) {
+        newUser.name = data.name;
+      }
+
+      newUser.save(function(error) {
+        if(error) {
+          callback(error);
+        } else {
+          callback(null, newUser);
+        }
+      });
+    });
+  },
+
+  authenticate: function(email, password, callback) {
+    var User = this;
+    
+    User.findOne({ email: email }, function(err, user) {
+      if (err) { return callback(err); }
+      if (!user) {
+        return callback(null, false, { message: 'Unknown user' });
+      }
+      user.validPassword(password, function(error, verified) {
+        if(error) {
+          return callback(error);
+        }
+        if(!verified) {
+          callback(null, false, { message: 'Invalid password' });          
+        } else {
+          callback(null, user);
+        }
+      });
+    });
+  },
+
   findById: function(id, callback) {
     try {
       id = parseInt(id.toString(), 10);
@@ -66,32 +115,14 @@ var methods = {
       }
     });
     callback();
+  },
+
+  verifyPassword: function(password, callback) {
+    bcrypt.compare(password, this.hash, callback);
   }
 };
 
 // Support functions
-var createNew = function(source, userData, callback) {
-  var User = model.User;
-  
-  var newUser = new User();
-  
-  if(userData.name) {
-    newUser.name = userData.name;
-  }
-  if(userData.email) {
-    newUser.email = userData.email;
-  }
-
-  newUser[source] = userData;
-  newUser.save(function(error) {
-    if(error) {
-      callback(error);
-    }
-
-    callback(null, newUser);
-  });
-};
-
 var findBySource = function(source, userData, callback) {
   var User = model.User;
   var select = {};

@@ -39,6 +39,10 @@ module.exports.register = function(req, res, next) {
   });
 };
 
+module.exports.googleAuthCallback = function(req, res, next) {
+  // TODO: Verify
+};
+
 module.exports.profile = function(req, res){
   var Course = model.Course;
   

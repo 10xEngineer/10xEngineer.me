@@ -67,9 +67,11 @@ module.exports = function(app) {
   // Interceptors
   app.all('/*', function(req, res, next) {
     
-    if(req.loggedIn) {
+    if(req.isAuthenticated()) {
+      res.local('isLoggedIn', true);
       res.local('isAdmin', _.include(req.user.roles, 'admin'));
     } else {
+      res.local('isLoggedIn', false);
       res.local('isAdmin', false);
     }
 
@@ -104,7 +106,22 @@ module.exports = function(app) {
   app.get('/about', main.about);
 
   // User
-  app.get('/login', accessPermission, user.login);
+  app.get('/auth', accessPermission, user.login);
+  app.get('/auth/google',
+    passport.authenticate('google', { 
+      scope: [
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email'
+      ]
+    })
+  );
+  app.get('/auth/google/callback',
+    passport.authenticate('google', { 
+      failureRedirect: '/login'
+    }),
+    user.googleAuthCallback
+  );
+
   app.get('/signup', accessPermission, user.signup);
   app.get('/register', accessPermission, user.registerView);
   app.post('/register', accessPermission, user.register);

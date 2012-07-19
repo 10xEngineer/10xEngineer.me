@@ -7,7 +7,7 @@ module.exports = function(config) {
   var sessionStore = new RedisStore();
 
   // Authentication Middleware
-  var authMiddleware = require('./app/helpers/auth')(config);
+  var authMiddleware = require('./app/middleware/authentication')(config);
 
   var app = express.createServer();
 
@@ -36,7 +36,9 @@ module.exports = function(config) {
     }));
 
     // Auth and routes
-    app.use(authMiddleware.middleware());
+    app.use(authMiddleware.initialize());
+    app.use(authMiddleware.session());
+
     app.use(function(req, res, next){
       if(req.method === 'GET') {
         // expose "error" and "message" to all
@@ -82,9 +84,6 @@ module.exports = function(config) {
     log.add(log.transports.File, { filename: 'app.log', level: 'info', handleExceptions: true, timestamp: true });
     app.use(require('./middleware/errorHandler')({}));
   });
-
-  // Everyauth view helper
-  authMiddleware.helpExpress(app);
 
   // Routes
   require('./app/routes')(app);
