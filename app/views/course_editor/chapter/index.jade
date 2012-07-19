@@ -18,11 +18,10 @@
           each lesson in chapter.lessons
             li.lesson
               a(href='/course_editor/lesson/#{lesson.id}')
-                h3 
-                  #{lesson.title}
+                h3 #{lesson.title} 
               - if(everyauth.loggedIn)
                 - if(lesson.status != 'published')
-                  | (Draft)
+                  | ( Draft )
                 a.btn.btn-danger.pull-right(href='/course_editor/lesson/#{lesson.id}/remove', style='margin-right: 5px;') Delete
                 - if(lesson.status != 'published')
                   a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/publish', style='margin-right: 5px;') Publish
