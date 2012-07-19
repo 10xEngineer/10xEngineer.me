@@ -102,10 +102,15 @@ module.exports = function(app) {
   // Miscellaneous
   app.get('/', main.home);
   app.get('/about', main.about);
-  app.get('/auth', accessPermission, main.auth);
-  // Note: All the actual authentication routes are handled by auth middleware (everyauth). Refer Auth helper for more.
-  app.get('/register', accessPermission, main.registerView);
-  app.post('/register', accessPermission, main.register);
+
+  // User
+  app.get('/login', accessPermission, user.login);
+  app.get('/signup', accessPermission, user.signup);
+  app.get('/register', accessPermission, user.registerView);
+  app.post('/register', accessPermission, user.register);
+  app.get('/user/profile', user.profile);
+  app.get('/user/settings', user.settingsView);
+  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate),user.settings);
   
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.featuredList);
@@ -169,10 +174,6 @@ module.exports = function(app) {
   // CDN
   app.get('/cdn/:fileName', cdn.load);
 
-  // User
-  app.get('/user/profile', user.profile);
-  app.get('/user/settings', user.settingsView);
-  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate),user.settings);
 
   //app.get('/user/:userId', user.load);
 

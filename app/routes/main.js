@@ -22,14 +22,6 @@ module.exports.about = function(req, res){
   });
 };
 
-module.exports.auth = function(req, res){
-  res.render('users/login', {
-    title: 'Log In',
-    coursenav: "N",
-    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
-  });
-};
-
 module.exports.registerView = function(req, res) {
   if(req.loggedIn && !req.user.email) {
     res.render('users/register', {
