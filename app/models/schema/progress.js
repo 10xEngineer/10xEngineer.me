@@ -4,8 +4,8 @@ var mongoose = require('mongoose')
 
 var CourseProgressSchema = module.exports = new Schema({
   _id: { type: ObjectId },
-  user: { type: ObjectId, ref: 'User' },
-  course: { type: ObjectId, ref: 'Course' },
+  user: { type: ObjectId, ref: 'User', index: true },
+  course: { type: ObjectId, ref: 'Course', index: true },
   status: { type: String, enum: ['ongoing', 'completed'], default: 'ongoing'},
   progress: Number,
   chapters: [ ChapterProgressSchema ]
