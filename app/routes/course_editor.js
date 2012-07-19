@@ -60,7 +60,6 @@ module.exports.create = function(req, res, next){
   course.wallImage = req.body.wallImage;
   course.cropWallImgInfo = req.body.cropWallImgInfo;
   course.created_by = req.user._id;
-  log.info(course);
 
   // Saves Created Course
   course.save(function(error) {

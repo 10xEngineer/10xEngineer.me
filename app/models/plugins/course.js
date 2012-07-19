@@ -21,8 +21,6 @@ module.exports = function(schema, options) {
       options.processWall = true;
     }
 
-    log.info(options);
-
     // Save image
     processImages(course, options, function(error) {
       if(error) {
@@ -86,8 +84,6 @@ var processImages = function (course, options, callback) {
       callback(error);
     }
     else{
-      log.info(results);
-
       if(results.icon) {
         course.iconImage = results.icon;
       }

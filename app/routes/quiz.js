@@ -15,9 +15,6 @@ module.exports.importJson = function(req, res, next) {
 
     var f = req.files.files;
 
-    log.info('[Quiz] Uploaded %s -> %s', f.filename, f.path);
-
-
     var tmp_path = f.path;
     var new_name = path.basename(f.path);
     var public_path = 'quiz/' + new_name;
@@ -25,7 +22,6 @@ module.exports.importJson = function(req, res, next) {
 
     var src = '/'+public_path;
     
-    log.info('[Quiz] Copying %s -> %s', tmp_path, target_path);
     fs.renameSync(tmp_path, target_path);
     fs.unlink(tmp_path); //Don't use unlinkSync there, it will throw ENOENT as always
     res.send(JSON.stringify({'status': "success", 'message': msg, 'src': src}));
@@ -77,8 +73,6 @@ module.exports.test = function(req, res, next){
   var is_correct = false;
   var ans = req.body['quiz-1']; //@@TODO
   //guard
-  log.info("GET params: ", req.params); //get or router params
-  log.info("POST params",req.body); //post
   
   //process the login there.
   if(ans === 'A')

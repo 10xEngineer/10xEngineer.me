@@ -23,7 +23,7 @@ module.exports.about = function(req, res){
 };
 
 module.exports.registerView = function(req, res) {
-  if(req.loggedIn && !req.user.email) {
+  if(req.isAuthenticated() && !req.user.email) {
     res.render('users/register', {
       layout: '',
       title: 'Register'

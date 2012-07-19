@@ -39,7 +39,7 @@ var statics = {
       if (!user) {
         return callback(null, false, { message: 'Unknown user' });
       }
-      user.validPassword(password, function(error, verified) {
+      user.verifyPassword(password, function(error, verified) {
         if(error) {
           return callback(error);
         }

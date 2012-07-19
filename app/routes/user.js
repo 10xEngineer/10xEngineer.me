@@ -46,7 +46,7 @@ module.exports.register = function(req, res, next) {
     }
 
     req.session.message = "Thank you for registering.";
-    util.redirectBackOrHome(req, res);
+    next();
   });
 };
 

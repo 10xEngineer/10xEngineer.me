@@ -33,7 +33,7 @@ var validUser = function(req, res, next) {
 var verifyPermission = function(entity, action){
   return function(req, res, next){
     var target = req[entity] ? req[entity].id : null;
-    if(req.loggedIn) {
+    if(req.isAuthenticated()) {
       ability.can(req.user.roles, entity, target, action, function(can) {
         if(can) {
           next();
@@ -53,7 +53,7 @@ var verifyPermission = function(entity, action){
 };
 
 var accessPermission = function(req, res, next) {
-  if(req.loggedIn && ( req.path == '/auth' )) {
+  if(req.isAuthenticated() && ( req.path == '/auth' )) {
     res.redirect('/');
   } else {
     next();
@@ -67,6 +67,7 @@ module.exports = function(app) {
 
   // Interceptors
   app.all('/*', function(req, res, next) {
+
     if(req.isAuthenticated()) {
       res.local('isLoggedIn', true);
       res.local('isAdmin', _.include(req.user.roles, 'admin'));
@@ -120,7 +121,7 @@ module.exports = function(app) {
 
   app.get('/signup', accessPermission, user.signup);
   app.get('/register', accessPermission, user.registerView);
-  app.post('/register', accessPermission, user.register);
+  app.post('/register', accessPermission, user.register, auth.local);
   app.get('/user/profile', user.profile);
   app.get('/user/settings', user.settingsView);
   app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate),user.settings);
@@ -183,13 +184,8 @@ module.exports = function(app) {
   app.get('/lesson/:lessonId/complete', verifyPermission('course', 'read'), lesson.complete);
   app.get('/lesson/:lessonId/updateProgress', lesson.updateProgress);
 
-
   // CDN
   app.get('/cdn/:fileName', cdn.load);
-
-
-  //app.get('/user/:userId', user.load);
-
 
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
