@@ -52,7 +52,6 @@ module.exports.save = function(imgUrl, fileName, callback) {
             callback(null, '/cdn/' + fileName);
           });
         });
-
       });
 
     }).on('error', function(e) {
@@ -191,6 +190,5 @@ module.exports.unlinkFile = function(name, callback){
       callback(error);
     }
     callback();
-  })
-
-}
+  });
+};

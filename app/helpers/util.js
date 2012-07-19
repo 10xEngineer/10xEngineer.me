@@ -5,9 +5,13 @@ var fs = require('fs');
 var gm = require('gm');
 var path = require('path');
 var mime = require('mime');
-var tmpFileUploadDir = appRoot + '/app/upload';
+var tmpFileUploadDir = process.cwd() + '/app/upload';
 
 module.exports = function() {};
+
+module.exports.json = {};
+module.exports.string = {};
+
 
 // Converts the date to epoch/unix time
 module.exports.dateToEpoch = function(date) {
@@ -26,7 +30,26 @@ module.exports.findFirst = function( key, jsonObj ) {
 	return firstProp;
 }
 
-module.exports.randomString = function(stringLength) {
+module.exports.string.isWhitespace = function(charToCheck) {
+  var whitespaceChars = " \t\n\r\f";
+  return (whitespaceChars.indexOf(charToCheck) != -1);
+};
+
+module.exports.string.ltrim = function(str) { 
+  for(var k = 0; k < str.length && module.exports.string.isWhitespace(str.charAt(k)); k++);
+  return str.substring(k, str.length);
+};
+
+module.exports.string.rtrim = function(str) {
+  for(var j=str.length-1; j>=0 && module.exports.string.isWhitespace(str.charAt(j)) ; j--) ;
+  return str.substring(0,j+1);
+};
+
+module.exports.string.trim = function(str) {
+  return module.exports.string.ltrim(module.exports.string.rtrim(str));
+};
+
+module.exports.string.random = function(stringLength) {
   var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
   if (!stringLength>0) {
     var stringLength = 8;
@@ -39,7 +62,7 @@ module.exports.randomString = function(stringLength) {
   return randomString; 
 }
 
-module.exports.merge = function(obj1, obj2) {
+module.exports.json.merge = function(obj1, obj2) {
   var obj = {};
   for(var key in obj1) {
     if(obj1.hasOwnProperty(key)) {
@@ -76,7 +99,7 @@ module.exports.saveToDisk = function(imgUrl, callback) {
  	protocol.get(parsedUrl, function(res) {
 
     var fileType = mime.extension(res.headers['content-type']);
-    var filePath = path.join(tmpFileUploadDir, self.randomString(10) + '.' + fileType);
+    var filePath = path.join(tmpFileUploadDir, self.string.random(10) + '.' + fileType);
 
   	var data = '';
 

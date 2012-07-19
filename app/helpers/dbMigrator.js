@@ -1,26 +1,32 @@
-var Metadata = load.model('Metadata');
-var Count = load.model('Count');
-var User = load.model('User');
-var Role = load.model('Role');
-var LabDef = load.model('LabDef');
+var model = require('../models');
 
-module.exports = function(config) {
+module.exports = function(config, callback) {
+  var Metadata = model.Metadata;
   var self = this;
 
   // Check current schema version from database
   Metadata.getValue('schemaVersion', function(error, currentVersion) {
     if(error) {
       log.error(error);
+      callback(error);
     }
+
     var codeSchemaVersion = config.get('db:schemaVersion');
 
     if(currentVersion !== codeSchemaVersion) {
       // Schema has changed. Execute migration functions.
       migrateSchema(currentVersion, codeSchemaVersion, function(version) {
-
         // Update schemaVersion in the database
-        Metadata.setValue('schemaVersion', version);
+        Metadata.setValue('schemaVersion', version, function(error) {
+          if(error) {
+            callback(error);
+          }
+
+          callback();
+        });
       });
+    } else {
+      callback();
     }
   });
 };
@@ -41,6 +47,11 @@ var migrateSchema = function(dbVersion, codeVersion, done) {
 };
 
 var migrate = function(dbVersion, codeVersion, done) {
+  var Count = model.Count;
+  var User = model.User;
+  var Role = model.Role;
+  var VMDef = model.VMDef;
+
   // TODO: Move the actual migration code to individual functions later
   if(dbVersion == 1) {
     // User _id is converted to a number from string

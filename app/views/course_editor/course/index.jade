@@ -9,7 +9,7 @@
         .course-content
           h2 #{course.title}
           p #{course.desc}
-          -if(everyauth.loggedIn)
+          -if(isLoggedIn)
             .btn-strip
               a.btn.btn-success(href="/course_editor/chapter/create/#{course.id}") Add Chapter
               a.btn(href='/course_editor/course/#{course.id}/edit') Edit Course Info

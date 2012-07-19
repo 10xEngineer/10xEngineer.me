@@ -1,5 +1,6 @@
-var User = load.model('User');
-var util = load.helper('util');
+var model = require('../models');
+
+var util = require('../helpers/util');
 
 module.exports = function() {};
 
@@ -21,16 +22,8 @@ module.exports.about = function(req, res){
   });
 };
 
-module.exports.auth = function(req, res){
-  res.render('users/login', {
-    title: 'Log In',
-    coursenav: "N",
-    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
-  });
-};
-
 module.exports.registerView = function(req, res) {
-  if(req.loggedIn && !req.user.email) {
+  if(req.isAuthenticated() && !req.user.email) {
     res.render('users/register', {
       layout: '',
       title: 'Register'
@@ -41,6 +34,8 @@ module.exports.registerView = function(req, res) {
 };
 
 module.exports.register = function(req, res, next) {
+  var user = model.User;
+  
   var email = req.body.email;
 
   // Check for existing accounts based on current email
@@ -70,7 +65,7 @@ module.exports.register = function(req, res, next) {
       delete userObj._id;
       delete userObj.id;
 
-      currentUser = util.merge(currentUser, userObj);
+      currentUser = util.json.merge(currentUser, userObj);
       currentUser.save(function(error) {
         if(error) {
           log.error(error);

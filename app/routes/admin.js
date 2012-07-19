@@ -1,17 +1,22 @@
-var User = load.model('User');
-var Role = load.model('Role');
-var LabDef = load.model('LabDef');
-var config = require('../config/config');
-var importer = load.helper('importer');
-var _ = require('underscore');
 var fs = require('fs');
-var async = require('async');
+var path = require('path');
 
+var _ = require('underscore');
+var async = require('async');
+var nodemailer = require("nodemailer");
+
+var model = require('../models');
+
+var importer = require('../helpers/importer');
+var util = require('../helpers/util');
 
 
 module.exports = function() {};
 
 module.exports.show = function(req, res) {
+  var User = model.User;
+  var Role = model.Role;
+
   User.find(function(error, users) {
     Role.find(function(error, roles) {
       res.render('admin', {
@@ -24,72 +29,102 @@ module.exports.show = function(req, res) {
 };
 
 module.exports.approveView = function(req, res) {
+  var User = model.User;
+
   User.find({ roles : { $ne : 'user' } } ,function(error, users) {
     res.render('admin/approve', {
       title: '10xengineer.me Beta Approval',
-      users: users,
+      users: users
     });
   });
 };
 
 module.exports.approve = function(req, res) {  
   var length = req.extUser.roles.length;
-  req.extUser.roles[length++] = 'user';
   var user = req.extUser;
-  user.markModified('roles');
-  user.save(function(error){
-    if(error) {
+
+  var templetPath = path.resolve('./Samples/emailTemplet/approvalForBeta.html');
+  getHtmlTemplate("approvalForBeta", { "name" : user.name }, function(error, htmlText){
+
+    if(error){
       log.error(error);
+      res.redirect('/admin/approve');
     }
-    res.redirect('/admin/approve');
-  })
+
+    // create reusable transport method (opens pool of SMTP connections)
+    var smtpTransport = nodemailer.createTransport("SMTP",{
+      service: "Gmail",
+      auth: {
+          user: "",  // Sender mail id here
+          pass: ""   // password
+      }
+    });
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+      from: "", // sender address
+      to: user.name + " <" + user.email + ">", // list of receivers
+      subject: "10xEngineer : Notification for beta version release", // Subject line
+      text: "", // plaintext body
+      html: htmlText //fs.readFileSync(templetPath).toString() // html body
+    };
+
+    // send mail with defined transport object
+    smtpTransport.sendMail(mailOptions, function(error, response){
+        if(error){
+            console.log(error);
+        }else{
+            console.log("Message sent: " + response.message);
+        }
+
+        // if you don't want to use this transport object anymore, uncomment following line
+        //smtpTransport.close(); // shut down the connection pool, no more messages
+    });
+    
+    req.extUser.roles[length++] = 'user';
+    user.markModified('roles');
+    user.save(function(error){
+      if(error) {
+        log.error(error);
+      }
+      res.redirect('/admin/approve');
+    });
+
+  });
+};
+
+var getHtmlTemplate = function(templateName, jsonObject, callback){
+  var templatePath = path.resolve('./Samples/emailTemplet/' + templateName + '.html');
+  var template = fs.readFileSync(templatePath).toString();
+  for(var key in jsonObject) {
+    if(jsonObject.hasOwnProperty(key)) {
+      var regEx = new RegExp("#{" + key + "}", "g");
+      template = template.replace(regEx, jsonObject[key]);
+    }
+  }
+  callback(null, template);
 };
 
 module.exports.usersImportView = function(req, res) {  
   res.render('admin/usersImport');
 };
 
-module.exports.usersImport = function(req, res) {  
+module.exports.usersImport = function(req, res, next) {  
   
   var f = req.files['users-file'];
   var fileContent = fs.readFileSync(f.path);
   
   fileContent = fileContent.toString();
   var fileContentArray = fileContent.split('\n');
-  var length = fileContentArray.length;
   
-  function isWhitespace(charToCheck) {
-    var whitespaceChars = " \t\n\r\f";
-    return (whitespaceChars.indexOf(charToCheck) != -1);
-  }
-  function ltrim(str) { 
-    for(var k = 0; k < str.length && isWhitespace(str.charAt(k)); k++);
-    return str.substring(k, str.length);
-  }
-  function rtrim(str) {
-    for(var j=str.length-1; j>=0 && isWhitespace(str.charAt(j)) ; j--) ;
-    return str.substring(0,j+1);
-  }
-  function trim(str) {
-    return ltrim(rtrim(str));
-  }
-  
-  var emails = [];
-  var count = 0 ;
-  for (var index = 1; index < (length-1); index++) {
-    var LineArray = fileContentArray[index].split(',');
-    emails[count++] = trim(LineArray[5]);
-  };
-
-  
-  async.forEach(emails, importer.users, function(error){
+  async.forEach(fileContentArray, importer.usersFromUnbounce, function(error){
     if(error) {
       log.error(error);
+      return next(error);
     }
-  });
 
-  req.session.message = "Import Sucessfully Course.";
-  res.redirect('/admin');
+    req.session.message = "Users imported successfully.";
+    res.redirect('/admin');
+  });
 };
 
 module.exports.removeUser = function(req, res, next) {
@@ -105,7 +140,9 @@ module.exports.removeUser = function(req, res, next) {
   });
 };
 
-module.exports.labsView = function(req, res) {  
+module.exports.labsView = function(req, res) {
+  var config = req.app.set('config');
+
   res.render('admin/labs', {
     lab: {name: '', type: '', /*cpu: '', */memory: '',storage: ''},
     itemList: config.get('vms')
@@ -114,6 +151,8 @@ module.exports.labsView = function(req, res) {
 
 module.exports.labEditView = function(req, res) {  
   var lab = req.labDef;
+  var config = req.app.set('config');
+
   var instanceLab = {
     id : lab.id,
     name : lab.name, 
@@ -154,8 +193,9 @@ module.exports.labEdit = function(req, res) {
 };
 
 module.exports.labs = function(req, res) {  
-  
-  var labDef = new LabDef();
+  var VMDef = model.VMDef;
+
+  var labDef = new VMDef();
   labDef.name = req.body.name;
   labDef.type = req.body.type;
   //labDef.cpu = req.body.cpu;
@@ -172,7 +212,10 @@ module.exports.labs = function(req, res) {
 };
 
 module.exports.showLabsView = function(req, res) {  
-  LabDef.find(function (error, lab) {
+  var VMDef = model.VMDef;
+  var config = req.app.set('config');
+
+  VMDef.find(function (error, lab) {
 
     var vmList = config.get('vms');
     res.render('admin/showLabs', {
@@ -200,6 +243,8 @@ module.exports.labRemove = function(req, res) {
 
 
 module.exports.rolesView = function(req, res) {
+  var Role = model.Role;
+
   Role.find(function (error, roles) {
     res.render('admin/roles', {
       roles: roles
@@ -208,14 +253,19 @@ module.exports.rolesView = function(req, res) {
 };
 
 module.exports.showUserRoles = function(req, res){
+  var Role = model.Role;
+
   Role.find(function (error, roles) {
     res.render('admin/user_roles', {
       roles : roles
     });
   });
-}
+};
 
 module.exports.updateUserRoles = function(req, res) {
+  var User = model.User;
+  var Role = model.Role;
+
   req.extUser.updateUserRoles(req.body.chngRoles, function(error){
     if(error){
       log.error(error);
@@ -231,14 +281,14 @@ module.exports.updateUserRoles = function(req, res) {
         });
       });
     }
-  })
-}
+  });
+};
 
 module.exports.clearProgress = function(req, res){
   req.session.progress = {};
   req.session.message = "Progress cleared Sucessfully !!!";
   res.redirect('/admin');
-}
+};
 
 module.exports.newRoleView = function(req, res) {
   res.render('admin/newRole');
@@ -249,8 +299,9 @@ module.exports.createRoleView = function(req, res) {
 };
 
 module.exports.editRoleView = function(req, res) {
+  var Role = model.Role;
 
-  var roleId = parseInt(req.route.params['roleId']);
+  var roleId = parseInt(req.route.params.roleId, 10);
 
   Role.findOne({ id: roleId }, function(error, role){
     var roleName = role.name;
@@ -301,13 +352,14 @@ module.exports.editRoleView = function(req, res) {
         permits: permits
       });
     }
-  })
+  });
 };
 
 module.exports.editRole = function(req, res) {
+  var Role = model.Role;
 
   var modifiedRoleName = req.body.name;
-  var roleId = parseInt(req.route.params['roleId']);
+  var roleId = parseInt(req.route.params.roleId, 10);
   getPermissionListForRole(req, function(error, modifiedRolePermits){
     if(!error){
       Role.findOne({ id : roleId }, function(error, role){
@@ -316,18 +368,19 @@ module.exports.editRole = function(req, res) {
             log.error(error);
           }
           res.redirect('/admin/roles');
-        })
-      })
+        });
+      });
     }
-  })
-}
+  });
+};
 
 module.exports.createRole = function(req, res) {
+  var Role = model.Role;
 
   var newRoleName = req.body.name;
 
   getPermissionListForRole(req, function(error, newRolePermits){
-    Role.generateRole(newRoleName, newRolePermits, function(error, role){
+    Role.createRole(newRoleName, newRolePermits, function(error, role){
       if(error){
         log.error(error);
       }
@@ -335,11 +388,13 @@ module.exports.createRole = function(req, res) {
         res.redirect('/admin/roles');
       }
     });
-  })
-}
+  });
+};
 
 module.exports.removeRole = function(req, res) {
-  var roleId = parseInt(req.route.params['roleId']);
+  var Role = model.Role;
+
+  var roleId = parseInt(req.route.params.roleId, 10);
   Role.findOne({ id : roleId}, function(error, role){
     if(error){
       log.error(error);
@@ -352,10 +407,12 @@ module.exports.removeRole = function(req, res) {
         res.redirect('/admin/roles');
       });
     }
-  })
-}
+  });
+};
 
 module.exports.assignRole = function(req, res) {
+  var Role = model.Role;
+
   var user = req.extUser;
   var roleId = req.params.roleId;
 
@@ -399,59 +456,4 @@ var getPermissionListForRole = function(req, callback) {
     }
   }
   callback(null, newRolePermits);
-}
-
-/*
-module.exports = function(app){
-  app.get('/admin/permissions', function(req, res){
-    User.findAll(function(users){
-      console.log(users);
-      res.render('admin/permissions',{
-        layout: false
-      });
-    });
-  });
-  
-  app.get('/admin/user/:id', function(req, res){
-    User.findById(parseFloat(req.params.id), function(error, user){
-      if(error)
-        log.error(error);
-      else{
-        res.render('admin/user_details',{
-          usr:user,
-          ability: require('../helpers/ability')
-        });
-      }
-    });
-  });
-  
-  app.post('/admin/user/:id', function(req, res){
-    User.findById(parseFloat(req.params.id), function(error, user){
-      if(error)
-        log.error(error);
-      else{
-        user.email = req.body.email;
-        user.name = req.body.name;
-        if(!user.abilities) {
-          user.abilities = {};
-        }
-        user.abilities.role = req.body.role;
-        user.abilities.courses = {}; 
-        _.each(req.body.abilities, function(value, key){
-          user.abilities.courses[key] = value;
-        });
-        User.updateUser(user, function(error, usr){
-          if(error){
-            res.json({status:'success'});
-          }
-          else
-          {
-            res.json({status:'fail'});
-          }
-        });
-      }
-    });
-  });
 };
-
-*/

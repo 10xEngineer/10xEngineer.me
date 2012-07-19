@@ -1,12 +1,11 @@
 var async = require('async');
 var request = require('request');
-var progressHelper = load.helper('progress');
+
+var model = require('../app/models');
+var progressHelper = require('../app/helpers/progress');
+var util = require('../app/helpers/util');
+
 var wsdlurl = 'http://ideone.com/api/1/service.json';
-
-var util = load.helper('util');
-
-var Lesson = load.model('Lesson');
-
 var languages = {
   'javascript': 112
 };
@@ -30,13 +29,22 @@ module.exports = function(io) {
       
       // Video Progress
       socket.on('change', function(data){
-        progressHelper.lessonUpdateProgress(data, socket.handshake.session);
+        var Progress = model.Progress;
+        Progress.updateProgress(data, function(error){
+          if(error) {
+            log.error(error);
+          }
+        });
       });
       
       // Video Completed
       socket.on('status', function(data){
-        log.info('Data :', data);
-        progressHelper.lessonCompleted(data, socket.handshake.session);
+        var Progress = model.Progress;
+        Progress.completedLesson(data, function(error){
+          if(error) {
+            log.error(error);
+          }
+        });
       });
 
       // Persists current user session in mongodb
@@ -51,14 +59,13 @@ module.exports = function(io) {
     .on('connection', function (socket) {
     
     socket.on('submitcode', function(data){
-      log.info(data);
+      var Lesson = model.Lesson;
 
       Lesson.findOne({ id: data.lessonId }, function(error, lesson) {
         if(error) {
           log.error(error);
         }
 
-        log.info(lesson);
 
         async.waterfall([
           function(callback) {
@@ -95,7 +102,6 @@ module.exports = function(io) {
           }
         ],
         function(error, result) {
-          log.info(result);
 
           if(result.output == (lesson.programming.output + '\n')) {
             socket.volatile.emit('codePassed', result);
@@ -111,7 +117,7 @@ module.exports = function(io) {
 };
 
 var callIdeoneService = function(method, params, callback) {
-  params = util.merge(defaultParams, params);  
+  params = util.json.merge(defaultParams, params);  
   request({
     method: 'GET',
     uri: wsdlurl,
@@ -127,7 +133,6 @@ var callIdeoneService = function(method, params, callback) {
       log.error(error);
       return callback(error);
     }
-    log.info(res.request.body.toString());
     if(body.result.error != 'OK') {
       log.error(body.result.error);
       return callback(body.result.error);

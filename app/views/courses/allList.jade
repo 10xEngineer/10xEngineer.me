@@ -1,19 +1,4 @@
-script(type="text/javascript")
-  $(window).load(function() {
-    $('.flexslider').flexslider({
-      animation: "slide",
-      directionNav: true,
-      controlsContainer: ".flexslider-container"
-    });
-  });
-//- Course Admin index?
-- course = {id: 1};
 .container
-  -if(everyauth.loggedIn && isAdmin)
-      p.actions.clearfix
-        a(href='/course_editor/create').btn.btn-primary.pull-left Add Course
-        a(href='/course_editor/import').btn.btn-inverse.pull-right Import a course
-
   ul.nav.nav-pills.courseMenu
     li
       a(href="/courses") Featured
@@ -26,7 +11,7 @@ script(type="text/javascript")
     div.flexslider
       ul.slides
         each courseObject,courseIndex in courses
-          -if(everyauth.loggedIn && courseObject.status == 'published')
+          - if(courseObject.status == 'published' || isAdmin)
             li
               center
                 img.courseImage(src="#{courseObject.wallImage}")
@@ -38,3 +23,12 @@ script(type="text/javascript")
   .row-fluid
     .span12
   .carouselWrapper
+
+script(type="text/javascript")
+  $(window).load(function() {
+    $('.flexslider').flexslider({
+      animation: "slide",
+      directionNav: true,
+      controlsContainer: ".flexslider-container"
+    });
+  });

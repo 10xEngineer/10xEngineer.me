@@ -1,16 +1,15 @@
-var Progress = load.model('Progress');
-var User = load.model('User');
-var Course = load.model('Course');
-var Chapter = load.model('Chapter');
-var User = load.model('User');
-var Lesson = load.model('Lesson');
+/*var model = require('../models');
 var async = require('async');
+var _ = require('underscore');
+
 
 module.exports = function() {};
 
 
 // Store Progress into Session
 module.exports.get = function(userId, callback) {
+  var User = model.User;
+  var Progress = model.Progress;
 
   User.findOne({id: userId}, function(error,user){
     if(error) {
@@ -145,6 +144,8 @@ module.exports.lessonUpdateProgress = function(data, session) {
 
 // Persists current progress session in mongodb
 module.exports.update = function(data, progressSession) {
+  var Progress = model.Progress;
+
   var courseId = data.courseId;
   var userId = data.userId;
   
@@ -166,14 +167,15 @@ module.exports.update = function(data, progressSession) {
 
 // Progress Calvulates
 var progressCalculate = function(session, courseId) {
-
+  var Course = model.Course;
+  
   var progress = session.progress[courseId];
   if(progress.status !== 'completed') {
 
     // Load course
     Course.findById(progress.course)
       .populate('chapters')
-      .run(function(error, course) {
+      .exec(function(error, course) {
 
       var chapters;
 
@@ -297,3 +299,4 @@ var progressCalculate = function(session, courseId) {
 var saveSession = function(session, callback) {
   session.save(callback);
 };
+*/

@@ -26,22 +26,6 @@
       features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
       alwaysShowControls: true,
       pluginPath: '/javascripts/mediaelement/',
-      success: function(mediaElement, domObject) {
-        mediaElement.addEventListener('timeupdate', function(e) {
-          //document.getElementById('current-time').innerHTML = mediaElement.currentTime;
-        }, false);
-        mediaElement.addEventListener('ended', function(e) {
-          $.ajax({
-            url: '/lesson/#{lesson.id}/complete/',
-            success: function(data) {
-              $('.lessonBar .btn-success').addClass('btn-large');
-            },
-            error: function(error, status, xhr) {
-              console.log(JSON.stringify(error) + "Status: " + status);
-            }
-          });
-        }, false);
-      },
       error: function(err) {
         console.log(err);
       }

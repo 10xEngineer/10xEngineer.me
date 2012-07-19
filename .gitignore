@@ -34,3 +34,4 @@ nbproject
 .idea
 node_modules
 app/upload/*
+/public/stylesheets/core.styl
