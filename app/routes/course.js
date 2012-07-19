@@ -33,6 +33,7 @@ module.exports.allList = function(req, res){
 
 // List existing featured courses
 module.exports.featuredList = function(req, res){
+  log.profile('courseList');
   var Course = model.Course;
   var Progress = model.Progress;
   
@@ -43,6 +44,7 @@ module.exports.featuredList = function(req, res){
         var progress = progresses[index];
         formatedProgress[progress.course] = progress.status;
       }
+      log.profile('courseList');
       res.render('courses', { 
         title: 'Courses',
         courses: courses,

@@ -2,13 +2,15 @@ var express = require('express');
 var stylus = require('stylus');
 var RedisStore = require('connect-redis')(express);
 
+var auth = require('./app/middleware/authentication');
+
 module.exports = function(config) {
   var appRoot = process.cwd();
   var tmpFileUploadDir = appRoot + '/app/upload';
   var sessionStore = new RedisStore();
 
   // Authentication Middleware
-  var authMiddleware = require('./app/helpers/auth')(config);
+  var authMiddleware = auth.getMiddleware(config);
 
   var app = express.createServer();
 
@@ -40,7 +42,9 @@ module.exports = function(config) {
     }));
 
     // Auth and routes
-    app.use(authMiddleware.middleware());
+    app.use(authMiddleware.initialize());
+    app.use(authMiddleware.session());
+
     app.use(function(req, res, next){
       if(req.method === 'GET') {
         // expose "error" and "message" to all
@@ -86,9 +90,6 @@ module.exports = function(config) {
     log.add(log.transports.File, { filename: 'app.log', level: 'info', handleExceptions: true, timestamp: true });
     app.use(require('./middleware/errorHandler')({}));
   });
-
-  // Everyauth view helper
-  authMiddleware.helpExpress(app);
 
   // Routes
   require('./app/routes')(app);

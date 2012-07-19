@@ -1,8 +1,8 @@
 {
   "site": {
+    "hostname": "dev.10xengineer.me",
     "port": 3000,
-    "site_name": "10xEngineer.me",
-    "site_email": "10xengineer@gmail.com"
+    "email": "10xengineer@gmail.com"
   },
   "auth": {
     "twitter": {
