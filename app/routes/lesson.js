@@ -24,21 +24,6 @@ module.exports.showView = function(req, res) {
   var quizQuestions = lesson.quiz.questions;
   var quizQuestionsLength = lesson.quiz.questions.length;
 
-  // For random the options
-  var randomOption =function (options) {
-    var temp;
-    var optionLength = Math.floor(options.length/2)+1;
-    
-    for (var i = 0; i < optionLength; i++) {
-
-      var n = Math.floor(Math.random() * optionLength);
-      temp = options[i];
-      options[i]= options[n];
-      options[n]=temp;
-
-    }
-  };
-
   for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
     randomOption(quizQuestions[questionsIndex].options);
   }  
@@ -107,6 +92,21 @@ module.exports.showView = function(req, res) {
 
     }
   });
+};
+
+// For random the options
+var randomOption =function (options) {
+  var temp;
+  var optionLength = Math.floor(options.length/2)+1;
+  
+  for (var i = 0; i < optionLength; i++) {
+
+    var n = Math.floor(Math.random() * optionLength);
+    temp = options[i];
+    options[i]= options[n];
+    options[n]=temp;
+
+  }
 };
 
 module.exports.show = function(req, res) {
