@@ -1,9 +1,11 @@
 var _ = require('underscore');
 var async = require('async');
 
-var Role = load.model('Role');
+var model = require('../models');
 
 module.exports.can = function(roles, entity, target, action, callback) {
+  var Role = model.Role;
+  
   var matched = false;
   async.forEach(roles, function(roleName, callback) {
     Role.findOne({ name: roleName }, function(error, role) {

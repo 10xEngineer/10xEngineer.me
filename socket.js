@@ -1,15 +1,20 @@
 var express = require('express');
+var redis = require('redis');
 var parseCookie = require('connect').utils.parseCookie;
 var Session = require('connect').middleware.session.Session;
-var RedisStore = require('connect-redis')(express);
+var ConnectRedisStore = require('connect-redis')(express);
+
+var RedisStore = require('socket.io/lib/stores/redis')
+  , pub    = redis.createClient()
+  , sub    = redis.createClient()
+  , client = redis.createClient();
 
 
 module.exports = function(app) {
   var io = module.exports = require('socket.io').listen(app);
-  var sessionStore = new RedisStore();
+  var sessionStore = new ConnectRedisStore();
 
   io.configure(function () {
-    io.set('transports', ['websocket', 'flashsocket']);
     io.set('authorization', function(data, callback) {
       // check if there's a cookie header
       if (data.headers.cookie) {
@@ -21,7 +26,6 @@ module.exports = function(app) {
           data.sessionID = data.cookie['my.sid'];
           // save the session store to the data object 
           // (as required by the Session constructor)
-          data.sessionStore = sessionStore;
           sessionStore.get(data.sessionID, function (err, session) {
             if (err) {
               callback(err, false);
@@ -43,9 +47,19 @@ module.exports = function(app) {
     });
   });
 
+  io.set('store', new RedisStore({
+    redisPub : pub,
+    redisSub : sub,
+    redisClient : client
+  }));
+  io.set('log level', 1);
+
   io.configure('development', function () {
     io.set('transports', ['websocket']);
-    //io.enable('log');
+  });
+
+  io.configure('production', function () {
+    io.set('transports', ['websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling', 'flashsocket']);
   });
 
   // Initialize socket events

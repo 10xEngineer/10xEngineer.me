@@ -17,8 +17,7 @@
                   each innerLesson in allLessons
                     - if (innerLesson.chapter.toString() == innerChapter._id.toString())
                       - if (innerLesson.id.toString() == lesson.id.toString())
-                          li
-                            #{innerLesson.title}
+                          li #{innerLesson.title}
                       - else
                           li 
                             a(href='/lesson/#{innerLesson.id}') #{innerLesson.title}

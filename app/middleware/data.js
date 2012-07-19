@@ -1,18 +1,17 @@
 var async = require('async');
-var User = load.model('User');
-var Course = load.model('Course');
-var Chapter = load.model('Chapter');
-var Lesson = load.model('Lesson');
-var LabDef = load.model('LabDef');
+
+var model = require('../models');
 
 module.exports = function(app) {
+  var Course = model.Course;
+  var Chapter = model.Chapter;
 
   // Course
   app.param('courseId', function(req, res, next, id){
     Course.findOne({ id: id })
       .populate('chapters')
       .populate('created_by')
-      .run(function(error, course) {
+      .exec(function(error, course) {
       if(error) {
         next(error);
       }
@@ -23,7 +22,7 @@ module.exports = function(app) {
         async.map(course.chapters, function(chapter, callback) {
           Chapter.findById(chapter._id)
             .populate('lessons')
-            .run(function(error, populatedChapter) {
+            .exec(function(error, populatedChapter) {
             if(error) {
               callback(error);
             }
@@ -51,10 +50,12 @@ module.exports = function(app) {
 
   // Chapter
   app.param('chapterId', function(req, res, next, id){
+    var Chapter = model.Chapter;
+
     Chapter.findOne({ id: id })
       .populate('course')
       .populate('lessons')
-      .run(function(error, chapter) {
+      .exec(function(error, chapter) {
       if(error) {
         next(error);
       }
@@ -75,9 +76,13 @@ module.exports = function(app) {
 
   // Lesson
   app.param('lessonId', function(req, res, next, id){
+    var Lesson = model.Lesson;
+    var Course = model.Course;
+    var Chapter = model.Chapter;
+
     Lesson.findOne({ id: id })
       .populate('chapter')
-      .run(function(error, lesson) {
+      .exec(function(error, lesson) {
       if(error) {
         next(error);
       }
@@ -85,10 +90,10 @@ module.exports = function(app) {
       if(lesson) {
         Course.findById(lesson.chapter.course)
           .populate('chapters')
-          .run(function(error, course) {
+          .exec(function(error, course) {
           Chapter.findById(lesson.chapter._id)
           .populate('lessons')
-          .run(function(error, chapter) {
+          .exec(function(error, chapter) {
             lesson.id = parseInt(lesson.id.toString(), 10);
             req.lesson = lesson;
             req.chapter = chapter;
@@ -109,6 +114,8 @@ module.exports = function(app) {
 
   // User
   app.param('userId', function(req, res, next, id){
+    var User = model.User;
+
     User.findById(id, function(error, user) {
       if(error) {
         next(error);
@@ -127,8 +134,9 @@ module.exports = function(app) {
 
   // LabDef
   app.param('labDefId', function(req, res, next, id){
-    LabDef.findOne({ id: id })
-    .run(function(error, labDef) {
+    var VMDef = model.VMDef;
+    
+    VMDef.findOne({ id: id }, function(error, labDef) {
       if(error) {
         next(error);
       }

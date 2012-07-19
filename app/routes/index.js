@@ -1,15 +1,18 @@
-var main = load.controller('main');
-var course = load.controller('course');
-var course_editor = load.controller('course_editor');
-var chapter = load.controller('chapter');
-var lesson = load.controller('lesson');
-var quiz = load.controller('quiz');
-var admin = load.controller('admin');
-var user = load.controller('user');
-var cdn = load.controller('cdn');
-var validation = load.middleware('validation');
-var ability = load.helper('ability');
-var validationConfig = load.helper('validationConfig');
+var _ = require('underscore');
+
+var main = require('./main');
+var course = require('./course');
+var course_editor = require('./course_editor');
+var lesson = require('./lesson');
+var quiz = require('./quiz');
+var admin = require('./admin');
+var user = require('./user');
+var cdn = require('./cdn');
+
+var auth = require('../middleware/authentication');
+var validation = require('../middleware/validation');
+var ability = require('../helpers/ability');
+var validationConfig = require('../helpers/validationConfig');
 
 
 // ---------------------
@@ -17,20 +20,10 @@ var validationConfig = load.helper('validationConfig');
 // ---------------------
 
 
-var validUser = function(req, res, next) { 
-  if(req.user === undefined && req.url != '/courses'){
-    req.session.redirectTo = req.url;
-    res.redirect('/auth');
-    return;
-  }
-  
-  next();
-};
-
 var verifyPermission = function(entity, action){
   return function(req, res, next){
     var target = req[entity] ? req[entity].id : null;
-    if(req.loggedIn) {
+    if(req.isAuthenticated()) {
       ability.can(req.user.roles, entity, target, action, function(can) {
         if(can) {
           next();
@@ -50,7 +43,7 @@ var verifyPermission = function(entity, action){
 };
 
 var accessPermission = function(req, res, next) {
-  if(req.loggedIn && ( req.path == '/auth' )) {
+  if(req.isAuthenticated() && ( req.path == '/auth' )) {
     res.redirect('/');
   } else {
     next();
@@ -64,18 +57,16 @@ module.exports = function(app) {
 
   // Interceptors
   app.all('/*', function(req, res, next) {
-    
-    if(req.loggedIn) {
+
+    if(req.isAuthenticated()) {
+      res.local('isLoggedIn', true);
       res.local('isAdmin', _.include(req.user.roles, 'admin'));
+      res.local('user', req.user);
     } else {
+      res.local('isLoggedIn', false);
       res.local('isAdmin', false);
     }
 
-    next();
-  });
-
-  //filter for checking if the users have login
-  app.all('/courses/:op?/*', validUser, function(req, res, next){
     next();
   });
 
@@ -91,7 +82,7 @@ module.exports = function(app) {
   });
 
   // Load Express data middleware
-  load.middleware('data')(app);
+  require('../middleware/data')(app);
 
 
 
@@ -100,10 +91,25 @@ module.exports = function(app) {
   // Miscellaneous
   app.get('/', main.home);
   app.get('/about', main.about);
-  app.get('/auth', accessPermission, main.auth);
-  // Note: All the actual authentication routes are handled by auth middleware (everyauth). Refer Auth helper for more.
-  app.get('/register', accessPermission, main.registerView);
-  app.post('/register', accessPermission, main.register);
+
+  // User
+  app.get('/auth', accessPermission, user.login);
+  app.post('/auth', accessPermission, auth.local);
+  app.get('/logout', auth.logout);
+
+  app.get('/auth/twitter', auth.twitter);
+  app.get('/auth/twitter/callback', auth.twitterCallback);
+  app.get('/auth/google', auth.google);
+  app.get('/auth/google/callback', auth.googleCallback);
+  app.get('/auth/fb', auth.facebook);
+  app.get('/auth/fb/callback', auth.facebookCallback);
+
+  app.get('/signup', accessPermission, user.signup);
+  app.get('/register', accessPermission, user.registerView);
+  app.post('/register', accessPermission, user.register, auth.local);
+  app.get('/user/profile', user.profile);
+  app.get('/user/settings', user.settingsView);
+  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate),user.settings);
   
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.featuredList);
@@ -163,17 +169,8 @@ module.exports = function(app) {
   app.get('/lesson/:lessonId/complete', verifyPermission('course', 'read'), lesson.complete);
   app.get('/lesson/:lessonId/updateProgress', lesson.updateProgress);
 
-
   // CDN
   app.get('/cdn/:fileName', cdn.load);
-
-  // User
-  app.get('/user/profile', user.profile);
-  app.get('/user/settings', user.settingsView);
-  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate),user.settings);
-
-  //app.get('/user/:userId', user.load);
-
 
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);

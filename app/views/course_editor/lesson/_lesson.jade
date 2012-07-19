@@ -4,8 +4,7 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
     input.required(value='#{lesson.title}', id='title', name='title')
   p
     label(for="description") Description:
-    textarea.required(name='description', id='description')
-      #{lesson.desc}
+    textarea.required(name='description', id='description') #{lesson.desc}
   - if(!edit)
 
     input#lessonType(name='type', type='hidden', value='video')
@@ -162,17 +161,19 @@ script(type='text/javascript')
 
     function getYoutubeID(url) {
       // For Youtube  Video Verification
-      if(/http:\\/\\/youtu.be\\/(\\w+)/.test(url)) {
-        var youtubeParse = /http:\\/\\/youtu.be\\/(\\w+)/.exec(url);
-        url = "http://www.youtube.com/embed/"+youtubeParse[1];
+      var youtubePttn = new RegExp("http:\\/\\/youtu.be\\/(\\w+)");
+      if(youtubePttn.test(url)) {
+        var youtubeParse = youtubePttn.exec(url);
+        var url = "http://www.youtube.com/embed/"+youtubeParse[1];
         $('#videoContent').val(youtubeParse[1]);
         return url;
       }
 
-      //FOr Facebook Video Verification
-      if(/https:\\/\\/www.facebook.com\\/sharer\\/sharer.php\\?u=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D(\\w+)/.test(url)) {
-        var youtubeParse = /https:\\/\\/www.facebook.com\\/sharer\\/sharer.php\\?u=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D(\\w+)/.exec(url);
-        url = "http://www.youtube.com/embed/"+youtubeParse[1];
+      // For Facebook Video Verification
+      var facebookPttn = new RegExp("https:\\/\\/www.facebook.com\\/sharer\\/sharer.php\\?u=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D(\\w+)");
+      if(facebookPttn.test(url)) {
+        var youtubeParse = facebookPttn.exec(url);
+        var url = "http://www.youtube.com/embed/"+youtubeParse[1];
         $('#videoContent').val(youtubeParse[1]);
         return url;
       } 
@@ -345,3 +346,4 @@ script(type='text/javascript')
       }
     });
   });
+

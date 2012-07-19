@@ -3,8 +3,8 @@
   .container-fluid.lesson.inner-index
     h1 #{lesson.title}
     .row-fluid
-      .span9
-        video#player(width='840', height='475', preload="none")
+      .span9#playerSpan
+        video#player(preload="none")
           - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
             source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
           - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
@@ -22,58 +22,62 @@
           include _footer
   script
     var currentVideoTime = 0, LastUpdatedTime = 0;
-    $('video').mediaelementplayer({
-      enablePluginDebug: false,
-      defaultVideoWidth: 840,
-      defaultVideoHeight: 475,
-      features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
-      alwaysShowControls: true,
-      pluginPath: '/javascripts/mediaelement/',
-      success: function(mediaElement, domObject) {
-
-        // At Video Start
-        mediaElement.addEventListener('playing', function(e) {
-          var videoResumeTime = '#{videoStartTime}';
-          if(typeof(videoResumeTime) != 'number') {
-            videoResumeTime = parseInt(videoResumeTime);
-          }
-          mediaElement.setCurrentTime(videoResumeTime);
-        }, false);
-
-
-        // Find Current Time and Update it in Progress
-        mediaElement.addEventListener('timeupdate', function(e) {
-          currentVideoTime = mediaElement.currentTime;
-        }, false);
-
-        // Change the Status at end of Video
-        mediaElement.addEventListener('ended', function(e) {
-          
-
-          if(#{progressFlag}) {  
-            // Send Complete Status of Video to Server Using Socket.
-            var courseId =  '#{lesson.chapter.course}';
-            var chapterId =  '#{lesson.chapter._id}';
-            var lessonId =  '#{lesson._id}';
-            progressSocket.emit('status', { status: 'completed', courseId: courseId, chapterId: chapterId, lessonId: lessonId});
-          }
-
-          /*$.ajax({
-            url: '/lesson/#{lesson.id}/complete/',
-            success: function(data) {
-              $('.lessonBar .btn-success').addClass('btn-large');
-            },
-            error: function(error, status, xhr) {
-              console.log(JSON.stringify(error) + "Status: " + status);
-            }
-          });*/
-        }, false);
-      },
-      error: function(err) {
-        console.log(err);
+    var videoH = 475;
+    var videoW = 840;
+    $(document).ready(function(){
+      var rowWidth = $('.row-fluid').width();
+      if(rowWidth < 900) {
+        videoW = rowWidth;
+        videoH = parseInt(rowWidth / 840 * 475);
       }
-    });
+      $('video').attr("width", videoW);
+      $('video').attr("height", videoH);
 
+      $('video').mediaelementplayer({
+        enablePluginDebug: false,
+        defaultVideoWidth: videoW,
+        defaultVideoHeight: videoH,
+        features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
+        alwaysShowControls: true,
+        pluginPath: '/javascripts/mediaelement/',
+        success: function(mediaElement, domObject) {
+
+          // At Video Start
+          mediaElement.addEventListener('playing', function(e) {
+            var videoResumeTime = '#{videoStartTime}';
+            if(typeof(videoResumeTime) != 'number') {
+              videoResumeTime = parseInt(videoResumeTime);
+            }
+            mediaElement.setCurrentTime(videoResumeTime);
+          }, false);
+
+
+          // Find Current Time and Update it in Progress
+          mediaElement.addEventListener('timeupdate', function(e) {
+            currentVideoTime = mediaElement.currentTime;
+          }, false);
+
+          // Change the Status at end of Video
+          mediaElement.addEventListener('ended', function(e) {
+            if(#{progressFlag}) {  
+              // Send Complete Status of Video to Server Using Socket.
+              var courseId =  '#{lesson.chapter.course}';
+              var chapterId =  '#{lesson.chapter._id}';
+              var lessonId =  '#{lesson._id}';
+              var userId = '#{userId}';
+              progressSocket.emit('status', { type: 'video', status: 'completed', userId: userId, courseId: courseId, chapterId: chapterId, lessonId: lessonId});
+            }
+          }, false);
+
+          $('#mep_0').css("margin-left", "auto");
+          $('#mep_0').css("margin-right", "auto");
+
+        },
+        error: function(err) {
+          console.log(err);
+        }
+      });
+    });
 
     if(#{progressFlag}) {
       var updateProgress = setInterval(function() {
@@ -85,8 +89,39 @@
           var courseId =  '#{lesson.chapter.course}';
           var chapterId =  '#{lesson.chapter.id}';
           var lessonId =  '#{lesson.id}';
-          progressSocket.emit('change', { type: 'video', data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          var userId = '#{userId}';
+          progressSocket.emit('change', { type: 'video', userId: userId, data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
           
         }
       }, 5000);
+    }
+
+    // Script for hide sidebar
+    $(window).resize(function(){
+      if($('.row-fluid').width() <= 250+parseInt($('video').attr("width"))) {
+        removeSideBar();
+      }
+      else {
+        addSideBar();
+      }
+    });
+    $(document).ready(function(){
+      if($('.row-fluid').width() <= 900) {
+        removeSideBar();
+      }
+      else {
+        addSideBar();
+      }
+    })
+
+    var addSideBar = function() {
+      $('.sidebar').css("display", "block");
+      $('#playerSpan').removeClass('span12');
+      $('#playerSpan').addClass('span9');
+    }
+
+    var removeSideBar = function() {
+      $('.sidebar').css("display", "none");
+      $('#playerSpan').removeClass('span9');
+      $('#playerSpan').addClass('span12');
     }

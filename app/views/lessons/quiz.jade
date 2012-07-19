@@ -19,19 +19,19 @@
                 - if(typeof(attempted) != 'undefined' && attempted[option] === 'true')
                     div.questionAnswer.correct
                       input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" ) 
-                      #{option}
+                      |  #{option}
                 - else if(typeof(attempted) != 'undefined' && attempted[option] === 'correct')
                     div.questionAnswer.correct
                       input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" , checked) 
-                      #{option}
+                      |  #{option}
                 - else if(typeof(attempted) != 'undefined' && attempted[option] === 'wrong')
                     div.questionAnswer.wrong
                       input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" , checked) 
-                      #{option} 
+                      |  #{option} 
                 - else
                     div.questionAnswer
                       input(type='#{type}',value="#{option}",name="question[#{questionIndex}]") 
-                      #{option}
+                      |  #{option}
 
           - if (typeof(attemptedAnswers) == 'undefined') 
             p

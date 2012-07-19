@@ -1,12 +1,12 @@
-var Course = load.model('Course');
-var Chapter = load.model('Chapter');
-var Lesson = load.model('Lesson');
-var User = load.model('User');
+var model = require('../models');
 
+var util = require('./util');
 
 module.exports = function() {};
 
 module.exports.course = function(data, callback) {
+  var Course = model.Course;
+
   var course = new Course();
   course.title = data.title;
   course.desc = data.desc;
@@ -32,6 +32,8 @@ module.exports.course = function(data, callback) {
 };
 
 module.exports.chapter = function(data, courseId, callback) {
+  var Chapter = model.Chapter;
+
   var chapter = new Chapter();
   chapter.title = data.title;
   chapter.desc = data.desc;
@@ -55,6 +57,8 @@ module.exports.chapter = function(data, courseId, callback) {
 };
 
 module.exports.lesson = function(data, chapterId, callback) {
+  var Lesson = model.Lesson;
+
   var lesson = new Lesson();
   lesson.title = data.title;
   lesson.desc = data.desc;
@@ -86,23 +90,35 @@ module.exports.lesson = function(data, chapterId, callback) {
 };
 
 
-module.exports.users = function(email, callback) {
-  User.findOne({email: email}, function(error, dbUser) {
-    if (error) {
-      callback(error);
-    }
-    if(dbUser == null) {
-      user = new User();
-      user.email = email;
-      user.roles = ['default'];
-      user.save(function(error){
-        if(error) {
-          log.error(error);
-          callback(error);
-        }
-        callback(null);
-      });
-    }
-    callback(null);
-  });
+module.exports.usersFromUnbounce = function(userRow, callback) {
+  var User = model.User;
+  
+  var fields = userRow.split(',');
+  var email = fields[5];
+  if(email && email !== 'email') {
+    email = util.string.trim(email);
+
+    User.findOne({email: email}, function(error, dbUser) {
+      if (error) {
+        return callback(error);
+      }
+
+      if(!dbUser) {
+        user = new User();
+        user.email = email;
+        user.roles = ['default'];
+        user.save(function(error){
+          if(error) {
+            return callback(error);
+          }
+
+          callback();
+        });
+      } else {
+        callback();
+      }
+    });
+  } else {
+    callback();
+  }
 }

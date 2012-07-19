@@ -1,14 +1,16 @@
 var express = require('express');
+var stylus = require('stylus');
 var RedisStore = require('connect-redis')(express);
-var log4js = require('log4js');
+
+var auth = require('./app/middleware/authentication');
 
 module.exports = function(config) {
-  var appRoot = config.appRoot || process.cwd();
+  var appRoot = process.cwd();
   var tmpFileUploadDir = appRoot + '/app/upload';
   var sessionStore = new RedisStore();
 
   // Authentication Middleware
-  var authMiddleware = load.helper('auth')(config);
+  var authMiddleware = auth.getMiddleware(config);
 
   var app = express.createServer();
 
@@ -17,6 +19,14 @@ module.exports = function(config) {
     // Views
     app.set('views', __dirname + '/app/views');
     app.set('view engine', 'jade');
+
+    // CSS Preprocessing with stylus
+    app.use(stylus.middleware({ src: __dirname + '/public' }));
+    
+    // Set app-level config in express
+    app.set('appRoot', appRoot);
+    app.set('tmpDir', tmpFileUploadDir);
+    app.set('config', config);
 
     // Body parser
     app.use(express.bodyParser({uploadDir: tmpFileUploadDir, keepExtensions: true }));
@@ -32,7 +42,9 @@ module.exports = function(config) {
     }));
 
     // Auth and routes
-    app.use(authMiddleware.middleware());
+    app.use(authMiddleware.initialize());
+    app.use(authMiddleware.session());
+
     app.use(function(req, res, next){
       if(req.method === 'GET') {
         // expose "error" and "message" to all
@@ -58,23 +70,29 @@ module.exports = function(config) {
   });
 
   // Express environment config
+  app.configure('test', function(){
+    app.use(require('./app/middleware/errorHandler')({ dumpExceptions: true, showStack: true }));
+  });
+
   app.configure('development', function(){
-    app.use(log4js.connectLogger(log, { level: log4js.levels.INFO }));
-    log.setLevel('TRACE');
-    app.use(load.middleware('errorHandler')({ dumpExceptions: true, showStack: true }));
+    log.exitOnError = true;
+    log.transports.console.level = 'silly';
+    log.transports.console.prettyPrint = true;
+    log.transports.console.handleExceptions = false;
+    app.use(require('./app/middleware/errorHandler')({ dumpExceptions: true, showStack: true }));
   });
 
   app.configure('production', function(){
-    log4js.addAppender(log4js.fileAppender('app.log'), 'app');
-    log.setLevel('INFO');
-    app.use(load.middleware('errorHandler')({}));
+    log.exitOnError = false;
+    log.transports.console.level = 'silly';
+    log.transports.console.prettyPrint = true;
+    log.transports.console.handleExceptions = true;
+    log.add(log.transports.File, { filename: 'app.log', level: 'info', handleExceptions: true, timestamp: true });
+    app.use(require('./middleware/errorHandler')({}));
   });
 
-  // Everyauth view helper
-  authMiddleware.helpExpress(app);
-
   // Routes
-  load.routes()(app);
+  require('./app/routes')(app);
 
   return app;
 };
