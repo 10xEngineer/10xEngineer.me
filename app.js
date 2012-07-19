@@ -1,4 +1,5 @@
 var express = require('express');
+var stylus = require('stylus');
 var RedisStore = require('connect-redis')(express);
 
 module.exports = function(config) {
@@ -17,6 +18,9 @@ module.exports = function(config) {
     app.set('views', __dirname + '/app/views');
     app.set('view engine', 'jade');
 
+    // CSS Preprocessing with stylus
+    app.use(stylus.middleware({ src: __dirname + '/public' }));
+    
     // Set app-level config in express
     app.set('appRoot', appRoot);
     app.set('tmpDir', tmpFileUploadDir);
