@@ -113,6 +113,10 @@ module.exports = function(app) {
 
   app.get('/auth/google', auth.google);
   app.get('/auth/google/callback', auth.googleCallback);
+  app.get('/auth/fb', auth.facebook);
+  app.get('/auth/fb/callback', auth.facebookCallback);
+  app.get('/auth/twitter', auth.twitter);
+  app.get('/auth/twitter/callback', auth.twiiterCallback);
 
   app.get('/signup', accessPermission, user.signup);
   app.get('/register', accessPermission, user.registerView);
