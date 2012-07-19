@@ -17,7 +17,7 @@
 	p
 		ul.course_list
 			each course in courses
-				-if(everyauth.loggedIn && (isAdmin || (course.created_by && course.created_by.toString() == user._id.toString())))
+				-if(everyauth.loggedIn && (isAdmin || (course.created_by && course.created_by._id && (course.created_by._id.toString() == user._id.toString()))))
 					li 
 						a(href='/course_editor/course/#{course.id}') #{course.title} 
 						a.btn.btn-danger.pull-right(href="/course_editor/course/#{course.id}/remove") Remove
