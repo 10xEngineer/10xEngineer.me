@@ -87,8 +87,8 @@ module.exports = function(config) {
     log.transports.console.level = 'silly';
     log.transports.console.prettyPrint = true;
     log.transports.console.handleExceptions = true;
-    log.add(log.transports.File, { filename: 'app.log', level: 'info', handleExceptions: true, timestamp: true });
-    app.use(require('./middleware/errorHandler')({}));
+    //`log.add(log.transports.File, { filename: 'app.log', level: 'info', handleExceptions: true, timestamp: true });
+    app.use(require('./app/middleware/errorHandler')({}));
   });
 
   // Routes
