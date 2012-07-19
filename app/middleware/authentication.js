@@ -2,6 +2,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
 
 var model = require('../models');
 
@@ -55,6 +56,19 @@ module.exports.getMiddleware = function(config) {
     }
   ));
 
+  // Twitter
+  passport.use(new TwitterStrategy({
+      consumerKey: config.get('auth:twitter:consumerKey'),
+      consumerSecret: config.get('auth:twitter:consumerSecret'),
+      callbackURL: hostname + '/auth/twitter/callback'
+    },
+    function(token, tokenSecret, profile, done) {
+      profile.token = token;
+      profile.tokenSecret = tokenSecret;
+
+      callback(null, profile);
+    }
+  ));
 
   // Serialize user on login
   passport.serializeUser(function(user, callback) {
@@ -172,7 +186,7 @@ module.exports.facebookCallback = function(req, res, next) {
         res.redirect('/register');
 
       } else {
-        user.google = profile;
+        user.facebook = profile;
 
         user.save(function(error) {
           // Establish a session
@@ -190,9 +204,50 @@ module.exports.facebookCallback = function(req, res, next) {
 };
 
 module.exports.twitter = function(req, res, next) {
-
+  passport.authenticate('twitter')(req, res, next);
 };
 
 module.exports.twitterCallback = function(req, res, next) {
+  passport.authenticate('twitter', {
+    successRedirect: '/',
+    failureRedirect: '/auth'
+  },
+  function(error, profile, info) {
+    if(error) {
+      return next(error);
+    }
 
+    var User = model.User;
+
+    var email = profile._json.email;
+    // Find out if the user is already registered
+    User.findOne({ email: email }, function(error, user) {
+      if(error) {
+        return callback(error);
+      }
+
+      if(!user) {
+        // User is not registered, save the profile in session and redirect to registration page
+        req.session.newUser = {
+          name: profile.displayName,
+          email: email
+        };
+        res.redirect('/register');
+
+      } else {
+        user.twitter = profile;
+
+        user.save(function(error) {
+          // Establish a session
+          req.logIn(user, function(error) {
+            if(error) {
+              return next(error);
+            }
+
+            util.redirectBackOrHome(req, res);
+          });
+        });
+      }
+    });
+  })(req, res, next);
 };
