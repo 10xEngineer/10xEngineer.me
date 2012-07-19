@@ -200,9 +200,9 @@ ul.lessons li a h3
 /*****************/
 
 .img
-  // filter: url(filters.svg#grayscale) /* Firefox */
-  // filter: gray /* IE */
-  -webkit-filter: grayscale(1) /* Webkit */
+	// filter: url(filters.svg#grayscale) /* Firefox */
+	// filter: gray /* IE */
+	-webkit-filter: grayscale(1) /* Webkit */
 
 
 /* User PRofile  End */
@@ -211,15 +211,17 @@ ul.lessons li a h3
 /* Chaper Moves */
 /*****************/
 
-.chapter:first-child .moveBox a
-.lesson:first-child .moveBox a 
-	&:first-child
-		display: none
+.chapter
+.lesson
+	&:first-child .moveBox a 
+		&:first-child
+			display: none
 
-.chapter:last-child .moveBox a
-.lesson:last-child .moveBox a 
-	&:last-child
-		display: none
+.chapter
+.lesson
+	&:last-child .moveBox a 
+		&:last-child
+			display: none
 
 
 .chapter:first-child .moveBox a
@@ -228,9 +230,10 @@ ul.lessons li a h3
 		top: 25px
 
 
-.chapter:hover .moveBox
-.lesson:hover .moveBox 
-	display: block
+.chapter
+.lesson
+	&:hover .moveBox 
+		display: block
 
 
 
@@ -776,8 +779,8 @@ a
 	Inline CSS from jade files
 */
 
-/* ADMIN */
-/*=======*/
+/* ADMIN [DIR]*/
+/*============*/
 
 // approve.jade & index.jade & roles.jade
 .admin_view_list_items li label
@@ -804,3 +807,94 @@ a
 .listItemComponent
 	> a
 		margin-right: 5px
+
+// show labs
+.labsHeader a
+	margin-bottom: 5px
+
+.labsTable a
+	margin-right: 5px
+
+// TODO: user_details.jade is remaining, because this page is not used right now
+
+// user_roles.jade
+#selRole
+	width=320px
+	display:none
+
+#permission
+	width:210px
+
+#permission div
+	display:none
+
+#permission div ul
+	width:220px
+
+// usersImport.jade has no inline styles
+/* admin Completed */
+
+
+/* COURSE_EDITOR [DIR] */
+/*=====================*/
+
+// index.jade
+ul.course_list a.btn.pull-right
+	margin-right: 5px
+
+/* chapter [dir] */
+
+// index.jade
+ul.lessons li.lesson a.pull-right
+	margin-right: 5px
+
+/* course [dir] */
+
+// index.jade
+ul.chapters li.chapter a.pull-right
+	margin-right: 5px
+
+/* lesson [dir] */
+
+// _sysAdminForm
+#addServerBtn 
+	margin: 5px 0px
+
+/** COURSE_EDITOR Completed **/
+
+/** Courses [dir] **/
+/**===============**/
+
+// courseDetails.jade
+#myCollapsible
+	.accordion-group
+		.accordion-body.collapse
+			height: 0px
+
+/** Courses Completed **/
+
+/** USERS **/
+/**=======**/
+
+// profile.jade
+form p .chapterPerogressbox
+	min-height: 75px
+
+// main.jade
+.mainPageBtnContainer
+	display:inline-block
+	> div
+		display:inline-block
+		width: 200px;
+		margin: 5px auto;
+
+.mainPageBtn
+	margin:10px
+	> div
+		float:left
+
+.mainPageFooter
+	background-color: #333
+	color: white
+	.container
+		padding: 20px

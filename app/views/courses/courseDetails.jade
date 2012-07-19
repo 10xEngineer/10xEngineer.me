@@ -50,7 +50,7 @@
                 - if(progress)
                   .progress
                     .bar(style="width: #{progress.chapters[chapterIndex].progress}%;")
-              div(class="accordion-body collapse", id="#{chapter.id}", style="height: 0px;", title="#{chapter.title}")
+              div(class="accordion-body collapse", id="#{chapter.id}", title="#{chapter.title}")
                 .accordion-inner
                   ul.lessonList
                     each lesson, lessonIndex in chapter.lessons

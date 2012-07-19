@@ -108,8 +108,7 @@ ul.carousel-inner li.item {
   color: #333;
 }
 /** Better Tab **/
-.nav-tabs.nav-stacked > a,
-> li > a {
+.nav-tabs.nav-stacked > li > a {
   background-color: #fff;
 }
 .nav-tabs {
@@ -126,8 +125,7 @@ ul.carousel-inner li.item {
   -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.3);
   box-shadow: 0 1px 1px rgba(0,0,0,0.3);
 }
-.nav-tabs > a,
-> .active > a {
+.nav-tabs > .active > a {
   pointer-events: none;
 /* Avoid Lock/Double Clicking in sequence: li.active -> li */
 }
@@ -194,13 +192,14 @@ ul.lessons li a h3 {
 /*****************/
 /* USERS PROFILE */
 /*****************/
-.img:first-child,
-:first-child,
--webkit-filter: grayscale(1) /* Webkit */:first-child,
-/* User PRofile  End */:first-child,
-/*****************/:first-child,
-/* Chaper Moves */:first-child,
-/*****************/:first-child,
+.img {
+  -webkit-filter: grayscale(1);
+/* Webkit */
+}
+/* User PRofile  End */
+/*****************/
+/* Chaper Moves */
+/*****************/
 .chapter:first-child .moveBox a:first-child,
 .lesson:first-child .moveBox a:first-child {
   display: none;
@@ -728,8 +727,8 @@ a:visited {
 /*
 	Inline CSS from jade files
 */
-/* ADMIN */
-/*=======*/
+/* ADMIN [DIR]*/
+/*============*/
 .admin_view_list_items li label,
 .admin_view_list_items li a,
 .admin_view_list_items li p,
@@ -746,7 +745,75 @@ a:visited {
 #createRoleForm #permissionTable {
   width: 50%;
 }
-.admin_view_list_items .listItemComponent,
-> a {
+.listItemComponent > a {
   margin-right: 5px;
+}
+.labsHeader a {
+  margin-bottom: 5px;
+}
+.labsTable a {
+  margin-right: 5px;
+}
+#selRole {
+  display: none;
+}
+#permission {
+  width: 210px;
+}
+#permission div {
+  display: none;
+}
+#permission div ul {
+  width: 220px;
+}
+/* admin Completed */
+/* COURSE_EDITOR [DIR] */
+/*=====================*/
+ul.course_list a.btn.pull-right {
+  margin-right: 5px;
+}
+/* chapter [dir] */
+ul.lessons li.lesson a.pull-right {
+  margin-right: 5px;
+}
+/* course [dir] */
+ul.chapters li.chapter a.pull-right {
+  margin-right: 5px;
+}
+/* lesson [dir] */
+#addServerBtn {
+  margin: 5px 0px;
+}
+/** COURSE_EDITOR Completed **/
+/** Courses [dir] **/
+/**===============**/
+#myCollapsible .accordion-group .accordion-body.collapse {
+  height: 0px;
+}
+/** Courses Completed **/
+/** USERS **/
+/**=======**/
+form p .chapterPerogressbox {
+  min-height: 75px;
+}
+.mainPageBtnContainer {
+  display: inline-block;
+}
+.mainPageBtnContainer > div {
+  display: inline-block;
+  width: 200px;
+  margin: 5px auto;
+}
+.mainPageBtn {
+  margin: 10px;
+}
+.mainPageBtn > div {
+  float: left;
+}
+.mainPageFooter {
+  background-color: #333;
+  color: #fff;
+}
+.mainPageFooter .container {
+  padding: 20px;
 }
