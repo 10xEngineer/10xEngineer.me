@@ -15,7 +15,7 @@ module.exports.home = function(req, res){
 };
 
 module.exports.about = function(req, res){
-  res.render('default', {
+  res.render('about', {
     title: '10xEngineer.me About',
     coursenav: "N",
     text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'

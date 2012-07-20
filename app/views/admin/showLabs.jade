@@ -3,13 +3,13 @@
 
   br
 
-  .labs_header
-    a.btn.pull-right(href="/admin/labs/create", style="margin-bottom: 5px;") 
+  .labsHeader
+    a.btn.pull-right(href="/admin/labs/create") 
       i.icon-plus
       |   Add New Lab
 
 
-  table.table.table-bordered
+  table.table.table-bordered.labsTable
     thead
       tr
         th Name
@@ -24,5 +24,5 @@
           td #{lab.type}
           td #{lab.runList}
           td 
-            a.btn.btn-success(href="/admin/labs/#{lab.id}/edit", style="margin-right: 5px;") Edit 
+            a.btn.btn-success(href="/admin/labs/#{lab.id}/edit") Edit 
             a.btn.btn-danger(href="/admin/labs/#{lab.id}/remove") Delete

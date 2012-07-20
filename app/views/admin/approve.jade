@@ -5,8 +5,8 @@
       each user in users
         li
           -if(user.name) 
-            label(for='#{user.id}', style='display:inline') #{user.name}
+            label(for='#{user.id}') #{user.name}
           -else
-            label(for='#{user.id}', style='display:inline') #{user.email}
+            label(for='#{user.id}') #{user.email}
           .pull-right
-            a.btn(href='/admin/approve/#{user.id}', id='#{user.id}', style="display:inline") Approve
+            a.btn(href='/admin/approve/#{user.id}', id='#{user.id}') Approve
