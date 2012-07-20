@@ -10,21 +10,26 @@ var statics = {
       return callback(new Error('Missing required fields'));
     }
 
-    bcrypt.genSalt(10, function(err, salt) {
-      bcrypt.hash(data.password, salt, function(error, hash) {
-        var newUser = new User();
-        newUser.email = data.email;
-        newUser.hash = hash;
-        
-        if(data.name) {
-          newUser.name = data.name;
-        }
-
-        newUser.save(function(error) {
-          if(error) {
-            callback(error);
+    User.findOne({ email: data.email }, function(error, dbUser) {
+      bcrypt.genSalt(10, function(err, salt) {
+        bcrypt.hash(data.password, salt, function(error, hash) {
+          var newUser;
+          if(dbUser) {
+            newUser = dbUser;
           } else {
-            callback(null, newUser);
+            newUser = new User();
+          }
+          
+          newUser.email = data.email;
+          newUser.hash = hash;
+
+          if(data.provider) {
+            newUser[data.provider] = data.profile;
+            newUser.markModified(data.provider);
+          }
+          
+          if(data.name) {
+            newUser.name = data.name;
           }
         });
       });
