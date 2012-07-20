@@ -1,29 +1,31 @@
 .container
-	.container-fluid.auth-page
-		header.page-header
-			h1 Login
-		.row-fluid
-			.span6
-					ul.auth-service
-						li.googl
-							a.btn(href='/auth/google') Login with Google
-						li.tw
-							a.btn.btn-info(href='/auth/twitter') Login with Twitter
-						li.fb
-							a.btn.btn-primary(href='/auth/fb') Login with Facebook
-			.span6
-					h2 LogIn with Email
-					form(method="POST")
-						p
-							label Email:
-							input(type="text", name="email")
-						p
-							label Password:
-							input(type="password", name="password")
-						p
-							input.btn(type="submit", value="Submit")
+  .container-fluid.auth-page
+    header.page-header
+      h1 Login
+    .row-fluid
+      .span6
+          ul.auth-service
+            li.googl
+              a.btn(href='/auth/google') Login with Google
+            li.tw
+              a.btn.btn-info(href='/auth/twitter') Login with Twitter
+            li.fb
+              a.btn.btn-primary(href='/auth/fb') Login with Facebook
+      .span6
+          h2 LogIn with Email
+          form(method="POST")
+            p
+              label Email:
+              input(type="text", name="email")
+            p
+              label Password:
+              input(type="password", name="password")
+            p
+              input.btn(type="submit", value="Submit")
 
-		.row-fluid
-			.span12
-				h3
-					a(href="/register") SignUp Now
+    .row-fluid
+      .span12.center
+        h3 or
+      .span12.center.SignUpBtnContainer
+        a.btn.btn-success.SignUpBtn(href="/register")
+          h2 SignUp Now

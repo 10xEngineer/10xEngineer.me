@@ -20,7 +20,7 @@
   },
   "db": {
     "address": "mongodb://localhost/",
-    "database": "10xengineer",
+    "database": "10xengTest",
     "schemaVersion": 5
   },
   "mail": {

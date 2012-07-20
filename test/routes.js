@@ -2,7 +2,7 @@ var app = require('../app')(require('../app/config/config'));
 var request = require('./support/http');
 
 // Override log
-global.log = function() {};
+global.log = { info: function(){}, error: function(){}, warn: function(){}, silly: function(){} };
 
 describe('Route collection', function() {
   describe('main', function(){

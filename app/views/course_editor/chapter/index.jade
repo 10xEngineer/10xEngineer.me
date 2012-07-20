@@ -21,13 +21,13 @@
                 h3 #{lesson.title}
               - if(isLoggedIn)
                 - if(lesson.status != 'published')
-                  | ( Draft )
-                a.btn.btn-danger.pull-right(href='/course_editor/lesson/#{lesson.id}/remove', style='margin-right: 5px;') Delete
+                  | (Draft)
+                a.btn.btn-danger.pull-right(href='/course_editor/lesson/#{lesson.id}/remove') Delete
                 - if(lesson.status != 'published')
-                  a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/publish', style='margin-right: 5px;') Publish
+                  a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/publish') Publish
                 - else
-                  a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/unpublish', style='margin-right: 5px;') Unpublish
-                a.btn.pull-right(href='/course_editor/lesson/#{lesson.id}/edit', style='margin-right: 5px;') Edit
+                  a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/unpublish') Unpublish
+                a.btn.pull-right(href='/course_editor/lesson/#{lesson.id}/edit') Edit
               div.moveBox
                   a.upArrow(href="/course_editor/lesson/#{lesson.id}/up")
                     i.icon-chevron-up

@@ -24,6 +24,18 @@ var statics = {
           newUser.hash = hash;
 
           if(data.provider) {
+            newUser[data.provider] = data.profile;
+            newUser.markModified(data.provider);
+          }
+          
+          if(data.name) {
+            newUser.name = data.name;
+          }
+          
+          newUser.email = data.email;
+          newUser.hash = hash;
+
+          if(data.provider) {
             log.info('provider', data.profile);
 
             newUser[data.provider] = data.profile;
