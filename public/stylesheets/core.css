@@ -466,7 +466,7 @@ div.course_editor_header {
   padding-top: 5px;
   padding-left: 5px;
 }
-#footer .container .socialmedia {
+#footer .container .span6.socialmedia {
   float: right;
 }
 .span12 .span4 {
@@ -706,7 +706,6 @@ a:visited {
   background-position: left top;
   height: 25px;
   width: 25px;
-  margin: -25px 0px 0px 25px;
 }
 .not-started {
   background-position: center;
@@ -790,9 +789,6 @@ ul.chapters li.chapter a.pull-right {
 /** COURSE_EDITOR Completed **/
 /** Courses [dir] **/
 /**===============**/
-#myCollapsible .accordion-group .accordion-body.collapse {
-  height: 0px;
-}
 /** Courses Completed **/
 /** USERS **/
 /**=======**/

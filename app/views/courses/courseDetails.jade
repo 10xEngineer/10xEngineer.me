@@ -23,7 +23,6 @@
             .row-fluid.detailsBorder
               h3 Rating: 
               img(src="/img/th_rating.gif")
-          - log.info("progress: ", progress); 
           - if(progress) 
             - if(progress.status != 'completed')
               .row-fluid.detailsBorder
@@ -50,7 +49,7 @@
                 - if(progress)
                   .progress
                     .bar(style="width: #{progress.chapters[chapterIndex].progress}%;")
-              div(class="accordion-body collapse", id="#{chapter.id}", title="#{chapter.title}")
+              div(class="accordion-body collapse", id="#{chapter.id}", style="height: 0px;", title="#{chapter.title}")
                 .accordion-inner
                   ul.lessonList
                     each lesson, lessonIndex in chapter.lessons
