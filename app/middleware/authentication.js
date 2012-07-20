@@ -124,7 +124,7 @@ module.exports.googleCallback = function(req, res, next) {
         return next(error);
       }
 
-      if(!user) {
+      if(!user || !user.hash) {
         // User is not registered, save the profile in session and redirect to registration page
         req.session.newUser = {
           name: profile.displayName,
@@ -177,7 +177,7 @@ module.exports.facebookCallback = function(req, res, next) {
         return next(error);
       }
 
-      if(!user) {
+      if(!user || !user.hash) {
         // User is not registered, save the profile in session and redirect to registration page
         req.session.newUser = {
           name: profile.displayName,
@@ -229,7 +229,7 @@ module.exports.twitterCallback = function(req, res, next) {
         return next(error);
       }
 
-      if(!user || !user.email) {
+      if(!user || !user.email || !user.hash) {
         // User is not registered, save the profile in session and redirect to registration page
         req.session.newUser = {
           name: profile.displayName,
