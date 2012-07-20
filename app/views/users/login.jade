@@ -13,13 +13,13 @@
 							a.btn.btn-primary(href='/auth/fb') Login with Facebook
 			.span6
 					h2 LogIn with Email
-					form
+					form(method="POST")
 						p
 							label Email:
 							input(type="text", name="email")
 						p
 							label Password:
-							input(type="password", name="pass")
+							input(type="password", name="password")
 						p
 							input.btn(type="submit", value="Submit")
 
