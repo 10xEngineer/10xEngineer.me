@@ -11,17 +11,19 @@
       a.btn(href='/admin/clearProgress', id='#{user.id}') Clear Progress           
       a.btn(href="/admin/approve") Approve
       .counts.pull-right
-        label [Total - #{users.length}]
+        code(style="padding:10px;")  Total Users- #{users.length}
 
   .actions 
     ul.admin_view_list_items
       each user in users
         li
           - if(user.name) 
-            label(for='#{user.id}') #{user.name} 
+            a(href="admin/user/#{user.id}/info")
+              label(for='#{user.id}', style='display:inline') #{user.name} 
           - else
-            label(for='#{user.id}') #{user.email} 
-          p ( 
+            a(href="admin/user/#{user.id}/info")
+              label(for='#{user.id}', style='display:inline') #{user.email} 
+          p(style="display:inline; margin-right: 5px;")  ( 
             each role,roleIndex in user.roles
               if(roleIndex != 0) 
                 | ,

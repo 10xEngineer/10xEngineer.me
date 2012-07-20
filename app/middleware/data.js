@@ -116,7 +116,7 @@ module.exports = function(app) {
   app.param('userId', function(req, res, next, id){
     var User = model.User;
 
-    User.findById(id, function(error, user) {
+    User.findOne({ id: id }, function(error, user) {
       if(error) {
         next(error);
       }
@@ -127,7 +127,7 @@ module.exports = function(app) {
           extUser: user
         });
       }
-
+     
       next();
     });
   });

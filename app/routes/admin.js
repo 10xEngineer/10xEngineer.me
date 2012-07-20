@@ -410,9 +410,22 @@ module.exports.removeRole = function(req, res) {
   });
 };
 
-module.exports.assignRole = function(req, res) {
-  var Role = model.Role;
+module.exports.usersRoleView = function(req, res) {
+  
+  var roleName = req.route.params.roleName.toString();
+  var User = model.User;
 
+  User.find({roles : roleName} ,function(error, users) {
+    res.render('admin/userRoles', {
+      title: roleName+" Roles's User List" ,
+      users : users
+    });
+  });
+};
+
+module.exports.assignRole = function(req, res) {
+  
+  var Role = model.Role;
   var user = req.extUser;
   var roleId = req.params.roleId;
 
@@ -427,6 +440,23 @@ module.exports.assignRole = function(req, res) {
       res.end('{"success": true}');
     });
   });
+};
+
+module.exports.userInfo = function(req, res) {
+
+  var Progress = model.Progress;
+  var Role = model.Role;
+
+  Progress.userChapterProgress(req.extUser, function(error, progress) {
+    if(error) {
+      log.error(error);
+      req.session.error = "Can not fetch a progress report of user.";
+    }
+    res.render('admin/userInfo', {
+      userObject: req.extUser,
+      progressObject : progress
+    });
+  }); 
 };
 
 var getPermissionListForRole = function(req, callback) {
