@@ -70,6 +70,7 @@ module.exports.user = {
 	
 	profileUpdate : {
 		name : {required: true},
-		email : {required: true , email : true}
+		email : {required: true , email : true},
+		password : {required: true}
 	}
 }

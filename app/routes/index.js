@@ -106,10 +106,10 @@ module.exports = function(app) {
 
   app.get('/signup', accessPermission, user.signup);
   app.get('/register', accessPermission, user.registerView);
-  app.post('/register', accessPermission, user.register, auth.local);
+  app.post('/register', accessPermission, validation.lookUp(validationConfig.user.profileUpdate), user.register, auth.local);
   app.get('/user/profile', user.profile);
   app.get('/user/settings', user.settingsView);
-  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate),user.settings);
+  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate), user.settings);
   
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.featuredList);
