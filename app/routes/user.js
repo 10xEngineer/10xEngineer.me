@@ -64,22 +64,6 @@ module.exports.profile = function(req, res){
       log.error(error);
       req.session.error = "Can not fetch a progress report of user.";
     }
-    var length = courses.length;
-    var formattedProgress = [];
-    
-    for (var index = 0; index < courses.length; index++) {
-
-      var instanceProgress = {
-        courseId     : '',
-        courseTitle  : '',
-        progress     : ''
-      };
-      instanceProgress.courseId = courses[index]._id;
-      instanceProgress.courseTitle = courses[index].title;
-      instanceProgress.progress = progress[courses[index]._id].progress;
-      formattedProgress.push(instanceProgress);
-    }
-
     res.render('users/profile', {
       user: req.user,
       progressObject : progress
