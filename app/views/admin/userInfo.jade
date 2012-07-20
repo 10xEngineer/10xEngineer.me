@@ -1,0 +1,55 @@
+.container
+  h1 
+    - if(userObject.name)
+      | #{userObject.name}
+    - else
+      | #{userObject.email}
+    | 's Info
+  br
+  form(method='POST', action='', id='profileForm')
+    - if(userObject.name)
+      p
+        h5 User Name :
+        label #{userObject.name}  
+    p 
+      h5 Email :
+      label #{userObject.email}
+    p
+      h5 Account Type :
+      - if (userObject.facebook.name)
+          a(href='#{userObject.facebook.link}')
+            img(src="/images/facebook.png")
+      - else
+          img(src="/images/facebook.png",class="img")
+      - if (userObject.google.name)
+          - if (userObject.google.link)
+              a(href='#{userObject.google.link}')
+                img(src="/images/google.png")
+          - else
+                img(src="/images/google.png")                
+      - else
+          img(src="/images/google.png",class="img")
+      - if (userObject.twitter.name)
+          a(href='https://twitter.com/#{userObject.twitter.screen_name}')
+            img(src="/images/twitter.png")
+      - else
+          img(src="/images/twitter.png",class="img")
+    p
+      h5 Roles :
+      p(style="display:inline; margin-right: 5px;")  ( 
+        each role,roleIndex in userObject.roles
+          if(roleIndex != 0) 
+            | ,
+          a(href='/admin/role/#{role}') #{role} 
+        | )
+    p
+        each progress,progressIndex in progressObject
+          - if(progressIndex == 0)
+            h5 Attented Courses :
+          - if(progress.course != null)
+            div.chapterPerogressbox(style = "min-height: 75px")
+              div.courseName #{progress.course.title} 
+              - if (progress.progress != 100)
+                  a.btn.btn-primary.btn-large.chapterContinue.pull-right(href='/course/#{progress.course.id}/start') Continue
+              .courseProgress.pull-right
+                .bar(style="width:#{progress.progress}%;")

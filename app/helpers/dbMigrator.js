@@ -112,8 +112,8 @@ var migrate = function(dbVersion, codeVersion, done) {
       });
     });
   } else if(dbVersion == 3) {
-    // Defualt LabDef 
-    var labDef = new LabDef();
+    // Defualt VMDef 
+    var labDef = new VMDef();
     labDef.name = 'Web Server';
     labDef.type = 'Ubuntu';
     labDef.cpu = 1;

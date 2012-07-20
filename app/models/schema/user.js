@@ -6,7 +6,7 @@ var mongoose = require('mongoose')
 var UserSchema = module.exports = new Schema({
   _id: { type: ObjectId },
   email: { type: String, required: true, index: true, trim: true },
-  hash: { type: String, required: true },
+  hash: { type: String },
   name: { type: String, trim: true },
   image: { type: String },
   courses: [{ type: ObjectId, ref: 'Course'}],
