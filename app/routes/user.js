@@ -6,6 +6,7 @@ module.exports = function() {};
 
 module.exports.login = function(req, res){
   res.render('users/login', {
+    message: req.flash('error'),
     title: 'Log In',
     coursenav: "N",
     text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
