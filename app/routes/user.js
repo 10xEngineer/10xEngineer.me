@@ -3,14 +3,22 @@ var model = require('../models');
 var util = require('../helpers/util');
 
 module.exports = function() {};
-
 module.exports.login = function(req, res){
-  res.render('users/login', {
-    message: req.flash('error'),
-    title: 'Log In',
-    coursenav: "N",
-    text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
-  });
+  var error = req.flash('error');
+  if(error != "") {
+    res.render('users/login', {
+      error: error,
+      title: 'Log In',
+      coursenav: "N",
+      text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
+    });
+  } else {
+    res.render('users/login', {
+      title: 'Log In',
+      coursenav: "N",
+      text: '10xEngineer.me - Creating the next generation of expert developers and engineers.'
+    });
+  }
 };
 
 // TODO: Implement
