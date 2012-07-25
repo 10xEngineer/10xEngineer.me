@@ -1,0 +1,14 @@
+form(method='POST')
+  p
+    label(for="title") Title:
+    input.required(value='#{test.title}', id='title', name='title')
+  p
+    label(for="description") Description:
+    textarea.required(name='description', id='description') #{test.desc}
+  p
+    label(for="type") Type:
+    select.required(name='type', id='type', value="#{test.type}")
+        option(value='quiz') Quiz
+        option(value='programming') Programming
+  p
+    input.btn.btn-primary(type='submit', value='Create')

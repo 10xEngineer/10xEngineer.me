@@ -1,0 +1,29 @@
+.container
+  h1= title
+  h2 #{test.title}
+  p #{test.desc}
+  .row-fluid
+    .spam10
+      a.btn(href="/question/create/#{test.id}")
+        i.icon-plus
+        |  Add Question
+      a.btn.pull-right(href="/question/import/#{test.id}") 
+        i.icon-download-alt
+        |  Import Questions
+
+  .actions 
+    ul.questionList
+      each question in questions
+        li
+          .questionDiv
+            label #{question.question}
+            .pull-right.actionBtns
+              a.btn.btn-success(href="/question/#{question.id}/edit")
+                i.icon-edit.icon-white
+                |  Edit Question
+              a.btn.btn-danger(href="/question/#{question.id}/remove")
+                i.icon-trash.icon-white 
+                |  Delete Question
+          ul
+            each opt in question.choices
+              li #{opt}

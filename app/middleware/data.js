@@ -132,6 +132,49 @@ module.exports = function(app) {
     });
   });
 
+  // Test
+  app.param('testId', function(req, res, next, id){
+    var Test = model.Test;
+
+    Test.findOne({ id: id }, function(error, test) {
+      if(error) {
+        next(error);
+      }
+
+      if(test) {
+        req.test = test;
+        req.app.helpers({
+          test: test
+        });
+      }
+     
+      next();
+    });
+  });
+
+  // Question
+  app.param('questionId', function(req, res, next, id){
+    var Question = model.Question;
+
+    Question.findOne({ id: id })
+    .populate('test')
+    .exec(function(error, question) {
+      if(error) {
+        next(error);
+      }
+
+      if(question) {
+        req.question = question;
+        req.test = question.test;
+        req.app.helpers({
+          question: question
+        });
+      }
+     
+      next();
+    });
+  });
+
   // LabDef
   app.param('labDefId', function(req, res, next, id){
     var VMDef = model.VMDef;
