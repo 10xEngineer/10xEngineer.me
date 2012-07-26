@@ -103,4 +103,58 @@ module.exports.testList = function(req, res) {
       tests: tests
     })
   })
+};
+
+
+module.exports.startTest = function(req, res) {
+  var Assessment = model.Assessment;
+  var Quesiton = model.Question;
+  var test = req.test._id;
+
+  async.parallel([
+    function(innerCallback){
+      Question.find({difficulty : {$gt: 0, $lte: 3}, test: test}, {_id: 1, waitage: 1}, innerCallback);
+    },
+    function(innerCallback){
+      Question.find({difficulty : {$gt: 3, $lte: 7}, test: test}, {_id: 1, waitage: 1}, innerCallback);
+    },
+    function(innerCallback){
+      Question.find({difficulty : {$gt: 7, $lte: 10}, test: test}, {_id: 1, waitage: 1}, innerCallback);
+    }],
+    function(error, resutls){ // result = [easy, mid, hard]
+      generateQuestionPaper(results, function(error, questionPaper){
+        var assessment = new Assessment();
+        assessment.test = test;
+        assessment.user = req.user._id;
+        assessment.score = 0;
+        assessment.attemptedDeatail = questionPaper;
+
+        assessment.save(function(error){
+          if(error){
+            log.error(error);
+            res.redirect('/test');
+          }
+
+          Question.find({ _id: questionPaper[0]}, function(error, question){
+            if(error){
+              log.error(error);
+              res.redirect('/test');
+            }
+            req.session.assessment = assessment;
+            res.render('test/attempt/question', {
+              assessment: assessment,
+              question: question 
+            });
+          });
+        });
+      });
+    });
+  });
+};
+
+var generateQuestionPaper = function(questions, callback) {
+  var easyQuestions = questions[0];
+  var midQuestion = questions[1];
+  var hardQuestion = questions[2];
+  callback(null, easyQuestions);
 }
