@@ -204,15 +204,21 @@ module.exports = function(app) {
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
 
   // Test 
+  app.get('/test', test.testList);
   app.get('/test/create', test.createView);
   app.post('/test/create', test.create);
   app.get('/test/:testId', test.view);
+  app.get('/test/:testId/edit', test.editView);
+  app.post('/test/:testId/edit', test.edit);
+  app.get('/test/:testId/remove', test.removeTest);
+  app.get('/test/:testId/start', test.startTest);
 
   app.get('/question/create/:testId', question.createView);
   app.post('/question/create/:testId', question.create);
+  app.get('/question/import/:testId', question.importQuestionView);
+  app.post('/question/import/:testId', question.importQuestion);
   app.get('/question/:questionId/remove', question.removeQuestion);
   app.get('/question/:questionId/edit', question.editView);
   app.post('/question/:questionId/edit', question.edit);
-  
 
 };

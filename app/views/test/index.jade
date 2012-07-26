@@ -1,0 +1,27 @@
+.container
+  h1= title
+  .row-fluid
+    .spam10
+      a.btn(href="/test/create")
+        i.icon-plus
+        |  Create Test
+
+  .actions 
+    ul.testList
+      each test in tests
+        li
+          .innerDiv
+            a(href="/test/#{test.id}")
+              label #{test.title}
+            .pull-right.actionBtns
+              a.btn.btn-success(href="/test/#{test.id}/edit")
+                i.icon-edit.icon-white
+                |  Edit Test
+              a.btn.btn-danger(href="/test/#{test.id}/remove")
+                i.icon-trash.icon-white 
+                |  Delete Test
+              a.btn.btn-primary(href="/test/#{test.id}/start")
+                i.icon-hand-right.icon-white
+                |  Start Test
+          p
+            #{test.desc}
