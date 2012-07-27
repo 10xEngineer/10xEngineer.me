@@ -219,6 +219,14 @@ module.exports.nextQuestion = function(req, res) {
       finish = true;
     }
     // TODO:: Randomize options of question
+    var options = [];
+    var length = question.choices.length;
+    for (var index = 0; index < length; index++) {
+      var randIndex = getRandom(question.choices.length);
+      options.push(question.choices[randIndex]);
+      question.choices.splice(randIndex,1);
+    };
+    question.choices = options;
 
     res.render('test/attempt/question', {
       title : "Title",
