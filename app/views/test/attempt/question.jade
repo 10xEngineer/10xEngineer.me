@@ -1,0 +1,31 @@
+.container
+  h1= title
+    .row-fluid
+      .spam10
+        label Test
+
+    - if(question.answers.length > 1)
+      - var type = "checkbox";
+    - else
+      - var type = "radio";
+  form(method="post")
+    .actions 
+      - if(question.answers.length==1 && question.choices.length==1)
+        textarea(name="answer")
+      - else
+        .questionBlock
+          label #{question.question}
+          each option, optionIndex in question.choices
+            div
+              input(type="#{type}", name="questionOption[#{optionIndex}]", value="#{option}")
+              |  #{option}
+
+    - if(finish)
+      button.btn.btn-success(type="submit")
+        i.icon-ok.icon-white 
+        |  Finish    
+    - else
+      button.btn.btn-primary(type="submit")
+        i.icon-circle-arrow-right.icon-white 
+        |  Next
+br

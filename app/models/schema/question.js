@@ -8,7 +8,7 @@ var QuestionSchema = module.exports = new Schema({
   question: String,
   choices: [ String ],
   answers: [ String ],
-  waitage: Number,
+  weightage: Number,
   difficulty: Number
 }, {
   collection: 'question'

@@ -7,7 +7,7 @@ var AssessmentSchema = module.exports = new Schema({
   user: { type: ObjectId, ref: 'User' },
   test: { type: ObjectId, ref: 'Test' },
   score: { type: Number },
-  attemptedDeatail: [ AttemptSchema ]
+  attemptedDetails: [ AttemptSchema ]
  }, {
   collection: 'assessment'
 });

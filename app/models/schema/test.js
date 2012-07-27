@@ -6,6 +6,7 @@ var TestSchema = module.exports = new Schema({
   _id: { type: ObjectId },
   title: { type: String, index: true, trim: true, required: true },
   desc: { type: String },
+  mark: { type: Number },
   status: { type: String, default: 'draft', enum: ['draft', 'published'], required: true },
 }, {
   collection: 'test'

@@ -5,11 +5,11 @@ form(method='POST')
       - if(edit)
         input.question(type="text", value="#{question.question}", placeholder="Question", name="question")
         input.span1.questionDiffernce(placeholder="Difficulty", value="#{question.difficulty}", type="text", style="margin : auto 5px auto 10px;", name="difficulty")
-        input.span1.questionWaitage(placeholder="Waitage", value="#{question.waitage}", style="margin : auto 5px;", name="waitage")
+        input.span1.questionWeightage(placeholder="Weightage", value="#{question.weightage}", style="margin : auto 5px;", name="weightage")
       - else
         input.question(type="text", placeholder="Question", name="question")
         input.span1.questionDiffernce(placeholder="Difficulty", type="text", style="margin : auto 5px auto 10px;", name="difficulty")
-        input.span1.questionWaitage(placeholder="Waitage", style="margin : auto 5px;", name="waitage")
+        input.span1.questionWeightage(placeholder="Weightage", style="margin : auto 5px;", name="weightage")
 
       br
       .options
