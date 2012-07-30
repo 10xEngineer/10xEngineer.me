@@ -113,92 +113,89 @@ module.exports.testList = function(req, res) {
 module.exports.startTest = function(req, res) {
   var Assessment = model.Assessment;
   var Question = model.Question;
-  var test = req.test._id;
-  var mark = req.test.mark;
+  var test = req.test;
+  var testId = test._id;
 
-  delete req.session.currQuestion;
-  async.parallel([
-    function(innerCallback){
-      Question.find({difficulty : {$gt: 0, $lte: 3}, test: test}, {_id: 1, weightage: 1}, innerCallback);
-    },
-    function(innerCallback){
-      Question.find({difficulty : {$gt: 3, $lte: 7}, test: test}, {_id: 1, weightage: 1}, innerCallback);
-    },
-    function(innerCallback){
-      Question.find({difficulty : {$gt: 7, $lte: 10}, test: test}, {_id: 1, weightage: 1}, innerCallback);
-    }],
-    function(error, results){ // result = [easy, mid, hard]
-      generateQuestionPaper(results, mark, function(error, questionPaper){
-        var assessment = new Assessment();
-        assessment.test = test;
-        assessment.user = req.user._id;
-        assessment.score = 0;
-        assessment.attemptedDetails = questionPaper;
+  if(req.session.currQuestion) {
+    delete req.session.currQuestion;
+  }
+  
+  generateQuestionPaper(test, function(error, questionPaper){
 
-        assessment.save(function(error){
-          if(error){
-            log.error(error);
-            res.redirect('/test');
-          }
-          req.session.assessment = assessment;
-          res.redirect("/test/"+req.test.id+"/next");
-        });
-      });
-    }
-  );
+    var assessment = new Assessment();
+    assessment.test = test;
+    assessment.user = req.user._id;
+    assessment.score = 0;
+    assessment.attemptedDetails = questionPaper;
+    assessment.save(function(error){
+      if(error){
+        log.error(error);
+        res.redirect('/test');
+      }
+
+      req.session.assessment = assessment;
+      res.redirect("/test/"+req.test.id+"/next");
+    });
+  });
 };
 
 var getRandom = function(MaxNum) {
   return Math.floor(Math.random()*MaxNum);
 }
 
-var generateQuestionPaper = function(questions, mark, callback) {
-  var easyQuestions = questions[0];
-  var midQuestions = questions[1];
-  var hardQuestions = questions[2];
-
+var generateQuestionPaper = function(test, callback) {
+  
+  var Question = model.Question;
+  var mark = test.mark;
   // Todo : All logic is remaining  :p
   var questionPaper = [];
   var easyWeight = mark * 0.4;
   var midWeight  = mark * 0.4;
   var hardWeight = mark * 0.2;
+  var noOfHardQuestions = parseInt(hardWeight/3);
+  var rand = Math.random();
+  var direction = (rand>0.5) ? '$gte': '$lt' ;
 
-  var currWeight = 0;
-  while(true){
-    var sampleQuestion = {}; 
-    var randomIndex = getRandom(easyQuestions.length);
-    var tmpQuestion = easyQuestions[randomIndex];
-    sampleQuestion['question'] = tmpQuestion._id;
-    questionPaper.push(sampleQuestion);
-    currWeight+=tmpQuestion.weightage;
-    easyQuestions.splice(randomIndex, 1);
-    if(currWeight>=easyWeight) break;    
-  }
-  log.info("Marks after Easy questions selection :: ", currWeight);
-  while(true){
-    var sampleQuestion = {}; 
-    var randomIndex = getRandom(midQuestions.length);
-    var tmpQuestion = midQuestions[randomIndex];
-    sampleQuestion['question'] = tmpQuestion._id;
-    questionPaper.push(sampleQuestion);
-    currWeight+=tmpQuestion.weightage;
-    midQuestions.splice(randomIndex, 1);
-    if(currWeight>=easyWeight+midWeight) break;    
-  }
-  log.info("Marks after Mid questions selection :: ", currWeight);
-  while(true){
-    var sampleQuestion = {}; 
-    var randomIndex = getRandom(hardQuestions.length);
-    var tmpQuestion = hardQuestions[randomIndex];
-    sampleQuestion['question'] = tmpQuestion._id;
-    questionPaper.push(sampleQuestion);
-    currWeight+=tmpQuestion.weightage;
-    hardQuestions.splice(randomIndex, 1);
-    if(currWeight>=mark) break;    
-  }
-  log.info("Total Marks of Question paper will be ", currWeight);
+  var noOfCollectedQuestions =0;
+  var random = {};
+  random[direction] = rand;
+  Question.find({difficulty : 3, random : random }, { _id : 1})
+    .sort('random', -1 )
+    .limit(noOfHardQuestions)
+    .exec(function(error, hardQuestions){
+    if(error) {
+      log.error(error);
+    }
+    noOfCollectedQuestions = hardQuestions.length;
+    for (var index = 0; index < noOfCollectedQuestions; index++) {
+      var sampleQuestion = {}; 
+      sampleQuestion['question'] = hardQuestions[index]._id;
+      questionPaper.push(sampleQuestion);
+    }
 
-  callback(null, questionPaper);
+    if ( noOfCollectedQuestions < noOfHardQuestions ) {
+      direction = (direction=='$gte') ? '$lt': '$gte';
+      var random = {};
+      random[direction] = rand;
+      Question.find({difficulty : 3, random : random }).sort('random', 1).limit(noOfHardQuestions-noOfCollectedQuestions).exec(function(error, hardQuestions){
+        if(error) {
+          log.error(error);
+        }
+        var length = hardQuestions.length;
+        for (var index = 0; index < length; index++) {
+          var sampleQuestion = {}; 
+          sampleQuestion['question'] = hardQuestions[index]._id;
+          questionPaper.push(sampleQuestion);
+        }
+        noOfCollectedQuestions+= length;
+        callback(null, questionPaper);
+
+      });
+    } else {
+      callback(null, questionPaper);
+    }
+  });
+
 }
 
 module.exports.nextQuestion = function(req, res) {
@@ -208,7 +205,6 @@ module.exports.nextQuestion = function(req, res) {
   if(!req.session.currQuestion){
     req.session.currQuestion = 0;
   }
-
   Question.findOne({ _id: req.session.assessment.attemptedDetails[req.session.currQuestion].question}, function(error, question){
     if(error){
       log.error(error);
@@ -272,5 +268,6 @@ module.exports.submitQuestion = function(req, res) {
 };
 
 module.exports.testResult = function(req, res) {
+  delete req.session.currQuestion;
   res.render('test/attempt/result');
 };

@@ -16,7 +16,7 @@
       each question in questions
         li
           .innerDiv
-            label #{question.question}
+            label #{question.question} ( #{question.weightage} )
             .pull-right.actionBtns
               a.btn.btn-success(href="/question/#{question.id}/edit")
                 i.icon-edit.icon-white

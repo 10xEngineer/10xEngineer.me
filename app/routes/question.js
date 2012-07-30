@@ -16,6 +16,7 @@ module.exports.create = function(req, res) {
   question.test = req.test._id;
   question.question = req.body.question;
   question.weightage = req.body.weightage;
+  question.random = Math.random();
   question.difficulty = req.body.difficulty;
   question.choices = [];
   question.answers = [];
