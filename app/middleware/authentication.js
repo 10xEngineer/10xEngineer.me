@@ -93,7 +93,7 @@ module.exports.local = function(req, res, next) {
   passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/auth',
-    failureFlash: true
+    failureFlash: 'Invalid Email or Password.'
   })(req, res, next);
 };
 

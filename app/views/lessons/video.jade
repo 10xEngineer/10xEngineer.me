@@ -24,6 +24,13 @@
     var currentVideoTime = 0, LastUpdatedTime = 0;
     var videoH = 475;
     var videoW = 840;
+    var flag =0;
+
+    var videoResumeTime = '#{videoStartTime}';
+    if(typeof(videoResumeTime) != 'number') {
+      videoResumeTime = parseInt(videoResumeTime);
+    }
+    
     $(document).ready(function(){
       var rowWidth = $('.row-fluid').width();
       if(rowWidth < 900) {
@@ -34,21 +41,23 @@
       $('video').attr("height", videoH);
 
       $('video').mediaelementplayer({
-        enablePluginDebug: false,
-        defaultVideoWidth: videoW,
-        defaultVideoHeight: videoH,
-        features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
-        alwaysShowControls: true,
-        pluginPath: '/javascripts/mediaelement/',
-        success: function(mediaElement, domObject) {
+        enablePluginDebug : false,
+        defaultVideoWidth : videoW,
+        startTime : videoResumeTime,
+        defaultVideoHeight : videoH,
+        features : ['playpause','progress','current','duration','tracks','volume','fullscreen'],
+        alwaysShowControls : true,
+        pluginPath : '/javascripts/mediaelement/',
+        success : function(mediaElement, domObject) {
+
+          mediaElement.play();
 
           // At Video Start
           mediaElement.addEventListener('playing', function(e) {
-            var videoResumeTime = '#{videoStartTime}';
-            if(typeof(videoResumeTime) != 'number') {
-              videoResumeTime = parseInt(videoResumeTime);
+            if(flag == 0) {
+              flag = 1;
+              mediaElement.setCurrentTime(videoResumeTime);
             }
-            mediaElement.setCurrentTime(videoResumeTime);
           }, false);
 
 

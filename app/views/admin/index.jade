@@ -1,0 +1,55 @@
+.container
+  h1= title
+  .row-fluid
+    a.btn.pull-right(href="/admin/usersImport") 
+      i.icon-download-alt
+      | Import User Email
+  .row-fluid
+    .admin_view_header.spam10
+      a.btn(href="/admin/roles") Roles
+      a.btn(href="/admin/labs") Labs 
+      a.btn(href='/admin/clearProgress', id='#{user.id}') Clear Progress           
+      a.btn(href="/admin/approve") Approve
+      .counts.pull-right
+        code(style="padding:10px;")  Total Users- #{users.length}
+
+  .actions 
+    ul.admin_view_list_items
+      each user in users
+        li
+          - if(user.name) 
+            a(href="/admin/user/#{user.id}/info")
+              label(for='#{user.id}', style='display:inline') #{user.name} 
+          - else
+            a(href="admin/user/#{user.id}/info")
+              label(for='#{user.id}', style='display:inline') #{user.email} 
+          p(style="display:inline; margin-right: 5px;")  ( 
+            each role,roleIndex in user.roles
+              if(roleIndex != 0) 
+                | ,
+              span(class='#{role}') #{role} 
+            | )
+          .roles.pull-right
+            a.btn.btn-success(href="/admin/user/#{user.id}/roles", id='#{user.id}')
+              i.icon-edit.icon-white
+              |  Edit Roles
+            a.btn.btn-danger(href="/admin/user/#{user.id}/remove")
+              i.icon-trash.icon-white 
+              |  Delete User
+script(type='text/javascript')
+  $('doucment').ready(function(){
+    var classes = [], colors = [];
+    $('p span').each(function(index, item){
+      var classInstance = $(item).attr('class');
+      var index = $.inArray(classInstance, classes);
+      if(index == -1){
+        var color ='#' + Math.floor(Math.random()*16777215).toString(16);
+        $(item).css("color", color);
+        classes.push(classInstance);
+        colors.push(color);
+      }
+      else {
+        $(item).css("color", colors[index]);
+      }
+    });
+  });

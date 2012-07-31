@@ -3,6 +3,8 @@ var _ = require('underscore');
 var main = require('./main');
 var course = require('./course');
 var course_editor = require('./course_editor');
+var test = require('./test');
+var question = require('./question');
 var lesson = require('./lesson');
 var quiz = require('./quiz');
 var admin = require('./admin');
@@ -200,5 +202,26 @@ module.exports = function(app) {
   app.get('/admin/user/:userId/remove', verifyPermission('admin', 'delete'), admin.removeUser);
   app.get('/admin/user/:userId/info', verifyPermission('admin', 'edit'), admin.userInfo);
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
+
+  // Test 
+  app.get('/test', test.testList);
+  app.get('/test/create', test.createView);
+  app.post('/test/create', test.create);
+  app.get('/test/:testId', test.view);
+  app.get('/test/:testId/edit', test.editView);
+  app.post('/test/:testId/edit', test.edit);
+  app.get('/test/:testId/remove', test.removeTest);
+  app.get('/test/:testId/start', test.startTest);
+  app.get('/test/:testId/next', test.nextQuestion);
+  app.post('/test/:testId/next', test.submitQuestion);
+  app.get('/test/:testId/finish', test.testResult);
+
+  app.get('/question/create/:testId', question.createView);
+  app.post('/question/create/:testId', question.create);
+  app.get('/question/import/:testId', question.importQuestionView);
+  app.post('/question/import/:testId', question.importQuestion);
+  app.get('/question/:questionId/remove', question.removeQuestion);
+  app.get('/question/:questionId/edit', question.editView);
+  app.post('/question/:questionId/edit', question.edit);
 
 };

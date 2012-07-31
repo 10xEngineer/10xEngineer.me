@@ -1,0 +1,80 @@
+form(method='POST')
+  div#questionBox
+    .addedQuestion(style="margin: 15px auto;")
+      p Question:
+      - if(edit)
+        input.question(type="text", value="#{question.question}", placeholder="Question", name="question")
+        input.span1.questionDiffernce(placeholder="Difficulty", value="#{question.difficulty}", type="text", style="margin : auto 5px auto 10px;", name="difficulty")
+        input.span1.questionWeightage(placeholder="Weightage", value="#{question.weightage}", style="margin : auto 5px;", name="weightage")
+      - else
+        input.question(type="text", placeholder="Question", name="question")
+        input.span1.questionDiffernce(placeholder="Difficulty", type="text", style="margin : auto 5px auto 10px;", name="difficulty")
+        input.span1.questionWeightage(placeholder="Weightage", style="margin : auto 5px;", name="weightage")
+
+      br
+      .options
+        -if(edit)
+          each option, index in question.choices
+            .addedOption
+              - if(question.answers.indexOf(option)>=0)
+                input.questionOptionCheckbox(type="checkbox", checked, name="questionOptionCheckbox[#{index}]")
+              - else
+                input.questionOptionCheckbox(type="checkbox", name="questionOptionCheckbox[#{index}]")
+              input.questionOption(type="text", placeholder="Option", style="margin: 5px", value="#{option}", name="questionOption[#{index}]")  
+
+  p
+    input.btn.btn-primary(type='submit', value=' Save ')
+
+script(type='text/javascript')
+  
+  $(document).ready(function() {
+
+    //-------------------------------------------------------//
+    //  For  Quiz : Add & Remove Question and their Options  //
+    //-------------------------------------------------------//
+
+    var optDiv = $('<div/>', {
+      class: "addedOption"
+    })
+    .append($('<input/>', {
+      type: "checkbox",
+      class: "questionOptionCheckbox"
+    }))
+    .append($('<input/>', {
+      type: "text",
+      placeholder: "Option",
+      class: "questionOption",
+      style: "margin : 5px;"
+    }));
+
+    optDiv.clone().appendTo('.options'); 
+
+    $(".questionOption").live("change",function() {    
+      var parQueDiv=$(this).parents("div").eq(1);
+      if(parQueDiv.find(".questionOption:last").val()!="") {
+        var tmpOpt = optDiv.clone();
+        tmpOpt.appendTo(parQueDiv);
+        $($(this).parent().next().children()[0]).focus();
+        $($(tmpOpt).children()[0]).focus();
+        assignNamesForOptions($('.options'));
+      }
+    });
+
+    $(".questionOption").live("blur",function(){
+      if($(this).val()=="" && $(this).parents(".options").find(".questionOption:last")[0] != this) {               
+        $(this).parent().remove();
+        assignNamesForOptions($('.options'));
+      }
+    });
+
+    var assignNamesForOptions = function($container) {
+      $container.find('.questionOption').each(function(i, opt) {
+        $(opt).attr('name', 'questionOption['+i+']');
+      });
+      $container.find('.questionOptionCheckbox').each(function(i, optChkBox) {
+        $(optChkBox).attr('name', 'questionOptionCheckbox['+i+']');
+      });
+    };
+
+    assignNamesForOptions($('.options'));
+  });
