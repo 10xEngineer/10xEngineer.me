@@ -14,5 +14,6 @@ var AssessmentSchema = module.exports = new Schema({
 
 var AttemptSchema = new Schema({
 	question: { type: ObjectId, ref:'Question' },
-	givenAns: [ { type: String } ]
+	givenAns: [ { type: String } ],
+  gotMarks: { type: Number }
 });
