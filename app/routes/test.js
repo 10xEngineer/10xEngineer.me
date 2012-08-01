@@ -4,6 +4,22 @@ var util = require('../helpers/util');
 
 var async = require('async');
 
+// Test List
+module.exports.testList = function(req, res) {
+  var Test = model.Test;
+  Test.find({}, function(error, tests){
+    if(error){
+      log.error("Test could not be fetched.");
+      res.redirect('/');
+    }
+    res.render('test', {
+      title: "Test List",
+      tests: tests
+    })
+  })
+};
+
+// Test Create
 module.exports.createView = function(req, res) {
 	var test = {
     title: "",
@@ -40,6 +56,7 @@ module.exports.create = function(req, res) {
   });
 };
 
+// Test Edit
 module.exports.editView = function(req, res) {
   var test = req.test;
   res.render("test/edit",{
@@ -69,6 +86,7 @@ module.exports.edit = function(req, res) {
 
 };
 
+// Test Remove
 module.exports.removeTest = function(req, res) {
   var test = req.test;
   
@@ -81,7 +99,7 @@ module.exports.removeTest = function(req, res) {
   });
 };
 
-
+// Test Details
 module.exports.view = function(req, res) {
   var Question = model.Question;
   var Test = model.Test;
@@ -98,21 +116,7 @@ module.exports.view = function(req, res) {
   });
 };
 
-module.exports.testList = function(req, res) {
-  var Test = model.Test;
-  Test.find({}, function(error, tests){
-    if(error){
-      log.error("Test could not be fetched.");
-      res.redirect('/');
-    }
-    res.render('test', {
-      title: "Test List",
-      tests: tests
-    })
-  })
-};
-
-
+// Test Start
 module.exports.startTest = function(req, res) {
   var Assessment = model.Assessment;
   var Question = model.Question;
@@ -247,29 +251,54 @@ var getQuestions = function(test, neededQuestions, difficulty, callback) {
   });
 }
 
-module.exports.nextQuestion = function(req, res) {
+// Question View
+module.exports.viewQuestion = function(req, res) {
   var Question = model.Question;
+  var questionIndex = req.questionIndex;
+  var assessment = req.session.assessment;
+  var attemptedDetails = assessment.attemptedDetails;
   // Collect answers and update it into database as well as session assessment
   // find next question and render that answer
-  if(!req.session.currQuestion){
-    req.session.currQuestion = 1;
+  if(!req.session.currQuestion) {
+    var currQuestion = req.session.currQuestion = 0;
+  } else {
+    var currQuestion = req.session.currQuestion;
   }
-  Question.findOne({ _id: req.session.assessment.attemptedDetails[req.session.currQuestion].question}, function(error, question){
+
+  if(questionIndex>currQuestion || questionIndex<0) {
+    req.session.error = "You are not permit to move at that question";
+    return res.redirect('/test/'+req.test.id+"/"+(parseInt(currQuestion)+1));
+  }
+
+  Question.findOne({ _id: attemptedDetails[questionIndex].question}, function(error, question) {
     if(error){
       log.error(error);
       res.redirect('/test');
     }
     var finish = false;
-    if(req.session.assessment.attemptedDetails.length == req.session.currQuestion+1) {
+    if(attemptedDetails.length == currQuestion+1) {
       finish = true;
     }
+
+
+    var givenAns ;
+    if(attemptedDetails[questionIndex].givenAns) givenAns = attemptedDetails[questionIndex].givenAns;
+    else givenAns = [];
+
     // Randomize options of question
     var length = question.choices.length;
+    var controls = {
+      finish: finish,
+      testId: req.test.id,
+      displayedQuestionIndex: questionIndex,
+      currQuestionIndex: currQuestion
+    };
     question.choices = util.randomizeArray(question.choices);
     res.render('test/attempt/question', {
-      title : "Title",
-      finish: finish,
-      question: question 
+      title : req.test.title,
+      question: question, 
+      givenAns: givenAns,
+      controls: controls
     });
   });
 };
@@ -282,6 +311,8 @@ module.exports.submitQuestion = function(req, res) {
   var length = options.length;
   var gotMarks = 0;
   var ans = [];
+
+  // Collect answers given by user
   if(typeof(options)=='object'){
     for (var count = 0; count < length; count++) {
       if(options[count]) {
@@ -313,7 +344,7 @@ module.exports.submitQuestion = function(req, res) {
       assessment.save(function(error) {
         if(error){
           log.error(error);
-          res.redirect('/test/'+req.test.id+'/'+currQuestion);
+          res.redirect('/test/'+req.test.id+'/'+(parseInt(currQuestion)+1));
         }
         currQuestion += 1;
         if(assessment.attemptedDetails.length == currQuestion){
@@ -322,7 +353,7 @@ module.exports.submitQuestion = function(req, res) {
         } else {
           req.session.currQuestion = currQuestion;
           req.session.assessment = assessment;
-          res.redirect('/test/'+req.test.id+'/'+currQuestion);
+          res.redirect('/test/'+req.test.id+'/'+(parseInt(currQuestion)+1));
         }
       });
     });

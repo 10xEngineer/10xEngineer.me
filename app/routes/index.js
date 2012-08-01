@@ -73,7 +73,7 @@ module.exports = function(app) {
   });
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'lessonId', 'userId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','testId','questionId'], function(req, res, next, num, name){ 
     var parsedNum = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('Invalid route: ' + num));
@@ -213,7 +213,7 @@ module.exports = function(app) {
   app.get('/test/:testId/remove', test.removeTest);
   app.get('/test/:testId/start', test.startTest);
   app.get('/test/:testId/finish', test.testResult);
-  app.get('/test/:testId/:questionIndex', test.nextQuestion);
+  app.get('/test/:testId/:questionIndex', test.viewQuestion);
   app.post('/test/:testId/:questionIndex', test.submitQuestion);
 
   app.get('/question/create/:testId', question.createView);
