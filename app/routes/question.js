@@ -1,4 +1,4 @@
- var model = require('../models');
+var model = require('../models');
 var fs = require('fs');
 var async = require('async');
 var importer = require('../helpers/importer');
@@ -23,12 +23,17 @@ module.exports.create = function(req, res) {
 
 
   var optCount = req.body.questionOption.length - 1;
-  for (var index = 0; index < optCount; index++) {
-    question.choices.push(req.body.questionOption[index]);
-    if(req.body.questionOptionCheckbox[index]) {
-      question.answers.push(req.body.questionOption[index]);
-    }
-  };
+  if(optCount==1){
+    question.answers.push(req.body.questionOption[0]);
+    question.choices.push(req.body.questionOption[0]);
+  } else {
+    for (var index = 0; index < optCount; index++) {
+      question.choices.push(req.body.questionOption[index]);
+      if(req.body.questionOptionCheckbox[index]) {
+        question.answers.push(req.body.questionOption[index]);
+      }
+    };
+  }
 
   // Saves Created Question
   question.save(function(error) {

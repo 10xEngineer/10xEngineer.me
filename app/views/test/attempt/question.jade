@@ -11,8 +11,11 @@
   h3 Q. #{parseInt(controls.displayedQuestionIndex)+1}: #{question.question}
   form(method="post")
     .actions 
+
       - if(question.answers.length==1 && question.choices.length==1)
-        textarea(name="answer")
+        br
+        textarea.span8(name="questionOption", rows="10")
+        br
       - else
         .questionBlock
           each option, optionIndex in question.choices
