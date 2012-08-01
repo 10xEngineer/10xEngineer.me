@@ -212,9 +212,9 @@ module.exports = function(app) {
   app.post('/test/:testId/edit', test.edit);
   app.get('/test/:testId/remove', test.removeTest);
   app.get('/test/:testId/start', test.startTest);
-  app.get('/test/:testId/next', test.nextQuestion);
-  app.post('/test/:testId/next', test.submitQuestion);
   app.get('/test/:testId/finish', test.testResult);
+  app.get('/test/:testId/:questionIndex', test.nextQuestion);
+  app.post('/test/:testId/:questionIndex', test.submitQuestion);
 
   app.get('/question/create/:testId', question.createView);
   app.post('/question/create/:testId', question.create);

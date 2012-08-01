@@ -1,4 +1,7 @@
 var model = require('../models');
+
+var util = require('../helpers/util');
+
 var async = require('async');
 
 module.exports.createView = function(req, res) {
@@ -119,9 +122,10 @@ module.exports.startTest = function(req, res) {
   if(req.session.currQuestion) {
     delete req.session.currQuestion;
   }
-  
+   
   generateQuestionPaper(test, function(error, questionPaper){
 
+    questionPaper = util.randomizeArray(questionPaper); 
     var assessment = new Assessment();
     assessment.test = test;
     assessment.user = req.user._id;
@@ -132,20 +136,14 @@ module.exports.startTest = function(req, res) {
         log.error(error);
         res.redirect('/test');
       }
-
       req.session.assessment = assessment;
-      res.redirect("/test/"+req.test.id+"/next");
+      res.redirect("/test/"+req.test.id+"/1");
     });
   });
 };
 
-var getRandom = function(MaxNum) {
-  return Math.floor(Math.random()*MaxNum);
-}
-
 var generateQuestionPaper = function(test, callback) {
   
-  var Question = model.Question;
   var mark = test.mark;
   // Todo : All logic is remaining  :p
   var questionPaper = [];
@@ -153,49 +151,100 @@ var generateQuestionPaper = function(test, callback) {
   var midWeight  = mark * 0.4;
   var hardWeight = mark * 0.2;
   var noOfHardQuestions = parseInt(hardWeight/3);
-  var rand = Math.random();
-  var direction = (rand>0.5) ? '$gte': '$lt' ;
+  var noOfMidQuestions;
+  var noOfEasyQuestions;
+  var collectedWeight;
 
-  var noOfCollectedQuestions =0;
-  var random = {};
-  random[direction] = rand;
-  Question.find({difficulty : 3, random : random }, { _id : 1})
-    .sort('random', -1 )
-    .limit(noOfHardQuestions)
-    .exec(function(error, hardQuestions){
-    if(error) {
-      log.error(error);
-    }
-    noOfCollectedQuestions = hardQuestions.length;
-    for (var index = 0; index < noOfCollectedQuestions; index++) {
-      var sampleQuestion = {}; 
-      sampleQuestion['question'] = hardQuestions[index]._id;
-      questionPaper.push(sampleQuestion);
-    }
+  var noOfCollectedQuestions = 0;
 
-    if ( noOfCollectedQuestions < noOfHardQuestions ) {
-      direction = (direction=='$gte') ? '$lt': '$gte';
-      var random = {};
-      random[direction] = rand;
-      Question.find({difficulty : 3, random : random }).sort('random', 1).limit(noOfHardQuestions-noOfCollectedQuestions).exec(function(error, hardQuestions){
-        if(error) {
-          log.error(error);
+  var difficulty = 3;
+  getQuestions(test, noOfHardQuestions, difficulty, function(error, hardQuestions){
+    if(error){
+      callback(error);
+    }
+    collectedWeight = hardQuestions.length * difficulty;
+    midWeight = (parseInt(midWeight+hardWeight - (collectedWeight)));
+    difficulty = 2;
+    noOfMidQuestions = parseInt(midWeight/difficulty);
+    questionPaper = questionPaper.concat(hardQuestions);
+    getQuestions(test, noOfMidQuestions, difficulty, function(error, midQuestions){
+      if(error){
+        callback(error);
+      }
+      collectedWeight += midQuestions.length * difficulty;
+      easyWeight = (parseInt(midWeight+hardWeight+easyWeight - (collectedWeight)));
+      difficulty = 1;
+      noOfEasyQuestions = parseInt(easyWeight/difficulty);
+      questionPaper = questionPaper.concat(midQuestions);
+      getQuestions(test, noOfEasyQuestions, difficulty, function(error, easyQuestions){
+        if(error){
+          callback(error);
         }
-        var length = hardQuestions.length;
-        for (var index = 0; index < length; index++) {
-          var sampleQuestion = {}; 
-          sampleQuestion['question'] = hardQuestions[index]._id;
-          questionPaper.push(sampleQuestion);
-        }
-        noOfCollectedQuestions+= length;
+        collectedWeight += easyQuestions.length * difficulty;
+        questionPaper = questionPaper.concat(easyQuestions);
         callback(null, questionPaper);
-
-      });
-    } else {
-      callback(null, questionPaper);
-    }
+      });  
+    });
   });
 
+
+}
+
+var getQuestions = function(test, neededQuestions, difficulty, callback) {
+  
+  // Difine variables 
+  var Question = model.Question;
+  var direction = (rand>0.5) ? '$gte': '$lt' ;
+  var order = direction == '$lt' ? 1 : -1;
+  var rand = Math.random();
+  var random = {};
+  var resultQuestionsSet = [];
+
+  random[direction] = rand;
+  
+  // find random questions
+  Question.find({difficulty : difficulty, random : random }, { _id : 1})
+    .sort('random', order )
+    .limit(neededQuestions)
+    .exec(function(error, questions){
+    if(error) {
+      log.error(error);
+      callback(error);
+    }
+    collectedQuestions = questions.length;
+    for (var index = 0; index < collectedQuestions; index++) {
+      var sampleQuestion = {}; 
+      sampleQuestion['question'] = questions[index]._id.toString();
+      resultQuestionsSet.push(sampleQuestion);
+    }
+
+    if ( collectedQuestions < neededQuestions ) {
+      // Need more questions
+      direction = (direction=='$gte') ? '$lt': '$gte';
+      order = direction == '$lt' ? 1 : -1;
+      random = {};
+      random[direction] = rand;
+      Question
+      .find({difficulty : difficulty, random : random }, { _id : 1})
+      .sort('random', order)
+      .limit(neededQuestions - collectedQuestions)
+      .exec(function(error, questions){
+        if(error) {
+          log.error(error);
+          callback(error);
+        }
+        var length = questions.length;
+        for (var index = 0; index < length; index++) {
+          var sampleQuestion = {}; 
+          sampleQuestion['question'] = questions[index]._id.toString();
+          resultQuestionsSet.push(sampleQuestion);
+        }
+        callback(null, resultQuestionsSet);
+      });
+    } else {
+      callback(null, resultQuestionsSet);
+    }
+  });
 }
 
 module.exports.nextQuestion = function(req, res) {
@@ -203,7 +252,7 @@ module.exports.nextQuestion = function(req, res) {
   // Collect answers and update it into database as well as session assessment
   // find next question and render that answer
   if(!req.session.currQuestion){
-    req.session.currQuestion = 0;
+    req.session.currQuestion = 1;
   }
   Question.findOne({ _id: req.session.assessment.attemptedDetails[req.session.currQuestion].question}, function(error, question){
     if(error){
@@ -214,16 +263,9 @@ module.exports.nextQuestion = function(req, res) {
     if(req.session.assessment.attemptedDetails.length == req.session.currQuestion+1) {
       finish = true;
     }
-    // TODO:: Randomize options of question
-    var options = [];
+    // Randomize options of question
     var length = question.choices.length;
-    for (var index = 0; index < length; index++) {
-      var randIndex = getRandom(question.choices.length);
-      options.push(question.choices[randIndex]);
-      question.choices.splice(randIndex,1);
-    };
-    question.choices = options;
-
+    question.choices = util.randomizeArray(question.choices);
     res.render('test/attempt/question', {
       title : "Title",
       finish: finish,
@@ -238,36 +280,66 @@ module.exports.submitQuestion = function(req, res) {
   var currQuestion = req.session.currQuestion;
   var options = req.body.questionOption;
   var length = options.length;
+  var gotMarks = 0;
   var ans = [];
-  for (var count = 0; count < length; count++) {
-    if(options[count]) {
-      ans.push(options[count]);
+  if(typeof(options)=='object'){
+    for (var count = 0; count < length; count++) {
+      if(options[count]) {
+        ans.push(options[count]);
+      }
     }
+  } else {
+    ans.push(options);
   }
-  // TODO: Calculate Score and update it befor save
+  
+  // Calculate Score and update it befor save
+  var Question = model.Question;
+  Question.findOne({ _id: assessment.attemptedDetails[currQuestion].question}, function(error, fullQuestion){
+    if(error){
+      log.error(error);
+      return res.redirect('/test/'+req.test.id+'/'+currQuestion);
+    }
+    var test = util.compareArray(ans, fullQuestion.answers);
+    if(test){
+      gotMarks = fullQuestion.weightage.toString();
+    }
 
-  // Saving assessment  into database
-  Assessment.findOne({ id: assessment.id }, function(error, assessment) {
-    assessment.attemptedDetails[currQuestion]['givenAns'] = ans;
-    assessment.save(function(error) {
-      if(error){
-        log.error(error);
-        res.redirect('/test/'+req.test.id+'/next');
-      }
-      currQuestion += 1;
-      if(assessment.attemptedDetails.length == currQuestion){
-        delete req.session.currQuestion;
-        delete req.session.assessment;
-        return res.redirect('/test/'+req.test.id+'/finish');
-      }
-      req.session.currQuestion = currQuestion;
-      req.session.assessment = assessment;
-      res.redirect('/test/'+req.test.id+'/next');
+    // Saving assessment  into database
+    Assessment.findOne({ id: assessment.id }, function(error, assessment) {
+      assessment.attemptedDetails[currQuestion]['givenAns'] = ans;
+      assessment.attemptedDetails[currQuestion]['gotMarks'] = gotMarks;
+      assessment.score += parseInt(gotMarks);
+      assessment.markModified('attemptedDetails');
+      assessment.save(function(error) {
+        if(error){
+          log.error(error);
+          res.redirect('/test/'+req.test.id+'/'+currQuestion);
+        }
+        currQuestion += 1;
+        if(assessment.attemptedDetails.length == currQuestion){
+          delete req.session.currQuestion;
+          res.redirect('/test/'+req.test.id+'/finish');
+        } else {
+          req.session.currQuestion = currQuestion;
+          req.session.assessment = assessment;
+          res.redirect('/test/'+req.test.id+'/'+currQuestion);
+        }
+      });
     });
   });
 };
 
 module.exports.testResult = function(req, res) {
+  var Assessment = model.Assessment;
+  var test = req.test;
+  var user = req.user;
+  var assessment = req.session.assessment;
   delete req.session.currQuestion;
-  res.render('test/attempt/result');
+  Assessment.findOne({ id: assessment.id }, function(error, assessment){
+    res.render('test/attempt/result', {
+      assessment: assessment,
+      userName: user.name,
+      test: test
+    });
+  }); 
 };
