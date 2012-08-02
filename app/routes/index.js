@@ -73,7 +73,7 @@ module.exports = function(app) {
   });
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'lessonId', 'userId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','testId','questionId'], function(req, res, next, num, name){ 
     var parsedNum = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('Invalid route: ' + num));
@@ -206,22 +206,22 @@ module.exports = function(app) {
   // Test 
   app.get('/test', test.testList);
   app.get('/test/create', test.createView);
-  app.post('/test/create', test.create);
+  app.post('/test/create', validation.lookUp(validationConfig.test.createTest), test.create);
   app.get('/test/:testId', test.view);
   app.get('/test/:testId/edit', test.editView);
-  app.post('/test/:testId/edit', test.edit);
+  app.post('/test/:testId/edit', validation.lookUp(validationConfig.test.editTest), test.edit);
   app.get('/test/:testId/remove', test.removeTest);
   app.get('/test/:testId/start', test.startTest);
   app.get('/test/:testId/finish', test.testResult);
-  app.get('/test/:testId/:questionIndex', test.nextQuestion);
-  app.post('/test/:testId/:questionIndex', test.submitQuestion);
+  app.get('/test/:testId/:questionIndex', test.viewQuestion);
+  app.post('/test/:testId/:questionIndex', validation.lookUp(validationConfig.question.attemptQuestion), test.submitQuestion);
 
   app.get('/question/create/:testId', question.createView);
-  app.post('/question/create/:testId', question.create);
+  app.post('/question/create/:testId', validation.lookUp(validationConfig.question.createQuestion), question.create);
   app.get('/question/import/:testId', question.importQuestionView);
   app.post('/question/import/:testId', question.importQuestion);
   app.get('/question/:questionId/remove', question.removeQuestion);
   app.get('/question/:questionId/edit', question.editView);
-  app.post('/question/:questionId/edit', question.edit);
+  app.post('/question/:questionId/edit', validation.lookUp(validationConfig.question.createQuestion), question.edit);
 
 };

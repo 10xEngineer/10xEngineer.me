@@ -152,6 +152,13 @@ module.exports = function(app) {
     });
   });
 
+  // QuetionIndex for Test
+  app.param('questionIndex', function(req, res, next, id){
+    var Test = model.Test;
+    req.questionIndex = (id-1).toString();
+    next();
+  });
+
   // Question
   app.param('questionId', function(req, res, next, id){
     var Question = model.Question;
