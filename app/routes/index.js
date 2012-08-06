@@ -224,4 +224,8 @@ module.exports = function(app) {
   app.get('/question/:questionId/edit', question.editView);
   app.post('/question/:questionId/edit', validation.lookUp(validationConfig.question.createQuestion), question.edit);
 
+  // Just for testing
+  // TODO: Remove it and all its related functions and files before commit
+  app.get('/testing', main.testing);
+
 };
