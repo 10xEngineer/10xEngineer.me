@@ -1,68 +1,291 @@
 link(rel="stylesheet", type="text/css", href="/stylesheets/tree.css", media="screen")
+style
+  .box {
+    background: blue;
+    color:white;
+  }
+  .box label {
+    color: white;
+  }
+  .head{
+    padding-left: 5px;
+  }
+  .well{
+    width: 300px;
+  }
+  .dir, .file {
+    width: 300px;
+  }
+  .level0 > .container, .level1 > .container, .level2 > .container, .level3 > .container, .level4 > .container, .level5 > .container {
+    padding-left: 10px;
+  }
+
 .container
   .row
     .span4
       .btn-toolbar(style="margin-top: 18px;")
         .btn-group
-          button(class="btn btn-primary") Create
+          button(class="btn btn-primary", data-toggle="dropdown") Create
           button(class="btn dropdown-toggle btn-primary", data-toggle="dropdown")
             span(class="caret")
           ul(class="dropdown-menu")
             li
-              a.createFolder(href="#") Create Folder
+              a.mkdir(href="#") Create Folder
             li
-              a(href="#") Create File
+              a.mkfile(href="#") Create File
         .btn-group
           button(class="btn btn-danger") Remove
           button(class="btn dropdown-toggle btn-danger", data-toggle="dropdown")
             span(class="caret")
           ul(class="dropdown-menu")
             li
-              a(href="#") Remove Folder
+              a.rmdir(href="#") Remove Folder
             li
-              a(href="#") Remove File
+              a.rmfile(href="#") Remove File
         .btn-group
-          button(class="btn btn-warning", type="submit") Rename
+          button(class="btn btn-warning rename", type="submit") Rename
   .row
-    ol(class="tree well")
-      li
-        label(for="folder1", class="folder") 
-        div.txtFolder  Folder 1
-        input(type="checkbox", checked ,id="folder1") 
-        ol
-          li(class="file")
-            div.txtFile File 1
-          li
-            label(for="subfolder1", class="folder") 
-            div.txtFolder Subfolder 1
-            input(type="checkbox", id="subfolder1") 
-            ol
-              li(class="file")
-                div.txtFile Filey 1
-              li(class="file")
-                div.txtFile Filey 2
-              li(class="file")
-                div.txtFile Filey
-          li
-            label(for="subfolder1", class="folder") 
-            div.txtFolder Subfolder 1
-            input(type="checkbox", id="subfolder1") 
+    div#root.dir.level0.well
+      div.head.box
+        i.icon-chevron-right.icon-white
+        label(style="display: inline-block;")  Root
+      div.container(style='display: none;')
 
-script(type="text/javascript")
+
+script
 
   $(document).ready(function(){
-    $(".txtFile, .txtFolder").click(function(){
-      $(".txtFile, .txtFolder").removeClass("box");
-      $(this).addClass("box");
+    
+
+
+
+    $('.head').click(function(){
+        // Get head from old selection
+        var $oldHead = $('.box');
+
+        // get head from selected element
+        var $newHead = $(this);
+
+        // fix processess of exchange
+        changeSelectedElementProcidure($oldHead, $newHead);
     });
-    $(".createFolder").click(function(){
-      console.log($('.box').parents("ol")[0]);
-      alert($('.box').parent("ol"));
-      var attClass = $('.box').attr('class').split(' ');
-      if(attClass[0] == 'txtFile') {
-        $($('.box').parents("ol")[0]).append('<li><label for="folder1" class="folder"> </label><div class="txtFolder">Folder 1</div> <input type="checkbox" checked id="folder1" /></li>');
-      } else if(attClass[0] == 'txtFolder') {
-        $('ol',$('.box')).append('<ol><li><label for="folder1" class="folder"> </label><div class="txtFolder">Folder 1</div> <input type="checkbox" checked id="folder1" /><ol></ol></li></ol>');
+
+    $('Button.rename').click(function(){
+      rename($('.box').parent());
+    });
+
+    $('.rmdir').click(function(){
+      $dir = $('.box').parent();
+      if($dir.hasClass('root')) {
+        alert("It can not be removed b'coz it is root directory");
+      } else if($dir.hasClass('dir')) {
+        $dir.remove();
+      } else {
+        alert("This is not directory");
       }
     });
+
+    $('.rmfile').click(function(){
+      $file = $('.box').parent();
+      if($file.hasClass('file')){
+        $file.remove();
+      }
+    });
+
+    $('.mkfile').click(function(){
+      var $newFile = $('<div/>', {
+        class: 'file'
+      }).append($('<div/>', {
+        class: 'head'
+      }).append($('<i/>', {
+        class: 'icon-file'
+      })).append($('<label/>', {
+        style: 'display: inline-block;',
+        html: "New File"
+      })));
+      var $dir = $('.box').parent();
+      if($dir.hasClass('dir')){
+        $dir.children('.container').append($newFile);
+        expand($dir);
+        rename($newFile);
+        $newFile.find('.head').click(function(){
+          // Get head from old selection
+          var $oldHead = $('.box');
+
+          // get head from selected element
+          var $newHead = $(this);
+
+          // fix processess of exchange
+          changeSelectedElementProcidure($oldHead, $newHead);
+        });
+      } else {
+        alert("You can not make file under " + $dir.children('.head').children('label').html());
+      }
+    });
+    
+    $('.mkdir').click(function(){
+      if(($($('.box').parent())).hasClass('dir')){
+        
+        // Create default structure of directory
+        var $newDir = $('<div/>', {
+          class: 'dir'
+        }).append($('<div/>', {
+          class: 'head collapsed'
+        }).append($('<i/>', {
+          class: 'icon-chevron-right'
+        })).append($('<label/>', {
+          style: 'display: inline-block;',
+          html: "New Directory"
+        }))).append($('<div/>', {
+          class: 'container',
+          style: 'display: none;'
+        }));
+
+        // Append new direcory to its parent
+        $($($('.box').parent()).children()[1]).append($newDir);
+
+        // Naming of directory
+        dirName = "New Folder";
+        $newDir.find('.head').html($newDir.find('.head').html() + " " + dirName);
+        expand($newDir.parent().parent());
+        rename($newDir);
+
+        // Assign Level to new directory
+        var $parent = $newDir.parent().parent();
+        if($parent.hasClass('level0')){
+          $newDir.addClass('level1');
+        } else if($parent.hasClass('level1')) {
+          $newDir.addClass('level2');
+        } else if($parent.hasClass('level2')) {
+          $newDir.addClass('level3');
+        } else if($parent.hasClass('level3')) {
+          $newDir.addClass('level4');
+        } else if($parent.hasClass('level4')) {
+          $newDir.addClass('level5');
+        }
+
+      } else {
+        alert("Directory can not be created here.");
+      }
+
+      // bind required event
+      // Select event
+      $newDir.find('.head').click(function(){
+        // Get head from old selection
+        var $oldHead = $('.box');
+
+        // get head from selected element
+        var $newHead = $(this);
+
+        // fix processess of exchange
+        changeSelectedElementProcidure($oldHead, $newHead);
+      });
+
+      //  Collaps event
+      //  Expand event
+      $newDir.find('.head').dblclick(function(){
+        if($(this).hasClass('collapsed')) {
+          // code for expand
+          expand($(this).parent());
+        } else {
+          // code for collaps
+          collapse($(this).parent());
+        }
+      });
+
+    });
+
+    var rename = function($dir) {
+      var $head = $dir.children('.head');
+      var $icon = $head.children('i');
+      var value = $head.children('label').html();
+      $head.html("");
+      var $input = $('<input/>', {
+        type: 'text',
+        value: value
+      });
+      $input.keypress(function(event){
+        if(event.keyCode==13){
+          renameDone($(this).parent());
+        }
+      })
+      $input.blur(function(){
+        renameDone($(this).parent());
+      })
+      $head.append($icon).append($input);
+
+      $input.focus();
+    }
+
+    var renameDone = function($head){
+      var value = $head.children('input').val();
+      var $icon = $head.children('i');
+      $head.html("");
+      $head.append($icon).append($('<label/>', {
+        html: value,
+        style: 'display: inline-block;'
+      }));
+    }
+
+    var expand = function($dir) {
+      // Set icon
+      $icon = $dir.children('.head').children('i');
+      $icon.removeClass('icon-chevron-right');
+      $icon.addClass('icon-chevron-down');
+
+      // show containt
+      $dir.children('.container').show();
+
+      // change class
+      $dir.children('.head').removeClass('collapsed');
+      $dir.children('.head').addClass('expanded');
+    }
+
+    var collapse = function($dir){
+      // set icon
+      $icon = $dir.children('.head').children('i');
+      $icon.removeClass('icon-chevron-down');
+      $icon.addClass('icon-chevron-right');
+
+      // hide containet
+      $dir.children('.container').hide();
+
+      // change class
+      $dir.children('.head').removeClass('expanded');
+      $dir.children('.head').addClass('collapsed');
+    }
+
+    $('.head').dblclick(function(){
+      if($(this).parent().hasClass('dir')){
+
+        // code for duble click on directory
+        if($(this).hasClass('collapsed')) {
+          // code for expand
+          expand($(this).parent());
+        } else {
+          // code for collaps
+          collapse($(this).parent());
+        }
+      
+      } else {
+        // code for duble click on file
+        alert("File open function is not implemented yet.");
+      }
+    })
+
+    var changeSelectedElementProcidure = function($oldHead, $newHead) {
+
+      // remove box from old head
+      $oldHead.removeClass('box');
+
+      // remove white icon from old head
+      $oldHead.find('i').removeClass('icon-white');
+
+      // set box over new head
+      $newHead.addClass('box');
+
+      // set white icon over new head
+      $newHead.find('i').addClass('icon-white');
+    }
+
   });
