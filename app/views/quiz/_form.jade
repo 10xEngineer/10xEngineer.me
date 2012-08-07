@@ -1,17 +1,17 @@
 form(method='POST')
   p
     label(for="title") Title:
-    input.required(value='#{test.title}', id='title', name='title')
+    input.required(value='#{quiz.title}', id='title', name='title')
   p
     label(for="mark") Mark:
-    input.required(value='#{test.mark}', id='mark', name='mark')
+    input.required(value='#{quiz.mark}', id='mark', name='mark')
   p
     label(for="description") Description:
-    textarea.required(name='description', id='description') #{test.desc}
+    textarea.required(name='description', id='description') #{quiz.desc}
   -if(!edit)
     p
       label(for="type") Type:
-      select.required(name='type', id='type', value="#{test.type}")
+      select.required(name='type', id='type', value="#{quiz.type}")
           option(value='quiz') Quiz
           option(value='programming') Programming
   p

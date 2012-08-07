@@ -132,19 +132,19 @@ module.exports = function(app) {
     });
   });
 
-  // Test
-  app.param('testId', function(req, res, next, id){
-    var Test = model.Test;
+  // Quiz
+  app.param('quizId', function(req, res, next, id){
+    var Quiz = model.Quiz;
 
-    Test.findOne({ id: id }, function(error, test) {
+    Quiz.findOne({ id: id }, function(error, quiz) {
       if(error) {
         next(error);
       }
 
-      if(test) {
-        req.test = test;
+      if(quiz) {
+        req.quiz = quiz;
         req.app.helpers({
-          test: test
+          quiz: quiz
         });
       }
      
@@ -152,9 +152,10 @@ module.exports = function(app) {
     });
   });
 
-  // QuetionIndex for Test
+
+  // QuetionIndex for Quiz
   app.param('questionIndex', function(req, res, next, id){
-    var Test = model.Test;
+    var Quiz = model.Quiz;
     req.questionIndex = (id-1).toString();
     next();
   });
@@ -164,7 +165,7 @@ module.exports = function(app) {
     var Question = model.Question;
 
     Question.findOne({ id: id })
-    .populate('test')
+    .populate('quiz')
     .exec(function(error, question) {
       if(error) {
         next(error);
@@ -172,9 +173,29 @@ module.exports = function(app) {
 
       if(question) {
         req.question = question;
-        req.test = question.test;
+        req.quiz = question.quiz;
         req.app.helpers({
           question: question
+        });
+      }
+     
+      next();
+    });
+  });
+
+  // Programming
+  app.param('ProgrammingId', function(req, res, next, id){
+    var Programming = model.Programming;
+
+    Programming.findOne({ id: id }, function(error, Programming) {
+      if(error) {
+        next(error);
+      }
+
+      if(Programming) {
+        req.Programming = Programming;
+        req.app.helpers({
+          Programming: Programming
         });
       }
      

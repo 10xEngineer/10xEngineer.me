@@ -1,13 +1,13 @@
 .container
   h1= title
-  h2 #{test.title}
-  p #{test.desc}
+  h2 #{quiz.title}
+  p #{quiz.desc}
   .row-fluid
     .spam10
-      a.btn(href="/question/create/#{test.id}")
+      a.btn(href="/assessment/question/create/#{quiz.id}")
         i.icon-plus
         |  Add Question
-      a.btn.pull-right(href="/question/import/#{test.id}") 
+      a.btn.pull-right(href="/assessment/question/import/#{quiz.id}") 
         i.icon-download-alt
         |  Import Questions
 
@@ -24,10 +24,10 @@
               - else if(question.weightage == 3)
                 span.label.label-important Hard
             .pull-right.actionBtns
-              a.btn.btn-success(href="/question/#{question.id}/edit")
+              a.btn.btn-success(href="/assessment/question/#{question.id}/edit")
                 i.icon-edit.icon-white
                 |  Edit Question
-              a.btn.btn-danger(href="/question/#{question.id}/remove")
+              a.btn.btn-danger(href="/assessment/question/#{question.id}/remove")
                 i.icon-trash.icon-white 
                 |  Delete Question
           ul

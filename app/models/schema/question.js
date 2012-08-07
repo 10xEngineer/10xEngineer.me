@@ -4,7 +4,7 @@ var mongoose = require('mongoose')
 
 var QuestionSchema = module.exports = new Schema({
   _id: { type: ObjectId },
-  test: { type: ObjectId, ref: 'Test' },
+  quiz: { type: ObjectId, ref: 'Quiz' },
   question: String,
   choices: [ String ],
   answers: [ String ],

@@ -13,7 +13,7 @@ module.exports.createView = function(req, res) {
 module.exports.create = function(req, res) {
   var Question = model.Question;
   var question = new Question();
-  question.test = req.test._id;
+  question.quiz = req.quiz._id;
   question.question = req.body.question;
   question.weightage = req.body.weightage;
   question.random = Math.random();
@@ -40,23 +40,23 @@ module.exports.create = function(req, res) {
     if(error) {
       log.error(error);
       req.session.error = "Can not create question.";
-      res.redirect('/test/create');
+      res.redirect('/assessment/quiz/create');
     }
 
     req.session.message = "Question created successfully.";
-    res.redirect('/test/' + req.test.id);
+    res.redirect('/assessment/quiz/' + req.quiz.id);
   });
 };
 
 module.exports.view = function(req, res) {
-  res.render('test/view', {
+  res.render('quiz/view', {
     title:  "Question",
-    test: req.test
+    quiz: req.quiz
   });
 };
 
 module.exports.removeQuestion = function(req, res) {
-  var Test = model.Test;
+  var Quiz = model.Quiz;
   var question = req.question;
   
   question.remove(function(error){
@@ -64,12 +64,12 @@ module.exports.removeQuestion = function(req, res) {
       log.error(error);
     }
     req.session.message = "Question remove successfully.";
-    res.redirect("/test/" + question.test.id);
+    res.redirect("/assessment/quiz/" + question.quiz.id);
   });
 };
 
 module.exports.editView = function(req, res) {
-  var Test = model.Test;
+  var Quiz = model.Quiz;
   var question = req.question;
   res.render("question/edit",{
     title: "Question",
@@ -80,7 +80,7 @@ module.exports.editView = function(req, res) {
 
 module.exports.edit= function(req, res) {
   var question = req.question;
-  question.test = req.test._id;
+  question.quiz = req.quiz._id;
   question.question = req.body.question;
   question.weightage = req.body.weightage;
   question.difficulty = req.body.difficulty;
@@ -104,11 +104,11 @@ module.exports.edit= function(req, res) {
     if(error) {
       log.error(error);
       req.session.error = "Can not update question.";
-      res.redirect('/test/create');
+      res.redirect('/assessment/quiz/create');
     }
 
     req.session.message = "Question saved successfully.";
-    res.redirect('/test/' + req.test.id);
+    res.redirect('/assessment/quiz/' + req.quiz.id);
   });
 };
 
@@ -137,7 +137,7 @@ module.exports.importQuestion = function(req, res, next) {
     }
   };
   req.session.message = "Questions imported successfully.";
-  res.redirect('/question/import/1');
+  res.redirect('/assessment/question/import/1');
 
 };
 

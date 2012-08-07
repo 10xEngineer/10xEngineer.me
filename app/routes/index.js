@@ -3,10 +3,11 @@ var _ = require('underscore');
 var main = require('./main');
 var course = require('./course');
 var course_editor = require('./course_editor');
-var test = require('./test');
+var quiz = require('./quiz');
 var question = require('./question');
 var lesson = require('./lesson');
 var quiz = require('./quiz');
+var programming = require('./programming');
 var admin = require('./admin');
 var user = require('./user');
 var cdn = require('./cdn');
@@ -73,7 +74,7 @@ module.exports = function(app) {
   });
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','testId','questionId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','quizId','questionId', 'programmingId'], function(req, res, next, num, name){ 
     var parsedNum = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('Invalid route: ' + num));
@@ -203,25 +204,32 @@ module.exports = function(app) {
   app.get('/admin/user/:userId/info', verifyPermission('admin', 'edit'), admin.userInfo);
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
 
-  // Test 
-  app.get('/test', test.testList);
-  app.get('/test/create', test.createView);
-  app.post('/test/create', validation.lookUp(validationConfig.test.createTest), test.create);
-  app.get('/test/:testId', test.view);
-  app.get('/test/:testId/edit', test.editView);
-  app.post('/test/:testId/edit', validation.lookUp(validationConfig.test.editTest), test.edit);
-  app.get('/test/:testId/remove', test.removeTest);
-  app.get('/test/:testId/start', test.startTest);
-  app.get('/test/:testId/finish', test.testResult);
-  app.get('/test/:testId/:questionIndex', test.viewQuestion);
-  app.post('/test/:testId/:questionIndex', validation.lookUp(validationConfig.question.attemptQuestion), test.submitQuestion);
+  // Quiz 
+  app.get('/assessment/quiz', quiz.quizList);
+  app.get('/assessment/quiz/create', quiz.createView);
+  app.post('/assessment/quiz/create', validation.lookUp(validationConfig.quiz.createQuiz), quiz.create);
+  app.get('/assessment/quiz/:quizId', quiz.view);
+  app.get('/assessment/quiz/:quizId/edit', quiz.editView);
+  app.post('/assessment/quiz/:quizId/edit', validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
+  app.get('/assessment/quiz/:quizId/remove', quiz.removeQuiz);
+  app.get('/assessment/quiz/:quizId/start', quiz.startQuiz);
+  app.get('/assessment/quiz/:quizId/finish', quiz.quizResult);
+  app.get('/assessment/quiz/:quizId/:questionIndex', quiz.viewQuestion);
+  app.post('/assessment/quiz/:quizId/:questionIndex', validation.lookUp(validationConfig.question.attemptQuestion), quiz.submitQuestion);
 
-  app.get('/question/create/:testId', question.createView);
-  app.post('/question/create/:testId', validation.lookUp(validationConfig.question.createQuestion), question.create);
-  app.get('/question/import/:testId', question.importQuestionView);
-  app.post('/question/import/:testId', question.importQuestion);
-  app.get('/question/:questionId/remove', question.removeQuestion);
-  app.get('/question/:questionId/edit', question.editView);
-  app.post('/question/:questionId/edit', validation.lookUp(validationConfig.question.createQuestion), question.edit);
+  app.get('/assessment/question/create/:quizId', question.createView);
+  app.post('/assessment/question/create/:quizId', validation.lookUp(validationConfig.question.createQuestion), question.create);
+  app.get('/assessment/question/import/:quizId', question.importQuestionView);
+  app.post('/assessment/question/import/:quizId', question.importQuestion);
+  app.get('/assessment/question/:questionId/remove', question.removeQuestion);
+  app.get('/assessment/question/:questionId/edit', question.editView);
+  app.post('/assessment/question/:questionId/edit', validation.lookUp(validationConfig.question.createQuestion), question.edit);
+
+  // For programming test
+  app.get('/assessment/programming', programming.list);
+  app.get('/assessment/programming/create', programming.createView);
+  app.post('/assessment/programming/create', programming.create);
+  app.get('/assessment/programming/:programmingId', programming.appearView);
+
 
 };
