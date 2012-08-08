@@ -22,6 +22,7 @@
     , "eyes": "0.1.x"
     , "gm" : "1.3.x"
     , "jade": "latest"
+    , "longjohn": "0.x"
     , "mail": "0.2.x"
     , "mime": "1.2.x"
     , "mongoose": "2.7.x"
