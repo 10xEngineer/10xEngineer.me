@@ -1,0 +1,418 @@
+link(rel="stylesheet", type="text/css", href="/stylesheets/tree.css", media="screen")
+style
+  .box {
+    background: blue;
+    color:white;
+  }
+  .box label {
+    color: white;
+  }
+  .well{
+    width: 300px;
+  }
+  .dir, .file {
+    width: 300px;
+  }
+  .level0 > .head {
+    padding-left: 10px;
+  }
+  .level1 > .head {
+    padding-left: 20px;
+  }
+  .level2 > .head {
+    padding-left: 30px;
+  }
+  .level3 > .head {
+    padding-left: 40px;
+  }
+  .level4 > .head {
+    padding-left: 50px;
+  }
+  .level5 > .head {
+    padding-left: 60px;
+  }
+
+.container
+  .row
+    .span4
+      .btn-toolbar(style="margin-top: 18px;")
+        .btn-group
+          button(class="btn btn-primary", data-toggle="dropdown") Create
+          button(class="btn dropdown-toggle btn-primary", data-toggle="dropdown")
+            span(class="caret")
+          ul(class="dropdown-menu")
+            li
+              a.mkdir(href="#") Create Folder
+            li
+              a.mkfile(href="#") Create File
+        .btn-group
+          button(class="btn btn-danger") Remove
+          button(class="btn dropdown-toggle btn-danger", data-toggle="dropdown")
+            span(class="caret")
+          ul(class="dropdown-menu")
+            li
+              a.rmdir(href="#") Remove Folder
+            li
+              a.rmfile(href="#") Remove File
+        .btn-group
+          button(class="btn btn-warning rename", type="submit") Rename
+  .row
+    div#root.dir.level0.well
+      div.head.box
+        i.icon-chevron-right.icon-white
+        label(style="display: inline-block;")  Root
+      div.container(style='display: none;')
+
+
+script
+
+  $(document).ready(function(){
+
+    var element = document.getElementById("root");
+    var eventMkDir = document.createEvent('Event');
+    var eventMkFile = document.createEvent('Event');
+    var eventRmDir = document.createEvent('Event');
+    var eventRmFile = document.createEvent('Event');
+    var eventRename = document.createEvent('Event');
+    eventMkDir.initEvent('createDir', true, true);
+    eventMkFile.initEvent('createFile', true, true);
+    eventRmDir.initEvent('removeDir', true, true);
+    eventRmFile.initEvent('removeFile', true, true);
+    eventRename.initEvent('rename', true, true);
+
+    /**************************************************/
+    /***  User Interface Functions                  ***/
+    /**************************************************/
+    var createDirUI = function() {
+      if(($($('.box').parent())).hasClass('dir')){
+        
+        // Create default structure of directory
+        var $newDir = $('<div/>', {
+          class: 'dir'
+        }).append($('<div/>', {
+          class: 'head collapsed'
+        }).append($('<i/>', {
+          class: 'icon-chevron-right'
+        })).append($('<label/>', {
+          style: 'display: inline-block;',
+          html: "New Directory"
+        }))).append($('<div/>', {
+          class: 'container',
+          style: 'display: none;'
+        }));
+
+        // Append new direcory to its parent
+        $($($('.box').parent()).children()[1]).append($newDir);
+
+        // Naming of directory
+        dirName = "New Folder";
+        $newDir.find('.head').html($newDir.find('.head').html() + " " + dirName);
+        expand($newDir.parent().parent());
+        rename($newDir);
+
+        // Assign Level to new directory
+        var $parent = $newDir.parent().parent();
+        if($parent.hasClass('level0')){
+          $newDir.addClass('level1');
+        } else if($parent.hasClass('level1')) {
+          $newDir.addClass('level2');
+        } else if($parent.hasClass('level2')) {
+          $newDir.addClass('level3');
+        } else if($parent.hasClass('level3')) {
+          $newDir.addClass('level4');
+        } else if($parent.hasClass('level4')) {
+          $newDir.addClass('level5');
+        }
+
+      } else {
+        alert("Directory can not be created here.");
+      }
+
+      // bind required event
+      // Select event
+      $newDir.find('.head').click(function(){
+        // Get head from old selection
+        var $oldHead = $('.box');
+
+        // get head from selected element
+        var $newHead = $(this);
+
+        // fix processess of exchange
+        changeSelectedElementProcidure($oldHead, $newHead);
+      });
+
+      //  Collaps event
+      //  Expand event
+      $newDir.find('.head').dblclick(function(){
+        if($(this).hasClass('collapsed')) {
+          // code for expand
+          expand($(this).parent());
+        } else {
+          // code for collaps
+          collapse($(this).parent());
+        }
+      });
+    };
+
+    var createFileUI = function() {
+      var $newFile = $('<div/>', {
+        class: 'file'
+      }).append($('<div/>', {
+        class: 'head'
+      }).append($('<i/>', {
+        class: 'icon-file'
+      })).append($('<label/>', {
+        style: 'display: inline-block;',
+        html: "New File"
+      })));
+      var $dir = $('.box').parent();
+      if($dir.hasClass('dir')){
+        $dir.children('.container').append($newFile);
+        expand($dir);
+        rename($newFile);
+        $newFile.find('.head').click(function(){
+          // Get head from old selection
+          var $oldHead = $('.box');
+
+          // get head from selected element
+          var $newHead = $(this);
+
+          // fix processess of exchange
+          changeSelectedElementProcidure($oldHead, $newHead);
+        });
+      } else {
+        alert("You can not make file under " + $dir.children('.head').children('label').html());
+      }
+    };
+
+    var removeDirUI = function(e) {
+      $dir = $('.box').parent();
+      if($dir.hasClass('root')) {
+        alert("It can not be removed b'coz it is root directory");
+      } else if($dir.hasClass('dir')) {
+        $dir.remove();
+      } else {
+        alert("This is not directory");
+      }
+    };
+
+    var removeFileUI = function(e) {
+      $file = $('.box').parent();
+      if($file.hasClass('file')){
+        $file.remove();
+      }
+    };
+
+    var renameUI = function(e) {
+      var $head = e.head;
+      var value = $head.children('input').val();
+      var $icon = $head.children('i');
+      $head.html("");
+      $head.append($icon).append($('<label/>', {
+        html: value,
+        style: 'display: inline-block;'
+      }));
+
+    };
+
+    /**************************************************/
+    /***  Virtual File System Functions             ***/
+    /**************************************************/
+
+    // TODO: add vfs functions
+
+    // Here variable 'e' is an event object
+    // e.path will give path 
+
+    var createDirVFS = function(e) {
+    };
+
+    var createFileVFS = function(e) {
+    };
+
+    var removeDirVFS = function(e) {
+    };
+
+    var removeFileVFS = function(e) {
+    };
+
+    var renameVFS = function(e) {
+    };
+    
+
+    /**************************************************/
+    /***  Jquery Functions                          ***/
+    /**************************************************/
+
+    
+    //- Make Dir
+    $('.mkdir').click(function(){
+      eventMkDir['path'] = generatePath($('.box').parent());
+      element.dispatchEvent(eventMkDir);  
+    });
+
+    //- Make File
+    $('.mkfile').click(function(){
+      eventMkFile['path'] = generatePath($('.box').parent());
+      element.dispatchEvent(eventMkFile);  
+    });
+
+    //- Remove Dir
+    $('.rmdir').click(function(){
+      eventRmDir['path'] = generatePath($('.box').parent());
+      element.dispatchEvent(eventRmDir);  
+    });
+
+    //- Remove File
+    $('.rmfile').click(function() {
+      eventRmFile['path'] = generatePath($('.box').parent());
+      element.dispatchEvent(eventRmFile);  
+    });
+
+    //- rename 
+    $('Button.rename').click(function(){
+      rename($('.box').parent());
+    });
+
+    //- Change selected file/dir
+    $('.head').click(function() {
+        // Get head from old selection
+        var $oldHead = $('.box');
+
+        // get head from selected element
+        var $newHead = $(this);
+
+        // fix processess of exchange
+        changeSelectedElementProcidure($oldHead, $newHead);
+    });
+
+    //- colleps and expand [double click on file/dir]
+    $('.head').dblclick(function(){
+      if($(this).parent().hasClass('dir')){
+
+        // code for duble click on directory
+        if($(this).hasClass('collapsed')) {
+          // code for expand
+          expand($(this).parent());
+        } else {
+          // code for collaps
+          collapse($(this).parent());
+        }
+      
+      } else {
+        // code for duble click on file
+        alert("File open function is not implemented yet.");
+      }
+    });
+
+
+    /**************************************************/
+    /***  Other Functions                           ***/
+    /**************************************************/
+
+    var generatePath = function($dir) {
+      var path;
+      if($dir.hasClass('level0')){
+        path = ("/" + $dir.children('.head').children('label').text());
+      }
+      else {
+        path = (generatePath($dir.parent().parent()) + "/" + $dir.children('.head').children('label').text());
+      }
+      return path;
+    };
+
+    var rename = function($dir) {
+      var $head = $dir.children('.head');
+      var $icon = $head.children('i');
+      var value = $head.children('label').html();
+      $head.html("");
+      var $input = $('<input/>', {
+        type: 'text',
+        value: value
+      });
+      $input.keypress(function(event){
+        if(event.keyCode==13){
+          renameDone($(this).parent());
+        }
+      })
+      $input.blur(function(){
+        renameDone($(this).parent());
+      })
+      $head.append($icon).append($input);
+      $input.focus();
+    }
+
+    var renameDone = function($head) {
+      eventRename['head'] = $head;
+      eventRename['path'] = generatePath($head.parent());
+      element.dispatchEvent(eventRename);
+    };
+
+    var expand = function($dir) {
+      // Set icon
+      $icon = $dir.children('.head').children('i');
+      $icon.removeClass('icon-chevron-right');
+      $icon.addClass('icon-chevron-down');
+
+      // show containt
+      $dir.children('.container').show();
+
+      // change class
+      $dir.children('.head').removeClass('collapsed');
+      $dir.children('.head').addClass('expanded');
+    };
+
+    var collapse = function($dir){
+      // set icon
+      $icon = $dir.children('.head').children('i');
+      $icon.removeClass('icon-chevron-down');
+      $icon.addClass('icon-chevron-right');
+
+      // hide containet
+      $dir.children('.container').hide();
+
+      // change class
+      $dir.children('.head').removeClass('expanded');
+      $dir.children('.head').addClass('collapsed');
+    };
+
+    var changeSelectedElementProcidure = function($oldHead, $newHead) {
+
+      // remove box from old head
+      $oldHead.removeClass('box');
+
+      // remove white icon from old head
+      $oldHead.find('i').removeClass('icon-white');
+
+      // set box over new head
+      $newHead.addClass('box');
+
+      // set white icon over new head
+      $newHead.find('i').addClass('icon-white');
+    };
+
+    /**************************************************/
+    /***  Add Listners Functions                    ***/
+    /**************************************************/
+
+    // create directory event
+    element.addEventListener("createDir", createDirUI, false);   
+    element.addEventListener("createDir", createDirVFS, false);
+
+    // create file event
+    element.addEventListener("createFile", createFileUI, false);   
+    element.addEventListener("createFile", createFileVFS, false);
+
+    // remove directory event
+    element.addEventListener("removeDir", removeDirUI, false);   
+    element.addEventListener("removeDir", removeDirVFS, false);
+
+    // remove file event
+    element.addEventListener("removeFile", removeFileUI, false);   
+    element.addEventListener("removeFile", removeFileVFS, false);
+
+    // rename event
+    element.addEventListener("rename", renameUI, false);   
+    element.addEventListener("rename", renameVFS, false);
+
+  });

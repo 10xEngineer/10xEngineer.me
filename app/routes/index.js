@@ -235,4 +235,8 @@ module.exports = function(app) {
   app.post('/assessment/programming/create', programming.create);
   app.get('/assessment/programming/:programmingId', programming.appearView);
 
+  // Just for testing
+  // TODO: Remove it and all its related functions and files before commit
+  app.get('/testing', main.testing);
+
 };

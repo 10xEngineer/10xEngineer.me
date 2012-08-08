@@ -1,0 +1,68 @@
+/* CSS Tree menu styles */
+.tree .box
+{
+	background-color: blue;
+    color: #fff;
+    cursor: pointer;
+}
+
+ol.tree
+{
+	padding:20px;
+	width: 300px;
+}
+	.tree li 
+	{ 
+		position: relative; 
+		list-style: none;
+		
+	}
+	.tree li div 
+	{
+		background: url("../img/folder-horizontal.png") 15px 1px no-repeat;
+		display: block;
+		padding-left: 37px;
+	}
+	.tree li.file div
+	{
+		background-image: url("../img/document.png");
+		cursor: pointer;
+	}
+	.tree li input
+	{
+		border : 1px solid green;
+		position: absolute;
+		left: 0;
+		margin-left: 0;
+		opacity: 0;
+		z-index: 2;
+		cursor: pointer;
+		height: 1em;
+		width: 1em;
+		top: 0;
+		background: url("../img/toggle-small-expand.png") 40px -3px no-repeat;
+	}
+	.tree li input + ol
+	{
+		background: url("../img/toggle-small-expand.png") 40px -3px no-repeat;
+		margin: -1.05em 0 0 -40px; /* 15px */
+		height: 1em;
+	}
+	.tree li input + ol > li { display: none; margin-left: -14px !important; padding-left: 1px; }
+	.tree li label
+	{
+		background: url("../img/folder-horizontal.png") 15px 1px no-repeat;
+		cursor: pointer;
+		display: block;
+		padding-left: 37px;
+	}
+
+	.tree li input:checked + ol
+	{
+		background: url("../img/toggle-small.png") 40px -3px no-repeat;
+		margin: -1.05em 0 0 -40px; /* 20px */
+		padding: 1.563em 0 0 80px;
+		height: auto;
+	}
+		li input:checked + ol > li { display: block; margin: 0 0 0.125em;  /* 2px */}
+		li input:checked + ol > li:last-child { margin: 0 0 0.063em; /* 1px */ }
