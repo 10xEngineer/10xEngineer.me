@@ -76,7 +76,7 @@ module.exports.user = {
 };
 
 // Test
-module.exports.test = {
+module.exports.quiz = {
 	
 	createTest : {
 		title : {required: true},
