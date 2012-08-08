@@ -87,7 +87,8 @@ module.exports = function(app) {
   // Load Express data middleware
   require('../middleware/data')(app);
 
-
+  // vfs <-> mongo-vfs adapter
+  require('../middleware/vfs')(app);
 
   // Routes
 
@@ -204,6 +205,9 @@ module.exports = function(app) {
   app.get('/admin/user/:userId/info', verifyPermission('admin', 'edit'), admin.userInfo);
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
 
+  // Assessment
+  app.get('/assessment/quiz', main.assessment);
+
   // Quiz 
   app.get('/assessment/quiz', quiz.quizList);
   app.get('/assessment/quiz/create', quiz.createView);
@@ -225,11 +229,10 @@ module.exports = function(app) {
   app.get('/assessment/question/:questionId/edit', question.editView);
   app.post('/assessment/question/:questionId/edit', validation.lookUp(validationConfig.question.createQuestion), question.edit);
 
-  // For programming test
+  // Programming
   app.get('/assessment/programming', programming.list);
   app.get('/assessment/programming/create', programming.createView);
   app.post('/assessment/programming/create', programming.create);
   app.get('/assessment/programming/:programmingId', programming.appearView);
-
 
 };
