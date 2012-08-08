@@ -1,0 +1,55 @@
+.container 
+    div#header
+        //- TODO:: Re write header
+
+    div#editor Loading...
+    script(src="/public/javascript/ace_2/ace.js")
+    script(src="/public/javascript/ace_2/mode-coffee.js")
+    script(src="/public/javascript/ace_2/theme-idle_fingers.js")
+    script(src="/public/javascript/channel/bcsocket.js")
+    script(src="/public/javascript/share/share.uncompressed.js")
+    script(src="/public/javascript/share/ace.js")
+    script
+        var randomDocName = function(length) {
+          var chars, x;
+          if (length == null) {
+            length = 10;
+          }
+          chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=";
+          var name = [];
+          for (x = 0; x < length; x++) {
+            name.push(chars[Math.floor(Math.random() * chars.length)]);
+          }
+          return name.join('');
+        };
+
+        window.onload = function() {
+          var editor = ace.edit("editor");
+
+          editor.setReadOnly(true);
+          editor.getSession().setUseSoftTabs(true);
+          editor.getSession().setTabSize(2);
+          editor.getSession().setMode(new (require("ace/mode/coffee").Mode));
+          editor.setTheme("ace/theme/idle_fingers");
+
+          if (!document.location.hash) {
+            document.location.hash = '#' + randomDocName();
+          }
+          var docName = "code:" + document.location.hash.slice(1);
+
+          var span = document.getElementById('docname').innerText = docName;
+
+          sharejs.open(docName, 'text', function(error, doc) {
+            if (error) {
+              console.error(error);
+              return;
+            }
+
+            if (doc.created) {
+              doc.insert(0, "# Coffeescript editor!\n\nexports.foo = ->\n  console.log 'hi!'");
+            }
+
+            doc.attach_ace(editor);
+            editor.setReadOnly(false);
+          });
+        };

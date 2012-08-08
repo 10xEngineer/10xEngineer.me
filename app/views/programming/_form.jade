@@ -1,0 +1,38 @@
+form(method='POST')
+  p
+    label(for="title") Title:
+    - if(edit) 
+      input.required(value='#{programming.title}', id='title', name='title')
+    - else
+      input.required(id='title', name='title')
+  p
+    label(for="description") Description:
+    textarea.required(name='description', id='description') #{programming.desc}
+  p
+    label(for="boilerPlateCode") BoilerPlateCode
+    textarea(name="boilerPlateCode", id="boilerPlateCode") #{programming.boilerPlateCode}
+  p
+    label Language
+    select#mode(name="language", size="1", value="#{programming.language}")
+      option(value="javascript") JavaScript
+      option(value="xml") XML
+      option(value="html") HTML
+      option(value="css") CSS
+      option(value="scss") SCSS
+      option(value="python") Python
+      option(value="php") PHP
+      option(value="java") Java
+      option(value="ruby") Ruby
+      option(value="c_cpp") C/C++
+      option(value="coffee") CoffeeScript
+      option(value="json") JSON
+      option(value="perl") Perl
+      option(value="clojure") Clojure
+      option(value="ocaml") OCaml
+      option(value="csharp") C#
+      option(value="svg") SVG
+      option(value="textile") Textile
+      option(value="groovy") Groovy
+      option(value="scala") Scala
+  p
+    input.btn.btn-primary(type='submit', value='Create')
