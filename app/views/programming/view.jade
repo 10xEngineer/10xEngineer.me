@@ -66,9 +66,10 @@ style
   #editor(style='position:relative;width:75%;min-height:500px;display:inline-block;') Sample code
 
   link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
-  script(src="/javascripts/eventemitter2.js")
+  script(src="/javascripts/superagent.min.js")
   script(src="/javascripts/ace_2/ace.js")
   script(src="/javascripts/jquery.contextMenu.js")
+  script(src="/javascripts/vfs-client.js")
   script(src="/javascripts/filetree.js")
   //script(src="/javascripts/ace_2/theme-solarized_dark.js")
   //script(src="/javascripts/share/share.uncompressed.js")
@@ -76,12 +77,6 @@ style
     var themes = {};
     var modes = {};
     var editor;
-    var vfs = {
-      newFile: function(cb) { cb(); },
-      newDir: function(cb) { cb(); },
-      rename: function(cb) { cb(); },
-      remove: function(cb) { cb(); },
-    };
 
     function loadTheme(name) {
       //check if the theme source files have been loaded before
@@ -137,12 +132,21 @@ style
       
       vfs.newFile(name, path, function(error) {
         var $file = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
+        $parentDir.append($file);
       });
-
     }
 
     function newDir(caller) {
-      console.log(caller);
+      var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
+      var path = $parentDir.children('a').attr('rel');
+
+      // Logic to figure out unique name
+      var name = 'untitled';
+      
+      vfs.newDir(name, path, function(error) {
+        var $file = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
+        $parentDir.append($dir);
+      });
     }
 
     function rename(caller) {
@@ -167,7 +171,8 @@ style
 
       // Initialize tree
       // TODO: Replace hardcoded bucketid with dynamic one
-      $('#tree').fileTree('test');
+      window.vfs = new VFSClient('test');
+      $('#tree').fileTree(vfs);
 
       // Initialize right-click context menu
       $.contextMenu({

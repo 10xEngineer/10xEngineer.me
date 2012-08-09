@@ -1,13 +1,14 @@
 if(jQuery) (function($){
 	
 	$.extend($.fn, {
-		fileTree: function(bucketId) {
+		fileTree: function(vfs) {
 			
 			$(this).each( function() {
 				
 				function showTree(c, t) {
+					console.log(t);
 					$(c).addClass('wait');
-					$.get('/fs/' + bucketId + t, function(fileList) {
+					vfs.readDir(t, function(fileList) {
 						$(c).find('.start').html('');
 						$(c).removeClass('wait');
 						var $ul = $('<ul/>', { class: 'fileTree' });
@@ -21,14 +22,15 @@ if(jQuery) (function($){
 							}
 							$item.appendTo($ul);
 							if(t === '/') $(c).find('ul:hidden').show(); else $(c).find('ul:hidden').slideDown({ duration: 500 });
-							bindTree(c);
 						});
+						bindTree($ul);
 						$ul.appendTo(c);
 					});
 				}
 				
 				function bindTree(t) {
 					$(t).find('li a').bind('dblclick', function() {
+						console.log('here');
 						if( $(this).parent().hasClass('directory') ) {
 							if( $(this).parent().hasClass('collapsed') ) {
 								$(this).parent().find('ul').remove(); // cleanup
@@ -45,6 +47,7 @@ if(jQuery) (function($){
 						}
 						return false;
 					});
+					console.log(t);
 					$(t).find('li a').bind('click', function() {
 						$('.selected').removeClass('selected');
 						$(this).addClass('selected');
