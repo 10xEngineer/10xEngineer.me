@@ -6,7 +6,6 @@ if(jQuery) (function($){
 			$(this).each( function() {
 				
 				function showTree(c, t) {
-					console.log(t);
 					$(c).addClass('wait');
 					vfs.readDir(t, function(fileList) {
 						$(c).find('.start').html('');
@@ -14,7 +13,6 @@ if(jQuery) (function($){
 						var $ul = $('<ul/>', { class: 'fileTree' });
 						$(fileList).each(function(index, file) {
 							var $item;
-							console.log(file);
 							if(file.mime === 'inode/directory') {
 								$item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
 							} else {
@@ -30,7 +28,6 @@ if(jQuery) (function($){
 				
 				function bindTree(t) {
 					$(t).find('li a').bind('dblclick', function() {
-						console.log('here');
 						if( $(this).parent().hasClass('directory') ) {
 							if( $(this).parent().hasClass('collapsed') ) {
 								$(this).parent().find('ul').remove(); // cleanup
@@ -47,7 +44,6 @@ if(jQuery) (function($){
 						}
 						return false;
 					});
-					console.log(t);
 					$(t).find('li a').bind('click', function() {
 						$('.selected').removeClass('selected');
 						$(this).addClass('selected');
