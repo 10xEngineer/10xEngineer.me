@@ -1,55 +1,580 @@
+- var docId = 'test';
+style
+  ul.fileTree {
+    font-family: Verdana, sans-serif;
+    font-size: 11px;
+    line-height: 18px;
+    padding: 0px;
+    margin: 0px;
+  }
+
+  ul.fileTree li {
+    list-style: none;
+    padding: 0px;
+    padding-left: 20px;
+    margin: 0px;
+    white-space: nowrap;
+  }
+
+  ul.fileTree a {
+    color: #333;
+    text-decoration: none;
+    display: block;
+    padding: 0px 2px;
+  }
+
+  ul.fileTree a:hover,
+  ul.fileTree a.selected {
+    background: #BDF;
+  }
+
+  /* Core Styles */
+  .fileTree li.directory { background: url(/img/fileTree/directory.png) left top no-repeat; }
+  .fileTree li.expanded { background: url(/img/fileTree/folder_open.png) left top no-repeat; }
+  .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
+  .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
+
+
 .container 
-    div#header
-        //- TODO:: Re write header
+  div#header
+      //- TODO:: Re write header
+  #sidebar(style="display: inline-block; width:25%;vertical-align:top;")
+    .btn-toolbar(style="margin-top: 18px;")
+      .btn-group
+        button(class="btn btn-primary", data-toggle="dropdown") Create
+        button(class="btn dropdown-toggle btn-primary", data-toggle="dropdown")
+          span(class="caret")
+        ul(class="dropdown-menu")
+          li
+            a.mkdir(href="#") Create Folder
+          li
+            a.mkfile(href="#") Create File
+      .btn-group
+        button(class="btn btn-danger") Remove
+        button(class="btn dropdown-toggle btn-danger", data-toggle="dropdown")
+          span(class="caret")
+        ul(class="dropdown-menu")
+          li
+            a.rmdir(href="#") Remove Folder
+          li
+            a.rmfile(href="#") Remove File
+      .btn-group
+        button(class="btn btn-warning rename", type="submit") Rename
 
-    div#editor Loading...
-    script(src="/public/javascript/ace_2/ace.js")
-    script(src="/public/javascript/ace_2/mode-coffee.js")
-    script(src="/public/javascript/ace_2/theme-idle_fingers.js")
-    script(src="/public/javascript/channel/bcsocket.js")
-    script(src="/public/javascript/share/share.uncompressed.js")
-    script(src="/public/javascript/share/ace.js")
-    script
-        var randomDocName = function(length) {
-          var chars, x;
-          if (length == null) {
-            length = 10;
+    #tree
+
+  #editor(style='position:relative;width:75%;min-height:500px;display:inline-block;') Sample code
+
+  link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
+  script(src="/javascripts/eventemitter2.js")
+  script(src="/javascripts/ace_2/ace.js")
+  script(src="/javascripts/jquery.contextMenu.js")
+  script(src="/javascripts/filetree.js")
+  //script(src="/javascripts/ace_2/theme-solarized_dark.js")
+  //script(src="/javascripts/share/share.uncompressed.js")
+  script
+    var themes = {};
+    var modes = {};
+    var editor;
+    var vfs = {
+      newFile: function(cb) { cb(); },
+      newDir: function(cb) { cb(); },
+      rename: function(cb) { cb(); },
+      remove: function(cb) { cb(); },
+    };
+
+    function loadTheme(name) {
+      //check if the theme source files have been loaded before
+      if(themes[name]){
+        editor.setTheme(themes[name]);
+        return;
+      }
+
+      var fileName = "/javascripts/ace_2/theme-" + name + ".js";
+      loadScriptFile(fileName, function(){
+        var path = "ace/theme/"+name;
+        themes[name] = path;
+        editor.setTheme(path);
+      });
+    }
+
+    var modes = {};
+    function loadMode(name){
+      $('#language .label').text(name);
+      //check if the language source files have been loaded before
+      if(modes[name]) {
+        editor.getSession().setMode(new modes[name]);
+        return;
+      }
+
+      var fileName = "/javascripts/ace_2/mode-" + name + ".js";
+      loadScriptFile(fileName, function(){
+        var Mode = require("ace/mode/"+name).Mode;
+        modes[name] = Mode;
+        editor.getSession().setMode(new Mode());
+      });
+    }
+
+    //dynamically load javascript source file
+    function loadScriptFile(path, callback) {
+      var head = document.getElementsByTagName('head')[0];
+      var s = document.createElement('script');
+
+      s.src = path;
+      head.appendChild(s);
+
+      s.onload = callback;
+    }
+
+
+    // Tree operations
+    function newFile(caller) {
+      var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
+      var path = $parentDir.children('a').attr('rel');
+
+      // Logic to figure out unique name
+      var name = 'untitled';
+      
+      vfs.newFile(name, path, function(error) {
+        var $file = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
+      });
+
+    }
+
+    function newDir(caller) {
+      console.log(caller);
+    }
+
+    function rename(caller) {
+      console.log(caller);
+    }
+
+    function remove(caller) {
+      console.log(caller);
+    }
+
+
+
+    $(document).ready(function() {
+      editor = ace.edit("editor");
+
+      //editor.setReadOnly(true);
+      editor.getSession().setUseSoftTabs(true);
+      editor.getSession().setTabSize(2);
+      //editor.getSession().setMode(new (require("ace/mode/coffee").Mode));
+      loadMode("java");
+      loadTheme("textmate");
+
+      // Initialize tree
+      // TODO: Replace hardcoded bucketid with dynamic one
+      $('#tree').fileTree('test');
+
+      // Initialize right-click context menu
+      $.contextMenu({
+        selector: '.directory, .file',
+        callback: function(key, options) {
+          switch(key) {
+            case 'newFile':
+              newFile(this);
+              break;
+            case 'newDir':
+              newDir(this);
+              break;
+            case 'rename':
+              rename(this);
+              break;
+            case 'remove':
+              remove(this);
+              break;
           }
-          chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=";
-          var name = [];
-          for (x = 0; x < length; x++) {
-            name.push(chars[Math.floor(Math.random() * chars.length)]);
+        },
+        items: {
+          newFile: { name: 'New File' },
+          newDir: { name: 'New Directory' },
+          rename: { name: 'Rename' },
+          remove: { name: 'Remove' }
+        }
+      });
+
+      /*
+      sharejs.open('#{docId}', 'text', function(error, doc) {
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        if (doc.created) {
+          doc.insert(0, "# Coffeescript editor!\n\nexports.foo = ->\n  console.log 'hi!'");
+        }
+
+        doc.attach_ace(editor);
+        editor.setReadOnly(false);
+      });
+      */
+    });
+
+    //$(document).ready(function(){
+    (function neverRun(){
+
+      var element = document.getElementById("root");
+      var eventMkDir = document.createEvent('Event');
+      var eventMkFile = document.createEvent('Event');
+      var eventRmDir = document.createEvent('Event');
+      var eventRmFile = document.createEvent('Event');
+      var eventRename = document.createEvent('Event');
+      eventMkDir.initEvent('createDir', true, true);
+      eventMkFile.initEvent('createFile', true, true);
+      eventRmDir.initEvent('removeDir', true, true);
+      eventRmFile.initEvent('removeFile', true, true);
+      eventRename.initEvent('rename', true, true);
+
+      /**************************************************/
+      /***  User Interface Functions                  ***/
+      /**************************************************/
+      var createDirUI = function() {
+        if(($($('.box').parent())).hasClass('dir')){
+          
+          // Create default structure of directory
+          var $newDir = $('<div/>', {
+            class: 'dir'
+          }).append($('<div/>', {
+            class: 'head collapsed'
+          }).append($('<i/>', {
+            class: 'icon-chevron-right'
+          })).append($('<label/>', {
+            style: 'display: inline-block;',
+            html: "New Directory"
+          }))).append($('<div/>', {
+            class: 'child-container',
+            style: 'display: none;'
+          }));
+
+          // Append new direcory to its parent
+          $($($('.box').parent()).children()[1]).append($newDir);
+
+          // Naming of directory
+          dirName = "New Folder";
+          $newDir.find('.head').html($newDir.find('.head').html() + " " + dirName);
+          expand($newDir.parent().parent());
+          rename($newDir);
+
+          // Assign Level to new directory
+          var $parent = $newDir.parent().parent();
+          if($parent.hasClass('level0')){
+            $newDir.addClass('level1');
+          } else if($parent.hasClass('level1')) {
+            $newDir.addClass('level2');
+          } else if($parent.hasClass('level2')) {
+            $newDir.addClass('level3');
+          } else if($parent.hasClass('level3')) {
+            $newDir.addClass('level4');
+          } else if($parent.hasClass('level4')) {
+            $newDir.addClass('level5');
           }
-          return name.join('');
-        };
 
-        window.onload = function() {
-          var editor = ace.edit("editor");
+        } else {
+          alert("Directory can not be created here.");
+        }
 
-          editor.setReadOnly(true);
-          editor.getSession().setUseSoftTabs(true);
-          editor.getSession().setTabSize(2);
-          editor.getSession().setMode(new (require("ace/mode/coffee").Mode));
-          editor.setTheme("ace/theme/idle_fingers");
+        // bind required event
+        // Select event
+        $newDir.find('.head').click(function(){
+          // Get head from old selection
+          var $oldHead = $('.box');
 
-          if (!document.location.hash) {
-            document.location.hash = '#' + randomDocName();
+          // get head from selected element
+          var $newHead = $(this);
+
+          // fix processess of exchange
+          changeSelectedElementProcidure($oldHead, $newHead);
+        });
+
+        //  Collaps event
+        //  Expand event
+        $newDir.find('.head').dblclick(function(){
+          if($(this).hasClass('collapsed')) {
+            // code for expand
+            expand($(this).parent());
+          } else {
+            // code for collaps
+            collapse($(this).parent());
           }
-          var docName = "code:" + document.location.hash.slice(1);
+        });
+      };
 
-          var span = document.getElementById('docname').innerText = docName;
+      var createFileUI = function() {
+        var $newFile = $('<div/>', {
+          class: 'file'
+        }).append($('<div/>', {
+          class: 'head'
+        }).append($('<i/>', {
+          class: 'icon-file'
+        })).append($('<label/>', {
+          style: 'display: inline-block;',
+          html: "New File"
+        })));
 
-          sharejs.open(docName, 'text', function(error, doc) {
-            if (error) {
-              console.error(error);
-              return;
-            }
+        var $dir = $('.box').parent();
+        if($dir.hasClass('dir')){
+          $dir.children('.child-container').append($newFile);
 
-            if (doc.created) {
-              doc.insert(0, "# Coffeescript editor!\n\nexports.foo = ->\n  console.log 'hi!'");
-            }
+          if($dir.hasClass('level0')){
+            $newFile.addClass('level1');
+          } else if($dir.hasClass('level1')) {
+            $newFile.addClass('level2');
+          } else if($dir.hasClass('level2')) {
+            $newFile.addClass('level3');
+          } else if($dir.hasClass('level3')) {
+            $newFile.addClass('level4');
+          } else if($dir.hasClass('level4')) {
+            $newFile.addClass('level5');
+          }
 
-            doc.attach_ace(editor);
-            editor.setReadOnly(false);
+          expand($dir);
+          rename($newFile);
+          $newFile.find('.head').click(function(){
+            // Get head from old selection
+            var $oldHead = $('.box');
+
+            // get head from selected element
+            var $newHead = $(this);
+
+            // fix processess of exchange
+            changeSelectedElementProcidure($oldHead, $newHead);
           });
-        };
+        } else {
+          alert("You can not make file under " + $dir.children('.head').children('label').html());
+        }
+      };
+
+      var removeDirUI = function(e) {
+        $dir = $('.box').parent();
+        if($dir.hasClass('root')) {
+          alert("It can not be removed b'coz it is root directory");
+        } else if($dir.hasClass('dir')) {
+          $dir.remove();
+        } else {
+          alert("This is not directory");
+        }
+      };
+
+      var removeFileUI = function(e) {
+        $file = $('.box').parent();
+        if($file.hasClass('file')){
+          $file.remove();
+        }
+      };
+
+      var renameUI = function(e) {
+        var $head = e.head;
+        var value = $head.children('input').val();
+        var $icon = $head.children('i');
+        $head.html("");
+        $head.append($icon).append($('<label/>', {
+          html: value,
+          style: 'display: inline-block;'
+        }));
+
+      };
+
+      /**************************************************/
+      /***  Virtual File System Functions             ***/
+      /**************************************************/
+
+      // TODO: add vfs functions
+
+      // Here variable 'e' is an event object
+      // e.path will give path 
+
+      var createDirVFS = function(e) {
+      };
+
+      var createFileVFS = function(e) {
+      };
+
+      var removeDirVFS = function(e) {
+      };
+
+      var removeFileVFS = function(e) {
+      };
+
+      var renameVFS = function(e) {
+      };
+      
+
+      /**************************************************/
+      /***  Jquery Functions                          ***/
+      /**************************************************/
+
+      
+      //- Make Dir
+      $('.mkdir').click(function(){
+        eventMkDir['path'] = generatePath($('.box').parent());
+        element.dispatchEvent(eventMkDir);  
+      });
+
+      //- Make File
+      $('.mkfile').click(function(){
+        eventMkFile['path'] = generatePath($('.box').parent());
+        element.dispatchEvent(eventMkFile);  
+      });
+
+      //- Remove Dir
+      $('.rmdir').click(function(){
+        eventRmDir['path'] = generatePath($('.box').parent());
+        element.dispatchEvent(eventRmDir);  
+      });
+
+      //- Remove File
+      $('.rmfile').click(function() {
+        eventRmFile['path'] = generatePath($('.box').parent());
+        element.dispatchEvent(eventRmFile);  
+      });
+
+      //- rename 
+      $('Button.rename').click(function(){
+        rename($('.box').parent());
+      });
+
+      //- Change selected file/dir
+      $('.head').click(function() {
+          // Get head from old selection
+          var $oldHead = $('.box');
+
+          // get head from selected element
+          var $newHead = $(this);
+
+          // fix processess of exchange
+          changeSelectedElementProcidure($oldHead, $newHead);
+      });
+
+      //- colleps and expand [double click on file/dir]
+      $('.head').dblclick(function(){
+        if($(this).parent().hasClass('dir')){
+
+          // code for duble click on directory
+          if($(this).hasClass('collapsed')) {
+            // code for expand
+            expand($(this).parent());
+          } else {
+            // code for collaps
+            collapse($(this).parent());
+          }
+        
+        } else {
+          // code for duble click on file
+          alert("File open function is not implemented yet.");
+        }
+      });
+
+
+      /**************************************************/
+      /***  Other Functions                           ***/
+      /**************************************************/
+
+      var generatePath = function($dir) {
+        var path;
+        if($dir.hasClass('level0')){
+          path = ("/" + $dir.children('.head').children('label').text());
+        }
+        else {
+          path = (generatePath($dir.parent().parent()) + "/" + $dir.children('.head').children('label').text());
+        }
+        return path;
+      };
+
+      var rename = function($dir) {
+        var $head = $dir.children('.head');
+        var $icon = $head.children('i');
+        var value = $head.children('label').html();
+        $head.html("");
+        var $input = $('<input/>', {
+          type: 'text',
+          value: value
+        });
+        $input.keypress(function(event){
+          if(event.keyCode==13){
+            renameDone($(this).parent());
+          }
+        })
+        $input.blur(function(){
+          renameDone($(this).parent());
+        })
+        $head.append($icon).append($input);
+        $input.focus();
+      }
+
+      var renameDone = function($head) {
+        eventRename['head'] = $head;
+        eventRename['path'] = generatePath($head.parent());
+        element.dispatchEvent(eventRename);
+      };
+
+      var expand = function($dir) {
+        // Set icon
+        $icon = $dir.children('.head').children('i');
+        $icon.removeClass('icon-chevron-right');
+        $icon.addClass('icon-chevron-down');
+
+        // show containt
+        $dir.children('.child-container').show();
+
+        // change class
+        $dir.children('.head').removeClass('collapsed');
+        $dir.children('.head').addClass('expanded');
+      };
+
+      var collapse = function($dir){
+        // set icon
+        $icon = $dir.children('.head').children('i');
+        $icon.removeClass('icon-chevron-down');
+        $icon.addClass('icon-chevron-right');
+
+        // hide containet
+        $dir.children('.child-container').hide();
+
+        // change class
+        $dir.children('.head').removeClass('expanded');
+        $dir.children('.head').addClass('collapsed');
+      };
+
+      var changeSelectedElementProcidure = function($oldHead, $newHead) {
+
+        // remove box from old head
+        $oldHead.removeClass('box');
+
+        // remove white icon from old head
+        $oldHead.find('i').removeClass('icon-white');
+
+        // set box over new head
+        $newHead.addClass('box');
+
+        // set white icon over new head
+        $newHead.find('i').addClass('icon-white');
+      };
+
+      /**************************************************/
+      /***  Add Listners Functions                    ***/
+      /**************************************************/
+
+      // create directory event
+      element.addEventListener("createDir", createDirUI, false);   
+      element.addEventListener("createDir", createDirVFS, false);
+
+      // create file event
+      element.addEventListener("createFile", createFileUI, false);   
+      element.addEventListener("createFile", createFileVFS, false);
+
+      // remove directory event
+      element.addEventListener("removeDir", removeDirUI, false);   
+      element.addEventListener("removeDir", removeDirVFS, false);
+
+      // remove file event
+      element.addEventListener("removeFile", removeFileUI, false);   
+      element.addEventListener("removeFile", removeFileVFS, false);
+
+      // rename event
+      element.addEventListener("rename", renameUI, false);   
+      element.addEventListener("rename", renameVFS, false);
+
+    });
