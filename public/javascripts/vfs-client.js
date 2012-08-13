@@ -14,8 +14,24 @@
     });
   };
 
+  VFSClient.prototype.readFile = function(path, callback) {
+    request.get(this.prefix + path)
+      .end(function(res) {
+      if(res.ok) {
+        callback(res.body);
+      }
+    });
+  };
+
   VFSClient.prototype.newFile = function(name, path, callback) {
     request.put(this.prefix + path + name)
+      .end(callback);
+  };
+
+  VFSClient.prototype.saveFile = function(path, content, callback) {
+    request.put(this.prefix + path)
+      .type('text/plain')
+      .send(content)
       .end(callback);
   };
 

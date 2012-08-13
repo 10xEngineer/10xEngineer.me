@@ -30,7 +30,6 @@ if(jQuery) (function($){
 				
 				function bindTree(t) {
 					$(t).find('li a').bind('dblclick', function() {
-						console.log('here');
 						if( $(this).parent().hasClass('directory') ) {
 							if( $(this).parent().hasClass('collapsed') ) {
 								$(this).parent().find('ul').remove(); // cleanup
@@ -43,7 +42,8 @@ if(jQuery) (function($){
 							}
 						} else {
 							// TODO: Load file content in the editor
-							var path = $(this).attr('href');
+							var path = $(this).attr('rel');
+							vfs.readFile(path, window.loadFile);
 						}
 						return false;
 					});

@@ -39,27 +39,7 @@ style
   div#header
       //- TODO:: Re write header
   #sidebar(style="display: inline-block; width:25%;vertical-align:top;")
-    .btn-toolbar(style="margin-top: 18px;")
-      .btn-group
-        button(class="btn btn-primary", data-toggle="dropdown") Create
-        button(class="btn dropdown-toggle btn-primary", data-toggle="dropdown")
-          span(class="caret")
-        ul(class="dropdown-menu")
-          li
-            a.mkdir(href="#") Create Folder
-          li
-            a.mkfile(href="#") Create File
-      .btn-group
-        button(class="btn btn-danger") Remove
-        button(class="btn dropdown-toggle btn-danger", data-toggle="dropdown")
-          span(class="caret")
-        ul(class="dropdown-menu")
-          li
-            a.rmdir(href="#") Remove Folder
-          li
-            a.rmfile(href="#") Remove File
-      .btn-group
-        button(class="btn btn-warning rename", type="submit") Rename
+    button#save(class="btn", type="button") Save
 
     #tree
 
@@ -199,6 +179,20 @@ style
           rename: { name: 'Rename' },
           remove: { name: 'Remove' }
         }
+      });
+
+      window.loadFile = function(content) {
+        editor.getSession().setValue(content);
+      };
+
+      $('#save').click(function() {
+        var path = $('.selected').attr('rel');
+        var content = editor.getSession().toString();
+        console.log(content);
+        vfs.saveFile(path, content, function() {
+          console.log('saved');
+        });
+        return false;
       });
 
       /*
