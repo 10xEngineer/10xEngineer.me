@@ -155,11 +155,6 @@ style
         caller.children('input').remove();
       }
       
-      // TODO : Remove before commit
-      //console.log("Old Path :", oldPath);
-      //console.log("New Path :", newPath);
-
-
       // Call to VFS Rename Function As per requirement
       vfs.rename(newPath, oldPath, function(error) {
         if(error){
@@ -185,7 +180,7 @@ style
           }
         },
         blur: function() {
-          enameFinish(caller);
+          renameFinish(caller);
         }
       }); 
     }

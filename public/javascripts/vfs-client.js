@@ -24,7 +24,7 @@
   };
 
   VFSClient.prototype.newFile = function(name, path, callback) {
-    request.put(this.prefix + path + name)
+    request.put(this.prefix + path + '/' + name)
       .end(callback);
   };
 
@@ -36,14 +36,14 @@
   };
 
   VFSClient.prototype.newDir = function(name, path, callback) {
-    request.put(this.prefix + path + name + '/')
+    request.put(this.prefix + path + '/' + name + '/')
       .end(callback);
   };
 
-  VFSClient.prototype.rename = function(from, to, callback) {
+  VFSClient.prototype.rename = function(to, from, callback) {
     request.post(this.prefix + to)
-      .set('Content-Type', 'application/json')
-      .send('{"renameFrom":"' + from + '"}')
+      .type('application/json')
+      .send('{"renameFrom": "' + from + '"}')
       .end(callback);
   };
 
