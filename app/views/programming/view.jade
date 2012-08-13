@@ -153,18 +153,17 @@ style
       
       var anchor = $(caller).children('a');
       var newPath = oldPath = anchor.attr('rel');
-      var oldname = anchor.html();
+      var oldName = anchor.html();
       var newName = $(caller).children('input').val();
-
       if(newName.trim() != "") {
         anchor.html(newName);
         var path = anchor.attr('rel');
         
         if(caller.hasClass('file')) {
-          var pattern = new RegExp(oldname + "$");
+          var pattern = new RegExp(oldName + "$");
           anchor.attr('rel', path.replace(pattern, newName));
         } else {
-          var pattern = new RegExp(oldname + "\\/$");
+          var pattern = new RegExp(oldName + "\\/$");
           anchor.attr('rel', path.replace(pattern, newName)+"/");
         }
         
@@ -175,9 +174,14 @@ style
       else{
         caller.children('input').remove();
       }
+      
+      // TODO : Remove before commit
+      //console.log("Old Path :", oldPath);
+      //console.log("New Path :", newPath);
+
 
       // Call to VFS Rename Function As per requirement
-      vfs.rename(oldPath, newPath, function(error) {
+      vfs.rename(newPath, oldPath, function(error) {
         if(error){
           console.log(error);
         } 
