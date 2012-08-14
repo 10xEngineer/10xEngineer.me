@@ -1,29 +1,32 @@
+
 Install Guide
 =============
 
-* Clone the repository
-* Install nodejs and npm
-* Install MongoDB (> 2.0)
-	Linux:
-	sudo apt-get install mongodb
+    # Clone the repository
+    git clone git@github.com:10xEngineer/10xEngineer.me.git
 
-	Mac:
-	brew install mongodb
-* Install Redis
-	Linux:
-	sudo apt-get install redis ??
+    # Install nodejs and npm
 
-	Mac:
-	brew install redis
-* Install graphicsmagick
-	Linux:
-	sudo apt-get install graphicsmagick
+    # Install MongoDB (> 2.0)
+    sudo apt-get install mongodb
+    or
+    brew install mongodb
 
-	Mac:
-	brew install graphicsmagick
-* Install dependencies
-	(inside project directory)
-	npm install
-* Configure the application (/config/server.<env>.json). In most cases, defaults are fine.
-* Run it
-	node server.js
+    # Install Redis
+    sudo apt-get install redis ??
+    or
+    brew install redis
+
+    # Install graphicsmagick
+    sudo apt-get install graphicsmagick
+    or
+    brew install graphicsmagick
+
+    # Install dependencies
+    (inside project directory)
+    npm install
+
+    # Configure the application (/config/server.<env>.json). In most cases, defaults are fine.
+
+    # Run it
+    node server.js
