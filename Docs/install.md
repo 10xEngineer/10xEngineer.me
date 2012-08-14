@@ -1,4 +1,3 @@
-
 Install Guide
 =============
 
@@ -26,7 +25,7 @@ Install Guide
     (inside project directory)
     npm install
 
-    # Configure the application (/config/server.<env>.json). In most cases, defaults are fine.
+    # Configure the application (app/config/server.<env>.json). In most cases, defaults are fine.
 
     # Run it
     node server.js
