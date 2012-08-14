@@ -34,18 +34,21 @@ style
   .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
   .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
 
-
 .container 
   div#header
-      //- TODO:: Re write header
-  #sidebar(style="display: inline-block; width:25%;vertical-align:top;")
+  //- TODO:: Re write header
+  #sidebar(style="display: inline-block; width:16%;vertical-align:top;")
     button#save(class="btn", type="button") Save
 
     #tree
 
-  #editor(style='position:relative;width:75%;min-height:500px;display:inline-block;')
-  script(src="/javascripts/share/bcsocket.js")
-  script(src="/share/share.js")
+  #editor(style='position:relative;width:64%;min-height:500px;display:inline-block;') Loading...
+  
+  #sidebar(style="display: inline-block; width:20%;vertical-align:top;")
+    div#chat
+      h3 Chat
+      div#messages
+      input#message
 
   link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
   script(src="/javascripts/superagent.min.js")
@@ -53,8 +56,14 @@ style
   script(src="/javascripts/jquery.contextMenu.js")
   script(src="/javascripts/vfs-client.js")
   script(src="/javascripts/filetree.js")
-  //script(src="/javascripts/ace_2/theme-solarized_dark.js")
-  //script(src="/javascripts/share/share.uncompressed.js")
+  
+  // For Share JS
+  script(src="/javascripts/share/bcsocket.js")
+  script(src="/share/share.js")
+  script(src="/share/json.js")
+  script(src="/javascripts/share/ace.js")
+  script(src="/javascripts/share/chat.js")
+  
   script
     var themes = {};
     var modes = {};
@@ -102,7 +111,6 @@ style
 
       s.onload = callback;
     }
-
 
     // Tree operations
     function newFile(caller) {
@@ -265,11 +273,6 @@ style
           console.error(error);
           return;
         }
-
-        if (doc.created) {
-          doc.insert(0, "# Coffeescript editor!\n\nexports.foo = ->\n  console.log 'hi!'");
-        }
-
         doc.attach_ace(editor);
         editor.setReadOnly(false);
       });
