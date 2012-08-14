@@ -37,22 +37,26 @@ style
 
 .container 
   div#header
-      //- TODO:: Re write header
+  //- TODO:: Re write header
   #sidebar(style="display: inline-block; width:25%;vertical-align:top;")
     button#save(class="btn", type="button") Save
 
     #tree
 
-  #editor(style='position:relative;width:75%;min-height:500px;display:inline-block;') Sample code
-
+  #editor(style='position:relative;width:75%;min-height:500px;display:inline-block;') Loading...
+  
   link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
   script(src="/javascripts/superagent.min.js")
   script(src="/javascripts/ace_2/ace.js")
   script(src="/javascripts/jquery.contextMenu.js")
   script(src="/javascripts/vfs-client.js")
   script(src="/javascripts/filetree.js")
-  //script(src="/javascripts/ace_2/theme-solarized_dark.js")
-  //script(src="/javascripts/share/share.uncompressed.js")
+  
+  // For Share JS
+  script(src="/javascripts/share/bcsocket.js")
+  script(src="/share/share.uncompressed.js")
+  script(src="/javascripts/share/ace.js")
+  
   script
     var themes = {};
     var modes = {};
@@ -252,21 +256,14 @@ style
         return false;
       });
 
-      /*
       sharejs.open('#{docId}', 'text', function(error, doc) {
         if (error) {
           console.error(error);
           return;
         }
-
-        if (doc.created) {
-          doc.insert(0, "# Coffeescript editor!\n\nexports.foo = ->\n  console.log 'hi!'");
-        }
-
         doc.attach_ace(editor);
         editor.setReadOnly(false);
       });
-      */
     });
 
     //$(document).ready(function(){

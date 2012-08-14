@@ -15,6 +15,21 @@ module.exports = function(config) {
 
   var app = express.createServer();
 
+  var sharejsOptions = {
+    db: { type: 'redis' },
+    auth: function(client, action) {
+      // Reject readonly requests
+      if (action.name === 'submit op' && action.docName.match(/^readonly/)) {
+        action.reject();
+      } else {
+        action.accept();
+      }
+    },
+    socketio: null,
+    rest: true
+  };
+
+
   // Express Middleware config
   app.configure(function(){
     // Views
@@ -58,6 +73,8 @@ module.exports = function(config) {
       }
       next();
     });
+
+    sharejs.server.attach(app, sharejsOptions);
     app.use(app.router);
 
     // Static files
@@ -94,20 +111,6 @@ module.exports = function(config) {
 
   // Routes
   require('./app/routes')(app);
-
-  var sharejsOptions = {
-    db: { type: 'redis' },
-    auth: function(client, action) {
-      // Reject readonly requests
-      if (action.name === 'submit op' && action.docName.match(/^readonly/)) {
-        action.reject();
-      } else {
-        action.accept();
-      }
-    }
-  };
-
-  sharejs.server.attach(app, sharejsOptions);
 
   return app;
 };
