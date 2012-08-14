@@ -34,17 +34,23 @@ style
   .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
   .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
 
-
 .container 
   div#header
   //- TODO:: Re write header
-  #sidebar(style="display: inline-block; width:25%;vertical-align:top;")
+  #sidebar(style="display: inline-block; width:16%;vertical-align:top;")
     button#save(class="btn", type="button") Save
 
     #tree
 
-  #editor(style='position:relative;width:75%;min-height:500px;display:inline-block;') Loading...
+  #editor(style='position:relative;width:64%;min-height:500px;display:inline-block;') Loading...
   
+  #sidebar(style="display: inline-block; width:20%;vertical-align:top;")
+    div#chat
+      h3 Chat
+      div#messages
+      input#message
+
+
   link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
   script(src="/javascripts/superagent.min.js")
   script(src="/javascripts/ace_2/ace.js")
@@ -55,7 +61,9 @@ style
   // For Share JS
   script(src="/javascripts/share/bcsocket.js")
   script(src="/share/share.uncompressed.js")
+  script(src="/share/json.js")
   script(src="/javascripts/share/ace.js")
+  script(src="/javascripts/share/chat.js")
   
   script
     var themes = {};
@@ -104,7 +112,6 @@ style
 
       s.onload = callback;
     }
-
 
     // Tree operations
     function newFile(caller) {
@@ -201,6 +208,7 @@ style
     }
 
     $(document).ready(function() {
+
       editor = ace.edit("editor");
 
       //editor.setReadOnly(true);
@@ -264,6 +272,7 @@ style
         doc.attach_ace(editor);
         editor.setReadOnly(false);
       });
+
     });
 
     //$(document).ready(function(){
@@ -629,5 +638,4 @@ style
       // rename event
       element.addEventListener("rename", renameUI, false);   
       element.addEventListener("rename", renameVFS, false);
-
     });
