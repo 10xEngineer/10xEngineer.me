@@ -1,5 +1,6 @@
 var express = require('express');
 var stylus = require('stylus');
+var sharejs = require('share');
 var RedisStore = require('connect-redis')(express);
 
 var auth = require('./app/middleware/authentication');
@@ -93,6 +94,20 @@ module.exports = function(config) {
 
   // Routes
   require('./app/routes')(app);
+
+  var sharejsOptions = {
+    db: { type: 'redis' },
+    auth: function(client, action) {
+      // Reject readonly requests
+      if (action.name === 'submit op' && action.docName.match(/^readonly/)) {
+        action.reject();
+      } else {
+        action.accept();
+      }
+    }
+  };
+
+  sharejs.server.attach(app, sharejsOptions);
 
   return app;
 };

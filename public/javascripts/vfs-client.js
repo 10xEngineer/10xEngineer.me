@@ -24,7 +24,8 @@
   };
 
   VFSClient.prototype.newFile = function(name, path, callback) {
-    request.put(this.prefix + path + '/' + name)
+    path = fixPath(path);
+    request.put(this.prefix + path + name)
       .end(callback);
   };
 
@@ -36,7 +37,8 @@
   };
 
   VFSClient.prototype.newDir = function(name, path, callback) {
-    request.put(this.prefix + path + '/' + name + '/')
+    path = fixPath(path);
+    request.put(this.prefix + path + name + '/')
       .end(callback);
   };
 
@@ -53,7 +55,8 @@
   };
 
   VFSClient.prototype.removeDir = function(path, callback) {
-    request.del(this.prefix + path + '/')
+    path = fixPath(path);
+    request.del(this.prefix + path)
       .end(callback);
   };
 
@@ -63,6 +66,14 @@
     });
   } else {
     exports.VFSClient = VFSClient; 
+  }
+
+  function fixPath(path) {
+    if(path.charAt(path.length-1) != '/') {
+      return path + '/';
+    } else {
+      return path;
+    }
   }
 
 }(typeof process !== 'undefined' && typeof process.title !== 'undefined' && typeof exports !== 'undefined' ? exports : window);

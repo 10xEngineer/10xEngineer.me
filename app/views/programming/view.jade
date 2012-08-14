@@ -107,7 +107,7 @@ style
       var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
       var path = $parentDir.children('a').attr('rel');
 
-      // Logic to figure out unique name
+      // TODO: Logic to figure out unique name
       var name = 'untitled';
       vfs.newFile(name, path, function(error) {
         var $file = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
@@ -119,11 +119,10 @@ style
       var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
       var path = $parentDir.children('a').attr('rel');
 
-      // Logic to figure out unique name
+      // TODO: Logic to figure out unique name
       var name = 'untitled';
-      
       vfs.newDir(name, path, function(error) {
-        var $dir = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
+        var $dir = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
         $parentDir.append($dir);
       });
     }
