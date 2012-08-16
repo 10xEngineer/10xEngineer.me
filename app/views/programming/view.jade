@@ -42,7 +42,7 @@ style
 
     #tree
 
-  #editor(style='position:relative;width:64%;min-height:500px;display:inline-block;') Loading...
+  #editor(style='position:relative;width:64%;min-height:500px;display:inline-block;')
   
   #sidebar(style="display: inline-block; width:20%;vertical-align:top;")
     div#chat
@@ -56,6 +56,7 @@ style
   script(src="/javascripts/jquery.contextMenu.js")
   script(src="/javascripts/vfs-client.js")
   script(src="/javascripts/filetree.js")
+  script(src="/javascripts/editor.js")
   
   // For Share JS
   script(src="/javascripts/share/bcsocket.js")
@@ -65,41 +66,10 @@ style
   script(src="/javascripts/share/chat.js")
   
   script
+
+  script
     var themes = {};
     var modes = {};
-    var editor;
-
-    function loadTheme(name) {
-      //check if the theme source files have been loaded before
-      if(themes[name]){
-        editor.setTheme(themes[name]);
-        return;
-      }
-
-      var fileName = "/javascripts/ace_2/theme-" + name + ".js";
-      loadScriptFile(fileName, function(){
-        var path = "ace/theme/"+name;
-        themes[name] = path;
-        editor.setTheme(path);
-      });
-    }
-
-    var modes = {};
-    function loadMode(name){
-      $('#language .label').text(name);
-      //check if the language source files have been loaded before
-      if(modes[name]) {
-        editor.getSession().setMode(new modes[name]);
-        return;
-      }
-
-      var fileName = "/javascripts/ace_2/mode-" + name + ".js";
-      loadScriptFile(fileName, function(){
-        var Mode = require("ace/mode/"+name).Mode;
-        modes[name] = Mode;
-        editor.getSession().setMode(new Mode());
-      });
-    }
 
     //dynamically load javascript source file
     function loadScriptFile(path, callback) {
@@ -206,21 +176,9 @@ style
       });
     }
 
-    function newEditor() {
-      var editor = ace.edit("editor");
-      //editor.setReadOnly(true);
-      editor.getSession().setUseSoftTabs(true);
-      editor.getSession().setTabSize(2);
-      //editor.getSession().setMode(new (require("ace/mode/coffee").Mode));
-      loadMode("java");
-      loadTheme("textmate");
-
-      return editor;
-    }
-
     $(document).ready(function() {
-      editor = newEditor();
-
+      require('editor');
+  
       // Initialize tree
       // TODO: Replace hardcoded bucketid with dynamic one
       window.vfs = new VFSClient('test');
