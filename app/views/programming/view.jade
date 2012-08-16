@@ -57,6 +57,7 @@ style
   script(src="/javascripts/vfs-client.js")
   script(src="/javascripts/filetree.js")
   script(src="/javascripts/editor.js")
+  script(src="/javascripts/eventemitter2.js")
   
   // For Share JS
   script(src="/javascripts/share/bcsocket.js")
@@ -182,7 +183,8 @@ style
       // Initialize tree
       // TODO: Replace hardcoded bucketid with dynamic one
       window.vfs = new VFSClient('test');
-      $('#tree').fileTree(vfs);
+      //$('#tree').fileTree(vfs);
+      gfs = new GridFS($('#tree'), vfs);  
 
       // Initialize right-click context menu
       $.contextMenu({
