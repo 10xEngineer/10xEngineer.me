@@ -45,7 +45,7 @@ function FoldHandler(editor) {
         var position = e.getDocumentPosition();
         var session = editor.session;
         
-        // If the user dclicked on a fold, then expand it.
+        // If the user clicked on a fold, then expand it.
         var fold = session.getFoldAt(position.row, position.column, 1);
         if (fold) {
             if (e.getAccelKey())
@@ -58,9 +58,13 @@ function FoldHandler(editor) {
     });
     
     editor.on("gutterclick", function(e) {
-        if (e.domEvent.target.className.indexOf("ace_fold-widget") != -1) {
+        var gutterRegion = editor.renderer.$gutterLayer.getRegion(e);
+
+        if (gutterRegion == "foldWidgets") {
             var row = e.getDocumentPosition().row;
-            editor.session.onFoldWidgetClick(row, e.domEvent);
+            var session = editor.session;
+            if (session.foldWidgets && session.foldWidgets[row])
+                editor.session.onFoldWidgetClick(row, e);
             e.stop();
         }
     });

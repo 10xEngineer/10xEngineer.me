@@ -29,3 +29,9 @@ Install Guide
 
     # Run it
     node server.js
+
+    # Point dev.10xengineer.me to 127.0.0.1
+    # Can use something like Gas Mask for that.
+    # http://code.google.com/p/gmask/
+
+    # Login and assign "admin" role to your user in the database.
