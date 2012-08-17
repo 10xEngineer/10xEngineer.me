@@ -206,34 +206,34 @@ module.exports = function(app) {
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
 
   // Assessment
-  app.get('/assessment/quiz', main.assessment);
+  app.get('/assessment/quiz', verifyPermission('admin', 'read'), main.assessment);
 
   // Quiz 
-  app.get('/assessment/quiz', quiz.quizList);
-  app.get('/assessment/quiz/create', quiz.createView);
-  app.post('/assessment/quiz/create', validation.lookUp(validationConfig.quiz.createQuiz), quiz.create);
-  app.get('/assessment/quiz/:quizId', quiz.view);
-  app.get('/assessment/quiz/:quizId/edit', quiz.editView);
-  app.post('/assessment/quiz/:quizId/edit', validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
-  app.get('/assessment/quiz/:quizId/remove', quiz.removeQuiz);
-  app.get('/assessment/quiz/:quizId/start', quiz.startQuiz);
-  app.get('/assessment/quiz/:quizId/finish', quiz.quizResult);
-  app.get('/assessment/quiz/:quizId/:questionIndex', quiz.viewQuestion);
-  app.post('/assessment/quiz/:quizId/:questionIndex', validation.lookUp(validationConfig.question.attemptQuestion), quiz.submitQuestion);
+  app.get('/assessment/quiz', verifyPermission('admin', 'read'), quiz.quizList);
+  app.get('/assessment/quiz/create', verifyPermission('admin', 'edit'), quiz.createView);
+  app.post('/assessment/quiz/create', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.createQuiz), quiz.create);
+  app.get('/assessment/quiz/:quizId', verifyPermission('admin', 'read'), quiz.view);
+  app.get('/assessment/quiz/:quizId/edit', verifyPermission('admin', 'edit'), quiz.editView);
+  app.post('/assessment/quiz/:quizId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
+  app.get('/assessment/quiz/:quizId/remove', verifyPermission('admin', 'delete'), quiz.removeQuiz);
+  app.get('/assessment/quiz/:quizId/start', verifyPermission('admin', 'read'), quiz.startQuiz);
+  app.get('/assessment/quiz/:quizId/finish', verifyPermission('admin', 'read'), quiz.quizResult);
+  app.get('/assessment/quiz/:quizId/:questionIndex', verifyPermission('admin', 'read'), quiz.viewQuestion);
+  app.post('/assessment/quiz/:quizId/:questionIndex', verifyPermission('admin', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), quiz.submitQuestion);
 
-  app.get('/assessment/question/create/:quizId', question.createView);
-  app.post('/assessment/question/create/:quizId', validation.lookUp(validationConfig.question.createQuestion), question.create);
-  app.get('/assessment/question/import/:quizId', question.importQuestionView);
-  app.post('/assessment/question/import/:quizId', question.importQuestion);
-  app.get('/assessment/question/:questionId/remove', question.removeQuestion);
-  app.get('/assessment/question/:questionId/edit', question.editView);
-  app.post('/assessment/question/:questionId/edit', validation.lookUp(validationConfig.question.createQuestion), question.edit);
+  app.get('/assessment/question/create/:quizId', verifyPermission('admin', 'edit'), question.createView);
+  app.post('/assessment/question/create/:quizId', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.create);
+  app.get('/assessment/question/import/:quizId', verifyPermission('admin', 'edit'), question.importQuestionView);
+  app.post('/assessment/question/import/:quizId', verifyPermission('admin', 'edit'), question.importQuestion);
+  app.get('/assessment/question/:questionId/remove', verifyPermission('admin', 'edit'), question.removeQuestion);
+  app.get('/assessment/question/:questionId/edit', verifyPermission('admin', 'edit'), question.editView);
+  app.post('/assessment/question/:questionId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.edit);
 
   // Programming
-  app.get('/assessment/programming', programming.list);
-  app.get('/assessment/programming/create', programming.createView);
-  app.post('/assessment/programming/create', programming.create);
-  app.get('/assessment/programming/:programmingId', programming.appearView);
+  app.get('/assessment/programming', verifyPermission('admin', 'read'), programming.list);
+  app.get('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.createView);
+  app.post('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.create);
+  app.get('/assessment/programming/:programmingId', verifyPermission('admin', 'read'), programming.appearView);
 
   // Just for testing
   // TODO: Remove it and all its related functions and files before commit
