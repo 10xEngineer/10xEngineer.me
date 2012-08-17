@@ -16,7 +16,7 @@ if(jQuery) (function($){
 							if(file.mime === 'inode/directory') {
 								$item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
 							} else {
-								$item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name }));
+								$item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name, 'data-type': file.mime }));
 							}
 							$item.appendTo($ul);
 							if(t === '/') $(c).find('ul:hidden').show(); else $(c).find('ul:hidden').slideDown({ duration: 500 });
@@ -41,7 +41,8 @@ if(jQuery) (function($){
 						} else {
 							// TODO: Load file content in the editor
 							var path = $(this).attr('rel');
-							vfs.readFile(path, window.loadFile);
+							var type = $(this).attr('data-type');
+							window.editor.loadContent(path);
 						}
 						return false;
 					});
