@@ -28,6 +28,7 @@ html(lang="en")
     script(src="/javascripts/yepnope-1.5.4.min.js")
     script(src='http://www.filepicker.io/static/js/filepicker.js')
     script(type='text/javascript', src='/javascripts/select2.min.js')
+    != renderScriptTags(scripts)
     body
       section#navbar
         include _header
