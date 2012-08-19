@@ -74,6 +74,24 @@ module.exports = function(config) {
       next();
     });
 
+    app.helpers({
+      renderScriptTags: function (all) {
+        if (all != undefined) {
+          return all.map(function(script) {
+            return '<script src="' + script + '"></script>';
+          }).join('\n ');
+        }
+        else {
+          return '';
+        }
+      }
+    })
+    app.dynamicHelpers({
+      scripts: function(req, res){
+        return [];
+      }
+    });
+
     sharejs.server.attach(app, sharejsOptions);
     app.use(app.router);
 
