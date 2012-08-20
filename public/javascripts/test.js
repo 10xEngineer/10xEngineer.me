@@ -31,15 +31,16 @@ $.contextMenu({
 
 var openFile = function(element) {
   var path = $(element).attr('rel');
-  var fileAllreadyOpen = grid.isFileOpen(element);
-  if(fileAllreadyOpen) {
-    // code to focus on that file
-  } else {
-    // code to actually open the file
-    vfs.readFile(path, function(data){
-      grid.open(element, data);
-    });
-  }
+  grid.isFileOpen(element, function(fileAllreadyOpen){
+    if(fileAllreadyOpen) {
+      // code to focus on that file
+    } else {
+      // code to actually open the file
+      vfs.readFile(path, function(data){
+        grid.open(element, data);
+      });
+    }
+  });
 };
 
 var doubleClickOnDir = function(element) {

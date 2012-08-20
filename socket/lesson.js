@@ -1,6 +1,9 @@
 var async = require('async');
 var request = require('request');
 
+var Compiler = require('10xCompiler').Compiler;
+var mongofs = require('mongo-vfs');
+
 var model = require('../app/models');
 var progressHelper = require('../app/helpers/progress');
 var util = require('../app/helpers/util');
@@ -111,6 +114,66 @@ module.exports = function(io) {
           }
         });
       });
+    });
+  });
+
+
+  io
+    .of('/codeNew')
+    .on('connection', function (socket) {
+    var compiler;
+    
+    socket.on('submitcode', function(data){
+      // Create VFS
+      mongofs({
+        database: 'mongofs_test',
+        bucketId: 'test'
+      }, function(error, vfs) {
+
+        compiler = new Compiler({
+          vfs: vfs,
+          language: 'java',
+          version: '1.6'
+        });
+
+        async.waterfall([
+          function(callback) {
+            var prepared = function() {
+              compiler.removeAllListeners('done');
+              callback();
+            };
+
+            compiler.on('done', prepared);
+            compiler.on('error', function(error) {
+              callback(error);
+            });
+            compiler.prepare();
+          },
+
+          function(callback) {
+            var compiled = function() {
+              compiler.removeAllListeners('compiled');
+              callback();
+            };
+
+            compiler.on('compiled', compiled);
+            compiler.on('error', function(error) {
+              callback(error);
+            });
+            compiler.compile();
+          }
+        ],
+        function(error) {
+
+          if(!error) {
+            socket.volatile.emit('codePassed');
+          } else {
+            socket.volatile.emit('codeFailed', error);
+          }
+        });
+
+      });
+
     });
   });
 

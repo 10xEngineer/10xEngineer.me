@@ -1,3 +1,4 @@
+//<<<<<<< HEAD
 /*
   // TODO :: Rearrenge function from vfs to json pattern
         
@@ -104,8 +105,43 @@ Grid.prototype.remove = function(caller) {
   
 };
 
-Grid.prototype.open = function(caller){
+Grid.prototype.isFileOpen = function(caller, callback){
+  callback(false);
+}
 
+Grid.prototype.open = function(caller){
+  $('#tabContainer .active').removeClass('active');
+  var $tab = $('<li/>', {
+    class: 'active'
+  }).append($('<a/>',{
+    href: "#", 
+    'data-toggle': "tab",
+    html: $(caller).html() + " "
+  }).append($('<i/>', {
+    class: 'icon-remove closeTab',
+    style: 'opacity: 0.3; z-index: 10;'
+  })));
+
+  $tab.find('i').click(function(e){
+    console.log("clicked on close btn");
+    if (!e)
+      e = window.event;
+
+    //IE9 & Other Browsers
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+    //IE8 and Lower
+    else {
+      e.cancelBubble = true;
+    }
+  });
+
+  $tab.children('a').click(function(){
+    console.log("anchor tag");
+  });
+
+  $tab.appendTo($('#tabContainer'));
 };
 
 Grid.prototype.close = function(path) {
@@ -197,5 +233,71 @@ Grid.prototype.explore = function(caller, json) {
   });
   $ul.appendTo($parent);
 
-  this.emit('explore', path)
+  this.emit('explore', path);
 };
+/*=======
+if(jQuery) (function($){
+	
+	$.extend($.fn, {
+		fileTree: function(vfs) {
+			
+			$(this).each( function() {
+				
+				function showTree(c, t) {
+					$(c).addClass('wait');
+					vfs.readDir(t, function(fileList) {
+						$(c).find('.start').html('');
+						$(c).removeClass('wait');
+						var $ul = $('<ul/>', { class: 'fileTree' });
+						$(fileList).each(function(index, file) {
+							var $item;
+							if(file.mime === 'inode/directory') {
+								$item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
+							} else {
+								$item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name, 'data-type': file.mime }));
+							}
+							$item.appendTo($ul);
+							if(t === '/') $(c).find('ul:hidden').show(); else $(c).find('ul:hidden').slideDown({ duration: 500 });
+						});
+						bindTree($ul);
+						$ul.appendTo(c);
+					});
+				}
+				
+				function bindTree(t) {
+					$(t).find('li a').bind('dblclick', function() {
+						if( $(this).parent().hasClass('directory') ) {
+							if( $(this).parent().hasClass('collapsed') ) {
+								$(this).parent().find('ul').remove(); // cleanup
+								showTree( $(this).parent(), escape($(this).attr('rel').match( /.*\// )) );
+								$(this).parent().removeClass('collapsed').addClass('expanded');
+							} else {
+								// Collapse
+								$(this).parent().find('ul').slideUp({ duration: 500 });
+								$(this).parent().removeClass('expanded').addClass('collapsed');
+							}
+						} else {
+							// TODO: Load file content in the editor
+							var path = $(this).attr('rel');
+							var type = $(this).attr('data-type');
+							window.editor.loadContent(path);
+						}
+						return false;
+					});
+					$(t).find('li a').bind('click', function() {
+						$('.selected').removeClass('selected');
+						$(this).addClass('selected');
+						return false;
+					});
+				}
+				// Loading message
+				$(this).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a><li></ul>');
+				// Get the initial file list
+				showTree( $(this).find('.fileTree.start .root'), escape('/') );
+			});
+		}
+	});
+	
+})(jQuery);
+>>>>>>> f4cf078b086a1269b2432eed31790d8eaa55c5af
+*/

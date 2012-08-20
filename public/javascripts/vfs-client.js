@@ -18,7 +18,8 @@
     request.get(this.prefix + path)
       .end(function(res) {
       if(res.ok) {
-        callback(res.body);
+        var body = res.body || res.text;
+        callback(body);
       }
     });
   };
@@ -50,6 +51,7 @@
   };
 
   VFSClient.prototype.removeFile = function(path, callback) {
+    console.log(this);
     request.del(this.prefix + path)
       .end(callback);
   };
