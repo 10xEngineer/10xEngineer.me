@@ -100,7 +100,7 @@ Grid.prototype.remove = function(caller) {
   console.log(path);
   caller.remove();
  
-  //this.emit('remove', path);
+  this.emit('remove', path);
   
 };
 

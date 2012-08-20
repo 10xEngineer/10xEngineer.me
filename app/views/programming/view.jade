@@ -42,7 +42,18 @@ style
 
     #tree
 
-  #editor(style='position:relative;width:64%;min-height:500px;display:inline-block;')
+  div(style="display: inline-block;width:64%;")
+    ul#tabContainer.nav.nav-tabs
+      li.active
+        span
+          a(href="#", data-toggle="tab") Section 1    
+        span
+          i.icon-remove.closeTab(style="opacity: 0.6;")
+      li
+        a(href="#", data-toggle="tab") Section 2    
+          i.icon-remove.closeTab(style="opacity: 0.6;")
+    #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
+    #extra(style="display: none")
   
   #sidebar(style="display: inline-block; width:20%;vertical-align:top;")
     div#chat
@@ -67,6 +78,8 @@ style
   script(src="/javascripts/share/chat.js")
   
   script
+    var editor = ace.edit("editor");
+
 
   script(src="/javascripts/test.js");
   

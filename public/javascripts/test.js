@@ -30,17 +30,31 @@ $.contextMenu({
 
 
 var openFile = function(element) {
-
+  var path = $(element).attr('rel');
+  var fileAllreadyOpen = grid.isFileOpen(element);
+  if(fileAllreadyOpen) {
+    // code to focus on that file
+  } else {
+    // code to actually open the file
+    vfs.readFile(path, function(data){
+      grid.open(element, data);
+    });
+  }
 };
 
 var doubleClickOnDir = function(element) {
   var $parent = $(element).parent();
-  
-  path = $(element).attr('rel');
-  console.log(path);
-  vfs.readDir(path, function(json){
-    grid.explore(element, json);
-  });
+  var path = $(element).attr('rel');
+  if($parent.hasClass('collapsed')) {
+    $parent.removeClass('collapsed').addClass('expanded');  
+    vfs.readDir(path, function(json){
+      console.log(json);
+      grid.explore(element, json);
+    });
+  } else {
+    $parent.removeClass('expanded').addClass('collapsed');
+    $parent.children('ul').remove();
+  }
 };
 
 var selectItem = function(element) {
@@ -52,8 +66,14 @@ var bindEvent = function() {
 
   // CREATE EVENT
   grid.on('create', function(name, path, type) {
+    console.log("Inside create event");
+    console.log(type);
     if((type=='file')){
+      console.log("Inside if-file");
+      console.log(name);
+      console.log(path);
       vfs.newFile(name, path, function(err){
+        cosole.log("Get Call back of file creation at VFS.");
         if(err){
           console.log("Error in "+type+" creation.");
         } else {
@@ -70,6 +90,13 @@ var bindEvent = function() {
         }
       });
     }
+  });
+
+  // RENAME EVENT
+  grid.on('rename', function(newName, oldName){
+    vfs.rename(newName, oldName, function(){
+      console.log("Get Callback");
+    });
   });
 
   // REMOVE EVENT
@@ -91,7 +118,10 @@ var bindEvent = function() {
 };
 
 vfs.readDir('/', function(json) {
-  console.log(json);
   window.grid = new Grid($('#tree'), json);  
   bindEvent();
 });
+
+// vfs.newDir('sample', '/test/', function(){
+//   console.log("get Callback.");
+// });
