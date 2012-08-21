@@ -78,6 +78,30 @@
       with parameters:
         path : full path of element to be collapse
 
+    * rename(element)
+    -----------------
+    Parameters:
+      element : HTML element which file/directory (which you need to rename)
+
+    Event:
+      'rename'
+      with parameters;
+        newPath : full new path of renamed element
+        oldPath : full old path of renamed element
+
+      NOTE: this event will fiers after UI rename operation is being completed.
+
+    * refresh(treeJSON)
+    -------------------
+    Parameters:
+      treeJSON : tree object in form of JSON
+
+    Event:
+      'refresh'
+      with parameters;
+        treeJSON : current tree in form of JSON
+
+
 *********************************************************************************************************************************/
 
 
@@ -265,7 +289,7 @@ Grid.prototype.renameFinished = function(caller) {
 };
 
 Grid.prototype.expand = function(caller, json) {
-  
+
   var path = $(caller).attr('rel');
   var $parent = $(caller).parent();
 
@@ -273,7 +297,7 @@ Grid.prototype.expand = function(caller, json) {
   var tmp = json;
   var indx = 0
   while(indx < tmp.length){
-    this.fileTree.push(tmp[0]);
+    this.fileTree.push(tmp[indx]);
     indx ++;
   }
   // Append JSON code completed
@@ -327,4 +351,60 @@ Grid.prototype.collapse = function(caller){
     $parent.children('ul').remove();
 
     this.emit('collapse', path);
-}
+};
+
+Grid.prototype.refresh = function(json) {
+
+  if(typeof(json)!='undefined'){
+    this.fileTree = json ;
+  }
+
+  var element = $('#tree');
+  $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a><li></ul>');
+
+  var currLength = 0;
+  var tmp = this.fileTree;
+  var appenderList = {
+    "/": $(element).find('li.directory.root').get(0)
+  }
+  while(currLength < tmp.length) {
+    var file = tmp[currLength++];
+    var path = file.path;
+    if(appenderList.hasOwnProperty(path)){
+      // Code to append element
+      var appender = appenderList[path];
+      var $ul;
+      if($(appender).children('ul').length != 0){
+        $ul = $(appender).children('ul');
+      } else {
+        $ul = $('<ul/>', { class: 'fileTree' });
+        $ul.appendTo($(appender));
+        $(appender).removeClass('collapsed').addClass('expanded');
+      }
+      var $item;
+      if(file.mime === 'inode/directory') {
+        $item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
+        $item.children('a').bind('dblclick', function(){
+          doubleClickOnDir(this);
+        });
+        $item.children('a').bind('click', function(){
+          selectItem(this);
+        });
+        // Code to add appender
+        appenderList[file.path+file.name+"/"] = $item.get(0);
+      } else {
+        $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name }));
+        $item.children('a').bind('dblclick', function(){
+          openFile(this);
+        });
+        $item.children('a').bind('click', function(){
+          selectItem(this);
+        });
+      }
+      $item.appendTo($ul);
+    } else {
+      console.log("File "+file.name+" can't be append.");
+    }
+  }
+  this.emit('refresh', this.fileTree);
+};
