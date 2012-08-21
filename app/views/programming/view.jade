@@ -34,6 +34,20 @@ style
   .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
   .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
 
+  #tabContainer > li > a > i.closeTab {
+    display : none;
+    z-index: 50;
+  }
+  #tabContainer > li.active > a {
+    pointer-events: inherit;
+  }
+  #tabContainer > li.active > a > i.closeTab:hover {
+    cursor: pointer;
+  } 
+  #tabContainer > li.active > a > i.closeTab {
+    display : inline-block;
+  } 
+
 .container
   div#header
     //- TODO:: Re write header
@@ -46,168 +60,71 @@ style
 
     .vsplit.span8
       #tabBar
+        ul#tabContainer.nav.nav-tabs
       #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
     
-    #sidebar.span2
+    #sidebar.span2(style="display: inline-block; vertical-align: top;")
       div#chat
         h3 Chat
         div#messages
         input#message
 
-link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
-script(src="/javascripts/superagent.min.js")
-script(src="/javascripts/ace_2/ace.js")
-script(src="/javascripts/jquery.contextMenu.js")
-script(src="/javascripts/vfs-client.js")
-script(src="/javascripts/filetree.js")
-script(src="/javascripts/editor.js")
-
-// For Share JS
-script(src="/javascripts/share/bcsocket.js")
-script(src="/share/share.js")
-script(src="/share/json.js")
-script(src="/javascripts/share/ace.js")
-script(src="/javascripts/share/chat.js")
+  link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
+  script(src="/javascripts/superagent.min.js")
+  script(src="/javascripts/ace_2/ace.js")
+  script(src="/javascripts/jquery.contextMenu.js")
+  script(src="/javascripts/vfs-client.js")
+  script(src="/javascripts/eventemitter2.js")
+  script(src="/javascripts/filetree.js")
+  script(src="/javascripts/editor.js")
   
-script(type='text/javascript')
- 
-  var themes = {};
-  var modes = {};
+  // For Share JS
+  script(src="/javascripts/share/bcsocket.js")
+  script(src="/share/share.js")
+  script(src="/share/json.js")
+  script(src="/javascripts/share/ace.js")
+  script(src="/javascripts/share/chat.js")
+  
+  script
+    var editor = ace.edit("editor");
+    console.log(editor.tabs);
 
-  //dynamically load javascript source file
-  function loadScriptFile(path, callback) {
-    var head = document.getElementsByTagName('head')[0];
-    var s = document.createElement('script');
-
-    s.src = path;
-    head.appendChild(s);
-
-    s.onload = callback;
-  }
-
-  // Tree operations
-  function newFile(caller) {
-    var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
-    var path = $parentDir.children('a').attr('rel');
-
-    // TODO: Logic to figure out unique name
-    var name = 'untitled';
-    vfs.newFile(name, path, function(error) {
-      var $file = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
-      $('#tree').fileTree(window.vfs);
-      //$parentDir.append($file);
-    });
-  }
-
-  function newDir(caller) {
-    var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
-    var path = $parentDir.children('a').attr('rel');
-
-    // TODO: Logic to figure out unique name
-    var name = 'untitled';
-    vfs.newDir(name, path, function(error) {
-      var $dir = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
-      $('#tree').fileTree(window.vfs);
-      //$parentDir.append($dir);
-    });
-  }
-
-  // For rename File or Directory at UI side
-  function renameFinish(caller) {
-    
-    var anchor = $(caller).children('a');
-    var newPath = oldPath = anchor.attr('rel');
-    var oldName = anchor.html();
-    var newName = $(caller).children('input').val();
-    if(newName.trim() != "") {
-      anchor.html(newName);
-      var path = anchor.attr('rel');
-      
-      if(caller.hasClass('file')) {
-        var pattern = new RegExp(oldName + "$");
-        anchor.attr('rel', path.replace(pattern, newName));
-      } else {
-        var pattern = new RegExp(oldName + "\\/$");
-        anchor.attr('rel', path.replace(pattern, newName)+"/");
-      }
-      
-      caller.children('input').remove();
-      anchor.css('display', 'block');
-      newPath = anchor.attr('rel');
-    }
-    else{
-      caller.children('input').remove();
-    }
-    
-    // Call to VFS Rename Function As per requirement
-    vfs.rename(newPath, oldPath, function(error) {
-      if(error){
-        console.log(error);
-      } 
-    });
-  }
-
-  function rename(caller) {
-
-    var $input = $('<input/>', {
-      type: 'text',
-      value: $(caller).children('a').html()
-    });
-
-    $(caller).children('a').css('display', 'none');
-    $(caller).append($input);
-    $input.focus();
-    $input.bind({
-      keypress: function() {
-        if(event.keyCode == 13) {
-          renameFinish(caller);
-        }
-      },
-      blur: function() {
-        renameFinish(caller);
-      }
-    }); 
-  }
-
-  function remove(caller) {
-    if($(caller).hasClass('directory') || $(caller).hasClass('file')) {
-      caller = $(caller);
-    } else {
-      caller = $(caller).closest('file') || $(caller).closest('directory');
-    }
-
-    var path = caller.children('a').attr('rel');
-    var removeItem ;
-    removeItem = $(caller).hasClass('file') ? vfs.removeFile : vfs.removeDir ;
-    removeItem.call(vfs, path, function(res) {
-      caller.remove();
-    });
-  }
 
   $(document).ready(function() {
-    window.editor = $('#editor').editor();
-
-    // Initialize tree
-    // TODO: Replace hardcoded bucketid with dynamic one
+    // Create Grid
     window.vfs = new VFSClient('test');
-    $('#tree').fileTree(vfs);
 
-    // Initialize right-click context menu
+
+    var themes = {};
+    var modes = {};
+
+    //dynamically load javascript source file
+    function loadScriptFile(path, callback) {
+      var head = document.getElementsByTagName('head')[0];
+      var s = document.createElement('script');
+
+      s.src = path;
+      head.appendChild(s);
+
+      s.onload = callback;
+    }
+
+    // UI functions
     $.contextMenu({
       selector: '.directory, .file',
       callback: function(key, options) {
         switch(key) {
           case 'newFile':
-            newFile(this);
+            grid.create(this, 'file');
             break;
           case 'newDir':
-            newDir(this);
+            grid.create(this, 'directory');
             break;
           case 'rename':
-            rename(this);
+            grid.rename(this);
             break;
           case 'remove':
-            remove(this);
+            grid.remove(this);
             break;
         }
       },
@@ -219,16 +136,114 @@ script(type='text/javascript')
       }
     });
 
-    $('#save').click(function() {
-      var path = $('.selected').attr('rel');
-      var content = editor.getSession().toString();
-      console.log(content);
-      vfs.saveFile(path, content, function() {
-        console.log('saved');
-      });
-      return false;
-    });
 
+    var openFile = function(element) {
+      var path = $(element).attr('rel');
+      grid.isFileOpen(element, function(fileAllreadyOpen){
+        if(fileAllreadyOpen) {
+          // code to focus on that file
+        } else {
+          // code to actually open the file
+          vfs.readFile(path, function(data){
+            grid.open(element, data);
+          });
+        }
+      });
+    };
+
+    var doubleClickOnDir = function(element) {
+      var $parent = $(element).parent();
+      var path = $(element).attr('rel');
+      if($parent.hasClass('collapsed')) {
+        vfs.readDir(path, function(json){
+          grid.expand(element, json);
+        });
+      } else {
+        grid.collapse(element);
+      }
+    };
+
+    var selectItem = function(element) {
+      $('.selected').removeClass('selected');
+      $(element).addClass('selected');
+    };
+
+    var bindEvent = function() {
+
+      // CREATE EVENT
+      grid.on('create', function(name, path, type) {
+        if((type=='file')){
+          vfs.newFile(name, path, function(err){
+            cosole.log("Get Call back of file creation at VFS.");
+            if(err){
+              console.log("Error in "+type+" creation.");
+            } else {
+              console.log(type+" has been created successfully.");
+            }
+          });
+        } else {
+          vfs.newDir(name, path, function(err){
+            if(err){
+              console.log("Error in "+type+" creation.");
+            }
+            else{
+              console.log(type+" has been created successfully.");
+            }
+          });
+        }
+      });
+
+      grid.on('openTab', function(path){
+        console.log("Testing of catch event"+path);
+      });
+
+      // RENAME EVENT
+      grid.on('rename', function(newName, oldName){
+        vfs.rename(newName, oldName, function(){
+          console.log("Test Callback");
+        });
+      });
+
+      // REMOVE EVENT
+      grid.on('remove', function(path){
+        if(/\/$/.test(path)){
+          vfs.removeDir(path, function(error) {
+            if(!error) {
+              caller.remove();
+            }
+          });
+        } else {
+          vfs.removeFile(path, function(error) {
+            if(!error) {
+              caller.remove();
+            }
+          });
+        }
+      });
+    };
+
+    var initTabs = function(){
+      var tabs = editor.tabs;
+      for (var path in tabs) {
+        var containt = tabs[path];
+        openTab(path, containt);
+      }
+    };
+
+    var openTab = function(path, containt) {
+      var $list = $('#tree').find('a');
+      $list.each(function(index, element) {
+        if($(element).attr('rel') == path){
+          return grid.open(element);
+        }
+      });
+    };
+
+    vfs.readDir('/', function(json) {
+      window.grid = new Grid($('#tree'), json);
+      bindEvent();
+      initTabs();
+    });
 
     newCodeSocket.on('codePassed', function(data) {
       displayMessage('success', 'Congratulations, your code compiled successfully.');
@@ -261,4 +276,15 @@ script(type='text/javascript')
       doc.attach_editor(editor);
       editor.setReadOnly(false);
     });
+
+    $('#save').click(function() {
+      var path = $('.selected').attr('rel');
+      var content = editor.getSession().toString();
+      console.log(content);
+      vfs.saveFile(path, content, function() {
+        console.log('saved');
+      });
+      return false;
+    });
   });
+  
