@@ -1,6 +1,21 @@
 // Create Grid
 window.vfs = new VFSClient('test');
 
+
+var themes = {};
+var modes = {};
+
+//dynamically load javascript source file
+function loadScriptFile(path, callback) {
+  var head = document.getElementsByTagName('head')[0];
+  var s = document.createElement('script');
+
+  s.src = path;
+  head.appendChild(s);
+
+  s.onload = callback;
+}
+
 // UI functions
 $.contextMenu({
   selector: '.directory, .file',
@@ -47,14 +62,11 @@ var doubleClickOnDir = function(element) {
   var $parent = $(element).parent();
   var path = $(element).attr('rel');
   if($parent.hasClass('collapsed')) {
-    $parent.removeClass('collapsed').addClass('expanded');  
     vfs.readDir(path, function(json){
-      console.log(json);
-      grid.explore(element, json);
+      grid.expand(element, json);
     });
   } else {
-    $parent.removeClass('expanded').addClass('collapsed');
-    $parent.children('ul').remove();
+    grid.collapse(element);
   }
 };
 
@@ -67,12 +79,7 @@ var bindEvent = function() {
 
   // CREATE EVENT
   grid.on('create', function(name, path, type) {
-    console.log("Inside create event");
-    console.log(type);
     if((type=='file')){
-      console.log("Inside if-file");
-      console.log(name);
-      console.log(path);
       vfs.newFile(name, path, function(err){
         cosole.log("Get Call back of file creation at VFS.");
         if(err){
@@ -93,10 +100,14 @@ var bindEvent = function() {
     }
   });
 
+  grid.on('openTab', function(path){
+    console.log("Testing of catch event"+path);
+  });
+
   // RENAME EVENT
   grid.on('rename', function(newName, oldName){
     vfs.rename(newName, oldName, function(){
-      console.log("Get Callback");
+      console.log("Test Callback");
     });
   });
 
@@ -118,11 +129,67 @@ var bindEvent = function() {
   });
 };
 
+var initTabs = function(){
+  var tabs = editor.tabs;
+  for (var path in tabs) {
+    var containt = tabs[path];
+    openTab(path, containt);
+  }
+};
+
+var openTab = function(path, containt) {
+  var $list = $('#tree').find('a');
+  $list.each(function(index, element) {
+    if($(element).attr('rel') == path){
+      return grid.open(element);
+    }
+  });
+};
+
 vfs.readDir('/', function(json) {
-  window.grid = new Grid($('#tree'), json);  
+  window.grid = new Grid($('#tree'), json);
   bindEvent();
+  initTabs();
 });
 
-// vfs.newDir('sample', '/test/', function(){
-//   console.log("get Callback.");
-// });
+newCodeSocket.on('codePassed', function(data) {
+  displayMessage('success', 'Congratulations, your code compiled successfully.');
+
+});
+
+newCodeSocket.on('codeFailed', function(error) {
+  console.log(error);
+  var error = error || 'Unknown error. Please contact support.';
+  error = '<pre>' + error + '</pre>';
+  displayMessage('error', error);
+
+});
+
+$('#compile').click(function() {
+  var sourceCode = editor.getSession().getValue();
+  var languageCode = $('#pageslide #mode').val();
+  if(!languageCode){
+    languageCode = $('#mode').val();
+  }
+  displayMessage('info', 'Compiling...');
+  newCodeSocket.emit('submitcode', 'test');
+});
+
+sharejs.open('#{docId}', 'text', function(error, doc) {
+  if (error) {
+    console.error(error);
+    return;
+  }
+  doc.attach_ace(editor);
+  editor.setReadOnly(false);
+});
+
+$('#save').click(function() {
+  var path = $('.selected').attr('rel');
+  var content = editor.getSession().toString();
+  console.log(content);
+  vfs.saveFile(path, content, function() {
+    console.log('saved');
+  });
+  return false;
+});

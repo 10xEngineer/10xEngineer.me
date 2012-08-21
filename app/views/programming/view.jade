@@ -28,15 +28,25 @@ style
     background: #BDF;
   }
 
-  i.closeTab:hover {
-    opacity: 0.6;
-  };
-
   /* Core Styles */
   .fileTree li.directory { background: url(/img/fileTree/directory.png) left top no-repeat; }
   .fileTree li.expanded { background: url(/img/fileTree/folder_open.png) left top no-repeat; }
   .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
   .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
+
+  #tabContainer > li > a > i.closeTab {
+    display : none;
+    z-index: 50;
+  }
+  #tabContainer > li.active > a {
+    pointer-events: inherit;
+  }
+  #tabContainer > li.active > a > i.closeTab:hover {
+    cursor: pointer;
+  } 
+  #tabContainer > li.active > a > i.closeTab {
+    display : inline-block;
+  } 
 
 .container
   div#header
@@ -77,202 +87,10 @@ style
   
   script
     var editor = ace.edit("editor");
+    console.log(editor.tabs);
 
 
   script(src="/javascripts/test.js");
   
   
   script(type='text/javascript')
-    /*
-    var themes = {};
-    var modes = {};
-
-    //dynamically load javascript source file
-    function loadScriptFile(path, callback) {
-      var head = document.getElementsByTagName('head')[0];
-      var s = document.createElement('script');
-
-      s.src = path;
-      head.appendChild(s);
-
-      s.onload = callback;
-    }
-
-    // Tree operations
-    function newFile(caller) {
-      var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
-      var path = $parentDir.children('a').attr('rel');
-
-      // TODO: Logic to figure out unique name
-      var name = 'untitled';
-      vfs.newFile(name, path, function(error) {
-        var $file = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
-        $('#tree').fileTree(window.vfs);
-        //$parentDir.append($file);
-      });
-    }
-
-    function newDir(caller) {
-      var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
-      var path = $parentDir.children('a').attr('rel');
-
-      // TODO: Logic to figure out unique name
-      var name = 'untitled';
-      vfs.newDir(name, path, function(error) {
-        var $dir = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
-        $('#tree').fileTree(window.vfs);
-        //$parentDir.append($dir);
-      });
-    }
-
-    // For rename File or Directory at UI side
-    function renameFinish(caller) {
-      
-      var anchor = $(caller).children('a');
-      var newPath = oldPath = anchor.attr('rel');
-      var oldName = anchor.html();
-      var newName = $(caller).children('input').val();
-      if(newName.trim() != "") {
-        anchor.html(newName);
-        var path = anchor.attr('rel');
-        
-        if(caller.hasClass('file')) {
-          var pattern = new RegExp(oldName + "$");
-          anchor.attr('rel', path.replace(pattern, newName));
-        } else {
-          var pattern = new RegExp(oldName + "\\/$");
-          anchor.attr('rel', path.replace(pattern, newName)+"/");
-        }
-        
-        caller.children('input').remove();
-        anchor.css('display', 'block');
-        newPath = anchor.attr('rel');
-      }
-      else{
-        caller.children('input').remove();
-      }
-      
-      // Call to VFS Rename Function As per requirement
-      vfs.rename(newPath, oldPath, function(error) {
-        if(error){
-          console.log(error);
-        } 
-      });
-    }
-
-    function rename(caller) {
-
-      var $input = $('<input/>', {
-        type: 'text',
-        value: $(caller).children('a').html()
-      });
-
-      $(caller).children('a').css('display', 'none');
-      $(caller).append($input);
-      $input.focus();
-      $input.bind({
-        keypress: function() {
-          if(event.keyCode == 13) {
-            renameFinish(caller);
-          }
-        },
-        blur: function() {
-          renameFinish(caller);
-        }
-      }); 
-    }
-
-    function remove(caller) {
-      if($(caller).hasClass('directory') || $(caller).hasClass('file')) {
-        caller = $(caller);
-      } else {
-        caller = $(caller).closest('file') || $(caller).closest('directory');
-      }
-
-      var path = caller.children('a').attr('rel');
-      var removeItem ;
-      removeItem = $(caller).hasClass('file') ? vfs.removeFile : vfs.removeDir ;
-      removeItem.call(vfs, path, function(res) {
-        caller.remove();
-      });
-    }
-
-    $(document).ready(function() {
-      window.editor = $('#editor').editor();
-
-      // Initialize tree
-      // TODO: Replace hardcoded bucketid with dynamic one
-      window.vfs = new VFSClient('test');
-      $('#tree').fileTree(vfs);
-
-      // Initialize right-click context menu
-      $.contextMenu({
-        selector: '.directory, .file',
-        callback: function(key, options) {
-          switch(key) {
-            case 'newFile':
-              newFile(this);
-              break;
-            case 'newDir':
-              newDir(this);
-              break;
-            case 'rename':
-              rename(this);
-              break;
-            case 'remove':
-              remove(this);
-              break;
-          }
-        },
-        items: {
-          newFile: { name: 'New File' },
-          newDir: { name: 'New Directory' },
-          rename: { name: 'Rename' },
-          remove: { name: 'Remove' }
-        }
-      });
-
-      $('#save').click(function() {
-        var path = $('.selected').attr('rel');
-        var content = editor.getSession().toString();
-        console.log(content);
-        vfs.saveFile(path, content, function() {
-          console.log('saved');
-        });
-        return false;
-      });
-
-
-      newCodeSocket.on('codePassed', function(data) {
-        displayMessage('success', 'Congratulations, your code compiled successfully.');
-
-      });
-
-      newCodeSocket.on('codeFailed', function(error) {
-        console.log(error);
-        var error = error || 'Unknown error. Please contact support.';
-        error = '<pre>' + error + '</pre>';
-        displayMessage('error', error);
-
-      });
-
-      $('#compile').click(function() {
-        var sourceCode = editor.getSession().getValue();
-        var languageCode = $('#pageslide #mode').val();
-        if(!languageCode){
-          languageCode = $('#mode').val();
-        }
-        displayMessage('info', 'Compiling...');
-        newCodeSocket.emit('submitcode', 'test');
-      });
-
-      sharejs.open('#{docId}', 'text', function(error, doc) {
-        if (error) {
-          console.error(error);
-          return;
-        }
-        doc.attach_ace(editor);
-        editor.setReadOnly(false);
-      });
-    });
-    >>>>>>> f4cf078b086a1269b2432eed31790d8eaa55c5af*/

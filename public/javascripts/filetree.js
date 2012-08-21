@@ -1,49 +1,91 @@
-//<<<<<<< HEAD
-/*
-  // TODO :: Rearrenge function from vfs to json pattern
-        
-  function showTree(c, fileList) {
-    fileList = fileList[0];
-    $(c).addClass('wait');
-    $(c).find('.start').html('');
-    $(c).removeClass('wait');
-    var $ul = $('<ul/>', { class: 'fileTree' });
-    $(fileList).each(function(index, file) {
-      var $item;
-      if(file.mime === 'inode/directory') {
-        $item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
-      } else {
-        $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name }));
-      }
-      $item.appendTo($ul);
-      $(c).find('ul:hidden').show();
-    });
-//    bindTree($ul);
-    $ul.appendTo(c);
-  }
-  
-  function bindTree(t) {
-    $(t).find('li a').bind('dblclick', function() { // event for double click
-      //this.emitter.
-    });
-    $(t).find('li a').bind('click', function() {
-      $('.selected').removeClass('selected');
-      $(this).addClass('selected');
-      return false;
-    });
-  }
-  // Loading message
-  $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a><li></ul>');
-  // Get the initial file list
-  showTree( $(element).find('.fileTree.start .root'), json );
+/*********************************************************************************************************************************
 
-};/**/
+  DOCUMENTATION 
+  -------------
+
+  Constructor :
+    To create new grid it needs to call a constructor
+    as
+
+    var grid = new Grid(element, json)
+
+    parameters:
+      element : is an element where to put tree
+      json    : root directory containts in JSON format
+
+  Methods:
+    
+    * create(element, type)
+    -----------------------
+    Parameters:
+      element : HTML element which is parent of file/dir (which you need to create)
+      type    : it have only two value "file" or "directory".
+
+    Event: 
+      'create'
+      with parameters:
+        name : 'untitled' (by defalt)
+        path : parent dir path
+        type : 'file' or 'directory'
+
+    * remove(element)
+    -----------------
+    Parameters:
+      element : HTML element which file/dir (which you need to remove)
+
+    Event:
+      'remove'
+      with paramenters:
+        path : full path of element to be removed
+
+    * open(element)
+    ---------------
+    Parameters:
+      element : HTML element which file (which you need to open)
+
+    Event:
+      'open'
+      with parameters:
+        path : full path of element to be opened
+
+    * close(element)
+    ---------------
+    Parameters:
+      element : HTML element (TAB) which file (which you need to close)
+
+    Event:
+      'close'
+      with parameters:
+        path : full path of element to be closed
+
+    * expand(element)
+    -----------------
+    Parameters:
+      element : HTML element which directory (which you need to expand)
+
+    Event:
+      'expand'
+      with parameters:
+        path : full path of element to be expand
+
+    * collapse(element)
+    -----------------
+    Parameters:
+      element : HTML element which directory (which you need to collapse)
+
+    Event:
+      'collapse'
+      with parameters:
+        path : full path of element to be collapse
+
+*********************************************************************************************************************************/
+
+
 var Grid = function(element, json) {
   // Generete tree code
   this.fileTree = json;
   this.openFiles = [];
 
-  console.log(this);
   $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a><li></ul>');
 
   fileList = json;
@@ -98,35 +140,65 @@ Grid.prototype.remove = function(caller) {
   var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
   var path = $parentDir.children('a').attr('rel');
 
-  console.log(path);
   caller.remove();
  
   this.emit('remove', path);
   
 };
 
-Grid.prototype.isFileOpen = function(caller, callback){
-  callback(false);
-}
-
 Grid.prototype.open = function(caller){
+  var path = $(caller).attr('rel');
   $('#tabContainer .active').removeClass('active');
   var $tab = $('<li/>', {
     class: 'active'
   }).append($('<a/>',{
     href: "#", 
     'data-toggle': "tab",
+    rel : path,
     html: $(caller).html() + " "
   }).append($('<i/>', {
     class: 'icon-remove closeTab',
-    style: 'opacity: 0.3; z-index: 10;'
+    style: 'opacity: 0.18; z-index: 10;'
   })));
 
+  var self = this;
   $tab.find('i').click(function(e){
-    console.log("clicked on close btn");
+    self.close($(this).parent());
+  });
+
+  $tab.children('a').click(function(){
+    self.switchTab($('#tabContainer li.active a').attr('rel'), $(this).attr('rel'));
+  });
+
+  $tab.appendTo($('#tabContainer'));
+  this.emit('openTab', path);
+  this.emit('open', path);
+};
+
+Grid.prototype.close = function(caller) {
+    var $currTab = $(caller).parent()
+    var $tabList = $('#tabContainer li');
+    if($tabList.length > 1){
+      var nextActiveTab;
+      for (var i = 0; i < $tabList.length; i++) {
+        var found = ($($tabList[i]).attr('rel') == $currTab.attr('rel') && $($tabList[i]).html() == $currTab.html());
+        var condition = ( found && !(typeof(nextActiveTab)=='undefined'));
+        if(condition){
+          break;
+        } else {
+          nextActiveTab = $tabList[i];
+        }
+      };
+      $currTab.removeClass('active');
+      $(nextActiveTab).addClass('active');
+    }
+    self.emit('closeTab', $currTab.children('a').attr('rel'));
+    if($('#tabContainer li.active')) { 
+      self.emit('openTab', $('#tabContainer li.active').children('a').attr('rel'));
+    }
+    $currTab.remove();
     if (!e)
       e = window.event;
-
     //IE9 & Other Browsers
     if (e.stopPropagation) {
       e.stopPropagation();
@@ -135,16 +207,6 @@ Grid.prototype.open = function(caller){
     else {
       e.cancelBubble = true;
     }
-  });
-
-  $tab.children('a').click(function(){
-    console.log("anchor tag");
-  });
-
-  $tab.appendTo($('#tabContainer'));
-};
-
-Grid.prototype.close = function(path) {
 
 };
 
@@ -202,10 +264,20 @@ Grid.prototype.renameFinished = function(caller) {
 
 };
 
-Grid.prototype.explore = function(caller, json) {
+Grid.prototype.expand = function(caller, json) {
   
   var path = $(caller).attr('rel');
   var $parent = $(caller).parent();
+
+  // Code To append JSON
+  var tmp = json;
+  var indx = 0
+  while(indx < tmp.length){
+    this.fileTree.push(tmp[0]);
+    indx ++;
+  }
+  // Append JSON code completed
+
   $parent.removeClass('collapsed').addClass('expanded');
 
   fileList = json;
@@ -232,72 +304,27 @@ Grid.prototype.explore = function(caller, json) {
     $item.appendTo($ul);
   });
   $ul.appendTo($parent);
-
-  this.emit('explore', path);
+  $parent.removeClass('collapsed').addClass('expanded');  
+  this.emit('expand', path);
 };
-/*=======
-if(jQuery) (function($){
-	
-	$.extend($.fn, {
-		fileTree: function(vfs) {
-			
-			$(this).each( function() {
-				
-				function showTree(c, t) {
-					$(c).addClass('wait');
-					vfs.readDir(t, function(fileList) {
-						$(c).find('.start').html('');
-						$(c).removeClass('wait');
-						var $ul = $('<ul/>', { class: 'fileTree' });
-						$(fileList).each(function(index, file) {
-							var $item;
-							if(file.mime === 'inode/directory') {
-								$item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
-							} else {
-								$item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name, 'data-type': file.mime }));
-							}
-							$item.appendTo($ul);
-							if(t === '/') $(c).find('ul:hidden').show(); else $(c).find('ul:hidden').slideDown({ duration: 500 });
-						});
-						bindTree($ul);
-						$ul.appendTo(c);
-					});
-				}
-				
-				function bindTree(t) {
-					$(t).find('li a').bind('dblclick', function() {
-						if( $(this).parent().hasClass('directory') ) {
-							if( $(this).parent().hasClass('collapsed') ) {
-								$(this).parent().find('ul').remove(); // cleanup
-								showTree( $(this).parent(), escape($(this).attr('rel').match( /.*\// )) );
-								$(this).parent().removeClass('collapsed').addClass('expanded');
-							} else {
-								// Collapse
-								$(this).parent().find('ul').slideUp({ duration: 500 });
-								$(this).parent().removeClass('expanded').addClass('collapsed');
-							}
-						} else {
-							// TODO: Load file content in the editor
-							var path = $(this).attr('rel');
-							var type = $(this).attr('data-type');
-							window.editor.loadContent(path);
-						}
-						return false;
-					});
-					$(t).find('li a').bind('click', function() {
-						$('.selected').removeClass('selected');
-						$(this).addClass('selected');
-						return false;
-					});
-				}
-				// Loading message
-				$(this).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a><li></ul>');
-				// Get the initial file list
-				showTree( $(this).find('.fileTree.start .root'), escape('/') );
-			});
-		}
-	});
-	
-})(jQuery);
->>>>>>> f4cf078b086a1269b2432eed31790d8eaa55c5af
-*/
+
+Grid.prototype.collapse = function(caller){
+    var $parent = $(caller).parent();
+    var path = $(caller).attr('rel');
+
+    var regex = new RegExp("^" + escape(path) + "$");
+    var indx = 0;
+    while(indx < this.fileTree.length) {
+      var tmpPath = this.fileTree[indx]['path'];
+      if(regex.test(tmpPath)) {
+        this.fileTree.splice(indx, 1);
+      } else {
+        indx++;
+      }
+    }
+
+    $parent.removeClass('expanded').addClass('collapsed');
+    $parent.children('ul').remove();
+
+    this.emit('collapse', path);
+}
