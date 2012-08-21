@@ -1,6 +1,6 @@
 /*var model = require('../models');
 var async = require('async');
-var _ = require('underscore');
+var _ = require('lodash');
 
 
 module.exports = function() {};

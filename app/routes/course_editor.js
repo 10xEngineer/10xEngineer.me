@@ -1,7 +1,7 @@
 var fs = require('fs');
 
 var async = require('async');
-var _ = require('underscore');
+var _ = require('lodash');
 
 var model = require('../models');
 

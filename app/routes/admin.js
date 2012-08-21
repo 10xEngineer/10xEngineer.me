@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var _ = require('underscore');
+var _ = require('lodash');
 var async = require('async');
 var nodemailer = require("nodemailer");
 
