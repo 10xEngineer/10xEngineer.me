@@ -1,4 +1,6 @@
-var model = require('../models');
+var model = require('../models'),
+	_ = require('underscore');
+
 
 module.exports = function(config, callback) {
   var Metadata = model.Metadata;
