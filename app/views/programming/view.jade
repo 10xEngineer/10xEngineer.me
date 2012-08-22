@@ -86,17 +86,7 @@ script(src="/javascripts/share/ace.js")
 script(src="/javascripts/share/chat.js")
 
 script
-  var editor = ace.edit("editor");
-  console.log(editor.tabs);
-
-
   $(document).ready(function() {
-    // Create Grid
-    window.vfs = new VFSClient('test');
-
-
-    var themes = {};
-    var modes = {};
 
     //dynamically load javascript source file
     function loadScriptFile(path, callback) {
@@ -109,40 +99,12 @@ script
       s.onload = callback;
     }
 
-    // UI functions
-    $.contextMenu({
-      selector: '.directory, .file',
-      callback: function(key, options) {
-        switch(key) {
-          case 'newFile':
-            grid.create(this, 'file');
-            break;
-          case 'newDir':
-            grid.create(this, 'directory');
-            break;
-          case 'rename':
-            grid.rename(this);
-            break;
-          case 'remove':
-            grid.remove(this);
-            break;
-        }
-      },
-      items: {
-        newFile: { name: 'New File' },
-        newDir: { name: 'New Directory' },
-        rename: { name: 'Rename' },
-        remove: { name: 'Remove' }
-      }
+    window.editor = new Editor({
+      vfs: new VFSClient('test'),
+      tree: '#tree',
+      editor: '#editor',
+      tab: '#tabContainer'
     });
-
-
-    window.openFile = function(element) {
-      var path = $(element).attr('rel');
-      vfs.readFile(path, function(data){
-        grid.open(element, data);
-      });
-    };
 
     var doubleClickOnDir = function(element) {
       var $parent = $(element).parent();
@@ -156,74 +118,6 @@ script
       }
     };
 
-    window.selectItem = function(element) {
-      $('.selected').removeClass('selected');
-      $(element).addClass('selected');
-    };
-
-    var bindEvent = function() {
-
-      // CREATE EVENT
-      grid.on('create', function(name, path, type) {
-        if((type=='file')){
-          vfs.newFile(name, path, function(err){
-            cosole.log("Get Call back of file creation at VFS.");
-            if(err){
-              console.log("Error in "+type+" creation.");
-            } else {
-              console.log(type+" has been created successfully.");
-            }
-          });
-        } else {
-          vfs.newDir(name, path, function(err){
-            if(err){
-              console.log("Error in "+type+" creation.");
-            }
-            else{
-              console.log(type+" has been created successfully.");
-            }
-          });
-        }
-      });
-
-      grid.on('openTab', function(path){
-        console.log("Testing of catch event"+path);
-      });
-
-      // RENAME EVENT
-      grid.on('rename', function(newName, oldName){
-        vfs.rename(newName, oldName, function(){
-          console.log("Test Callback");
-        });
-      });
-
-      // REMOVE EVENT
-      grid.on('remove', function(path){
-        console.log(path);
-        if(/\/$/.test(path)){
-          vfs.removeDir(path, function(error) {
-            if(!error) {
-              caller.remove();
-            }
-          });
-        } else {
-          vfs.removeFile(path, function(error) {
-            if(!error) {
-              caller.remove();
-            }
-          });
-        }
-      });
-    };
-
-    var initTabs = function(){
-      var tabs = editor.tabs;
-      for (var path in tabs) {
-        var containt = tabs[path];
-        openTab(path, containt);
-      }
-    };
-
     var openTab = function(path, containt) {
       var $list = $('#tree').find('a');
       $list.each(function(index, element) {
@@ -232,12 +126,6 @@ script
         }
       });
     };
-
-    vfs.readDir('/', function(json) {
-      window.grid = new Grid($('#tree'), json);
-      bindEvent();
-      initTabs();
-    });
 
     newCodeSocket.on('codePassed', function(data) {
       displayMessage('success', 'Congratulations, your code compiled successfully.');
@@ -253,7 +141,7 @@ script
     });
 
     $('#compile').click(function() {
-      var sourceCode = editor.getSession().getValue();
+      var sourceCode = editor.getContent();
       var languageCode = $('#pageslide #mode').val();
       if(!languageCode){
         languageCode = $('#mode').val();
@@ -272,12 +160,7 @@ script
     });
 
     $('#save').click(function() {
-      var path = $('.selected').attr('rel');
-      var content = editor.getSession().toString();
-      console.log(content);
-      vfs.saveFile(path, content, function() {
-        console.log('saved');
-      });
+      editor.saveFile();
       return false;
     });
   });

@@ -7,7 +7,7 @@
     To create new grid it needs to call a constructor
     as
 
-    var grid = new Grid(element, json)
+    var grid = new FileTree(element, json)
 
     parameters:
       element : is an element where to put tree
@@ -105,10 +105,11 @@
 *********************************************************************************************************************************/
 
 
-var Grid = function(element, json) {
+var FileTree = function(element, json) {
+  var self = this;
+
   // Generete tree code
   this.fileTree = json;
-  this.openFiles = [];
 
   $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a><li></ul>');
 
@@ -122,15 +123,15 @@ var Grid = function(element, json) {
         doubleClickOnDir(this);
       });
       $item.children('a').bind('click', function(){
-        selectItem(this);
+        self.selectItem(this);
       });
     } else {
       $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name }));
       $item.children('a').bind('dblclick', function(){
-        openFile(this);
+        self.openFile(this);
       });
       $item.children('a').bind('click', function(){
-        selectItem(this);
+        self.selectItem(this);
       });
     }
     $item.appendTo($ul);
@@ -138,13 +139,14 @@ var Grid = function(element, json) {
   $ul.appendTo($(element).find('.fileTree.start .root'));
 };
 
-Grid.prototype = new EventEmitter2({
+FileTree.prototype = new EventEmitter2({
   wildcard: true,
   delimiter: '::',
   maxListeners: 20
 });
 
-Grid.prototype.create =  function(caller, type) {
+FileTree.prototype.create =  function(caller, type) {
+  var self = this;
 
   // Procedure to create file
   var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
@@ -154,10 +156,10 @@ Grid.prototype.create =  function(caller, type) {
   if(type=='file'){
     $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
     $item.children('a').bind('dblclick', function(){
-      openFile(this);
+      self.openFile(this);
     });
     $item.children('a').bind('click', function(){
-      selectItem(this);
+      self.selectItem(this);
     });
   } else {
     $item = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
@@ -165,23 +167,17 @@ Grid.prototype.create =  function(caller, type) {
       doubleClickOnDir(this);
     });
     $item.children('a').bind('click', function(){
-      selectItem(this);
+      self.selectItem(this);
     });
   }
   $parentDir.append($item);
-  $item.children('a').bind('dblclick', function(){
-    openFile(this);
-  });
-  $item.children('a').bind('click', function(){
-    selectItem(this);
-  });
 
   this.emit('create', name, path, type);
 
   this.rename($item);
 };
 
-Grid.prototype.remove = function(caller) {
+FileTree.prototype.remove = function(caller) {
 
   var path = $(caller).children('a').attr('rel');
 
@@ -191,46 +187,20 @@ Grid.prototype.remove = function(caller) {
   
 };
 
-Grid.prototype.open = function(caller){
-  var path = $(caller).attr('rel');
-  $('#tabContainer .active').removeClass('active');
-  var $tab = $('<li/>', {
-    class: 'active'
-  }).append($('<a/>',{
-    href: "#", 
-    'data-toggle': "tab",
-    rel : path,
-    html: $(caller).html() + " "
-  }).append($('<i/>', {
-    class: 'icon-remove closeTab',
-    style: 'opacity: 0.18; z-index: 10;'
-  })));
+FileTree.prototype.selectItem = function(element) {
+  $('.selected').removeClass('selected');
+  $(element).addClass('selected');
+}
 
-  var self = this;
-  $tab.find('i').click(function(e){
-    self.close($(this).parent());
-    if (!e)
-      e = window.event;
-    //IE9 & Other Browsers
-    if (e.stopPropagation) {
-      e.stopPropagation();
-    }
-    //IE8 and Lower
-    else {
-      e.cancelBubble = true;
-    }
-  });
+FileTree.prototype.openFile = function(element) {
+  var path = $(element).attr('rel');
+  this.emit('openFile', path);
+}
 
-  $tab.children('a').click(function(){
-    self.switchTab($('#tabContainer li.active a').attr('rel'), $(this).attr('rel'));
-  });
-
-  $tab.appendTo($('#tabContainer'));
-  this.emit('openTab', path);
-  this.emit('open', path);
+FileTree.prototype.open = function(caller){
 };
 
-Grid.prototype.close = function(caller) {
+FileTree.prototype.close = function(caller) {
   var self = this;
   var $currTab = $(caller).parent()
   var $tabList = $('#tabContainer li');
@@ -255,7 +225,7 @@ Grid.prototype.close = function(caller) {
   $currTab.remove();
 };
 
-Grid.prototype.rename = function(caller) {
+FileTree.prototype.rename = function(caller) {
   var $input = $('<input/>', {
     type: 'text',
     value: $(caller).children('a').html()
@@ -278,7 +248,7 @@ Grid.prototype.rename = function(caller) {
   //this.emit('rename');
 };
 
-Grid.prototype.renameFinished = function(caller) {
+FileTree.prototype.renameFinished = function(caller) {
   
   var anchor = $(caller).children('a');
   var newPath = oldPath = anchor.attr('rel');
@@ -309,8 +279,8 @@ Grid.prototype.renameFinished = function(caller) {
 
 };
 
-Grid.prototype.expand = function(caller, json) {
-
+FileTree.prototype.expand = function(caller, json) {
+  var self = this;
   var path = $(caller).attr('rel');
   var $parent = $(caller).parent();
 
@@ -335,15 +305,15 @@ Grid.prototype.expand = function(caller, json) {
         doubleClickOnDir(this);
       });
       $item.children('a').bind('click', function(){
-        selectItem(this);
+        self.selectItem(this);
       });
     } else {
       $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name }));
       $item.children('a').bind('dblclick', function(){
-        openFile(this);
+        self.openFile(this);
       });
       $item.children('a').bind('click', function(){
-        selectItem(this);
+        self.selectItem(this);
       });
     }
     $item.appendTo($ul);
@@ -353,7 +323,7 @@ Grid.prototype.expand = function(caller, json) {
   this.emit('expand', path);
 };
 
-Grid.prototype.collapse = function(caller){
+FileTree.prototype.collapse = function(caller){
     var $parent = $(caller).parent();
     var path = $(caller).attr('rel');
 
@@ -374,7 +344,8 @@ Grid.prototype.collapse = function(caller){
     this.emit('collapse', path);
 };
 
-Grid.prototype.refresh = function(json) {
+FileTree.prototype.refresh = function(json) {
+  var self = this;
 
   if(typeof(json)!='undefined'){
     this.fileTree = json ;
@@ -409,17 +380,17 @@ Grid.prototype.refresh = function(json) {
           doubleClickOnDir(this);
         });
         $item.children('a').bind('click', function(){
-          selectItem(this);
+          self.selectItem(this);
         });
         // Code to add appender
         appenderList[file.path+file.name+"/"] = $item.get(0);
       } else {
         $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name }));
         $item.children('a').bind('dblclick', function(){
-          openFile(this);
+          self.openFile(this);
         });
         $item.children('a').bind('click', function(){
-          selectItem(this);
+          self.selectItem(this);
         });
       }
       $item.appendTo($ul);
