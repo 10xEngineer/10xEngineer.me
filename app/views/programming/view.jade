@@ -69,25 +69,25 @@ style
         div#messages
         input#message
 
-  link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
-  script(src="/javascripts/superagent.min.js")
-  script(src="/javascripts/ace_2/ace.js")
-  script(src="/javascripts/jquery.contextMenu.js")
-  script(src="/javascripts/vfs-client.js")
-  script(src="/javascripts/eventemitter2.js")
-  script(src="/javascripts/filetree.js")
-  script(src="/javascripts/editor.js")
-  
-  // For Share JS
-  script(src="/javascripts/share/bcsocket.js")
-  script(src="/share/share.js")
-  script(src="/share/json.js")
-  script(src="/javascripts/share/ace.js")
-  script(src="/javascripts/share/chat.js")
-  
-  script
-    var editor = ace.edit("editor");
-    console.log(editor.tabs);
+link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
+script(src="/javascripts/superagent.min.js")
+script(src="/javascripts/ace_2/ace.js")
+script(src="/javascripts/jquery.contextMenu.js")
+script(src="/javascripts/vfs-client.js")
+script(src="/javascripts/eventemitter2.js")
+script(src="/javascripts/filetree.js")
+script(src="/javascripts/editor.js")
+
+// For Share JS
+script(src="/javascripts/share/bcsocket.js")
+script(src="/share/share.js")
+script(src="/share/json.js")
+script(src="/javascripts/share/ace.js")
+script(src="/javascripts/share/chat.js")
+
+script
+  var editor = ace.edit("editor");
+  console.log(editor.tabs);
 
 
   $(document).ready(function() {
@@ -137,17 +137,10 @@ style
     });
 
 
-    var openFile = function(element) {
+    window.openFile = function(element) {
       var path = $(element).attr('rel');
-      grid.isFileOpen(element, function(fileAllreadyOpen){
-        if(fileAllreadyOpen) {
-          // code to focus on that file
-        } else {
-          // code to actually open the file
-          vfs.readFile(path, function(data){
-            grid.open(element, data);
-          });
-        }
+      vfs.readFile(path, function(data){
+        grid.open(element, data);
       });
     };
 
@@ -163,7 +156,7 @@ style
       }
     };
 
-    var selectItem = function(element) {
+    window.selectItem = function(element) {
       $('.selected').removeClass('selected');
       $(element).addClass('selected');
     };
@@ -206,6 +199,7 @@ style
 
       // REMOVE EVENT
       grid.on('remove', function(path){
+        console.log(path);
         if(/\/$/.test(path)){
           vfs.removeDir(path, function(error) {
             if(!error) {

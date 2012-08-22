@@ -153,6 +153,12 @@ Grid.prototype.create =  function(caller, type) {
   var $item;
   (type=='file')? $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name })) : $item = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
   $parentDir.append($item);
+  $item.children('a').bind('dblclick', function(){
+    openFile(this);
+  });
+  $item.children('a').bind('click', function(){
+    selectItem(this);
+  });
 
   this.emit('create', name, path, type);
 
@@ -161,8 +167,7 @@ Grid.prototype.create =  function(caller, type) {
 
 Grid.prototype.remove = function(caller) {
 
-  var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
-  var path = $parentDir.children('a').attr('rel');
+  var path = $(caller).children('a').attr('rel');
 
   caller.remove();
  
@@ -188,6 +193,16 @@ Grid.prototype.open = function(caller){
   var self = this;
   $tab.find('i').click(function(e){
     self.close($(this).parent());
+    if (!e)
+      e = window.event;
+    //IE9 & Other Browsers
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+    //IE8 and Lower
+    else {
+      e.cancelBubble = true;
+    }
   });
 
   $tab.children('a').click(function(){
@@ -200,38 +215,28 @@ Grid.prototype.open = function(caller){
 };
 
 Grid.prototype.close = function(caller) {
-    var $currTab = $(caller).parent()
-    var $tabList = $('#tabContainer li');
-    if($tabList.length > 1){
-      var nextActiveTab;
-      for (var i = 0; i < $tabList.length; i++) {
-        var found = ($($tabList[i]).attr('rel') == $currTab.attr('rel') && $($tabList[i]).html() == $currTab.html());
-        var condition = ( found && !(typeof(nextActiveTab)=='undefined'));
-        if(condition){
-          break;
-        } else {
-          nextActiveTab = $tabList[i];
-        }
-      };
-      $currTab.removeClass('active');
-      $(nextActiveTab).addClass('active');
-    }
-    self.emit('closeTab', $currTab.children('a').attr('rel'));
-    if($('#tabContainer li.active')) { 
-      self.emit('openTab', $('#tabContainer li.active').children('a').attr('rel'));
-    }
-    $currTab.remove();
-    if (!e)
-      e = window.event;
-    //IE9 & Other Browsers
-    if (e.stopPropagation) {
-      e.stopPropagation();
-    }
-    //IE8 and Lower
-    else {
-      e.cancelBubble = true;
-    }
-
+  var self = this;
+  var $currTab = $(caller).parent()
+  var $tabList = $('#tabContainer li');
+  if($tabList.length > 1){
+    var nextActiveTab;
+    for (var i = 0; i < $tabList.length; i++) {
+      var found = ($($tabList[i]).attr('rel') == $currTab.attr('rel') && $($tabList[i]).html() == $currTab.html());
+      var condition = ( found && !(typeof(nextActiveTab)=='undefined'));
+      if(condition){
+        break;
+      } else {
+        nextActiveTab = $tabList[i];
+      }
+    };
+    $currTab.removeClass('active');
+    $(nextActiveTab).addClass('active');
+  }
+  self.emit('closeTab', $currTab.children('a').attr('rel'));
+  if($('#tabContainer li.active')) { 
+    self.emit('openTab', $('#tabContainer li.active').children('a').attr('rel'));
+  }
+  $currTab.remove();
 };
 
 Grid.prototype.rename = function(caller) {
