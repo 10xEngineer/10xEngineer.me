@@ -151,7 +151,23 @@ Grid.prototype.create =  function(caller, type) {
   var path = $parentDir.children('a').attr('rel');
   var name = 'untitled';
   var $item;
-  (type=='file')? $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name })) : $item = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
+  if(type=='file'){
+    $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
+    $item.children('a').bind('dblclick', function(){
+      openFile(this);
+    });
+    $item.children('a').bind('click', function(){
+      selectItem(this);
+    });
+  } else {
+    $item = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
+    $item.children('a').bind('dblclick', function(){
+      doubleClickOnDir(this);
+    });
+    $item.children('a').bind('click', function(){
+      selectItem(this);
+    });
+  }
   $parentDir.append($item);
 
   this.emit('create', name, path, type);
