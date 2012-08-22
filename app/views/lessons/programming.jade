@@ -4,339 +4,101 @@
 
   include ../_breadcrumb
 
-  .container-fluid
-    h1 #{lesson.title}
-    link(rel="stylesheet", href="/stylesheets/ribbon.css")
-    link(rel="stylesheet", href="/stylesheets/jquery-ui-lightness/jquery-ui-1.8.19.custom.css")
-    style(type="text/css")
-      #pageslide select{
-        width:120px;
-      }
-    .row-fluid
-      .span9
-        .row-fluid
-          form#editform.well(onsubmit='return false')
-            .row-fluid.action-bar
-              .btn-group.pull-left
-                a.btn.btn-primary(onclick='submitSourceCode()') Run
-                a.btn.open(href='#modal') Settings
-              .btn-group.pull-right
-                a.btn Help
-            #language.row-fluid
-              .span2  
-                .label.label-info  
-            .row-fluid
-              #panel.well(style='display:none;position:absolute;background:whitesmoke;z-index:999;')
-                #modal(style='margin-top:10px')
-                  #editorSetting
-                    table
-                      tr
-                        td
-                          label(for="mode") Mode
-                        td
-                          select#mode(size="1")
-                            option(value="javascript", selected="selected") JavaScript
-                            option(value="xml") XML
-                            option(value="html") HTML
-                            option(value="css") CSS
-                            option(value="scss") SCSS
-                            option(value="python") Python
-                            option(value="php") PHP
-                            option(value="java") Java
-                            option(value="ruby") Ruby
-                            option(value="c_cpp") C/C++
-                            option(value="coffee") CoffeeScript
-                            option(value="json") JSON
-                            option(value="perl") Perl
-                            option(value="clojure") Clojure
-                            option(value="ocaml") OCaml
-                            option(value="csharp") C#
-                            option(value="svg") SVG
-                            option(value="textile") Textile
-                            option(value="groovy") Groovy
-                            option(value="scala") Scala
-                      tr
-                        td
-                          label(for="theme") Theme
-                        td
-                          select#theme(size="1") 
-                            option(value="clouds") Clouds
-                            option(value="clouds_midnight") Clouds Midnight
-                            option(value="cobalt") Cobalt
-                            option(value="crimson_editor") Crimson Editor
-                            option(value="dawn") Dawn
-                            option(value="eclipse") Eclipse
-                            option(value="idle_fingers") idleFingers
-                            option(value="kr_theme") krTheme
-                            option(value="merbivore") Merbivore
-                            option(value="merbivore_soft") Merbivore Soft
-                            option(value="mono_industrial") Mono Industrial
-                            option(value="monokai") Monokai
-                            option(value="pastel_on_dark") Pastel on dark
-                            option(value="solarized_dark") Solarized Dark
-                            option(value="solarized_light") Solarized Light
-                            option(value="textmate", selected="selected") TextMate
-                            option(value="twilight") Twilight
-                            option(value="vibrant_ink") Vibrant Ink
-                      tr
-                        td
-                          label(for="fontsize") Font Size
-                        td
-                          select#fontsize(size="1") 
-                            option(value="10px") 10px
-                            option(value="11px") 11px
-                            option(value="12px", selected="selected") 12px
-                            option(value="14px") 14px
-                            option(value="16px") 16px
-                            option(value="20px") 20px
-                            option(value="24px") 24px
-                      tr
-                        td
-                          label(for="highlight_active") Highlight Active Line
-                        td
-                          input(type="checkbox", name="highlight_active", checked)#highlight_active.checked
-                      tr
-                        td
-                          label(for="show_hidden") Show Invisibles
-                        td
-                          input(type="checkbox", name="show_hidden")#show_hidden 
-                      tr
-                        td
-                          label(for="soft_wrap") Soft Wrap
-                        td
-                          select#soft_wrap(size="1") 
-                            option(value="off") Off
-                            option(value="40") 40 Chars
-                            option(value="80") 80 Chars
-                            option(value="free") Free
-                      tr
-                        td
-                          label(for="show_gutter") Show Gutter
-                        td
-                          input(type="checkbox", checked)#show_gutter.checked
-                      tr
-                        td
-                          label(for="show_print_margin") Show Print Margin
-                        td
-                          input(type="checkbox")#show_print_margin.checked
-                      tr
-                        td
-                          label(for="soft_tab") Use Soft Tab
-                        td
-                          input(type="checkbox")#soft_tab.checked
-                      tr
-                        td
-                          label(for="highlight_selected_word") Highlight selected word
-                        td
-                          input(type="checkbox")#highlight_selected_word.checked
-                  a(href="javascript:$.pageslide.close()").btn.btn-info Close
-              #source-editor 
-                .controls
-                  input#sourcecode(type='hidden', name='sourcecode', value='#{lesson.programming.skeletonCode}')
-                  #editor(style='position:relative;width:100%;height:400px;') #{lesson.programming.skeletonCode}
-                .form-actions
-                  span.danger
-                    a#clear.button.btn.btn-danger RESET
-                  span.pull-right
-                    button#submit.button.btn.btn-submit SUBMIT
+- var docId = 'test';
+style
+  ul.fileTree {
+    font-family: Verdana, sans-serif;
+    font-size: 11px;
+    line-height: 18px;
+    padding: 0px;
+    margin: 0px;
+  }
 
-        .lessonBar.row-fluid
-          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
+  ul.fileTree li {
+    list-style: none;
+    padding: 0px;
+    padding-left: 20px;
+    margin: 0px;
+    white-space: nowrap;
+  }
 
-        .row-fluid
-          p.pull-right 10xEngineer.me uses 
-            a(href="http://ideone.com") ideone.com 
-            | &copy; by 
-            a(href="http://sphere-research.com") Sphere Research Labs
+  ul.fileTree a {
+    color: #333;
+    text-decoration: none;
+    display: block;
+    padding: 0px 2px;
+  }
 
-      .span3
-        include _sidebar
+  ul.fileTree a:hover,
+  ul.fileTree a.selected {
+    background: #BDF;
+  }
 
-    .row-fluid
-      include _footer
+  /* Core Styles */
+  .fileTree li.directory { background: url(/img/fileTree/directory.png) left top no-repeat; }
+  .fileTree li.expanded { background: url(/img/fileTree/folder_open.png) left top no-repeat; }
+  .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
+  .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
 
-    .row-fluid
-      .span12
+  #tabContainer > li > a > i.closeTab {
+    display : none;
+    z-index: 50;
+  }
+  #tabContainer > li.active > a {
+    pointer-events: inherit;
+  }
+  #tabContainer > li.active > a > i.closeTab:hover {
+    cursor: pointer;
+  } 
+  #tabContainer > li.active > a > i.closeTab {
+    display : inline-block;
+  } 
 
-    script(type='text/javascript', src='/javascripts/ace_2/ace.js')
-    script(type='text/javascript', src='/javascripts/jquery-ui/jquery-ui-1.8.19.custom.min.js')
-    script(type='text/javascript', src='/javascripts/jquery.pageslide.js')
-    script(type='text/javascript')
-      var editor;
-      var themes = {};
+.container
+  div#header
+    //- TODO:: Re write header
+  .row-fluid
+    #sidebar.span2
+      button#save(class="btn", type="button") Save
+      button#compile(class="btn", type="button") Compile
 
-      //Check the compilation status and get the run result
-      var errors = {
-        '0': 'not running – the paste has been created with run parameter set to false',
-        '11': 'compilation error  – the program could not be executed due to compilation errors',
-        '12': 'runtime   error   –   the   program   finished because of  the runtime error, for example: division by zero,  array index out of bounds,uncaught exception',
-        '13': "time  limit  exceeded   –   the   program   didn't stop before the time limit",
-        '15': 'success - everything went ok',
-        '17': "memory limit exceeded – the program tried to use more memory than it is allowed",
-        '19': "illegal system call – the program tried to call illegal system function",
-        '20': "internal error – some problem occurred on ideone.com; try to submit the paste again and if that fails too, then please contact us"
-      }
+      #tree
 
-      function loadTheme(name) {
-        //check if the theme source files have been loaded before
-        if(themes[name]){
-          editor.setTheme(themes[name]);
-          return;
-        }
+    .vsplit.span8
+      #tabBar
+        ul#tabContainer.nav.nav-tabs
+      #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
+    
+    #sidebar.span2(style="display: inline-block; vertical-align: top;")
+      div#chat
+        h3 Chat
+        div#messages
+        input#message
+  .lessonBar.row-fluid
+    a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+    a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
 
-        var fileName = "/javascripts/ace_2/theme-" + name + ".js";
-        loadScriptFile(fileName, function(){
-          var path = "ace/theme/"+name;
-          themes[name] = path;
-          editor.setTheme(path);
-        });
-      }
 
-      var modes = {};
-      function loadMode(name){
-        $('#language .label').text(name);
-        //check if the language source files have been loaded before
-        if(modes[name]) {
-          editor.getSession().setMode(new modes[name]);
-          return;
-        }
+  link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
+  script(src="/javascripts/superagent.min.js")
+  script(src="/javascripts/ace_2/ace.js")
+  script(src="/javascripts/jquery.contextMenu.js")
+  script(src="/javascripts/vfs-client.js")
+  script(src="/javascripts/eventemitter2.js")
+  script(src="/javascripts/filetree.js")
+  script(src="/javascripts/editor.js")
+  
+  // For Share JS
+  script(src="/javascripts/share/bcsocket.js")
+  script(src="/share/share.js")
+  script(src="/share/json.js")
+  script(src="/javascripts/share/ace.js")
+  script(src="/javascripts/share/chat.js")
+  
+  script
+    var editor = ace.edit("editor");
 
-        var fileName = "/javascripts/ace_2/mode-" + name + ".js";
-        loadScriptFile(fileName, function(){
-          var Mode = require("ace/mode/"+name).Mode;
-          modes[name] = Mode;
-          editor.getSession().setMode(new Mode());
-        });
-      }
-
-      //dynamically load javascript source file
-      function loadScriptFile(path, callback) {
-        var head = document.getElementsByTagName('head')[0];
-        var s = document.createElement('script');
-
-        s.src = path;
-        head.appendChild(s);
-
-        s.onload = callback;
-      }
-
-      function init() {
-        editor = ace.edit('editor');
-        $(".open").pageslide({direction: "right", modal: true, iframe:false});
-
-        $('#editor').resizable({
-          resize: function(event, ui){
-            editor.resize();
-          }
-        })
-
-        if( $('editor') ) {
-          //binding the setting panel events
-          $("#mode").change(function(e){
-            loadMode(e.target.value);
-          })
-          $("#theme").change(function(e){
-            loadTheme(e.target.value);
-          })
-          $("#fontsize").change(function(e){
-            document.getElementById('editor').style.fontSize=e.target.value;
-          })
-          $("#highlight_active").change(function(e){
-            editor.setHighlightActiveLine(e.target.checked);
-          })
-          $("#show_hidden").change(function(e){
-            editor.setShowInvisibles(e.target.checked);
-          })
-          $("#soft_wrap").change(function(e){
-            var session = editor.getSession();
-            var renderer = editor.renderer;
-            switch (e.target.value) {
-              case "off":
-                session.setUseWrapMode(false);
-                renderer.setPrintMarginColumn(80);
-                break;
-              case "40":
-                session.setUseWrapMode(true);
-                session.setWrapLimitRange(40, 40);
-                renderer.setPrintMarginColumn(40);
-                break;
-              case "80":
-                session.setUseWrapMode(true);
-                session.setWrapLimitRange(80, 80);
-                renderer.setPrintMarginColumn(80);
-                break;
-              case "free":
-                session.setUseWrapMode(true);
-                session.setWrapLimitRange(null, null);
-                renderer.setPrintMarginColumn(80);
-                break;
-            }
-          })
-          $("#show_gutter").change(function(e){
-            editor.renderer.setShowGutter(e.target.checked); 
-          }) 
-          $("#show_print_margin").change(function(e){
-            editor.renderer.setShowPrintMargin(e.target.checked); 
-          })
-          $("#soft_tab").change(function(e){
-            editor.getSession().setUseSoftTabs(e.target.checked);  
-          })
-          $("#highlight_selected_word").change(function(e){
-            editor.setHighlightSelectedWord(e.target.checked);
-          });
-
-          //load default theme and language
-          loadTheme("textmate");    
-          loadMode('#{lesson.programming.language}');
-        }
-
-        $('a#clear').click(function(e){
-          editor.getSession().setValue($('#sourcecode').val());
-          editor.focus();
-        })
-      }
-
-      $(document).ready(function() {
-
-        var courseId =  '#{lesson.chapter.course}';
-        var chapterId =  '#{lesson.chapter._id}';
-        var lessonId =  '#{lesson._id}';
-        var userId = '#{userId}';
-        
-        codeSocket.on('codePassed', function(data) {
-          displayMessage('success', 'Congratulations, your code executed successfully.');
-
-          // TODO: Save code and change lesson status to completed
-          progressSocket.emit('status', { status: 'completed', userId: userId, courseId: courseId, chapterId: chapterId, lessonId: lessonId, data : data});
-
-        });
-
-        codeSocket.on('codeFailed', function(data) {
-          var error = data.stderr || data.error || 'Unknown error. Please contact support.';
-          displayMessage('error', error);
-
-          // TODO: Save code
-          // For Sending Current Code to Server Using Socket.
-          progressSocket.emit('change', { type:"programming", userId: userId, data: data, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-          
-        });
-
-        $('#submit').click(function(e) {
-          var sourceCode = editor.getSession().getValue();
-          var languageCode = $('#pageslide #mode').val();
-          if(!languageCode){
-            languageCode = $('#mode').val();
-          }
-          var data = {'source':sourceCode, 'language': languageCode, 'lessonId': '#{lesson.id}'};
-          displayMessage('info', 'Compiling...');
-          codeSocket.emit('submitcode', data);
-        });
-
-        // Periodically save the code
-        var saveTimer = window.setInterval(function() {
-          var data = { 'source': editor.getSession().getValue(), 'lessonId': '#{lesson.id}'};
-          progressSocket.emit('change', { type:"programming", data: data, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-        }, 10000);
-
-      });
+  script(src="/javascripts/test.js");
+  
+  
+  script(type='text/javascript')

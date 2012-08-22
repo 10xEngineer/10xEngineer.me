@@ -16,9 +16,7 @@ var LessonSchema = module.exports = new Schema({
   },
   programming:{
     language: { type: String, trim: true },
-    skeletonCode: { type: String, trim: true },
-    input: { type: String, trim: true },
-    output: { type: String, trim: true }
+    boilerPlateCode: { type: String, trim: true },
   },
   sysAdmin:{
     serverInfo: [],

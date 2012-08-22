@@ -54,9 +54,7 @@ module.exports.lesson = {
 				},
 				programming: {
 					language : {required:true},
-					code: {required: true},
-					input: {required: true},
-					output: {required: true}
+					boilerPlateCode: {required: true},
 				}
 			}
 		}

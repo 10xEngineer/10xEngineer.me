@@ -49,31 +49,28 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
         h3 Programming
         select#language(name='language')
           option(value="javascript", selected="selected") JavaScript
-          //- option(value="xml") XML
-          //- option(value="html") HTML
-          //- option(value="css") CSS
-          //- option(value="scss") SCSS
-          //- option(value="python") Python
-          //- option(value="php") PHP
-          //- option(value="java") Java
-          //- option(value="ruby") Ruby
-          //- option(value="c_cpp") C/C++
-          //- option(value="coffee") CoffeeScript
-          //- option(value="json") JSON
-          //- option(value="perl") Perl
-          //- option(value="clojure") Clojure
-          //- option(value="ocaml") OCaml
-          //- option(value="csharp") C#
-          //- option(value="svg") SVG
-          //- option(value="textile") Textile
-          //- option(value="groovy") Groovy
-          //- option(value="scala") Scala
-        p Code :
-        textarea#code(name='code')
-        p Enter Input :
-        textarea#input(name='input')
-        p Enter Output :
-        textarea#output(name='output')
+          option(value="xml") XML
+          option(value="html") HTML
+          option(value="css") CSS
+          option(value="scss") SCSS
+          option(value="python") Python
+          option(value="php") PHP
+          option(value="java") Java
+          option(value="ruby") Ruby
+          option(value="c_cpp") C/C++
+          option(value="coffee") CoffeeScript
+          option(value="json") JSON
+          option(value="perl") Perl
+          option(value="clojure") Clojure
+          option(value="ocaml") OCaml
+          option(value="csharp") C#
+          option(value="svg") SVG
+          option(value="textile") Textile
+          option(value="groovy") Groovy
+          option(value="scala") Scala
+        p
+          label(for="boilerPlateCode") BoilerPlateCode
+          textarea(name="boilerPlateCode", id="boilerPlateCode", rows="5")
         
       #sysAdmin.tab-pane
         h3 SysAdmin

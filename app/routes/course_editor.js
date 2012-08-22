@@ -483,9 +483,7 @@ module.exports.lessonCreate = function(req, res, next) {
   // For Programming Lesson
   if(lesson.type == 'programming') {
     lesson.programming.language = req.body.language ;
-    lesson.programming.skeletonCode = req.body.code ;
-    lesson.programming.input = req.body.input ;
-    lesson.programming.output = req.body.output ;
+    lesson.programming.boilerPlateCode = req.body.boilerPlateCode ;
     saveLesson(lesson, req, res);
   }
   // For Quiz Lesson
