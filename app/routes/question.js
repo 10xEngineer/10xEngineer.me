@@ -13,7 +13,7 @@ module.exports.createView = function(req, res) {
 module.exports.create = function(req, res) {
   var Question = model.Question;
   var question = new Question();
-  question.quiz = req.quiz._id;
+  question.lesson = req.lesson._id;
   question.question = req.body.question;
   question.weightage = req.body.weightage;
   question.random = Math.random();
@@ -40,11 +40,11 @@ module.exports.create = function(req, res) {
     if(error) {
       log.error(error);
       req.session.error = "Can not create question.";
-      res.redirect('/assessment/quiz/create');
+      res.redirect('/course_editor/lesson/create');
     }
 
     req.session.message = "Question created successfully.";
-    res.redirect('/assessment/quiz/' + req.quiz.id);
+    res.redirect('/course_editor/lesson/' + req.lesson.id);
   });
 };
 
@@ -56,15 +56,29 @@ module.exports.view = function(req, res) {
 };
 
 module.exports.removeQuestion = function(req, res) {
-  var Quiz = model.Quiz;
+  var Lesson = model.Lesson;
   var question = req.question;
   
+  /*
   question.remove(function(error){
     if(error){
       log.error(error);
     }
     req.session.message = "Question remove successfully.";
-    res.redirect("/assessment/quiz/" + question.quiz.id);
+    res.redirect("/course_editor/lesson/" + req.lesson.id);
+  });
+  */
+  Lesson.findOne({_id: question.lesson}, function(err, lesson){
+    if(err){
+      log.error(err);
+    }
+    question.remove(function(error){
+      if(error){
+        log.error(error);
+      }
+      req.session.message = "Question remove successfully.";
+      res.redirect("/course_editor/lesson/" + lesson.id);
+    });
   });
 };
 

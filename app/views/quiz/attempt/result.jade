@@ -1,8 +1,25 @@
 .container
-	h1 Congratulations !!!
-	hr
-	h3 Dear #{userName},
-	h4 You successfully completed the quiz and your result is 	
-		- var per = Math.round((assessment.score * 100 / quiz.mark)*100)/100;
-		code(style="padding:8px;") #{per}%  (Marks : #{assessment.score}/#{quiz.mark})
-	hr
+  include ../../_breadcrumb
+  .container-fluid.course-index.inner-index
+    
+    .row-fluid
+      .span9
+        h1 Congratulations !!!
+        hr
+        h3 Dear #{userName},
+        h4 You successfully completed the quiz and your result is   
+            - var per = Math.round((assessment.score * 100 / quiz.marks)*100)/100;
+            code(style="padding:8px;") #{per}%  (Marks : #{assessment.score}/#{quiz.marks})
+        br
+        hr
+        .lessonBar
+          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+
+      .span3
+        include ../../lessons/_sidebar
+    .row-fluid
+      p
+    .row-fluid
+      .span9
+        include ../../lessons/_footer

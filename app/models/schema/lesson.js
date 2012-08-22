@@ -12,7 +12,7 @@ var LessonSchema = module.exports = new Schema({
     type: { type: String, enum: ['youtube', 'upload'] }
   },
   quiz: { 
-    questions : [ OptionSchema ],
+    marks : { type: Number }
   },
   programming:{
     language: { type: String, trim: true },

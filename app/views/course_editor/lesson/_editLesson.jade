@@ -26,37 +26,8 @@
 - else if(lesson.type == 'quiz')
   h3 Quiz
   br
-  div#questionBox
-    - var questionNo = 0;
-    each questionContent,questionIndex in lesson.quiz.questions
-      div.addedQuestion
-        p Question #{questionIndex}:
-        input.question(type="text", value="#{questionContent.question}", name="question[#{questionIndex}]")
-        br
-        div.options
-          p Options
-          - var optionnameIndex = 0;
-          each option,optionIndex in answersJSON[questionIndex]
-            div.addedOption
-              - if(option)
-                input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]", checked)
-              - else
-                input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
-              input.questionOption(type="text", value="#{optionIndex}", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
-              - optionnameIndex = optionnameIndex + 1;
-          div.addedOption
-            input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
-            input.questionOption(type="text", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
-      - questionNo = questionNo + 1;
-    div.addedQuestion
-      p Question #{questionNo}:
-      input.question(type="text", name="question[#{questionNo}]")
-      br
-      div.options
-        p Options
-        div.addedOption
-          input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionNo}][0]")
-          input.questionOption(type="text", name="questionOption[#{questionNo}][0]")
+  p Marks
+  input(name="marks", value="#{lesson.quiz.marks}")    
 
 - else if(lesson.type == 'programming')
   p Programming :

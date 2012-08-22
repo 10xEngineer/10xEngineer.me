@@ -21,13 +21,6 @@ module.exports.showView = function(req, res) {
   var videoStartTime = 0;
   var progressFlag = false;
 
-  var quizQuestions = lesson.quiz.questions;
-  var quizQuestionsLength = lesson.quiz.questions.length;
-
-  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
-    randomOption(quizQuestions[questionsIndex].options);
-  }  
-  
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
     if(error) {
@@ -63,6 +56,27 @@ module.exports.showView = function(req, res) {
         }
         
         progressFlag = true;
+        if(lesson.type == "quiz"){
+          res.redirect('/assessment/quiz/'+lesson.id+"/start");
+        } else {
+          Lesson.find({}, function(error, allLessons) {
+            res.render('lessons/' + lesson.type, {
+              title: lesson.title,
+              quiz: lesson.quiz,
+              videoStartTime: videoStartTime,
+              allLessons: allLessons,
+              userId: req.user._id,
+              progressFlag : progressFlag
+            });
+          });
+        }
+      });
+
+    } else {
+      progressFlag = true;
+      if(lesson.type == "quiz"){
+        res.redirect('/assessment/quiz/'+lesson.id+"/start");
+      } else {
         Lesson.find({}, function(error, allLessons) {
           res.render('lessons/' + lesson.type, {
             title: lesson.title,
@@ -73,23 +87,7 @@ module.exports.showView = function(req, res) {
             progressFlag : progressFlag
           });
         });
-        
-
-      });
-
-    } else {
-
-      Lesson.find({}, function(error, allLessons) {
-        res.render('lessons/' + lesson.type, {
-          title: lesson.title,
-          quiz: lesson.quiz,
-          videoStartTime: videoStartTime,
-          allLessons: allLessons,
-          userId: req.user._id,
-          progressFlag : progressFlag
-        });
-      });
-
+      }
     }
   });
 };

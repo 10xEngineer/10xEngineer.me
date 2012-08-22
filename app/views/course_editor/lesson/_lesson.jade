@@ -40,7 +40,10 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
       #quiz.tab-pane
         h3 Quiz
         br
-        div#questionBox
+        label(for="marks") Marks:
+        input#marks.required( name='marks')
+
+        //  div#questionBox
 
       #programming.tab-pane
         h3 Programming

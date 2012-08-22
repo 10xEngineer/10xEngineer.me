@@ -116,22 +116,23 @@ module.exports.view = function(req, res) {
   });
 };
 
-// Quiz Start
+// Quiz Start :: 
 module.exports.startQuiz = function(req, res) {
   var Assessment = model.Assessment;
   var Question = model.Question;
-  var quiz = req.quiz;
-  var quizId = quiz._id;
+  var lesson = req.lesson;
+  var quiz = req.lesson.quiz;
+  var lessonId = lesson._id;
 
   if(req.session.currQuestion) {
     delete req.session.currQuestion;
   }
    
-  generateQuestionPaper(quiz, function(error, questionPaper){
+  generateQuestionPaper(lesson, function(error, questionPaper){
 
     questionPaper = util.randomizeArray(questionPaper); 
     var assessment = new Assessment();
-    assessment.quiz = quiz;
+    assessment.quiz = lesson;
     assessment.user = req.user._id;
     assessment.score = 0;
     assessment.attemptedDetails = questionPaper;
@@ -141,14 +142,15 @@ module.exports.startQuiz = function(req, res) {
         res.redirect('/assessment/quiz');
       }
       req.session.assessment = assessment;
-      res.redirect("/assessment/quiz/"+req.quiz.id+"/1");
+      res.redirect("/assessment/quiz/"+lesson.id+"/1");
     });
   });
 };
 
-var generateQuestionPaper = function(quiz, callback) {
+// 
+var generateQuestionPaper = function(lesson, callback) {
   
-  var mark = quiz.mark;
+  var mark = lesson.quiz.mark;
   // Todo : All logic is remaining  :p
   var questionPaper = [];
   var easyWeight = mark * 0.4;
@@ -162,7 +164,7 @@ var generateQuestionPaper = function(quiz, callback) {
   var noOfCollectedQuestions = 0;
 
   var difficulty = 3;
-  getQuestions(quiz, noOfHardQuestions, difficulty, function(error, hardQuestions){
+  getQuestions(lesson._id, noOfHardQuestions, difficulty, function(error, hardQuestions){
     if(error){
       callback(error);
     }
@@ -171,7 +173,7 @@ var generateQuestionPaper = function(quiz, callback) {
     difficulty = 2;
     noOfMidQuestions = parseInt(midWeight/difficulty);
     questionPaper = questionPaper.concat(hardQuestions);
-    getQuestions(quiz, noOfMidQuestions, difficulty, function(error, midQuestions){
+    getQuestions(lesson._id, noOfMidQuestions, difficulty, function(error, midQuestions){
       if(error){
         callback(error);
       }
@@ -180,7 +182,7 @@ var generateQuestionPaper = function(quiz, callback) {
       difficulty = 1;
       noOfEasyQuestions = parseInt(easyWeight/difficulty);
       questionPaper = questionPaper.concat(midQuestions);
-      getQuestions(quiz, noOfEasyQuestions, difficulty, function(error, easyQuestions){
+      getQuestions(lesson._id, noOfEasyQuestions, difficulty, function(error, easyQuestions){
         if(error){
           callback(error);
         }
@@ -194,7 +196,8 @@ var generateQuestionPaper = function(quiz, callback) {
 
 }
 
-var getQuestions = function(quiz, neededQuestions, difficulty, callback) {
+// 
+var getQuestions = function(lesson_id, Questions, difficulty, callback) {
   
   // Difine variables 
   var Question = model.Question;
@@ -207,9 +210,9 @@ var getQuestions = function(quiz, neededQuestions, difficulty, callback) {
   random[direction] = rand;
   
   // find random questions
-  Question.find({difficulty : difficulty, random : random }, { _id : 1})
+  Question.find({difficulty : difficulty, random : random, lesson: lesson_id }, { _id : 1})
     .sort('random', order )
-    .limit(neededQuestions)
+    .limit(Questions)
     .exec(function(error, questions){
     if(error) {
       log.error(error);
@@ -222,7 +225,7 @@ var getQuestions = function(quiz, neededQuestions, difficulty, callback) {
       resultQuestionsSet.push(sampleQuestion);
     }
 
-    if ( collectedQuestions < neededQuestions ) {
+    if ( collectedQuestions < Questions ) {
       // Need more questions
       direction = (direction=='$gte') ? '$lt': '$gte';
       order = direction == '$lt' ? 1 : -1;
@@ -231,7 +234,7 @@ var getQuestions = function(quiz, neededQuestions, difficulty, callback) {
       Question
       .find({difficulty : difficulty, random : random }, { _id : 1})
       .sort('random', order)
-      .limit(neededQuestions - collectedQuestions)
+      .limit(Questions - collectedQuestions)
       .exec(function(error, questions){
         if(error) {
           log.error(error);
@@ -251,8 +254,9 @@ var getQuestions = function(quiz, neededQuestions, difficulty, callback) {
   });
 }
 
-// Question View
+// Question View :: 
 module.exports.viewQuestion = function(req, res) {
+
   var Question = model.Question;
   var questionIndex = req.questionIndex;
   var assessment = req.session.assessment;
@@ -267,7 +271,7 @@ module.exports.viewQuestion = function(req, res) {
 
   if(questionIndex>currQuestion || questionIndex<0) {
     req.session.error = "You are not permit to move at that question";
-    return res.redirect('/assessment/quiz/'+req.quiz.id+"/"+(parseInt(currQuestion)+1));
+    return res.redirect('/assessment/quiz/'+req.lesson.id+"/"+(parseInt(currQuestion)+1));
   }
 
   Question.findOne({ _id: attemptedDetails[questionIndex].question}, function(error, question) {
@@ -289,20 +293,26 @@ module.exports.viewQuestion = function(req, res) {
     var length = question.choices.length;
     var controls = {
       finish: finish,
-      quizId: req.quiz.id,
+      lessonId: req.lesson.id,
       displayedQuestionIndex: questionIndex,
       currQuestionIndex: currQuestion
     };
+    var Lesson = model.Lesson;
     question.choices = util.randomizeArray(question.choices);
-    res.render('quiz/attempt/question', {
-      title : req.quiz.title,
-      question: question, 
-      givenAns: givenAns,
-      controls: controls
+    Lesson.find({}, function(error, allLessons) {
+      res.render('quiz/attempt/question', {
+        title : req.lesson.title,
+        course: req.course,
+        allLessons: allLessons,
+        question: question, 
+        givenAns: givenAns,
+        controls: controls
+      });
     });
   });
 };
 
+// 
 module.exports.submitQuestion = function(req, res) {
   var Assessment = model.Assessment;
   var assessment = req.session.assessment;
@@ -328,7 +338,7 @@ module.exports.submitQuestion = function(req, res) {
   Question.findOne({ _id: assessment.attemptedDetails[currQuestion].question}, function(error, fullQuestion){
     if(error){
       log.error(error);
-      return res.redirect('/assessment/quiz/'+req.quiz.id+'/'+currQuestion);
+      return res.redirect('/assessment/quiz/'+req.lesson.id+'/'+currQuestion);
     }
     var quiz = util.compareArray(ans, fullQuestion.answers);
     if(quiz){
@@ -344,33 +354,38 @@ module.exports.submitQuestion = function(req, res) {
       assessment.save(function(error) {
         if(error){
           log.error(error);
-          res.redirect('/assessment/quiz/'+req.quiz.id+'/'+(parseInt(currQuestion)+1));
+          res.redirect('/assessment/quiz/'+req.lesson.id+'/'+(parseInt(currQuestion)+1));
         }
         currQuestion += 1;
         if(assessment.attemptedDetails.length == currQuestion){
           delete req.session.currQuestion;
-          res.redirect('/assessment/quiz/'+req.quiz.id+'/finish');
+          res.redirect('/assessment/quiz/'+req.lesson.id+'/finish');
         } else {
           req.session.currQuestion = currQuestion;
           req.session.assessment = assessment;
-          res.redirect('/assessment/quiz/'+req.quiz.id+'/'+(parseInt(currQuestion)+1));
+          res.redirect('/assessment/quiz/'+req.lesson.id+'/'+(parseInt(currQuestion)+1));
         }
       });
     });
   });
 };
 
+// 
 module.exports.quizResult = function(req, res) {
   var Assessment = model.Assessment;
-  var quiz = req.quiz;
+  var Lesson = model.Lesson;
+  var quiz = req.lesson.quiz;
   var user = req.user;
   var assessment = req.session.assessment;
   delete req.session.currQuestion;
   Assessment.findOne({ id: assessment.id }, function(error, assessment){
-    res.render('quiz/attempt/result', {
-      assessment: assessment,
-      userName: user.name,
-      quiz: quiz
+    Lesson.find({}, function(error, allLessons) {
+      res.render('quiz/attempt/result', {
+        assessment: assessment,
+        allLessons: allLessons,
+        userName: user.name,
+        quiz: quiz
+      });
     });
   }); 
 };
