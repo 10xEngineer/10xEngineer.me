@@ -372,20 +372,45 @@ module.exports.submitQuestion = function(req, res) {
 
 // 
 module.exports.quizResult = function(req, res) {
+  var Progress = model.Progress;
   var Assessment = model.Assessment;
   var Lesson = model.Lesson;
   var quiz = req.lesson.quiz;
+  var lesson = req.lesson;
   var user = req.user;
   var assessment = req.session.assessment;
   delete req.session.currQuestion;
   Assessment.findOne({ id: assessment.id }, function(error, assessment){
-    Lesson.find({}, function(error, allLessons) {
-      res.render('quiz/attempt/result', {
-        assessment: assessment,
-        allLessons: allLessons,
-        userName: user.name,
-        quiz: quiz
-      });
+    Progress.getProgress(req.user, req.course, function(error, progress) {
+      if(error) {
+        log.error(error);
+      }
+      if(progress.status != 'completed') {
+        // Start the Lesson : Change status of lesson to 'ongoing'
+        progress.completeLesson(lesson, function(error) {
+          if(error) {
+            log.error(error);
+          }
+
+          Lesson.find({}, function(error, allLessons) {
+            res.render('quiz/attempt/result', {
+              assessment: assessment,
+              allLessons: allLessons,
+              userName: user.name,
+              quiz: quiz
+            });
+          });
+        });
+      } else {
+        Lesson.find({}, function(error, allLessons) {
+          res.render('quiz/attempt/result', {
+            assessment: assessment,
+            allLessons: allLessons,
+            userName: user.name,
+            quiz: quiz
+          });
+        });
+      }
     });
   }); 
 };
