@@ -29,6 +29,24 @@ module.exports = function(config) {
     rest: true
   };
 
+  // Custom parser to ignore parsing vfs requests
+  var bodyParser = function(req, res, next) {
+    var parser = express.bodyParser({uploadDir: tmpFileUploadDir, keepExtensions: true });
+    if(req.url.indexOf('/fs') == 0) {
+      var content = '', onData, onEnd;
+      req.on('data', onData = function(data) {
+        content += data;
+      });
+      req.on('end', onEnd = function() {
+        req.removeListener('data', onData);
+        req.removeListener('end', onEnd);
+        req.content = content;
+        next();
+      })
+    } else {
+      parser(req, res, next);
+    }
+  };
 
   // Express Middleware config
   app.configure(function(){
@@ -38,14 +56,14 @@ module.exports = function(config) {
 
     // CSS Preprocessing with stylus
     app.use(stylus.middleware({ src: __dirname + '/public' }));
-    
+
     // Set app-level config in express
     app.set('appRoot', appRoot);
     app.set('tmpDir', tmpFileUploadDir);
     app.set('config', config);
 
     // Body parser
-    app.use(express.bodyParser({uploadDir: tmpFileUploadDir, keepExtensions: true }));
+    app.use(bodyParser);
     app.use(express.methodOverride());
 
     // Cookies and session

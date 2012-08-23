@@ -14,7 +14,7 @@ var UndoManager = require("ace/undomanager").UndoManager;
 var HashHandler = require("ace/keyboard/hash_handler").HashHandler;
 
 var Renderer = require("ace/virtual_renderer").VirtualRenderer;
-var Editor = require("ace/editor").Editor;
+var AceEditor = require("ace/editor").Editor;
 var MultiSelect = require("ace/multi_select").MultiSelect;
 
 // workers do not work for file:
@@ -108,23 +108,205 @@ if (window.require && window.require.s) try {
 } catch(e) {}
 
 
-Editor.prototype.tabs = {};
+function Editor(options) {
+  var self = this;
+  this.options = options;
+  this.tabs = {};
+  this.blankSession = new EditSession('');
 
-Editor.prototype.loadMode = function(value) {
-  env.editor.getSession().setMode(modesByName[value].mode || modesByName.text.mode);
-  env.editor.getSession().modeName = value;
-};
+  var el = $(options.editor).get(0);
 
-Editor.prototype.loadContent = function(path) {
+  // TODO: Dragdrop over editor window
+  $(el).on('dragover', function(e) {
+    return event.preventDefault(e);
+  });
+
+  $(el).on('drop', function(e) {
+    // TODO: Implement
+    return event.preventDefault(e);
+  });
+
+  // Initialize renderer
+  var renderer = new Renderer(el);
+  renderer.scrollBar.element.style.display = "none";
+  renderer.scrollBar.width = 0;
+  renderer.content.style.height = "auto";
+
+  renderer.screenToTextCoordinates = function(x, y) {
+    var pos = this.pixelToScreenCoordinates(x, y);
+    return this.session.screenToDocumentPosition(
+      Math.min(this.session.getScreenLength() - 1, Math.max(pos.row, 0)),
+      Math.max(pos.column, 0)
+    );
+  };
+
+  // todo size change event
+  renderer.$computeLayerConfig = function() {
+    var longestLine = this.$getLongestLine();
+    var lastRow = this.session.getLength();
+    var height = this.session.getScreenLength() * this.lineHeight;
+
+    this.scrollTop = 0;
+    var config = this.layerConfig;
+    config.width = longestLine;
+    config.padding = this.$padding;
+    config.firstRow = 0;
+    config.firstRowScreen = 0;
+    config.lastRow = lastRow;
+    config.lineHeight = this.lineHeight;
+    config.characterWidth = this.characterWidth;
+    config.minHeight = height;
+    config.maxHeight = height;
+    config.offset = 0;
+    config.height = height;
+
+    this.$gutterLayer.element.style.marginTop = 0 + "px";
+    this.content.style.marginTop = 0 + "px";
+    this.content.style.width = longestLine + 2 * this.$padding + "px";
+    this.content.style.height = height + "px";
+    this.scroller.style.height = height + "px";
+    this.container.style.height = height + "px";
+  };
+
+  var ace = new AceEditor(renderer);
+  new MultiSelect(ace);
+  ace.setSession(this.blankSession);
+  ace.setKeyboardHandler(null);
+  ace.setAnimatedScroll(true);
+  ace.setReadOnly(true);
+
+  ace.commands.addCommand({
+      name: "save",
+      bindKey: {win: "Ctrl-S", mac: "Command-S"},
+      exec: function(e) {
+        self.saveFile();
+      }
+  });
+
+  // Assign ace editor
+  this.ace = ace;
+
+
+  this.vfs = options.vfs;
+
+  // TODO: fix
+  var json = {};
+  this.tree = new FileTree($(options.tree), json);
+
+  // Create context menu
+  $.contextMenu({
+    selector: '.directory, .file',
+    callback: function(key, options) {
+      switch(key) {
+        case 'newFile':
+          self.tree.create(this, 'file');
+          break;
+        case 'newDir':
+          self.tree.create(this, 'directory');
+          break;
+        case 'rename':
+          self.tree.rename(this);
+          break;
+        case 'remove':
+          self.tree.remove(this);
+          break;
+      }
+    },
+    items: {
+      newFile: { name: 'New File' },
+      newDir: { name: 'New Directory' },
+      rename: { name: 'Rename' },
+      remove: { name: 'Remove' }
+    }
+  });
+
+
+  // Bind events to fileTree
+  this.tree.on('create', function(name, path, type) {
+    if((type=='file')){
+      self.vfs.newFile(name, path, function(err){
+        cosole.log("Get Call back of file creation at VFS.");
+        if(err){
+          console.log("Error in "+type+" creation.");
+        } else {
+          console.log(type+" has been created successfully.");
+        }
+      });
+    } else {
+      self.vfs.newDir(name, path, function(err){
+        if(err){
+          console.log("Error in "+type+" creation.");
+        }
+        else{
+          console.log(type+" has been created successfully.");
+        }
+      });
+    }
+  });
+
+  this.tree.on('openTab', function(path){
+    console.log("Testing of catch event"+path);
+  });
+
+  // RENAME EVENT
+  this.tree.on('rename', function(newName, oldName){
+    self.vfs.rename(newName, oldName, function(){
+      console.log("Test Callback");
+    });
+  });
+
+  // REMOVE EVENT
+  this.tree.on('remove', function(path){
+    console.log(path);
+    if(/\/$/.test(path)){
+      self.vfs.removeDir(path, function(error) {
+        if(!error) {
+          caller.remove();
+        }
+      });
+    } else {
+      self.vfs.removeFile(path, function(error) {
+        if(!error) {
+          caller.remove();
+        }
+      });
+    }
+  });
+
+  this.tree.on('openFile', function(path) {
+    self.openTab(path);
+  });
+
+  // Load the root directory
+  this.vfs.readDir('/', function(json) {
+    self.tree.refresh(json);
+  });
+}
+
+Editor.prototype = new EventEmitter2({
+  wildcard: true,
+  delimiter: '::',
+  maxListeners: 20
+});
+
+
+// Tab related functions
+
+Editor.prototype.openTab = function(path) {
+  var self = this;
+  // TODO: Extract actual name
+  var name = path;
+
   var self = this;
   var doc = this.tabs[path] || {};
 
-  if (doc.session)
-    return self.setSession(doc.session);
+  if (doc.session) {
+    return self.ace.setSession(doc.session);
+  }
 
   //@todo do something while waiting
   // env.editor.setSession(emptySession || (emptySession = new EditSession("")))
-  window.vfs.readFile(path, function(content) {
+  self.vfs.readFile(path, function(content) {
     var session = new EditSession(content);
     session.setUndoManager(new UndoManager());
     doc.session = session;
@@ -132,11 +314,100 @@ Editor.prototype.loadContent = function(path) {
     var mode = getModeFromPath(path);
     session.modeName = mode.name;
     session.setMode(mode.mode);
-    self.setSession(session);
-    self.focus();
+    self.ace.setSession(session);
+    self.ace.focus();
 
+    var $close = $('<i/>', {
+      class: 'icon-remove closeTab',
+      style: 'opacity: 0.18; z-index: 10;'
+    });
+
+    $close.click(function(e){
+      // TODO: Pass path
+      self.closeTab($(this).parent());
+      if (!e)
+        e = window.event;
+      //IE9 & Other Browsers
+      if (e.stopPropagation) {
+        e.stopPropagation();
+      }
+      //IE8 and Lower
+      else {
+        e.cancelBubble = true;
+      }
+    });
+
+    var $link = $('<a/>',{
+      href: "#", 
+      'data-toggle': "tab",
+      rel : path,
+      html: name
+    }).append($close);
+    $link.click(function(){
+      self.openTab($(this).attr('rel'));
+    });
+
+    var $tab = $('<li/>').append($link);
+    $tab.appendTo($(self.options.tab));
+
+    doc.html = $tab.get(0);
+
+    // Save the open tab in memory
     self.tabs[path] = doc;
+
+    self.markTabActive($tab);
   });
+};
+
+Editor.prototype.closeTab = function(path) {
+  // Mark the editor readonly
+  this.ace.setReadOnly(true);
+};
+
+Editor.prototype.markTabActive = function(element) {
+  if(typeof(element) === 'string') {
+    // Assume it's a path
+    element = this.tabs[element];
+  } else {
+    element = this.tabs[$(element).children('a').attr('rel')];
+  }
+
+  $(this.options.tab).find('.active').removeClass('active');
+
+  $(element.html).addClass('active');
+
+  this.active = element.path;
+
+  // Mark the editor editable
+  this.ace.setReadOnly(false);
+}
+
+
+// File related functions
+Editor.prototype.saveFile = function() {
+  console.log(this);
+  if(!this.active) {
+    return console.log('No active tabs');
+  }
+
+  var content = this.getContent();
+  console.log(content);
+
+  this.vfs.saveFile(this.active, content, function() {
+    console.log('saved');
+  });
+
+  this.emit('saved');
+  return false;
+};
+
+Editor.prototype.loadMode = function(value) {
+  this.ace.getSession().setMode(modesByName[value].mode || modesByName.java.mode);
+  this.ace.getSession().modeName = value;
+};
+
+Editor.prototype.getContent = function() {
+  return this.ace.getSession().getValue();
 };
 
 var consoleHight = 20;
@@ -148,70 +419,3 @@ Editor.prototype.onResize = function() {
   this.resize();
 };
 
-
-if(jQuery) (function($){
-  
-  $.extend($.fn, {
-    editor: function(options) {
-      var el = $(this).get(0);
-
-      $(this).on('dragover', function(e) {
-        return event.preventDefault(e);
-      });
-
-      $(this).on('drop', function(e) {
-        // TODO: Implement
-        return event.preventDefault(e);
-      });
-
-      var renderer = new Renderer(el);
-      renderer.scrollBar.element.style.display = "none";
-      renderer.scrollBar.width = 0;
-      renderer.content.style.height = "auto";
-
-      renderer.screenToTextCoordinates = function(x, y) {
-        var pos = this.pixelToScreenCoordinates(x, y);
-        return this.session.screenToDocumentPosition(
-          Math.min(this.session.getScreenLength() - 1, Math.max(pos.row, 0)),
-          Math.max(pos.column, 0)
-        );
-      };
-
-      // todo size change event
-      renderer.$computeLayerConfig = function() {
-        var longestLine = this.$getLongestLine();
-        var lastRow = this.session.getLength();
-        var height = this.session.getScreenLength() * this.lineHeight;
-
-        this.scrollTop = 0;
-        var config = this.layerConfig;
-        config.width = longestLine;
-        config.padding = this.$padding;
-        config.firstRow = 0;
-        config.firstRowScreen = 0;
-        config.lastRow = lastRow;
-        config.lineHeight = this.lineHeight;
-        config.characterWidth = this.characterWidth;
-        config.minHeight = height;
-        config.maxHeight = height;
-        config.offset = 0;
-        config.height = height;
-
-        this.$gutterLayer.element.style.marginTop = 0 + "px";
-        this.content.style.marginTop = 0 + "px";
-        this.content.style.width = longestLine + 2 * this.$padding + "px";
-        this.content.style.height = height + "px";
-        this.scroller.style.height = height + "px";
-        this.container.style.height = height + "px";
-      };
-
-      var editor = new Editor(renderer);
-      new MultiSelect(editor);
-      editor.session.setUndoManager(new UndoManager());
-      editor.setAnimatedScroll(true);
-
-      return editor;
-    }
-  });
-
-})(jQuery);

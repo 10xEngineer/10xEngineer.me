@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 var model = require('../models');
 
