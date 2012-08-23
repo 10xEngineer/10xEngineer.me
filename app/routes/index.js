@@ -74,7 +74,7 @@ module.exports = function(app) {
   });
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','quizId','questionId', 'programmingId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','assessmentId','questionId', 'programmingId'], function(req, res, next, num, name){ 
     var parsedNum = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('Invalid route: ' + num));
@@ -167,7 +167,7 @@ module.exports = function(app) {
   app.get('/lesson/serverInfo', lesson.serverInfo);
 
   app.get('/lesson/:lessonId', verifyPermission('course', 'read'), lesson.showView);
-  app.post('/lesson/:lessonId', verifyPermission('course', 'read'), lesson.show);
+  //app.post('/lesson/:lessonId', verifyPermission('course', 'read'), lesson.show);
   app.get('/lesson/:lessonId/next', verifyPermission('course', 'read'),lesson.next);
   app.get('/lesson/:lessonId/previous', verifyPermission('course', 'read'), lesson.previous);
   app.get('/lesson/:lessonId/complete', verifyPermission('course', 'read'), lesson.complete);
@@ -212,6 +212,10 @@ module.exports = function(app) {
   app.get('/assessment/quiz', verifyPermission('admin', 'read'), quiz.quizList);
   app.get('/assessment/quiz/create', verifyPermission('admin', 'edit'), quiz.createView);
   app.post('/assessment/quiz/create', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.createQuiz), quiz.create);
+  app.get('/assessment/quiz/examin', verifyPermission('admin', 'edit'), quiz.examin);
+  app.get('/assessment/quiz/examin/:assessmentId/start', verifyPermission('admin', 'edit'), quiz.startExamin);
+  app.get('/assessment/quiz/examin/:assessmentId/:questionIndex', verifyPermission('admin', 'edit'), quiz.showQuestionToExaminer);
+  app.post('/assessment/quiz/examin/:assessmentId/:questionIndex', verifyPermission('admin', 'edit'), quiz.submitAssessmentMarks);
   app.get('/assessment/quiz/:lessonId', verifyPermission('admin', 'read'), quiz.view);
   app.get('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), quiz.editView);
   app.post('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
@@ -220,7 +224,6 @@ module.exports = function(app) {
   app.get('/assessment/quiz/:lessonId/finish', verifyPermission('admin', 'read'), quiz.quizResult);
   app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), quiz.viewQuestion);
   app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), quiz.submitQuestion);
-
   app.get('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), question.createView);
   app.post('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.create);
   app.get('/assessment/question/import/:lessonId', verifyPermission('admin', 'edit'), question.importQuestionView);

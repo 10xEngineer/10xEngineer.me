@@ -94,7 +94,7 @@ module.exports.editView = function(req, res) {
 
 module.exports.edit= function(req, res) {
   var question = req.question;
-  question.quiz = req.quiz._id;
+  question.lesson = req.lesson._id;
   question.question = req.body.question;
   question.weightage = req.body.weightage;
   question.difficulty = req.body.difficulty;

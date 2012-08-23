@@ -118,11 +118,11 @@ module.exports.view = function(req, res) {
 
 // Quiz Start :: 
 module.exports.startQuiz = function(req, res) {
-  var Assessment = model.Assessment;
-  var Question = model.Question;
-  var lesson = req.lesson;
-  var quiz = req.lesson.quiz;
-  var lessonId = lesson._id;
+  var Assessment  = model.Assessment;
+  var Question    = model.Question;
+  var lesson      = req.lesson;
+  var quiz        = req.lesson.quiz;
+  var lessonId    = lesson._id;
 
   if(req.session.currQuestion) {
     delete req.session.currQuestion;
@@ -130,18 +130,23 @@ module.exports.startQuiz = function(req, res) {
    
   generateQuestionPaper(lesson, function(error, questionPaper){
 
-    questionPaper = util.randomizeArray(questionPaper); 
-    var assessment = new Assessment();
-    assessment.quiz = lesson;
-    assessment.user = req.user._id;
-    assessment.score = 0;
+    questionPaper               = util.randomizeArray(questionPaper); 
+    var assessment              = new Assessment();
+    assessment.lesson.id        = lessonId;
+    assessment.lesson.title     = lesson.title;
+    assessment.lesson.marks     = lesson.quiz.marks;
+    assessment.user.id          = req.user._id;
+    assessment.user.name        = req.user.name;
+    assessment.score            = 0;
     assessment.attemptedDetails = questionPaper;
     assessment.save(function(error){
       if(error){
         log.error(error);
         res.redirect('/assessment/quiz');
       }
-      req.session.assessment = assessment;
+      req.session.assessment   = assessment;
+      req.session.currQuestion = 0;
+
       res.redirect("/assessment/quiz/"+lesson.id+"/1");
     });
   });
@@ -152,10 +157,10 @@ var generateQuestionPaper = function(lesson, callback) {
   
   var mark = lesson.quiz.mark;
   // Todo : All logic is remaining  :p
-  var questionPaper = [];
-  var easyWeight = mark * 0.4;
-  var midWeight  = mark * 0.4;
-  var hardWeight = mark * 0.2;
+  var questionPaper     = [];
+  var easyWeight        = mark * 0.4;
+  var midWeight         = mark * 0.4;
+  var hardWeight        = mark * 0.2;
   var noOfHardQuestions = parseInt(hardWeight/3);
   var noOfMidQuestions;
   var noOfEasyQuestions;
@@ -200,12 +205,12 @@ var generateQuestionPaper = function(lesson, callback) {
 var getQuestions = function(lesson_id, Questions, difficulty, callback) {
   
   // Difine variables 
-  var Question = model.Question;
-  var direction = (rand>0.5) ? '$gte': '$lt' ;
-  var order = direction == '$lt' ? 1 : -1;
-  var rand = Math.random();
-  var random = {};
-  var resultQuestionsSet = [];
+  var Question            = model.Question;
+  var direction           = (rand>0.5) ? '$gte': '$lt' ;
+  var order               = direction == '$lt' ? 1 : -1;
+  var rand                = Math.random();
+  var random              = {};
+  var resultQuestionsSet  = [];
 
   random[direction] = rand;
   
@@ -257,17 +262,12 @@ var getQuestions = function(lesson_id, Questions, difficulty, callback) {
 // Question View :: 
 module.exports.viewQuestion = function(req, res) {
 
-  var Question = model.Question;
-  var questionIndex = req.questionIndex;
-  var assessment = req.session.assessment;
-  var attemptedDetails = assessment.attemptedDetails;
-  // Collect answers and update it into database as well as session assessment
-  // find next question and render that answer
-  if(!req.session.currQuestion) {
-    var currQuestion = req.session.currQuestion = 0;
-  } else {
-    var currQuestion = req.session.currQuestion;
-  }
+  var Question          = model.Question;
+  var questionIndex     = req.questionIndex;
+  var assessment        = req.session.assessment;
+  var attemptedDetails  = assessment.attemptedDetails;
+
+  var currQuestion = req.session.currQuestion;
 
   if(questionIndex>currQuestion || questionIndex<0) {
     req.session.error = "You are not permit to move at that question";
@@ -283,7 +283,6 @@ module.exports.viewQuestion = function(req, res) {
     if(attemptedDetails.length == currQuestion+1) {
       finish = true;
     }
-
 
     var givenAns ;
     if(attemptedDetails[questionIndex].givenAns) givenAns = attemptedDetails[questionIndex].givenAns;
@@ -314,13 +313,14 @@ module.exports.viewQuestion = function(req, res) {
 
 // 
 module.exports.submitQuestion = function(req, res) {
-  var Assessment = model.Assessment;
-  var assessment = req.session.assessment;
-  var currQuestion = req.session.currQuestion;
-  var options = req.body.questionOption;
-  var length = options.length;
-  var gotMarks = 0;
-  var ans = [];
+  var Assessment    = model.Assessment;
+  var assessment    = req.session.assessment;
+  var currQuestion  = req.session.currQuestion;
+  var options       = req.body.questionOption;
+  var length        = options.length;
+  var gotMarks      = 0;
+  var ans           = [];
+  var status        = 'attempted';
 
   // Collect answers given by user
   if(typeof(options)=='object'){
@@ -340,15 +340,16 @@ module.exports.submitQuestion = function(req, res) {
       log.error(error);
       return res.redirect('/assessment/quiz/'+req.lesson.id+'/'+currQuestion);
     }
-    var quiz = util.compareArray(ans, fullQuestion.answers);
-    if(quiz){
+    if(fullQuestion.choices.length>1 && util.compareArray(ans, fullQuestion.answers)){
       gotMarks = fullQuestion.weightage.toString();
+      status   = 'assessed';
     }
-
+    log.info(req.session.assessedQust);
     // Saving assessment  into database
     Assessment.findOne({ id: assessment.id }, function(error, assessment) {
       assessment.attemptedDetails[currQuestion]['givenAns'] = ans;
       assessment.attemptedDetails[currQuestion]['gotMarks'] = gotMarks;
+      assessment.attemptedDetails[currQuestion]['status'] = status;
       assessment.score += parseInt(gotMarks);
       assessment.markModified('attemptedDetails');
       assessment.save(function(error) {
@@ -381,7 +382,25 @@ module.exports.quizResult = function(req, res) {
   var assessment = req.session.assessment;
   delete req.session.currQuestion;
   Assessment.findOne({ id: assessment.id }, function(error, assessment){
-    Progress.getProgress(req.user, req.course, function(error, progress) {
+    var details = assessment.attemptedDetails;
+    var assessed = true;
+    for (var index = 0; index < details.length; index++) {
+      if(details[index].status != 'assessed'){
+        assessed = false;
+        break;
+      };
+    };
+    console.log(assessed)
+    if(assessed) {
+      assessment.status = 'assessed';
+      assessment.save(function(err){
+        if(err){
+          console.log(err);
+        }
+        console.log("Seved successfully");
+      });
+    }
+    Progress.getProgress(user, req.course, function(error, progress) {
       if(error) {
         log.error(error);
       }
@@ -391,26 +410,96 @@ module.exports.quizResult = function(req, res) {
           if(error) {
             log.error(error);
           }
-
-          Lesson.find({}, function(error, allLessons) {
-            res.render('quiz/attempt/result', {
-              assessment: assessment,
-              allLessons: allLessons,
-              userName: user.name,
-              quiz: quiz
-            });
-          });
-        });
-      } else {
-        Lesson.find({}, function(error, allLessons) {
-          res.render('quiz/attempt/result', {
-            assessment: assessment,
-            allLessons: allLessons,
-            userName: user.name,
-            quiz: quiz
-          });
         });
       }
     });
+    res.redirect('/lesson/'+lesson.id);
   }); 
 };
+
+module.exports.examin = function(req, res) {
+  var Assessment = model.Assessment;
+  Assessment.find({status: 'inProgress'}, function(err, assessments){
+    res.render('quiz/examiner/quizList', {
+      assessments : assessments
+    });
+  });
+};
+
+module.exports.startExamin = function(req, res) {
+  var Question = model.Question;
+  var assessment = req.assessment;
+  req.session.currQuestion = 0;
+
+  var questionList = [];
+  var attemptedDetails = assessment.attemptedDetails;
+  for(var i = 0; i < attemptedDetails.length; i++){
+    questionList.push(attemptedDetails[i].question);
+  };
+
+  Question.find({ _id: { $in: questionList}}, function(err, fullQuestionList){
+    
+    for(var i = 0; i < fullQuestionList.length; i++){
+      if(fullQuestionList[i].choices.length == 1) {
+        continue;
+      } else {
+        fullQuestionList.splice(i,1);
+        i--;
+      }
+    };
+    req.session.essayQuestionList = fullQuestionList;
+    req.session.currQuestion      = 0;
+    res.redirect('/assessment/quiz/examin/'+req.assessment.id+'/1');
+  });
+};
+
+module.exports.showQuestionToExaminer = function(req, res) {
+  var Question          = model.Question;
+  var assessment        = req.assessment;
+  var currQuestion      = req.questionIndex;
+  var attemptedDetails  = assessment.attemptedDetails;
+  var length            = attemptedDetails.length;
+  console.log(currQuestion);
+  var question          = req.session.essayQuestionList[currQuestion];
+
+  res.render('quiz/examiner/question', {
+    currQuestion : currQuestion,
+    assessment   : assessment,
+    question     : question
+  });
+};
+
+module.exports.submitAssessmentMarks = function(req, res) {
+  var Assessment = model.Assessment;
+  var marks = req.body.marks;
+  var assessment = req.assessment;
+
+  Assessment.findOne({ id: assessment.id}, function(err, assessment){
+    var details = assessment.attemptedDetails;
+    var question = req.session.essayQuestionList[req.session.currQuestion];
+    var assessmentQN;
+    for (var i = 0; i < details.length; i++) {
+      if(question._id == details[i].question){
+        assessmentQN = i;
+        break;
+      }
+    };
+    assessment.attemptedDetails[assessmentQN]['gotMarks'] = marks;
+    assessment.markModified('attemptedDetails');
+    assessment.save(function(error) {
+      if(error){
+        log.error(error);
+        res.redirect('/assessment/quiz/'+assessment.id+'/'+(parseInt(currQuestion)+1));
+      }
+      var currQuestion = req.session.currQuestion + 1;
+      if(assessment.attemptedDetails.length == currQuestion){
+        delete req.session.currQuestion;
+        res.redirect('/assessment/quiz/examin');
+      } else {
+        req.session.currQuestion = currQuestion;
+        req.session.assessment = assessment;
+        res.redirect('/assessment/quiz/examin/'+assessment.id+'/'+(parseInt(currQuestion)+1));
+      }
+    });
+  });
+}

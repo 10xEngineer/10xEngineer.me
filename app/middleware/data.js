@@ -132,19 +132,19 @@ module.exports = function(app) {
     });
   });
 
-  // Quiz
-  app.param('quizId', function(req, res, next, id){
-    var Quiz = model.Quiz;
+  // Assessment
+  app.param('assessmentId', function(req, res, next, id){
+    var Assessment = model.Assessment;
 
-    Quiz.findOne({ id: id }, function(error, quiz) {
+    Assessment.findOne({ id: id }, function(error, assessment) {
       if(error) {
         next(error);
       }
 
-      if(quiz) {
-        req.quiz = quiz;
+      if(assessment) {
+        req.assessment = assessment;
         req.app.helpers({
-          quiz: quiz
+          assessment: assessment
         });
       }
      
