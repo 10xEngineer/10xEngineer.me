@@ -1,3 +1,5 @@
+include ../widget/tabbar
+
 - var docId = 'test';
 - scripts.push("/javascripts/superagent.min.js");
 - scripts.push("/javascripts/ace_2/ace.js");
@@ -59,7 +61,7 @@ style
       #tree
 
     .vsplit.span8
-      #tabBar
+      mixin tabbar
       #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
     
     #sidebar.span2
