@@ -68,10 +68,20 @@ module.exports = function(config) {
         else {
           return '';
         }
+      },
+      renderCssTags: function (all) {
+        if (all != undefined) {
+          return all.map(function(css) {
+            return '<link href="' + css + '" rel="stylesheet" type="text/css" />';
+          }).join('\n ');
+        }
       }
     })
     app.dynamicHelpers({
       scripts: function(req, res){
+        return [];
+      },
+      styles: function(req, res){
         return [];
       }
     });
