@@ -40,6 +40,7 @@ TabBar = (function() {
       title = options.title;
     var tabElement = this.createTabElement(id, title);
     this.appendTabElement(tabElement);
+    this.getTabBarElement().triggerHandler('TabAddedEvent', id);
     this.setActiveTab(id);
   };
   
@@ -47,6 +48,7 @@ TabBar = (function() {
   TabBar.prototype.removeTab = function(id) {
     this.setActiveTab(this.nextActiveTab());
     element = this.removeTabElement(id);
+    this.getTabBarElement().triggerHandler('TabRemovedEvent', id);
     this.destroyTabElement(element);
   }
   
