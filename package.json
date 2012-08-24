@@ -31,6 +31,7 @@
     , "mongo-vfs-http-adapter": "git://github.com/10xEngineer/mongo-vfs-http-adapter.git"
     , "mongoose": "2.7.x"
     , "nconf": "0.6.x"
+    , "nib": "0.8.x"
     , "nodemailer": "0.3.x"
     , "passport": "0.1.12"
     , "passport-facebook": "0.1.4"
