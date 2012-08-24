@@ -85,6 +85,7 @@ module.exports.removeQuestion = function(req, res) {
 module.exports.editView = function(req, res) {
   var Quiz = model.Quiz;
   var question = req.question;
+  console.log(req.lesson);
   res.render("question/edit",{
     title: "Question",
     question: question,
@@ -94,7 +95,6 @@ module.exports.editView = function(req, res) {
 
 module.exports.edit= function(req, res) {
   var question = req.question;
-  question.lesson = req.lesson._id;
   question.question = req.body.question;
   question.weightage = req.body.weightage;
   question.difficulty = req.body.difficulty;
@@ -118,11 +118,11 @@ module.exports.edit= function(req, res) {
     if(error) {
       log.error(error);
       req.session.error = "Can not update question.";
-      res.redirect('/assessment/quiz/create');
+      res.redirect('/course_editor/lesson/'+question.lesson.id);
     }
 
     req.session.message = "Question saved successfully.";
-    res.redirect('/assessment/quiz/' + req.quiz.id);
+    res.redirect('/course_editor/lesson/'+question.lesson.id);
   });
 };
 

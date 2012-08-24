@@ -155,7 +155,6 @@ module.exports = function(app) {
 
   // QuetionIndex for Quiz
   app.param('questionIndex', function(req, res, next, id){
-    var Quiz = model.Quiz;
     req.questionIndex = (id-1).toString();
     next();
   });
@@ -165,7 +164,7 @@ module.exports = function(app) {
     var Question = model.Question;
 
     Question.findOne({ id: id })
-    .populate('quiz')
+    .populate('lesson')
     .exec(function(error, question) {
       if(error) {
         next(error);

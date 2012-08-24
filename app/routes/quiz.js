@@ -155,7 +155,7 @@ module.exports.startQuiz = function(req, res) {
 // 
 var generateQuestionPaper = function(lesson, callback) {
   
-  var mark = lesson.quiz.mark;
+  var mark = lesson.quiz.marks;
   // Todo : All logic is remaining  :p
   var questionPaper     = [];
   var easyWeight        = mark * 0.4;
@@ -167,7 +167,9 @@ var generateQuestionPaper = function(lesson, callback) {
   var collectedWeight;
 
   var noOfCollectedQuestions = 0;
-
+  console.log(easyWeight);
+  console.log(midWeight);
+  console.log(hardWeight);
   var difficulty = 3;
   getQuestions(lesson._id, noOfHardQuestions, difficulty, function(error, hardQuestions){
     if(error){
@@ -202,28 +204,75 @@ var generateQuestionPaper = function(lesson, callback) {
 }
 
 // 
-var getQuestions = function(lesson_id, Questions, difficulty, callback) {
+var getQuestions = function(lesson_id, noOfQuestions, difficulty, callback) {
   
   // Difine variables 
   var Question            = model.Question;
+  var rand                = 0.33;
   var direction           = (rand>0.5) ? '$gte': '$lt' ;
   var order               = direction == '$lt' ? 1 : -1;
-  var rand                = Math.random();
   var random              = {};
   var resultQuestionsSet  = [];
+  var randStr             = rand.toString();
+  var data                = {};
 
+  // randStr = randStr.substring(0,6);
+  // rand = parseFloat(randStr, 10);
   random[direction] = rand;
+  console.log("-=-=>>"+difficulty);
+  console.log("Items Got :: ");
+  console.log("Needed Questions :: "+noOfQuestions, typeof(noOfQuestions));
+  console.log("lesson :: "+lesson_id);
   
+  data['difficulty'] = difficulty;
+  data['random'] = random;
+  data['lesson'] = lesson_id;
+  data['limit']  = noOfQuestions;
+  data['order']  = order;
+  data['questionList'] = [];
+
+  getSingleSideQuestions(data, function(err, questions){
+    if(err){
+      callback(err);
+    }
+    if(questions.length < noOfQuestions) {
+      direction = (direction=='$gte') ? '$lt': '$gte';
+      order = direction == '$lt' ? 1 : -1;
+      random = {};
+      random[direction] = rand;
+
+      data['random'] = random;
+      data['limit']  = noOfQuestions - questions.length;
+      data['order']  = order;
+      data['questionList'] = questions
+ 
+      getSingleSideQuestions(data, function(err, questions){
+        if(err){
+          callback(err);
+        }
+        callback(questions)
+      });
+    }
+    else {
+      callback(questions)
+    }
+  });
+/*
   // find random questions
-  Question.find({difficulty : difficulty, random : random, lesson: lesson_id }, { _id : 1})
+  Question.find({difficulty : difficulty, random: random, lesson: lesson_id }, { _id : 1})
     .sort('random', order )
-    .limit(Questions)
-    .exec(function(error, questions){
+    .limit(Questions);
+    console.log("");
+    console.log(q);
+    console.log("");
+    q.exec(function(error, questions){
     if(error) {
       log.error(error);
       callback(error);
     }
-    collectedQuestions = questions.length;
+    var collectedQuestions = questions.length;
+    console.log("condition :: "+ JSON.stringify(random));
+    console.log("Collected Quiestion :: "+collectedQuestions);
     for (var index = 0; index < collectedQuestions; index++) {
       var sampleQuestion = {}; 
       sampleQuestion['question'] = questions[index]._id.toString();
@@ -236,15 +285,19 @@ var getQuestions = function(lesson_id, Questions, difficulty, callback) {
       order = direction == '$lt' ? 1 : -1;
       random = {};
       random[direction] = rand;
-      Question
-      .find({difficulty : difficulty, random : random }, { _id : 1})
-      .sort('random', order)
-      .limit(Questions - collectedQuestions)
-      .exec(function(error, questions){
+      var q = Question.find({difficulty: difficulty, random: random, lesson: lesson_id}, { _id: 1})
+        .sort('random', order)
+        .limit(Questions- collectedQuestions);
+        console.log("");
+        console.log(q);
+        console.log("");
+        q.exec(function(error, questions) {
         if(error) {
           log.error(error);
           callback(error);
         }
+        console.log("condition :: "+ JSON.stringify(random));
+        console.log("Collected Quiestion :: " + collectedQuestions);
         var length = questions.length;
         for (var index = 0; index < length; index++) {
           var sampleQuestion = {}; 
@@ -256,7 +309,28 @@ var getQuestions = function(lesson_id, Questions, difficulty, callback) {
     } else {
       callback(null, resultQuestionsSet);
     }
-  });
+  });*/
+}
+
+var getSingleSideQuestions = function (data, callback) {
+  var Question = model.Question;
+
+  Question.find({difficulty : data.difficulty, random: data.random, lesson: data.lesson }, { _id : 1})
+    .sort('random', data.order )
+    .limit(data.limit)
+    .exec(function(error, questions){
+      if(error) {
+        callback(error);
+      }
+      var questionList = data.questionList;
+      for (var index = 0; index < questions.length; index++) {
+        var sampleQuestion = {}; 
+        sampleQuestion['question'] = questions[index]._id.toString();
+        questionList.push(sampleQuestion);
+      }
+
+      callback(null, questionList);
+    });
 }
 
 // Question View :: 
