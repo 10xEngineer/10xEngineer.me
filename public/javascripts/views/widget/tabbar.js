@@ -58,7 +58,17 @@ TabBar = (function() {
     return element = $('<div/>', {
       'class' : 'tab ' + id,
       text    : title
-    }).click(function() {
+    })
+    .append($('<a/>', {
+      'class' : 'close_button',
+      text    : 'x'
+    })
+      .click(function(event) {
+        _self.removeTab(id);
+        return event.stopPropagation();
+      })
+    )
+    .click(function() {
       _self.setActiveTab(id);
     });
   }
