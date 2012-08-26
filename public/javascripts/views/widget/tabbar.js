@@ -14,6 +14,8 @@ var TabBar;
 TabBar = (function() {
 
   function TabBar(initialState) {
+    this.state = {tabs : []};
+    
     var tab, _i, _len, _ref;
     _ref = initialState.tabs;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -35,28 +37,37 @@ TabBar = (function() {
   }
   
   
-  TabBar.prototype.addTab = function(options) {
-    var id = options.id,
-      title = options.title;
+  TabBar.prototype.triggerTabBarEvent = function() {
+    this.getTabBarElement().triggerHandler.apply(null, arguments);
+  }
+  
+  
+  TabBar.prototype.addTab = function(tab) {
+    var id = tab.id,
+      title = tab.title;
+    this.state.tabs.push(tab)
     var tabElement = this.createTabElement(id, title);
     this.appendTabElement(tabElement);
-    this.getTabBarElement().triggerHandler('TabAddedEvent', id);
+    this.triggerTabBarEvent('TabAddedEvent', id);
     this.setActiveTab(id);
   };
   
   
   TabBar.prototype.removeTab = function(id) {
-    this.setActiveTab(this.nextActiveTab());
+    if (this.state.activeTab === id) {
+      this.setActiveTab(this.getNextActiveTab());
+    }
     element = this.removeTabElement(id);
-    this.getTabBarElement().triggerHandler('TabRemovedEvent', id);
+    this.triggerTabBarEvent('TabRemovedEvent', id);
     this.destroyTabElement(element);
+    this.state.tabs.splice(this.getTabIndexById(id), 1);
   }
   
   
   TabBar.prototype.createTabElement = function(id, title) {
     var _self = this;
     return element = $('<div/>', {
-      'class' : 'tab ' + id,
+      'class' : 'tab',
       text    : title
     })
     .append($('<a/>', {
@@ -80,8 +91,9 @@ TabBar = (function() {
   
   
   TabBar.prototype.appendTabElement = function(element, index) {
-    previousElement = $('#tabBar .tab').eq(index);
-    if (previousElement.length !== 0) {
+    if (index) {
+      previousElement = $('#tabBar .tab').eq(index);
+      assert(previousElement.length !== 0, 'Recorded and actual state should have matched wherever this.state was modified');
       return previousElement.after(element);
     }
     else {
@@ -91,29 +103,67 @@ TabBar = (function() {
   
   
   TabBar.prototype.removeTabElement = function(id) {
-    element = this.getTabById(id);
+    var element = this.getTabElementById(id);
     return element.detach();
   }
   
   
-  TabBar.prototype.getActiveTab = function() {
-    return $('#tabBar .tab.active');
+  TabBar.prototype.getState = function() {
+    return this.state;
+  }
+  
+  
+  TabBar.prototype.getNextActiveTab = function() {
+    var currentState = this.getState(),
+      currentTabs = currentState.tabs,
+      currentTabId = currentState.activeTab,
+      currentIndex = this.getTabIndexById(currentTabId);
+    
+    if (currentIndex > 0) {
+      var nextActiveIndex = currentIndex - 1;
+    }
+    else {
+      var nextActiveIndex = 0;
+    }
+    var nextActiveTab = currentTabs[nextActiveIndex];
+    return nextActiveTab.id
+  }
+  
+  
+  TabBar.prototype.getActiveTabElement = function() {
+    return this.getTabElementById(this.state.activeTab);
   }
   
   
   TabBar.prototype.setActiveTab = function(id) {
-    this.getActiveTab().removeClass('active');
+    this.getActiveTabElement().removeClass('active');
     
-    element = this.getTabById(id);
+    element = this.getTabElementById(id);
     element.addClass('active');
     
-    this.getTabBarElement().triggerHandler('ActiveTabChangeEvent', id);
+    this.state.activeTab = id;
+    
+    this.triggerTabBarEvent('ActiveTabChangeEvent', id);
     return element;
   }
   
   
-  TabBar.prototype.getTabById = function(id) {
-    return $('#tabBar .tab.' + id);
+  TabBar.prototype.getTabIndexById = function(id) {
+    var tab, tabIndex, _i, _len,
+      tabs = this.state.tabs;
+
+    for (tabIndex = _i = 0, _len = tabs.length; _i < _len; tabIndex = ++_i) {
+      tab = tabs[tabIndex];
+      if (tab.id === id) {
+        break;
+      }
+    }
+    return tabIndex;
+  }
+  
+  
+  TabBar.prototype.getTabElementById = function(id) {
+    return $('#tabBar .tab').eq(this.getTabIndexById(id));
   }
   
   
