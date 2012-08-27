@@ -212,10 +212,10 @@ module.exports = function(app) {
   app.get('/assessment/quiz', verifyPermission('admin', 'read'), quiz.quizList);
   app.get('/assessment/quiz/create', verifyPermission('admin', 'edit'), quiz.createView);
   app.post('/assessment/quiz/create', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.createQuiz), quiz.create);
-  app.get('/assessment/quiz/examin', verifyPermission('admin', 'edit'), quiz.examin);
-  app.get('/assessment/quiz/examin/:assessmentId/start', verifyPermission('admin', 'edit'), quiz.startExamin);
-  app.get('/assessment/quiz/examin/:assessmentId/:questionIndex', verifyPermission('admin', 'edit'), quiz.showQuestionToExaminer);
-  app.post('/assessment/quiz/examin/:assessmentId/:questionIndex', verifyPermission('admin', 'edit'), quiz.submitAssessmentMarks);
+  app.get('/assessment/quiz/examin', verifyPermission('assessment', 'edit'), quiz.examin);
+  app.get('/assessment/quiz/examin/:assessmentId/start', verifyPermission('assessment', 'edit'), quiz.startExamin);
+  app.get('/assessment/quiz/examin/:assessmentId/:questionIndex', verifyPermission('assessment', 'edit'), quiz.showQuestionToExaminer);
+  app.post('/assessment/quiz/examin/:assessmentId/:questionIndex', verifyPermission('assessment', 'edit'), quiz.submitAssessmentMarks);
   app.get('/assessment/quiz/:lessonId', verifyPermission('admin', 'read'), quiz.view);
   app.get('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), quiz.editView);
   app.post('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);

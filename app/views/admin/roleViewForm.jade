@@ -87,12 +87,12 @@
             -if(typeof(permits) != 'undefined' && permits.course_edit) 
               input(type="checkbox", name="course_edit", checked);
             -else  
-              input(type="checkbox", name="course_edit");				
+              input(type="checkbox", name="course_edit");       
           td
             -if(typeof(permits) != 'undefined' && permits.course_insert) 
               input(type="checkbox", name="course_insert", checked);
             -else  
-              input(type="checkbox", name="course_insert");				
+              input(type="checkbox", name="course_insert");       
           td
             -if(typeof(permits) != 'undefined' && permits.course_delete) 
               input(type="checkbox", name="course_delete", checked);
@@ -103,6 +103,33 @@
               input(type="checkbox", name="course_publish", checked);
             -else  
               input(type="checkbox", name="course_publish");
+        tr.assessment
+          th Assessment
+          td
+            -if(typeof(permits) != 'undefined' && permits.assessment_read) 
+              input(type="checkbox", name="assessment_read", checked);
+            -else  
+              input(type="checkbox", name="assessment_read");
+          td
+            -if(typeof(permits) != 'undefined' && permits.assessment_edit) 
+              input(type="checkbox", name="assessment_edit", checked);
+            -else  
+              input(type="checkbox", name="assessment_edit");				
+          td
+            -if(typeof(permits) != 'undefined' && permits.assessment_insert) 
+              input(type="checkbox", name="assessment_insert", checked);
+            -else  
+              input(type="checkbox", name="assessment_insert");				
+          td
+            -if(typeof(permits) != 'undefined' && permits.assessment_delete) 
+              input(type="checkbox", name="assessment_delete", checked);
+            -else  
+              input(type="checkbox", name="assessment_delete");
+          td
+            -if(typeof(permits) != 'undefined' && permits.assessment_publish) 
+              input(type="checkbox", name="assessment_publish", checked);
+            -else  
+              input(type="checkbox", name="assessment_publish");
 
     p
       a#cancel.btn.btn-small(href="/admin/roles") Cancel
