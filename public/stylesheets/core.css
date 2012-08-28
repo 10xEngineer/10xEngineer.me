@@ -1,15 +1,10 @@
 body{background-color:whiteSmoke}
 footer{margin-top:30px}
 img.repsonsive{max-width:100%}
-.navbar .containter{width:940px}
 @media (max-width: 767px){p{font-size:.9em}
-.navbar .container-fluid{padding:0}
-.navbar .container{width:auto}
 .hero-unit{padding:20px}
 }@media (min-width: 768px) and (max-width:979px){p{font-size:1em}
-.navbar .container{width:724px}
 }@media (min-width: 1200px){p{font-size:1em}
-.navbar .container{width:1170px}
 }#footer{background-color:#000;color:#fff;padding:10px 0}
 .main-page .page-header{width:100%}
 .main-page .header-photo{max-width:100%}
@@ -82,13 +77,12 @@ div.course_editor_header{margin:5px 0;margin-left:30px;margin-bottom:18px;width:
 .align-center{text-align:center}
 .align-right{text-align:right}
 .align-left{text-align:left}
-.navbar-inner .container .pull-right a{font-size:13px}
 #footer .container .span6{width:230px;}
 #footer .container .span6 img{padding-right:5px}
 #footer .container .span6 p{padding-top:5px;padding-left:5px}
 #footer .container .span6.socialmedia{float:right}
 .span12 .span4{padding-bottom:5px}
-#content{background-color:#f5f5f5;padding-top:15px}
+#content{margin-top:24px;background-color:#f5f5f5;padding-top:15px}
 .courseMenuNav{background-color:#3db4ff;float:left;padding-bottom:5px;padding-top:5px;position:relative;text-align:center;width:100%;color:#fff;font-weight:bold;font-size:17px;margin-bottom:5px}
 .courseMenu .active{background-color:#22a3ff;color:#333}
 .courseMenuNav:hover{background-color:#22a3ff}
