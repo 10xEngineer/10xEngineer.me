@@ -1,5 +1,6 @@
 var express = require('express');
 var stylus = require('stylus');
+var nib = require('nib');
 var RedisStore = require('connect-redis')(express);
 
 var auth = require('./app/middleware/authentication');
@@ -21,7 +22,14 @@ module.exports = function(config) {
     app.set('view engine', 'jade');
 
     // CSS Preprocessing with stylus
-    app.use(stylus.middleware({ src: __dirname + '/public' }));
+    function compile(str, path) {
+      return stylus(str)
+        .set('filename', path)
+        .set('compress', true)
+        .use(nib())
+        .import('nib');
+    }
+    app.use(stylus.middleware({ src: __dirname + '/public', compile: compile }));
     
     // Set app-level config in express
     app.set('appRoot', appRoot);
