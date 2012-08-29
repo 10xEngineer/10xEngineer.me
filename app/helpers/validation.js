@@ -31,7 +31,7 @@ module.exports = {
 		if(this.regexp(value, new RegExp('^[a-zA-Z0-9._-]+[\\+]{0,1}[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+[\\.]{1}[a-zA-Z]{2,6}$')) === true) {
 			return true;
 		} else {
-			return "is an invalid.";
+			return "is invalid";
 		}
 	},
 

@@ -36,8 +36,6 @@ var statics = {
           newUser.hash = hash;
 
           if(data.provider) {
-            log.info('provider', data.profile);
-
             newUser[data.provider] = data.profile;
             newUser.markModified(data.provider);
           }
@@ -94,7 +92,6 @@ var methods = {
 
   verifyPassword: function(password, callback) {
     var user = this;
-    log.info(password, user);
     bcrypt.compare(password, this.hash, callback);
   }
 };

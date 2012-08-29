@@ -31,4 +31,4 @@ describe('Route collection', function() {
       .end(done);
     });
   });
-})
+});

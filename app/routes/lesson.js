@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 var model = require('../models');
 
@@ -14,6 +14,7 @@ module.exports = function() {};
 module.exports.showView = function(req, res) {
   
   var Lesson = model.Lesson;
+  var Assessment = model.Assessment;
   var Progress = model.Progress;
   var lesson = req.lesson;
 
@@ -21,13 +22,6 @@ module.exports.showView = function(req, res) {
   var videoStartTime = 0;
   var progressFlag = false;
 
-  var quizQuestions = lesson.quiz.questions;
-  var quizQuestionsLength = lesson.quiz.questions.length;
-
-  for(var questionsIndex=0 ; questionsIndex < quizQuestionsLength ; questionsIndex++) {
-    randomOption(quizQuestions[questionsIndex].options);
-  }  
-  
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
     if(error) {
@@ -64,21 +58,33 @@ module.exports.showView = function(req, res) {
         
         progressFlag = true;
         Lesson.find({}, function(error, allLessons) {
-          res.render('lessons/' + lesson.type, {
-            title: lesson.title,
-            quiz: lesson.quiz,
-            videoStartTime: videoStartTime,
-            allLessons: allLessons,
-            userId: req.user._id,
-            progressFlag : progressFlag
+          Assessment.findOne({'user.id': req.user._id, 'lesson.id': req.lesson._id}, function(err, assessment){
+            var ass;
+            if(err){
+              console.log(err);
+              ass = {};
+            }
+            else {
+              ass = assessment;
+            }
+            res.render('lessons/' + lesson.type, {
+              title           : lesson.title,
+              quiz            : lesson.quiz,
+              assessment      : ass,
+              videoStartTime  : videoStartTime,
+              userName        : req.user.name,
+              allLessons      : allLessons,
+              userId          : req.user._id,
+              progressFlag    : progressFlag,
+              progressId      : progress._id,
+              username        : req.user.name
+            });
           });
         });
-        
-
       });
 
     } else {
-
+      progressFlag = true;
       Lesson.find({}, function(error, allLessons) {
         res.render('lessons/' + lesson.type, {
           title: lesson.title,
@@ -86,10 +92,11 @@ module.exports.showView = function(req, res) {
           videoStartTime: videoStartTime,
           allLessons: allLessons,
           userId: req.user._id,
-          progressFlag : progressFlag
+          progressFlag : progressFlag,
+          progressId: progress._id,
+          username: req.user.name
         });
       });
-
     }
   });
 };
@@ -111,45 +118,10 @@ var randomOption =function (options) {
 
 module.exports.show = function(req, res) {
   
-  var Lesson = model.Lesson;
-  var lesson = req.lesson;
+  var Lesson   = model.Lesson;
   var Progress = model.Progress;
+  var lesson   = req.lesson;
 
-  var quizQuestions = req.lesson.quiz.questions;
-  var attemptedAnswers = req.body.question;
-  var quizQuestionsLength = req.lesson.quiz.questions.length;
-  var answersJSON = {};
-
-  for(var index = 0; index < quizQuestionsLength; index++) {
-    var answers = quizQuestions[index].answers;
-    for(var indexAnswers = 0; indexAnswers < answers.length; indexAnswers++) {
-      if(!answersJSON[index]) {
-        answersJSON[index] = {};
-      }
-      answersJSON[index][answers[indexAnswers]] = 'true';
-    }
-  }
-
-  for(var index = 0; index < attemptedAnswers.length; index++){
-    var arrayValue = attemptedAnswers[index];
-    if(typeof(arrayValue) != 'object') {
-      if(_.indexOf(quizQuestions[index].answers, arrayValue) !== -1) {
-        answersJSON[index][arrayValue] = 'correct';
-      } else {
-        answersJSON[index][arrayValue] = 'wrong';
-      }
-    } else {
-      for(indexObject = 0; indexObject < arrayValue.length; indexObject++){
-        if(_.indexOf(quizQuestions[index].answers, arrayValue[indexObject]) !== -1) {
-          answersJSON[index][arrayValue[indexObject]] = 'correct';
-        } else {
-          answersJSON[index][arrayValue[indexObject]] = 'wrong';
-        }
-      }
-    }
-  }
-
-  lesson.attemptedAnswers = answersJSON;
 
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
@@ -157,35 +129,24 @@ module.exports.show = function(req, res) {
       log.error(error);
     }
     if(progress.status != 'completed') {
-
       // Start the Lesson : Change status of lesson to 'ongoing'
       progress.completeLesson(lesson, function(error) {
-      
         if(error) {
           log.error(error);
         }
-        // Render based on the type
-        Lesson.find({}, function(error, allLessons){
-          res.render('lessons/' + lesson.type, {
-            title: req.lesson.title,
-            attemptedAnswers: answersJSON,
-            allLessons : allLessons
-          });
-        });
       });
-
-    } else {
-
-      // Render based on the type
-      Lesson.find({}, function(error, allLessons){
-        res.render('lessons/' + lesson.type, {
-          title: req.lesson.title,
-          attemptedAnswers: answersJSON,
-          allLessons : allLessons
-        });
-      });    
-    }
+    } 
+    renderLesson();      
   });
+};
+
+var renderLesson = function(){
+  Lesson.find({}, function(error, allLessons){
+    res.render('lessons/' + lesson.type, {
+      title: req.lesson.title,
+      allLessons : allLessons
+    });
+  });    
 };
 
 // Lesson Completes

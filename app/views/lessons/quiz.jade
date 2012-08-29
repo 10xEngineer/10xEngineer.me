@@ -5,45 +5,33 @@
     h1 #{lesson.title}
     .row-fluid
       .span9
-        form(method='POST', id='lessonForm', enctype='multipart/form-data')
-          each question, questionIndex in lesson.quiz.questions
-            div.questionBox
-              h4.question Q #{questionIndex+1}:  #{question.question}
-              -if (question.answers.length == 1)
-                - type = 'radio';
-              -if (question.answers.length > 1)
-                - type = 'checkbox'; 
+        - if(typeof(assessment) == 'undefined' || assessment == null)
+          p #{lesson.desc}
+          h4(style="text-align: center;") It's a Quiz of #{lesson.quiz.marks} Marks
+          br
+          div(style="text-align: center;")
+            a.btn.btn-primary.btn-large(href="/assessment/quiz/#{lesson.id}/start") Start Quiz
+          br
+          br
+        - else if(assessment.status == 'assessed')
+          h1 Congratulations !!!
+          hr
+          h3 Dear #{userName},
+          h4 You successfully completed the quiz and your result is   
+              - var per = Math.round((assessment.score * 100 / quiz.marks)*100)/100;
+              code(style="padding:8px;") #{per}%  (Marks : #{assessment.score}/#{assessment.lesson.marks})
+          br
+          hr
+        - else
+          h1 Quiz completed !!!
+          hr
+          h3 Dear #{userName},
+          h4 You successfully completed the quiz and your result will be mail to your mail account after examin.
 
-              each option, optionIndex in question.options
-                - var attempted = typeof(attemptedAnswers) != 'undefined' ? attemptedAnswers[questionIndex] : undefined;
-                - if(typeof(attempted) != 'undefined' && attempted[option] === 'true')
-                    div.questionAnswer.correct
-                      input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" ) 
-                      |  #{option}
-                - else if(typeof(attempted) != 'undefined' && attempted[option] === 'correct')
-                    div.questionAnswer.correct
-                      input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" , checked) 
-                      |  #{option}
-                - else if(typeof(attempted) != 'undefined' && attempted[option] === 'wrong')
-                    div.questionAnswer.wrong
-                      input(type='#{type}',value="#{option}",name="question[#{questionIndex}]" , checked) 
-                      |  #{option} 
-                - else
-                    div.questionAnswer
-                      input(type='#{type}',value="#{option}",name="question[#{questionIndex}]") 
-                      |  #{option}
-
-          - if (typeof(attemptedAnswers) == 'undefined') 
-            p
-              input.btn.btn-primary(type='submit', value='Submit') 
-          
+          br
+          hr
         .lessonBar
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
           a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
       .span3
         include _sidebar
-    .row-fluid
-      p
-    .row-fluid
-      .span9
-        include _footer

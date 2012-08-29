@@ -1,5 +1,6 @@
 window.progressSocket = io.connect('/progress');
 window.codeSocket = io.connect('/code');
+window.newCodeSocket = io.connect('/codeNew');
 
 progressSocket.on('connect', function() {
   

@@ -122,3 +122,36 @@ module.exports.usersFromUnbounce = function(userRow, callback) {
     callback();
   }
 }
+
+module.exports.questions = function(quesitonRow, callback) {
+  var Question = model.Question;
+  
+  var fields = quesitonRow.split('\t');
+  // var email = fields[5];
+  // if(email && email !== 'email') {
+  //   email = util.string.trim(email);
+
+  //   User.findOne({email: email}, function(error, dbUser) {
+  //     if (error) {
+  //       return callback(error);
+  //     }
+
+  //     if(!dbUser) {
+  //       user = new User();
+  //       user.email = email;
+  //       user.roles = ['default'];
+  //       user.save(function(error){
+  //         if(error) {
+  //           return callback(error);
+  //         }
+
+  //         callback();
+  //       });
+  //     } else {
+  //       callback();
+  //     }
+  //   });
+  // } else {
+    callback();
+  // }
+}

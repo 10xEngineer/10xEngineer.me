@@ -2,7 +2,7 @@ var fs = require('fs');
 
 var async = require('async');
 var mongoose = require('mongoose');
-var _ = require('underscore');
+var _ = require('lodash');
 
 module.exports = exports = function(callback) {
   exports.models = {};

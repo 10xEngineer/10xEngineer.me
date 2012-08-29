@@ -1,0 +1,26 @@
+.container
+    .row-fluid
+    .spam10
+      a.btn(href="/assessment/programming/create")
+        i.icon-plus
+        |  Create Programming Test
+
+    .actions 
+    ul.quizList
+      each programming in programmingList
+        li
+          .innerDiv
+            a(href="/assessment/programming/#{programming.id}")
+              label #{programming.title}
+            .pull-right.actionBtns
+              a.btn.btn-success(href="/assessment/programming/#{programming.id}/edit")
+                i.icon-edit.icon-white
+                |  Edit
+              a.btn.btn-danger(href="/assessment/programming/#{programming.id}/remove")
+                i.icon-trash.icon-white 
+                |  Delete
+              a.btn.btn-primary(href="/assessment/programming/#{programming.id}/start")
+                i.icon-hand-right.icon-white
+                |  Start
+          p
+            #{programming.desc}

@@ -15,7 +15,7 @@ module.exports.course = {
 		wallImage : {required:true}
 	}
 
-}
+};
 
 // Chapters Configs
 module.exports.chapter = {
@@ -29,7 +29,7 @@ module.exports.chapter = {
 		title : {required:true},
 		description : {required: true}
 	}
-}
+};
 
 // Lesson Configs
 module.exports.lesson = {
@@ -50,20 +50,16 @@ module.exports.lesson = {
 					}
 				},
 				quiz : {
-					question: { required: 1},
-					questionOption:{ required: 2},
-					questionOptionCheckbox:{ required: 1}
+					marks: { required: true},
 				},
 				programming: {
 					language : {required:true},
-					code: {required: true},
-					input: {required: true},
-					output: {required: true}
+					boilerPlateCode: {required: true},
 				}
 			}
 		}
 	}
-}
+};
 
 // User Profile
 module.exports.user = {
@@ -73,4 +69,33 @@ module.exports.user = {
 		email : {required: true , email : true},
 		password : {required: true}
 	}
-}
+};
+
+// Test
+module.exports.quiz = {
+	
+	createTest : {
+		title : {required: true},
+		mark : {required: true, number: true},
+		type : {required: true}
+	},
+	editTest : {
+		title : {required: true},
+		mark : {required: true, number: true}
+	}
+};
+
+// Question 
+module.exports.question = {
+	
+	createQuestion : {
+		question: { required: 1},
+		questionOption:{ required: 1},
+		questionOptionCheckbox:{ required: 1},
+		difficulty: {required: true, number: true},
+		weightage: {required: true, number: true}
+	},
+	attemptQuestion : {
+		questionOption: { required : true}
+	}
+};

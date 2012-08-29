@@ -174,4 +174,28 @@ module.exports.processImage = function(imagePath, options, callback) {
     });
   });
 
-}
+};
+
+module.exports.compareArray = function(array0, array1) {
+  var result = true;
+  arr1Length = array1.length;
+  for (var index = 0; index < arr1Length; index++) {
+    if(array0.indexOf(array1[index]) == -1){
+      result = false;
+      return result;
+      break;
+    }
+  }
+  return result;
+};
+
+module.exports.randomizeArray = function(array1) { 
+  var array2 = [];
+  var length = array1.length;
+  for (var index = 0; index < length; index++) {
+    var randIndex = Math.floor(Math.random() * array1.length);
+    array2.push(array1[randIndex]);
+    array1.splice(randIndex, 1);
+  };
+  return array2;
+};

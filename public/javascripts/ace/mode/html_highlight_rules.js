@@ -44,6 +44,25 @@ var JavaScriptHighlightRules = require("./javascript_highlight_rules").JavaScrip
 var xmlUtil = require("./xml_util");
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 
+var tagMap = {
+    a           : 'anchor',
+    button 	    : 'form',
+    form        : 'form',
+    img         : 'image',
+    input       : 'form',
+    label       : 'form',
+    script      : 'script',
+    select      : 'form',
+    textarea    : 'form',
+    style       : 'style',
+    table       : 'table',
+    tbody       : 'table',
+    td          : 'table',
+    tfoot       : 'table',
+    th          : 'table',
+    tr          : 'table'
+};
+
 var HtmlHighlightRules = function() {
 
     // regexp must not have capturing parentheses
@@ -63,6 +82,9 @@ var HtmlHighlightRules = function() {
             regex : "<\\!--",
             next : "comment"
         }, {
+            token : "xml_pe",
+            regex : "<\\!.*?>"
+        }, {
             token : "meta.tag",
             regex : "<(?=\s*script\\b)",
             next : "script"
@@ -77,6 +99,9 @@ var HtmlHighlightRules = function() {
         }, {
             token : "text",
             regex : "\\s+"
+        }, {
+            token : "constant.character.entity",
+            regex : "(?:&#[0-9]+;)|(?:&#x[0-9a-fA-F]+;)|(?:&[a-zA-Z0-9_:\\.-]+;)"
         }, {
             token : "text",
             regex : "[^<]+"
@@ -107,9 +132,9 @@ var HtmlHighlightRules = function() {
         } ]
     };
     
-    xmlUtil.tag(this.$rules, "tag", "start");
-    xmlUtil.tag(this.$rules, "style", "css-start");
-    xmlUtil.tag(this.$rules, "script", "js-start");
+    xmlUtil.tag(this.$rules, "tag", "start", tagMap);
+    xmlUtil.tag(this.$rules, "style", "css-start", tagMap);
+    xmlUtil.tag(this.$rules, "script", "js-start", tagMap);
     
     this.embedRules(JavaScriptHighlightRules, "js-", [{
         token: "comment",

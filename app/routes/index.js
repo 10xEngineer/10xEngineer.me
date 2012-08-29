@@ -1,10 +1,13 @@
-var _ = require('underscore');
+var _ = require('lodash');
 
 var main = require('./main');
 var course = require('./course');
 var course_editor = require('./course_editor');
+var quiz = require('./quiz');
+var question = require('./question');
 var lesson = require('./lesson');
 var quiz = require('./quiz');
+var programming = require('./programming');
 var admin = require('./admin');
 var user = require('./user');
 var cdn = require('./cdn');
@@ -71,7 +74,7 @@ module.exports = function(app) {
   });
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'lessonId', 'userId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','assessmentId','questionId', 'programmingId'], function(req, res, next, num, name){ 
     var parsedNum = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('Invalid route: ' + num));
@@ -84,7 +87,8 @@ module.exports = function(app) {
   // Load Express data middleware
   require('../middleware/data')(app);
 
-
+  // vfs <-> mongo-vfs adapter
+  require('../middleware/vfs')(app);
 
   // Routes
 
@@ -163,7 +167,7 @@ module.exports = function(app) {
   app.get('/lesson/serverInfo', lesson.serverInfo);
 
   app.get('/lesson/:lessonId', verifyPermission('course', 'read'), lesson.showView);
-  app.post('/lesson/:lessonId', verifyPermission('course', 'read'), lesson.show);
+  //app.post('/lesson/:lessonId', verifyPermission('course', 'read'), lesson.show);
   app.get('/lesson/:lessonId/next', verifyPermission('course', 'read'),lesson.next);
   app.get('/lesson/:lessonId/previous', verifyPermission('course', 'read'), lesson.previous);
   app.get('/lesson/:lessonId/complete', verifyPermission('course', 'read'), lesson.complete);
@@ -200,5 +204,42 @@ module.exports = function(app) {
   app.get('/admin/user/:userId/remove', verifyPermission('admin', 'delete'), admin.removeUser);
   app.get('/admin/user/:userId/info', verifyPermission('admin', 'edit'), admin.userInfo);
   app.get('/admin/user/:userId/:roleId', verifyPermission('admin', 'edit'), admin.assignRole);
+
+  // Assessment
+  app.get('/assessment/quiz', verifyPermission('admin', 'read'), main.assessment);
+
+  // Quiz 
+  app.get('/assessment/quiz', verifyPermission('admin', 'read'), quiz.quizList);
+  app.get('/assessment/quiz/create', verifyPermission('admin', 'edit'), quiz.createView);
+  app.post('/assessment/quiz/create', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.createQuiz), quiz.create);
+  app.get('/assessment/quiz/examin', verifyPermission('assessment', 'edit'), quiz.examin);
+  app.get('/assessment/quiz/examin/:assessmentId/start', verifyPermission('assessment', 'edit'), quiz.startExamin);
+  app.get('/assessment/quiz/examin/:assessmentId/:questionIndex', verifyPermission('assessment', 'edit'), quiz.showQuestionToExaminer);
+  app.post('/assessment/quiz/examin/:assessmentId/:questionIndex', verifyPermission('assessment', 'edit'), quiz.submitAssessmentMarks);
+  app.get('/assessment/quiz/:lessonId', verifyPermission('admin', 'read'), quiz.view);
+  app.get('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), quiz.editView);
+  app.post('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
+  app.get('/assessment/quiz/:lessonId/remove', verifyPermission('admin', 'delete'), quiz.removeQuiz);
+  app.get('/assessment/quiz/:lessonId/start', verifyPermission('admin', 'read'), quiz.startQuiz);
+  app.get('/assessment/quiz/:lessonId/finish', verifyPermission('admin', 'read'), quiz.quizResult);
+  app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), quiz.viewQuestion);
+  app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), quiz.submitQuestion);
+  app.get('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), question.createView);
+  app.post('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.create);
+  app.get('/assessment/question/import/:lessonId', verifyPermission('admin', 'edit'), question.importQuestionView);
+  app.post('/assessment/question/import/:lessonId', verifyPermission('admin', 'edit'), question.importQuestion);
+  app.get('/assessment/question/:questionId/remove', verifyPermission('admin', 'edit'), question.removeQuestion);
+  app.get('/assessment/question/:questionId/edit', verifyPermission('admin', 'edit'), question.editView);
+  app.post('/assessment/question/:questionId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.edit);
+
+  // Programming
+  app.get('/assessment/programming', verifyPermission('admin', 'read'), programming.list);
+  app.get('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.createView);
+  app.post('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.create);
+  app.get('/assessment/programming/:programmingId', verifyPermission('admin', 'read'), programming.appearView);
+
+  // Just for testing
+  // TODO: Remove it and all its related functions and files before commit
+  app.get('/testing', main.testing);
 
 };

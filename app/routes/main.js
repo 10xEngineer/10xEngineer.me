@@ -85,3 +85,7 @@ module.exports.register = function(req, res, next) {
     }
   });
 };
+
+module.exports.testing = function(req, res, next) {
+  res.render('testing');
+}

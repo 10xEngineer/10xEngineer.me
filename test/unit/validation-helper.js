@@ -46,9 +46,9 @@ describe('Validation', function() {
       done();
     });
     it('should not allow invalid email', function(done) {
-      assert.equal('is an invalid email', validation.email('all@inhtml@gmail.com'));
-      assert.equal('is an invalid email', validation.email('allinhtml@gmail'));
-      assert.equal('is an invalid email', validation.email('allinhtml@gmail.'));
+      assert.equal('is invalid', validation.email('all@inhtml@gmail.com'));
+      assert.equal('is invalid', validation.email('allinhtml@gmail'));
+      assert.equal('is invalid', validation.email('allinhtml@gmail.'));
       done();
     });
   });
