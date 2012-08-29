@@ -83,13 +83,11 @@ style
     
     #sidebar.span2(style="display: inline-block; vertical-align: top;")
       div#chat
-        h3 Chat
-        div#messages
-        input#message
 
 link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
+<<<<<<< HEAD
 
-script
+script(type='text/javascript')
   $(document).ready(function() {
 
     //dynamically load javascript source file
@@ -124,7 +122,7 @@ script
     });
 
     $('#compile').click(function() {
-      var sourceCode = editor.getContent();
+      var sourceCode = editor.getSession().getValue();
       var languageCode = $('#pageslide #mode').val();
       if(!languageCode){
         languageCode = $('#mode').val();

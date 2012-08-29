@@ -1,0 +1,38 @@
+.header
+  z-index 1
+  width 100%
+  position absolute
+  .left
+    height            24px
+    background-image  url("/img/header-background.png")
+    background-position center bottom
+    overflow          hidden
+    transition        height .2s .2s ease-in-out
+    transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
+  .right
+    float             right
+    width             198px
+    height            46px
+    background-image  url("/img/header-logo-complete.png")
+    background-position center bottom
+    transition        height .2s .2s ease-in-out
+    transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
+  .navbar
+    position          absolute
+    bottom            24px
+    padding-left      20px
+    > ul
+      padding-top     3px
+  a
+    color             rgb(99,82,82) !important
+  a:hover
+    color             #999 !important
+.header:hover
+  .left
+    height            108px
+    transition        height .2s ease-in-out
+    transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
+  .right
+    height            130px
+    transition        height .2s ease-in-out
+    transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)

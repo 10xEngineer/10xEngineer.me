@@ -48,6 +48,7 @@
     , "uglify-js": "1.2.x"
     , "util": "0.4.x"
     , "winston": "0.6.x"
+    , "nib": "0.8.1"
   }
   , "devDependencies": {
       "mocha": "latest"

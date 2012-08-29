@@ -63,8 +63,8 @@ module.exports = function(config) {
         .use(nib())
         .import('nib');
     }
-    app.use(stylus.middleware({ src: __dirname + '/public' , compile : compile}));
-
+    app.use(stylus.middleware({ src: __dirname + '/public', compile: compile }));
+    
     // Set app-level config in express
     app.set('appRoot', appRoot);
     app.set('tmpDir', tmpFileUploadDir);
