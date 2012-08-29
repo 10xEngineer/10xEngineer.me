@@ -1,6 +1,6 @@
 {
   "site": {
-    "hostname": "localhost:3000",
+    "hostname": "dev.10xengineer.me:3000",
     "port": 3000,
     "email": "10xengineer@gmail.com"
   },
