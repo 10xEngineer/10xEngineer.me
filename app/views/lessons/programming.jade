@@ -128,7 +128,7 @@ script
     });
 
     $('#compile').click(function() {
-      var sourceCode = editor.ace.getContent();
+      var sourceCode = editor.getContent();
       var languageCode = $('#pageslide #mode').val();
       if(!languageCode){
         languageCode = $('#mode').val();

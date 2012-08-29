@@ -37,19 +37,21 @@ html(lang="en")
     body
       section#header
         mixin header
-      .container.alertContainer
-        -if(typeof(error) != 'undefined') 
-          div.alert.alert-block
-            a.close(data-dismiss='alert',href='#') x
-            h4.alert-heading Warning
-            | #{error}
-        -else if(typeof(message) != 'undefined') 
-          div.alert.alert-info
-            a.close(data-dismiss='alert',href='#') x
-            h4.alert-heading Information 
-            | #{message}			
+      .container
+      section#content
+        .container.alertContainer
+          -if(typeof(error) != 'undefined') 
+            div.alert.alert-block
+              a.close(data-dismiss='alert',href='#') x
+              h4.alert-heading Warning
+              | #{error}
+          -else if(typeof(message) != 'undefined') 
+            div.alert.alert-info
+              a.close(data-dismiss='alert',href='#') x
+              h4.alert-heading Information 
+              | #{message}      
+        != body
 
-      section#content!= body
       section#footer.row-fluid
         .container
           .span6
