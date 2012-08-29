@@ -450,8 +450,7 @@ module.exports.lessonCreate = function(req, res, next) {
         req.session.error = "Can not create lesson.";
       }
       var id = lesson.id;
-      if(lesson.video.type == 'upload')
-      {
+      if(lesson.video.type == 'upload') {
         var fileName = 'lessonVideo_' + id;
 
         cdn.saveFile(fileName, f, function(error, fileName) {
@@ -475,8 +474,10 @@ module.exports.lessonCreate = function(req, res, next) {
             });
           });
         });
+      } else {
+        req.session.message = "Lesson created successfully.";
+        res.redirect('/course_editor/lesson/' + id);
       }
-      else saveLesson(lesson, req, res); 
     });
   }
 

@@ -6,7 +6,8 @@ var async = require('async');
 var nodemailer = require("nodemailer");
 
 var model = require('../models');
-
+var config = require('../config/config');
+  
 var importer = require('../helpers/importer');
 var util = require('../helpers/util');
 
@@ -51,12 +52,15 @@ module.exports.approve = function(req, res) {
       res.redirect('/admin/approve');
     }
 
+    var hostMailID    = config.get('mail:username');
+    var hostMailPass  = config.get('mail:password');
+
     // create reusable transport method (opens pool of SMTP connections)
     var smtpTransport = nodemailer.createTransport("SMTP",{
       service: "Gmail",
       auth: {
-          user: "",  // Sender mail id here
-          pass: ""   // password
+          user: hostMailID,    // Sender mail id here
+          pass: hostMailPass   // password
       }
     });
     // setup e-mail data with unicode symbols

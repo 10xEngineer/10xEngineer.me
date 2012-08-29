@@ -32,26 +32,26 @@
 - else if(lesson.type == 'programming')
   p Programming :
   select#editLanguage(name='language', value='#{lesson.programming.language}')
-    option(value="javascript") JavaScript
-    option(value="xml") XML
-    option(value="html") HTML
-    option(value="css") CSS
-    option(value="scss") SCSS
-    option(value="python") Python
-    option(value="php") PHP
     option(value="java") Java
-    option(value="ruby") Ruby
-    option(value="c_cpp") C/C++
-    option(value="coffee") CoffeeScript
-    option(value="json") JSON
-    option(value="perl") Perl
-    option(value="clojure") Clojure
-    option(value="ocaml") OCaml
-    option(value="csharp") C#
-    option(value="svg") SVG
-    option(value="textile") Textile
-    option(value="groovy") Groovy
-    option(value="scala") Scala
+    //- option(value="javascript") JavaScript
+    //- option(value="xml") XML
+    //- option(value="html") HTML
+    //- option(value="css") CSS
+    //- option(value="scss") SCSS
+    //- option(value="python") Python
+    //- option(value="php") PHP
+    //- option(value="ruby") Ruby
+    //- option(value="c_cpp") C/C++
+    //- option(value="coffee") CoffeeScript
+    //- option(value="json") JSON
+    //- option(value="perl") Perl
+    //- option(value="clojure") Clojure
+    //- option(value="ocaml") OCaml
+    //- option(value="csharp") C#
+    //- option(value="svg") SVG
+    //- option(value="textile") Textile
+    //- option(value="groovy") Groovy
+    //- option(value="scala") Scala
 
   p Boiler Plate Code :
   textarea#code(name='boilerPlateCode', rows="5") #{lesson.programming.boilerPlateCode}
