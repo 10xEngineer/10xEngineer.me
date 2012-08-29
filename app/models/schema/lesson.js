@@ -28,9 +28,3 @@ var LessonSchema = module.exports = new Schema({
 }, {
   collection: 'lessons'
 });
-
-var OptionSchema = new Schema({
-  question: String,
-  options: [ String ],
-  answers: [ String ]
-});

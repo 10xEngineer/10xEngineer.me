@@ -68,15 +68,15 @@ style
       #tabBar
         ul#tabContainer.nav.nav-tabs
       #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
+      .lessonBar.row-fluid
+        a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+        a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
     
     #sidebar.span2(style="display: inline-block; vertical-align: top;")
       div#chat
-        h3 Chat
-        div#messages
-        input#message
-  .lessonBar.row-fluid
-    a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-    a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
+        h3.row-fluid Chat
+        div.row-fluid#messages
+        input.row-fluid#message
 
 
   link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
