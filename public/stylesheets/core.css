@@ -163,3 +163,13 @@ form p .chapterPerogressbox{min-height:75px}
 .mainPageBtn > div{float:left}
 .mainPageFooter{background-color:#333;color:#fff;}
 .mainPageFooter .container{padding:20px}
+ul.questionList > li,ul.quizList > li{margin:5px 0;background:#fff;padding:20px;border:solid 1px #eee;-webkit-border-radius:10px 10px;border-radius:10px 10px;list-style:none;margin-left:0;margin-bottom:18px;}
+ul.questionList > li label,ul.quizList > li label{font-size:17px}
+ul.questionList > li .innerDiv label,ul.quizList > li .innerDiv label{display:inline-block;}
+ul.questionList > li .innerDiv label:hover,ul.quizList > li .innerDiv label:hover{cursor:pointer}
+ul.questionList > li .innerDiv a:hover,ul.quizList > li .innerDiv a:hover{cursor:pointer}
+ul.questionList > li .innerDiv .actionBtns a,ul.quizList > li .innerDiv .actionBtns a{margin-right:5px}
+div.questionBlock{margin:5px 0;background:#fff;padding:20px;border:solid 1px #eee;-webkit-border-radius:10px 10px;border-radius:10px 10px;list-style:none;margin-left:0;margin-bottom:18px}
+#messages{height:350px;overflow-y:scroll}
+.vsplit .lessonBar .btn{margin:15px auto}
+#compile{margin-left:5px}

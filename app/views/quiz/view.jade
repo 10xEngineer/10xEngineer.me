@@ -1,0 +1,35 @@
+.container
+  h1= title
+  h2 #{quiz.title}
+  p #{quiz.desc}
+  .row-fluid
+    .spam10
+      a.btn(href="/assessment/question/create/#{quiz.id}")
+        i.icon-plus
+        |  Add Question
+      a.btn.pull-right(href="/assessment/question/import/#{quiz.id}") 
+        i.icon-download-alt
+        |  Import Questions
+
+  .actions 
+    ul.questionList
+      each question in questions
+        li
+          .innerDiv
+            label #{question.question} 
+              - if(question.weightage == 1)
+                span.label.label-success Easy
+              - else if(question.weightage == 2)
+                span.label.label-warning Modrate
+              - else if(question.weightage == 3)
+                span.label.label-important Hard
+            .pull-right.actionBtns
+              a.btn.btn-success(href="/assessment/question/#{question.id}/edit")
+                i.icon-edit.icon-white
+                |  Edit Question
+              a.btn.btn-danger(href="/assessment/question/#{question.id}/remove")
+                i.icon-trash.icon-white 
+                |  Delete Question
+          ul
+            each opt in question.choices
+              li #{opt}

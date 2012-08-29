@@ -1,0 +1,19 @@
+form(method='POST')
+  p
+    label(for="title") Title:
+    - if(edit) 
+      input.required(value='#{programming.title}', id='title', name='title')
+    - else
+      input.required(id='title', name='title')
+  p
+    label(for="description") Description:
+    textarea.required(name='description', id='description') #{programming.desc}
+  p
+    label(for="boilerPlateCode") BoilerPlateCode
+    textarea(name="boilerPlateCode", id="boilerPlateCode") #{programming.boilerPlateCode}
+  p
+    label Language
+    select#mode(name="language", size="1", value="#{programming.language}")
+      option(value="java") Java
+  p
+    input.btn.btn-primary(type='submit', value='Create')

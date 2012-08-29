@@ -67,6 +67,7 @@ module.exports.start = function(req, res, next){
 
     // Redirect the user to first unfinished lesson
     progress.getNextLesson(function(error, nextLesson) {
+      log.info(nextLesson);
       res.redirect('/lesson/' + nextLesson);
     });
   });

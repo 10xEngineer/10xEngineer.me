@@ -12,13 +12,11 @@ var LessonSchema = module.exports = new Schema({
     type: { type: String, enum: ['youtube', 'upload'] }
   },
   quiz: { 
-    questions : [ OptionSchema ],
+    marks : { type: Number }
   },
   programming:{
     language: { type: String, trim: true },
-    skeletonCode: { type: String, trim: true },
-    input: { type: String, trim: true },
-    output: { type: String, trim: true }
+    boilerPlateCode: { type: String, trim: true },
   },
   sysAdmin:{
     serverInfo: [],
@@ -29,10 +27,4 @@ var LessonSchema = module.exports = new Schema({
   chapter: { type: ObjectId, ref: 'Chapter', required: true }
 }, {
   collection: 'lessons'
-});
-
-var OptionSchema = new Schema({
-  question: String,
-  options: [ String ],
-  answers: [ String ]
 });

@@ -20,6 +20,8 @@
  *
  * Contributor(s):
  *      Rich Healey <richo AT psych0tik DOT net>
+ *      Javier Perez-Griffo <javier AT besol DOT es>
+ *      James Tan   <jamestyj AT gmail DOT com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -47,20 +49,21 @@ var ShHighlightRules = function() {
     var reservedKeywords = lang.arrayToMap(
         ('!|{|}|case|do|done|elif|else|'+
         'esac|fi|for|if|in|then|until|while|'+
-        '&|;'
+        '&|;|export|local|read|typeset|unset|'+
+        'elif|select|set'
         ).split('|')
     );
 
     var languageConstructs = lang.arrayToMap(
-            // TODO
-        ('echo|exit|eval|source|[|]|test|'+
-         'true|false|read'
+        ('[|]|alias|bg|bind|break|builtin|'+
+         'cd|command|compgen|complete|continue|'+
+         'dirs|disown|echo|enable|eval|exec|'+
+         'exit|fc|fg|getopts|hash|help|history|'+
+         'jobs|kill|let|logout|popd|printf|pushd|'+
+         'pwd|return|set|shift|shopt|source|'+
+         'suspend|test|times|trap|type|ulimit|'+
+         'umask|unalias|wait'
          ).split('|')
-    );
-
-    var builtinVariables = lang.arrayToMap(
-            // TODO
-        ('$?|$$|$!|$SHLVL').split('|')
     );
 
     var integer = "(?:(?:[1-9]\\d*)|(?:0))";
@@ -71,6 +74,14 @@ var ShHighlightRules = function() {
     var pointFloat = "(?:(?:" + intPart + "?" + fraction + ")|(?:" + intPart + "\\.))";
     var exponentFloat = "(?:(?:" + pointFloat + "|" +  intPart + ")" + ")";
     var floatNumber = "(?:" + exponentFloat + "|" + pointFloat + ")";
+    var fileDescriptor = "(?:&" + intPart + ")";
+
+    var variableName = "[a-zA-Z][a-zA-Z0-9_]*";
+    var variable = "(?:(?:\\$" + variableName + ")|(?:" + variableName + "=))";
+
+    var builtinVariable = "(?:\\$(?:SHLVL|\\$|\\!|\\?))";
+
+    var func = "(?:" + variableName + "\\s*\\(\\))";
 
     this.$rules = {
         "start" : [ {
@@ -79,6 +90,18 @@ var ShHighlightRules = function() {
         }, {
             token : "string",           // " string
             regex : '"(?:[^\\\\]|\\\\.)*?"'
+        }, {
+            token : "variable.language",
+            regex : builtinVariable
+        }, {
+            token : "variable",
+            regex : variable
+        }, {
+            token : "support.function",
+            regex : func,
+        }, {
+            token : "support.function",
+            regex : fileDescriptor
         }, {
             token : "string",           // ' string
             regex : "'(?:[^\\\\]|\\\\.)*?'"
@@ -94,8 +117,6 @@ var ShHighlightRules = function() {
                     return "keyword";
                 else if (languageConstructs.hasOwnProperty(value))
                     return "constant.language";
-                else if (builtinVariables.hasOwnProperty(value))
-                    return "support.function";
                 else if (value == "debugger")
                     return "invalid.deprecated";
                 else
@@ -106,7 +127,7 @@ var ShHighlightRules = function() {
             token : "keyword.operator",
             regex : "\\+|\\-|\\*|\\*\\*|\\/|\\/\\/|~|<|>|<=|=>|=|!="
         }, {
-            token : "lparen.paren",
+            token : "paren.lparen",
             regex : "[\\[\\(\\{]"
         }, {
             token : "paren.rparen",

@@ -1,0 +1,68 @@
+link(rel="stylesheet", type="text/css", href="/stylesheets/tree.css", media="screen")
+.container
+  .row
+    .span4
+      .btn-toolbar(style="margin-top: 18px;")
+        .btn-group
+          button(class="btn btn-primary") Create
+          button(class="btn dropdown-toggle btn-primary", data-toggle="dropdown")
+            span(class="caret")
+          ul(class="dropdown-menu")
+            li
+              a.createFolder(href="#") Create Folder
+            li
+              a(href="#") Create File
+        .btn-group
+          button(class="btn btn-danger") Remove
+          button(class="btn dropdown-toggle btn-danger", data-toggle="dropdown")
+            span(class="caret")
+          ul(class="dropdown-menu")
+            li
+              a(href="#") Remove Folder
+            li
+              a(href="#") Remove File
+        .btn-group
+          button(class="btn btn-warning", type="submit") Rename
+  .row
+    ol(class="tree well")
+      li
+        label(for="folder1", class="folder") 
+        div.txtFolder  Folder 1
+        input(type="checkbox", checked ,id="folder1") 
+        ol
+          li(class="file")
+            div.txtFile File 1
+          li
+            label(for="subfolder1", class="folder") 
+            div.txtFolder Subfolder 1
+            input(type="checkbox", id="subfolder1") 
+            ol
+              li(class="file")
+                div.txtFile Filey 1
+              li(class="file")
+                div.txtFile Filey 2
+              li(class="file")
+                div.txtFile Filey
+          li
+            label(for="subfolder1", class="folder") 
+            div.txtFolder Subfolder 1
+            input(type="checkbox", id="subfolder1") 
+
+script(type="text/javascript")
+
+  $(document).ready(function(){
+    $(".txtFile, .txtFolder").click(function(){
+      $(".txtFile, .txtFolder").removeClass("box");
+      $(this).addClass("box");
+    });
+    $(".createFolder").click(function(){
+      console.log($('.box').parents("ol")[0]);
+      alert($('.box').parent("ol"));
+      var attClass = $('.box').attr('class').split(' ');
+      if(attClass[0] == 'txtFile') {
+        $($('.box').parents("ol")[0]).append('<li><label for="folder1" class="folder"> </label><div class="txtFolder">Folder 1</div> <input type="checkbox" checked id="folder1" /></li>');
+      } else if(attClass[0] == 'txtFolder') {
+        $('ol',$('.box')).append('<ol><li><label for="folder1" class="folder"> </label><div class="txtFolder">Folder 1</div> <input type="checkbox" checked id="folder1" /><ol></ol></li></ol>');
+      }
+    });
+  });

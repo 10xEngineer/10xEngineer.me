@@ -1,6 +1,7 @@
 var express = require('express');
 var stylus = require('stylus');
 var nib = require('nib');
+var sharejs = require('share');
 var RedisStore = require('connect-redis')(express);
 
 var auth = require('./app/middleware/authentication');
@@ -14,6 +15,39 @@ module.exports = function(config) {
   var authMiddleware = auth.getMiddleware(config);
 
   var app = express.createServer();
+
+  var sharejsOptions = {
+    db: { type: 'redis' },
+    auth: function(client, action) {
+      // Reject readonly requests
+      if (action.name === 'submit op' && action.docName.match(/^readonly/)) {
+        action.reject();
+      } else {
+        action.accept();
+      }
+    },
+    socketio: null,
+    rest: true
+  };
+
+  // Custom parser to ignore parsing vfs requests
+  var bodyParser = function(req, res, next) {
+    var parser = express.bodyParser({uploadDir: tmpFileUploadDir, keepExtensions: true });
+    if(req.url.indexOf('/fs') == 0) {
+      var content = '', onData, onEnd;
+      req.on('data', onData = function(data) {
+        content += data;
+      });
+      req.on('end', onEnd = function() {
+        req.removeListener('data', onData);
+        req.removeListener('end', onEnd);
+        req.content = content;
+        next();
+      })
+    } else {
+      parser(req, res, next);
+    }
+  };
 
   // Express Middleware config
   app.configure(function(){
@@ -37,7 +71,7 @@ module.exports = function(config) {
     app.set('config', config);
 
     // Body parser
-    app.use(express.bodyParser({uploadDir: tmpFileUploadDir, keepExtensions: true }));
+    app.use(bodyParser);
     app.use(express.methodOverride());
 
     // Cookies and session
@@ -94,6 +128,7 @@ module.exports = function(config) {
       }
     });
 
+    sharejs.server.attach(app, sharejsOptions);
     app.use(app.router);
 
     // Static files

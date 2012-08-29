@@ -48,7 +48,7 @@ var MockRenderer = exports.MockRenderer = function(visibleRowCount) {
     };
 
     this.isMockRenderer = true;
-    
+
     this.$gutter = {};
 };
 
@@ -81,6 +81,12 @@ MockRenderer.prototype.getTextAreaContainer = function() {
     return this.container;
 };
 
+MockRenderer.prototype.addGutterDecoration = function() {
+};
+
+MockRenderer.prototype.removeGutterDecoration = function() {
+};
+
 MockRenderer.prototype.moveTextAreaToCursor = function() {
 };
 
@@ -101,20 +107,27 @@ MockRenderer.prototype.on = function() {
 MockRenderer.prototype.updateCursor = function() {
 };
 
+MockRenderer.prototype.animateScrolling = function(fromValue, callback) {
+    callback && callback();
+};
+
 MockRenderer.prototype.scrollToX = function(scrollTop) {};
 MockRenderer.prototype.scrollToY = function(scrollLeft) {};
-    
+
 MockRenderer.prototype.scrollToLine = function(line, center) {
-    var lineHeight = { lineHeight: 16 };
+    var lineHeight = 16;
     var row = 0;
     for (var l = 1; l < line; l++) {
-        row += this.session.getRowHeight(lineHeight, l-1) / lineHeight.lineHeight;
+        row += this.session.getRowLength(l-1);
     }
 
     if (center) {
         row -= this.visibleRowCount / 2;
     }
     this.scrollToRow(row);
+};
+
+MockRenderer.prototype.scrollSelectionIntoView = function() {
 };
 
 MockRenderer.prototype.scrollCursorIntoView = function() {
@@ -141,6 +154,9 @@ MockRenderer.prototype.getScrollTopRow = function() {
 MockRenderer.prototype.draw = function() {
 };
 
+MockRenderer.prototype.onChangeTabSize = function(startRow, endRow) {
+};
+
 MockRenderer.prototype.updateLines = function(startRow, endRow) {
 };
 
@@ -150,7 +166,7 @@ MockRenderer.prototype.updateBackMarkers = function() {
 MockRenderer.prototype.updateFrontMarkers = function() {
 };
 
-MockRenderer.prototype.setBreakpoints = function() {
+MockRenderer.prototype.updateBreakpoints = function() {
 };
 
 MockRenderer.prototype.onResize = function() {
@@ -171,6 +187,12 @@ MockRenderer.prototype.visualizeFocus = function() {
 MockRenderer.prototype.setAnnotations = function() {
 };
 
+MockRenderer.prototype.setStyle = function() {
+};
+
+MockRenderer.prototype.unsetStyle = function() {
+};
+
 MockRenderer.prototype.textToScreenCoordinates = function() {
     return {
         pageX: 0,
@@ -179,7 +201,7 @@ MockRenderer.prototype.textToScreenCoordinates = function() {
 };
 
 MockRenderer.prototype.adjustWrapLimit = function () {
-    
+
 };
 
 });

@@ -38,14 +38,29 @@
 
 define(function(require, exports, module) {
 "use strict";
+var dom = require("../lib/dom");
 
-function GutterHandler(editor) {
-    editor.setDefaultHandler("gutterclick", function(e) {
+function GutterHandler(mouseHandler) {
+    var editor = mouseHandler.editor;
+
+    mouseHandler.editor.setDefaultHandler("guttermousedown", function(e) {
+        if (!editor.isFocused())
+            return;
+        var gutterRegion = editor.renderer.$gutterLayer.getRegion(e);
+
+        if (gutterRegion)
+            return;
+
         var row = e.getDocumentPosition().row;
         var selection = editor.session.selection;
-        
-        selection.moveCursorTo(row, 0);
-        selection.selectLine();
+
+        if (e.getShiftKey())
+            selection.selectTo(row, 0);
+        else
+            mouseHandler.$clickSelection = editor.selection.getLineRange(row);
+
+        mouseHandler.captureMouse(e, "selectByLines");
+        return e.preventDefault();
     });
 }
 
