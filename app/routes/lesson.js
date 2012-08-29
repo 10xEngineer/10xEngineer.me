@@ -75,7 +75,9 @@ module.exports.showView = function(req, res) {
               userName        : req.user.name,
               allLessons      : allLessons,
               userId          : req.user._id,
-              progressFlag    : progressFlag
+              progressFlag    : progressFlag,
+              progressId      : progress._id,
+              username        : req.user.name
             });
           });
         });
@@ -90,7 +92,9 @@ module.exports.showView = function(req, res) {
           videoStartTime: videoStartTime,
           allLessons: allLessons,
           userId: req.user._id,
-          progressFlag : progressFlag
+          progressFlag : progressFlag,
+          progressId: progress._id,
+          username: req.user.name
         });
       });
     }

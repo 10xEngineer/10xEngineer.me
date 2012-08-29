@@ -1,10 +1,21 @@
-.container
-  //- @@TODO: Tabs is okay but need other content
-  //- require pageslide ace2
+- var docId = progressId;
+- scripts.push("/javascripts/superagent.min.js");
+- scripts.push("/javascripts/ace_2/ace.js");
+- scripts.push("/javascripts/jquery.contextMenu.js");
+- scripts.push("/javascripts/eventemitter2.js");
+- scripts.push("/javascripts/vfs-client.js");
+- scripts.push("/javascripts/filetree.js");
+- scripts.push("/javascripts/editor.js");
 
-  include ../_breadcrumb
+// For Share JS
+- scripts.push("/javascripts/share/bcsocket.js");
+- scripts.push("/share/share.js");
+- scripts.push("/share/json.js");
+- scripts.push("/javascripts/share/ace.js");
+- scripts.push("/javascripts/share/chat.js");
 
-- var docId = 'test';
+include ../widget/tabbar
+
 style
   ul.fileTree {
     font-family: Verdana, sans-serif;
@@ -55,6 +66,8 @@ style
   } 
 
 .container
+  include ../_breadcrumb
+
   div#header
     //- TODO:: Re write header
   .row-fluid
@@ -65,40 +78,73 @@ style
       #tree
 
     .vsplit.span8
-      #tabBar
-        ul#tabContainer.nav.nav-tabs
+      mixin tabbar
+      //- #tabBar
+      //-   ul#tabContainer.nav.nav-tabs
       #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
     
     #sidebar.span2(style="display: inline-block; vertical-align: top;")
       div#chat
-        h3 Chat
-        div#messages
-        input#message
-  .lessonBar.row-fluid
-    a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-    a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
 
+link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
 
-  link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
-  script(src="/javascripts/superagent.min.js")
-  script(src="/javascripts/ace_2/ace.js")
-  script(src="/javascripts/jquery.contextMenu.js")
-  script(src="/javascripts/vfs-client.js")
-  script(src="/javascripts/eventemitter2.js")
-  script(src="/javascripts/filetree.js")
-  script(src="/javascripts/editor.js")
-  
-  // For Share JS
-  script(src="/javascripts/share/bcsocket.js")
-  script(src="/share/share.js")
-  script(src="/share/json.js")
-  script(src="/javascripts/share/ace.js")
-  script(src="/javascripts/share/chat.js")
-  
-  script
-    var editor = ace.edit("editor");
+script
+  $(document).ready(function() {
 
-  script(src="/javascripts/test.js");
+    //dynamically load javascript source file
+    function loadScriptFile(path, callback) {
+      var head = document.getElementsByTagName('head')[0];
+      var s = document.createElement('script');
+
+      s.src = path;
+      head.appendChild(s);
+
+      s.onload = callback;
+    }
+
+    window.editor = new Editor({
+      vfs: new VFSClient('test'),
+      tree: '#tree',
+      editor: '#editor',
+      tab: '#tabContainer'
+    });
+
+    new Chat($('#chat'), '#{username}');
+
+    newCodeSocket.on('codePassed', function(data) {
+      displayMessage('success', 'Congratulations, your code compiled successfully.');
+
+    });
+
+    newCodeSocket.on('codeFailed', function(error) {
+      console.log(error);
+      var error = error || 'Unknown error. Please contact support.';
+      error = '<pre>' + error + '</pre>';
+      displayMessage('error', error);
+
+    });
+
+    $('#compile').click(function() {
+      var sourceCode = editor.ace.getContent();
+      var languageCode = $('#pageslide #mode').val();
+      if(!languageCode){
+        languageCode = $('#mode').val();
+      }
+      displayMessage('info', 'Compiling...');
+      newCodeSocket.emit('submitcode', 'test');
+    });
+
+    sharejs.open('#{docId}_json', 'json', function(error, doc) {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      doc.attach_editor(editor);
+    });
+
+    $('#save').click(function() {
+      editor.saveFile();
+      return false;
+    });
+  });
   
-  
-  script(type='text/javascript')

@@ -38,7 +38,7 @@
     /*
      * Format:
      * {
-     *   grid: {} # Grid object
+     *   tree: {} # Grid object
      *   tabs: {} # Tabs object
      *   currentDoc: {} # Currently displayed ace document
      * }
@@ -50,23 +50,53 @@
 
     var doc = this;
 
-    // Events for grid
-    var gridDoc = doc.at('grid');
-    gridDoc.on('insert', function(position, data) {
+    // Initialize
+    if(!doc.created) {
+      doc.submitOp([{p:[],od:null,oi:{
+        tree: {},
+        tabs: {
+          tabs: [],
+          current: ""
+        },
+        currentDoc: ""
+      }}]);
+    }
+
+    // Events for tree
+    var treeDoc = doc.at('tree');
+    treeDoc.on('insert', function(position, data) {
       // TODO: Handle file/dir creation
     });
-    gridDoc.on('delete', function(position, data) {
+    treeDoc.on('delete', function(position, data) {
       // TODO: Handle file/dir removal
     });
 
 
     // Events for tabs
     var tabDoc = doc.at('tabs');
-    tabDoc.on('insert', function(position, data) {
-      // TODO: Handle tab open
+    var syncTabs = tabDoc.at('tabs');
+    var syncActiveTab = tabDoc.at('active');
+    var currentTabs = editor.tabbar;
+    currentTabs.on('new', function(id) {
+      syncTabs.push(id);
     });
-    tabDoc.on('delete', function(position, data) {
-      // TODO: Handle tab close
+    currentTabs.on('open', function(id) {
+      syncActiveTab.set(id);
+    });
+    currentTabs.on('close', function(id) {
+      var tabs = syncTabs.get();
+      tabs.splice(tabs.indexOf(id), 1);
+      syncTabs.set(tabs);
+    });
+    syncTabs.on('insert', function(position, data) {
+      console.log(data);
+      editor.openTab(data);
+    });
+    syncTabs.on('delete', function(position, data) {
+      editor.closeTab(data);
+    });
+    doc.on('change', function(op) {
+      console.log(op);
     });
 
 

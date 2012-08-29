@@ -285,10 +285,6 @@ function Editor(options) {
   });
 
   // Tabbar events
-  this.tabbar.on('new', function(id) {
-    console.log('Tab added - ', id);
-  });
-
   this.tabbar.on('close', function(id) {
     self.closeTab(id);
   });

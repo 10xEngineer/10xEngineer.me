@@ -34,14 +34,17 @@ module.exports = function(config, callback) {
 };
 
 var migrateSchema = function(dbVersion, codeVersion, done) {
-  log.info('Migrating the database from version ' + dbVersion + ' to ' + codeVersion);
-
-  migrate(dbVersion, codeVersion, function() {
-    process.nextTick(function() {
-      migrateSchema(++dbVersion, codeVersion, done);
-      log.info('Database has been successfully migrated to version ', dbVersion);
-    });
-  });
+  if(dbVersion === codeVersion) {
+    done(dbVersion);
+  } else {
+    log.info('Migrating the database from version ' + dbVersion + ' to ' + codeVersion);
+    migrate(dbVersion, codeVersion, function() {
+      process.nextTick(function() {
+        migrateSchema(++dbVersion, codeVersion, done);
+        log.info('Database has been successfully migrated to version ', dbVersion);
+      });
+    });    
+  }
 };
 
 var migrate = function(dbVersion, codeVersion, done) {
