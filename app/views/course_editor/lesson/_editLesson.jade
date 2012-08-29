@@ -26,48 +26,35 @@
 - else if(lesson.type == 'quiz')
   h3 Quiz
   br
-  div#questionBox
-    - var questionNo = 0;
-    each questionContent,questionIndex in lesson.quiz.questions
-      div.addedQuestion
-        p Question #{questionIndex}:
-        input.question(type="text", value="#{questionContent.question}", name="question[#{questionIndex}]")
-        br
-        div.options
-          p Options
-          - var optionnameIndex = 0;
-          each option,optionIndex in answersJSON[questionIndex]
-            div.addedOption
-              - if(option)
-                input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]", checked)
-              - else
-                input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
-              input.questionOption(type="text", value="#{optionIndex}", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
-              - optionnameIndex = optionnameIndex + 1;
-          div.addedOption
-            input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionIndex}][#{optionnameIndex}]")
-            input.questionOption(type="text", name="questionOption[#{questionIndex}][#{optionnameIndex}]")
-      - questionNo = questionNo + 1;
-    div.addedQuestion
-      p Question #{questionNo}:
-      input.question(type="text", name="question[#{questionNo}]")
-      br
-      div.options
-        p Options
-        div.addedOption
-          input.questionOptionCheckbox(type="checkBox", name="questionOptionCheckbox[#{questionNo}][0]")
-          input.questionOption(type="text", name="questionOption[#{questionNo}][0]")
+  p Marks
+  input(name="marks", value="#{lesson.quiz.marks}")    
 
 - else if(lesson.type == 'programming')
   p Programming :
-  select#editLanguage(name='language')
-    option(value="javascript", selected="selected") JavaScript
-  p Code :
-  textarea#code(name='code') #{lesson.programming.skeletonCode}
-  p Enter Input :
-  textarea#input(name='input') #{lesson.programming.input}
-  p Enter Output :
-  textarea#output(name='output') #{lesson.programming.output}
+  select#editLanguage(name='language', value='#{lesson.programming.language}')
+    option(value="javascript") JavaScript
+    option(value="xml") XML
+    option(value="html") HTML
+    option(value="css") CSS
+    option(value="scss") SCSS
+    option(value="python") Python
+    option(value="php") PHP
+    option(value="java") Java
+    option(value="ruby") Ruby
+    option(value="c_cpp") C/C++
+    option(value="coffee") CoffeeScript
+    option(value="json") JSON
+    option(value="perl") Perl
+    option(value="clojure") Clojure
+    option(value="ocaml") OCaml
+    option(value="csharp") C#
+    option(value="svg") SVG
+    option(value="textile") Textile
+    option(value="groovy") Groovy
+    option(value="scala") Scala
+
+  p Boiler Plate Code :
+  textarea#code(name='boilerPlateCode', rows="5") #{lesson.programming.boilerPlateCode}
 
 - else if(lesson.type == 'sysAdmin')
     select.serverName#serverName(name='serverName', multiple='multiple', style='display:none')

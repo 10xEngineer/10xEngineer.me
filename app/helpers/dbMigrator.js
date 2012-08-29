@@ -15,7 +15,7 @@ module.exports = function(config, callback) {
 
     var codeSchemaVersion = config.get('db:schemaVersion');
 
-    if(currentVersion !== codeSchemaVersion) {
+    if(currentVersion < codeSchemaVersion) {
       // Schema has changed. Execute migration functions.
       migrateSchema(currentVersion, codeSchemaVersion, function(version) {
         // Update schemaVersion in the database
@@ -34,18 +34,14 @@ module.exports = function(config, callback) {
 };
 
 var migrateSchema = function(dbVersion, codeVersion, done) {
-  if(dbVersion < codeVersion) {
-    log.info('Migrating the database from version ' + dbVersion + ' to ' + codeVersion);
+  log.info('Migrating the database from version ' + dbVersion + ' to ' + codeVersion);
 
-    migrate(dbVersion, codeVersion, function() {
-      process.nextTick(function() {
-        migrateSchema(++dbVersion, codeVersion, done);
-        log.info('Database has been successfully migrated to version ', dbVersion);
-      });
+  migrate(dbVersion, codeVersion, function() {
+    process.nextTick(function() {
+      migrateSchema(++dbVersion, codeVersion, done);
+      log.info('Database has been successfully migrated to version ', dbVersion);
     });
-  } else {
-    done(codeVersion);
-  }
+  });
 };
 
 var migrate = function(dbVersion, codeVersion, done) {
@@ -161,6 +157,22 @@ var migrate = function(dbVersion, codeVersion, done) {
           userRole.save(function(error) {
             done();
           });
+        });
+      });
+    });
+  } else if(dbVersion == 5) {
+    Role.findOne({name : 'admin'}, function(error, adminRole){
+      adminRole.permissions.push('assessment_all_all');
+      adminRole.markModified('permissions');
+      adminRole.save(function(error) {
+
+        var examinerRole = new Role();
+        examinerRole.name = "examiner";
+        examinerRole.permissions = [];
+        examinerRole.permissions.push('assessment_all_all');
+
+        examinerRole.save(function(error){
+          done();
         });
       });
     });

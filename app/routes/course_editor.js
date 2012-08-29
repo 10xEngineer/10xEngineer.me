@@ -483,14 +483,15 @@ module.exports.lessonCreate = function(req, res, next) {
   // For Programming Lesson
   if(lesson.type == 'programming') {
     lesson.programming.language = req.body.language ;
-    lesson.programming.skeletonCode = req.body.code ;
-    lesson.programming.input = req.body.input ;
-    lesson.programming.output = req.body.output ;
+    lesson.programming.boilerPlateCode = req.body.boilerPlateCode ;
     saveLesson(lesson, req, res);
   }
   // For Quiz Lesson
   if(lesson.type == 'quiz') {
 
+    lesson.quiz.marks = req.body.marks;
+    /*
+    // Old code
     var questionLength = req.body.question.length-1;
     var lessonInstanceQuestion = lesson.quiz.questions;
     for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
@@ -513,6 +514,9 @@ module.exports.lessonCreate = function(req, res, next) {
       }
       lessonInstanceQuestion.push(instanceQuestion);
     }
+    saveLesson(lesson, req, res);
+    // old code over
+    */
     saveLesson(lesson, req, res);
   }
 
@@ -597,7 +601,7 @@ module.exports.lessonEditView = function(req, res) {
   var lesson = req.lesson;
   var answersJSON = {};
   if(lesson.type == 'quiz') {
-    
+    /*
     var quizQuestions = lesson.quiz.questions;
     var quizQuestionsLength = lesson.quiz.questions.length;
 
@@ -614,7 +618,7 @@ module.exports.lessonEditView = function(req, res) {
           answersJSON[index][options[indexOption]] = false;
         }
       }
-    }
+    }*/
   }
   VMDef.find(function (error, lab) {
     res.render('course_editor/lesson/edit', {
@@ -656,29 +660,7 @@ module.exports.lessonEdit = function(req, res){
   }
   // For Quiz Lesson
   if(lesson.type == 'quiz') {
-    var questionLength = req.body.question.length - 1;
-    var lessonInstanceQuestion = [];
-    for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
-      
-      var instanceQuestion = {
-        question : '',
-        options  : [],
-        answers  : []
-      };
-
-      instanceQuestion.question = req.body.question[indexQuestion];
-
-      var optionsLength = req.body.questionOption[indexQuestion].length - 1;
-      var answerIndex = 0;
-      for (var indexOption = 0; indexOption < optionsLength; indexOption++) {
-        instanceQuestion.options[indexOption] = req.body.questionOption[indexQuestion][indexOption];
-        if(req.body.questionOptionCheckbox[indexQuestion][indexOption]) {
-          instanceQuestion.answers[answerIndex++] = req.body.questionOption[indexQuestion][indexOption];
-        }
-      }
-      lessonInstanceQuestion.push(instanceQuestion);
-    }
-    lesson.quiz.questions = lessonInstanceQuestion;
+    lesson.quiz.marks = req.body.marks;
   }
 
   // Sys Admin Lesson 
@@ -727,8 +709,17 @@ module.exports.lessonEdit = function(req, res){
 module.exports.lessonRemove = function(req, res, next){
 
   var lesson = req.lesson;
+  var Question = model.Question;
   var chapterId =lesson.chapter.id;
-  
+  var lesson_id = lesson._id;
+
+  if(lesson.type == "quiz") {
+    Question.remove({lesson: lesson_id}, function(err){
+      if(err){
+        log.error(err);
+      }
+    });
+  }
   lesson.removeLesson(function(error){
     if (error) {
       log.error(error);
@@ -802,6 +793,7 @@ module.exports.lessonDown = function(req, res, next){
 
 module.exports.lessonView = function(req, res) {
   var VMDef = model.VMDef;
+  var Question = model.Question;
   //For random the options
   var lesson = req.lesson;
   if(lesson.type=='sysAdmin'){
@@ -809,6 +801,14 @@ module.exports.lessonView = function(req, res) {
       res.render('course_editor/lesson/' + req.lesson.type, {
         lesson: lesson,
         labs : VMDeflist
+      });
+    });
+  } else if(lesson.type=='quiz') {
+    Question.find({ lesson: lesson._id }, function(err, questions) {
+      console.log(questions);
+      res.render('course_editor/lesson/' + req.lesson.type, {
+        lesson : lesson,
+        questions: questions
       });
     });
   } else {

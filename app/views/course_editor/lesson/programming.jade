@@ -12,16 +12,7 @@
       strong Language :
       | #{lesson.programming.language}
     p
-      strong SampleCode :
-      pre #{lesson.programming.skeletonCode}
+      strong BoilerPlateCode :
+      pre #{lesson.programming.boilerPlateCode}
 
-    p
-      strong Input :
-      pre #{lesson.programming.input}
-
-    p
-      strong Output :
-      pre #{lesson.programming.output}
-
-    p
-      a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back
+    a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back

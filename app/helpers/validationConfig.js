@@ -50,15 +50,11 @@ module.exports.lesson = {
 					}
 				},
 				quiz : {
-					question: { required: 1},
-					questionOption:{ required: 2},
-					questionOptionCheckbox:{ required: 1}
+					marks: { required: true},
 				},
 				programming: {
 					language : {required:true},
-					code: {required: true},
-					input: {required: true},
-					output: {required: true}
+					boilerPlateCode: {required: true},
 				}
 			}
 		}
