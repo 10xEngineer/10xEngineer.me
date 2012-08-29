@@ -106,7 +106,7 @@ script
     }
 
     window.editor = new Editor({
-      vfs: new VFSClient('test'),
+      vfs: new VFSClient('#{docId}'),
       tree: '#tree',
       editor: '#editor',
       tab: '#tabContainer'
