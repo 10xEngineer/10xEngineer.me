@@ -17,15 +17,24 @@ TabBar = (function() {
     this.state = {tabs : []};
     
     var tab, _i, _len, _ref;
-    _ref = initialState.tabs;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      tab = _ref[_i];
-      this.addTab(tab);
-    }  
-    this.setActiveTab(initialState.activeTab);
+    if(initialState) {
+      _ref = initialState.tabs;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        tab = _ref[_i];
+        this.addTab(tab);
+      }  
+      this.setActiveTab(initialState.activeTab);
+    }
   }
+
+  TabBar.prototype = new EventEmitter2({
+    wildcard: true,
+    delimiter: '::',
+    maxListeners: 20
+  });
+
   views_tabbar_create = function(initialState) {
-    tabBar = new TabBar(initialState);
+    var tabBar = new TabBar(initialState);
     api = tabBar.exposeApi.call(tabBar);
     tabBar.getTabBarElement().data(api);
     return tabBar;
@@ -34,21 +43,15 @@ TabBar = (function() {
   
   TabBar.prototype.getTabBarElement = function() {
     return $('#tabBar');
-  }
-  
-  
-  TabBar.prototype.triggerTabBarEvent = function() {
-    this.getTabBarElement().triggerHandler.apply(null, arguments);
-  }
-  
+  };  
   
   TabBar.prototype.addTab = function(tab) {
     var id = tab.id,
       title = tab.title;
-    this.state.tabs.push(tab)
+    this.state.tabs.push(tab);
     var tabElement = this.createTabElement(id, title);
     this.appendTabElement(tabElement);
-    this.triggerTabBarEvent('TabAddedEvent', id);
+    this.emit('new', id);
     this.setActiveTab(id);
   };
   
@@ -57,16 +60,16 @@ TabBar = (function() {
     if (this.state.activeTab === id) {
       this.setActiveTab(this.getNextActiveTab());
     }
-    element = this.removeTabElement(id);
-    this.triggerTabBarEvent('TabRemovedEvent', id);
+    var element = this.removeTabElement(id);
+    this.emit('close', id);
     this.destroyTabElement(element);
     this.state.tabs.splice(this.getTabIndexById(id), 1);
-  }
+  };
   
   
   TabBar.prototype.createTabElement = function(id, title) {
     var _self = this;
-    return element = $('<div/>', {
+    var element = $('<div/>', {
       'class' : 'tab',
       text    : title
     })
@@ -82,35 +85,36 @@ TabBar = (function() {
     .click(function() {
       _self.setActiveTab(id);
     });
-  }
+    return element;
+  };
   
   
   TabBar.prototype.destroyTabElement = function(element) {
     return element.remove();
-  }
+  };
   
   
   TabBar.prototype.appendTabElement = function(element, index) {
     if (index) {
-      previousElement = $('#tabBar .tab').eq(index);
+      var previousElement = $('#tabBar .tab').eq(index);
       assert(previousElement.length !== 0, 'Recorded and actual state should have matched wherever this.state was modified');
       return previousElement.after(element);
     }
     else {
       return $('#tabBar').append(element);
     }
-  }
+  };
   
   
   TabBar.prototype.removeTabElement = function(id) {
     var element = this.getTabElementById(id);
     return element.detach();
-  }
+  };
   
   
   TabBar.prototype.getState = function() {
     return this.state;
-  }
+  };
   
   
   TabBar.prototype.getNextActiveTab = function() {
@@ -119,33 +123,33 @@ TabBar = (function() {
       currentTabId = currentState.activeTab,
       currentIndex = this.getTabIndexById(currentTabId);
     
+    var nextActiveIndex;
     if (currentIndex > 0) {
-      var nextActiveIndex = currentIndex - 1;
+      nextActiveIndex = currentIndex - 1;
     }
     else {
-      var nextActiveIndex = 0;
+      nextActiveIndex = 0;
     }
     var nextActiveTab = currentTabs[nextActiveIndex];
-    return nextActiveTab.id
-  }
+    return nextActiveTab.id;
+  };
   
   
   TabBar.prototype.getActiveTabElement = function() {
     return this.getTabElementById(this.state.activeTab);
-  }
+  };
   
   
   TabBar.prototype.setActiveTab = function(id) {
     this.getActiveTabElement().removeClass('active');
     
-    element = this.getTabElementById(id);
+    var element = this.getTabElementById(id);
     element.addClass('active');
     
     this.state.activeTab = id;
-    
-    this.triggerTabBarEvent('ActiveTabChangeEvent', id);
+    this.emit('open', id);
     return element;
-  }
+  };
   
   
   TabBar.prototype.getTabIndexById = function(id) {
@@ -159,19 +163,21 @@ TabBar = (function() {
       }
     }
     return tabIndex;
-  }
+  };
   
   
   TabBar.prototype.getTabElementById = function(id) {
     return $('#tabBar .tab').eq(this.getTabIndexById(id));
-  }
+  };
   
   
   TabBar.prototype.exposeApi = function() {
     return {
       addTab : this.addTab.bind(this),
-    }
-  }
+      removeTab : this.removeTab.bind(this),
+      setActiveTab : this.setActiveTab.bind(this)
+    };
+  };
 
 
   return TabBar;
@@ -179,4 +185,4 @@ TabBar = (function() {
 })();
 
   
-})()
+})();

@@ -186,6 +186,7 @@ function Editor(options) {
   // Assign ace editor
   this.ace = ace;
 
+  this.tabbar = views_tabbar_create();
 
   this.vfs = options.vfs;
 
@@ -277,6 +278,25 @@ function Editor(options) {
     self.openTab(path);
   });
 
+  this.tree.on('openDir', function(path, element) {
+    self.vfs.readDir(path, function(json){
+      self.tree.expand(element, json);
+    });
+  });
+
+  // Tabbar events
+  this.tabbar.on('new', function(id) {
+    console.log('Tab added - ', id);
+  });
+
+  this.tabbar.on('close', function(id) {
+    self.closeTab(id);
+  });
+
+  this.tabbar.on('open', function(id) {
+    self.openTab(id);
+  });
+
   // Load the root directory
   this.vfs.readDir('/', function(json) {
     self.tree.refresh(json);
@@ -292,17 +312,11 @@ Editor.prototype = new EventEmitter2({
 
 // Tab related functions
 
-Editor.prototype.openTab = function(path) {
+Editor.prototype.newTab = function(path) {
   var self = this;
   // TODO: Extract actual name
   var name = path;
-
-  var self = this;
   var doc = this.tabs[path] || {};
-
-  if (doc.session) {
-    return self.ace.setSession(doc.session);
-  }
 
   //@todo do something while waiting
   // env.editor.setSession(emptySession || (emptySession = new EditSession("")))
@@ -316,72 +330,39 @@ Editor.prototype.openTab = function(path) {
     session.setMode(mode.mode);
     self.ace.setSession(session);
     self.ace.focus();
-
-    var $close = $('<i/>', {
-      class: 'icon-remove closeTab',
-      style: 'opacity: 0.18; z-index: 10;'
-    });
-
-    $close.click(function(e){
-      // TODO: Pass path
-      self.closeTab($(this).parent());
-      if (!e)
-        e = window.event;
-      //IE9 & Other Browsers
-      if (e.stopPropagation) {
-        e.stopPropagation();
-      }
-      //IE8 and Lower
-      else {
-        e.cancelBubble = true;
-      }
-    });
-
-    var $link = $('<a/>',{
-      href: "#", 
-      'data-toggle': "tab",
-      rel : path,
-      html: name
-    }).append($close);
-    $link.click(function(){
-      self.openTab($(this).attr('rel'));
-    });
-
-    var $tab = $('<li/>').append($link);
-    $tab.appendTo($(self.options.tab));
-
-    doc.html = $tab.get(0);
+    self.ace.setReadOnly(false);
 
     // Save the open tab in memory
     self.tabs[path] = doc;
 
-    self.markTabActive($tab);
+    var $tab = self.tabbar.addTab({
+      id: path,
+      title: name
+    });
+
   });
 };
 
-Editor.prototype.closeTab = function(path) {
-  // Mark the editor readonly
-  this.ace.setReadOnly(true);
+Editor.prototype.openTab = function(path) {
+  var self = this;
+  // TODO: Extract actual name
+  var doc = this.tabs[path] || {};
+
+  this.active = path;
+  if (doc.session) {
+    self.ace.setSession(doc.session);
+  } else {
+    self.newTab(path);
+  }
 };
 
-Editor.prototype.markTabActive = function(element) {
-  if(typeof(element) === 'string') {
-    // Assume it's a path
-    element = this.tabs[element];
-  } else {
-    element = this.tabs[$(element).children('a').attr('rel')];
-  }
-
-  $(this.options.tab).find('.active').removeClass('active');
-
-  $(element.html).addClass('active');
-
-  this.active = element.path;
-
-  // Mark the editor editable
-  this.ace.setReadOnly(false);
-}
-
+Editor.prototype.closeTab = function(path) {
+  var self = this;
+  this.active = null;
+  self.ace.setReadOnly(true);
+  self.ace.setSession(self.blankSession);
+  delete self.tabs[path];
+};
 
 // File related functions
 Editor.prototype.saveFile = function() {

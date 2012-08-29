@@ -120,7 +120,7 @@ var FileTree = function(element, json) {
     if(file.mime === 'inode/directory') {
       $item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
       $item.children('a').bind('dblclick', function(){
-        doubleClickOnDir(this);
+        self.openDir(this);
       });
       $item.children('a').bind('click', function(){
         self.selectItem(this);
@@ -164,7 +164,7 @@ FileTree.prototype.create =  function(caller, type) {
   } else {
     $item = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
     $item.children('a').bind('dblclick', function(){
-      doubleClickOnDir(this);
+      self.openDir(this);
     });
     $item.children('a').bind('click', function(){
       self.selectItem(this);
@@ -191,6 +191,18 @@ FileTree.prototype.selectItem = function(element) {
   $('.selected').removeClass('selected');
   $(element).addClass('selected');
 }
+
+FileTree.prototype.openDir = function(element) {
+  var self = this;
+  var $parent = $(element).parent();
+  var path = $(element).attr('rel');
+  if($parent.hasClass('collapsed')) {
+    this.emit('openDir', path, element);
+  } else {
+    self.collapse(element);
+  }
+};
+
 
 FileTree.prototype.openFile = function(element) {
   var path = $(element).attr('rel');
@@ -302,7 +314,7 @@ FileTree.prototype.expand = function(caller, json) {
     if(file.mime === 'inode/directory') {
       $item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
       $item.children('a').bind('dblclick', function(){
-        doubleClickOnDir(this);
+        self.openDir(this);
       });
       $item.children('a').bind('click', function(){
         self.selectItem(this);
@@ -377,7 +389,7 @@ FileTree.prototype.refresh = function(json) {
       if(file.mime === 'inode/directory') {
         $item = $('<li/>', { class: 'directory collapsed' }).append($('<a/>', { html: file.name, href: '#', rel: file.path + file.name + '/' }));
         $item.children('a').bind('dblclick', function(){
-          doubleClickOnDir(this);
+          self.openDir(this);
         });
         $item.children('a').bind('click', function(){
           self.selectItem(this);

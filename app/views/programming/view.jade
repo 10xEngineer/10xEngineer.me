@@ -1,5 +1,3 @@
-include ../widget/tabbar
-
 - var docId = 'test';
 - scripts.push("/javascripts/superagent.min.js");
 - scripts.push("/javascripts/ace_2/ace.js");
@@ -15,6 +13,8 @@ include ../widget/tabbar
 - scripts.push("/share/json.js");
 - scripts.push("/javascripts/share/ace.js");
 - scripts.push("/javascripts/share/chat.js");
+
+include ../widget/tabbar
 
 style
   ul.fileTree {
@@ -109,27 +109,6 @@ script
       editor: '#editor',
       tab: '#tabContainer'
     });
-
-    var doubleClickOnDir = function(element) {
-      var $parent = $(element).parent();
-      var path = $(element).attr('rel');
-      if($parent.hasClass('collapsed')) {
-        vfs.readDir(path, function(json){
-          grid.expand(element, json);
-        });
-      } else {
-        grid.collapse(element);
-      }
-    };
-
-    var openTab = function(path, containt) {
-      var $list = $('#tree').find('a');
-      $list.each(function(index, element) {
-        if($(element).attr('rel') == path){
-          return grid.open(element);
-        }
-      });
-    };
 
     newCodeSocket.on('codePassed', function(data) {
       displayMessage('success', 'Congratulations, your code compiled successfully.');
