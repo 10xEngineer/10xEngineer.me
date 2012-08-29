@@ -89,14 +89,14 @@
       syncTabs.set(tabs);
     });
     syncTabs.on('insert', function(position, data) {
-      console.log(data);
+      //console.log(data);
       editor.openTab(data);
     });
     syncTabs.on('delete', function(position, data) {
       editor.closeTab(data);
     });
     doc.on('change', function(op) {
-      console.log(op);
+      //console.log(op);
     });
 
 

@@ -362,13 +362,11 @@ Editor.prototype.closeTab = function(path) {
 
 // File related functions
 Editor.prototype.saveFile = function() {
-  console.log(this);
   if(!this.active) {
     return console.log('No active tabs');
   }
 
   var content = this.getContent();
-  console.log(content);
 
   this.vfs.saveFile(this.active, content, function() {
     console.log('saved');
