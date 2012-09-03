@@ -174,6 +174,7 @@ TabBar = (function() {
   TabBar.prototype.exposeApi = function() {
     return {
       addTab : this.addTab.bind(this),
+      getTab : this.getTabElementById.bind(this),
       removeTab : this.removeTab.bind(this),
       setActiveTab : this.setActiveTab.bind(this)
     };
