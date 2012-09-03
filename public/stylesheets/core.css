@@ -1,11 +1,13 @@
-body{background-color:whiteSmoke}
+html{height:100%}
+body{background-color:whiteSmoke;height:100%}
 footer{margin-top:30px}
 img.repsonsive{max-width:100%}
 @media (max-width: 767px){p{font-size:.9em}
 .hero-unit{padding:20px}
 }@media (min-width: 768px) and (max-width:979px){p{font-size:1em}
 }@media (min-width: 1200px){p{font-size:1em}
-}#footer{background-color:#000;color:#fff;padding:10px 0}
+}#footer{background-color:#000;color:#fff;padding:10px 0;position:absolute;bottom:0;z-index:10}
+#content{height:100%}
 .main-page .page-header{width:100%}
 .main-page .header-photo{max-width:100%}
 .main-page .page-header h1{width:90%}
