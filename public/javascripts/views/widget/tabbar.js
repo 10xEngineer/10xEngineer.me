@@ -73,6 +73,9 @@ TabBar = (function() {
       'class' : 'tab',
       text    : title
     })
+    .append($('<div/>', {
+      'class' : 'loader'
+    }))
     .append($('<a/>', {
       'class' : 'close_button',
       text    : 'x'

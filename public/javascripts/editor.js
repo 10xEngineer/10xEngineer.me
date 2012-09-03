@@ -324,6 +324,9 @@ Editor.prototype.newTab = function(path) {
     var mode = getModeFromPath(path);
     session.modeName = mode.name;
     session.setMode(mode.mode);
+    session.on('change', function() {
+      self.setTabState(self.active, 'dirty');
+    });
     self.ace.setSession(session);
     self.ace.focus();
     self.ace.setReadOnly(false);
@@ -362,13 +365,16 @@ Editor.prototype.closeTab = function(path) {
 
 // File related functions
 Editor.prototype.saveFile = function() {
+  var self = this;
   if(!this.active) {
     return console.log('No active tabs');
   }
-
+  this.setTabState(this.active, 'saving')
+  
   var content = this.getContent();
 
   this.vfs.saveFile(this.active, content, function() {
+    self.setTabState(self.active, 'clean');
     console.log('saved');
   });
 
@@ -394,3 +400,17 @@ Editor.prototype.onResize = function() {
   this.resize();
 };
 
+Editor.prototype.setTabState = function(id, state) {
+  tab = this.tabbar.getTabElementById(id)
+  switch (state) {
+    case 'saving':
+      tab.addClass('saving');
+      break;
+    case 'clean':
+      tab.removeClass('saving');
+      tab.removeClass('dirty');
+      break;
+    case 'dirty':
+      tab.addClass('dirty');
+  }
+}
