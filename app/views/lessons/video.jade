@@ -50,8 +50,6 @@
         pluginPath : '/javascripts/mediaelement/',
         success : function(mediaElement, domObject) {
 
-          mediaElement.play();
-
           // At Video Start
           mediaElement.addEventListener('playing', function(e) {
             if(flag == 0) {
