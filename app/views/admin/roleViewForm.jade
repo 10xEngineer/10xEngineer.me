@@ -1,137 +1,140 @@
-.container
-  h1 Create New Role
+extends ../layout
 
-  form#createRoleForm(method="post")
-    p
-      label(for="name") Name
+block layout.body
+  .container
+    h1 Create New Role
 
-      -if(typeof(role) != 'undefined' && typeof(role.name) != 'undefined')
-        input#name(type="text", name="name", value='#{role.name}')
-      -else
-        input#name(type="text", name="name")
+    form#createRoleForm(method="post")
+      p
+        label(for="name") Name
 
-    p
-      label Permissions
+        -if(typeof(role) != 'undefined' && typeof(role.name) != 'undefined')
+          input#name(type="text", name="name", value='#{role.name}')
+        -else
+          input#name(type="text", name="name")
 
-    p
-      table#permissionTable.table.table-bordered
-        tr.permission
-          th Entity\\Permission
-          th Read
-          th Edit
-          th Insert
-          th Delete
-          th Publish
-        tr
-          th Admin
-          td
-            -if(typeof(permits) != 'undefined' && permits.admin_read) 
-              input(type="checkbox", name="admin_read", checked);
-            -else  
-              input(type="checkbox", name="admin_read");
-          td
-            -if(typeof(permits) != 'undefined' && permits.admin_edit) 
-              input(type="checkbox", name="admin_edit", checked);
-            -else  
-              input(type="checkbox", name="admin_edit");				
-          td
-            -if(typeof(permits) != 'undefined' && permits.admin_insert) 
-              input(type="checkbox", name="admin_insert", checked);
-            -else  
-              input(type="checkbox", name="admin_insert");				
-          td
-            -if(typeof(permits) != 'undefined' && permits.admin_delete) 
-              input(type="checkbox", name="admin_delete", checked);
-            -else  
-              input(type="checkbox", name="admin_delete");
-          td
-            -if(typeof(permits) != 'undefined' && permits.admin_publish) 
-              input(type="checkbox", name="admin_publish", checked);
-            -else  
-              input(type="checkbox", name="admin_publish");
-        tr.user
-          th User
-          td
-            -if(typeof(permits) != 'undefined' && permits.user_read) 
-              input(type="checkbox", name="user_read", checked);
-            -else
-              input(type="checkbox", name="user_read");
-          td
-            -if(typeof(permits) != 'undefined' && permits.user_edit) 
-              input(type="checkbox", name="user_edit", checked);
-            -else  
-              input(type="checkbox", name="user_edit");				
-          td
-            -if(typeof(permits) != 'undefined' && permits.user_insert) 
-              input(type="checkbox", name="user_insert", checked);
-            -else  
-              input(type="checkbox", name="user_insert");				
-          td
-            -if(typeof(permits) != 'undefined' && permits.user_delete) 
-              input(type="checkbox", name="user_delete", checked);
-            -else  
-              input(type="checkbox", name="user_delete");
-          td
-            -if(typeof(permits) != 'undefined' && permits.user_publish) 
-              input(type="checkbox", name="user_publish", checked);
-            -else  
-              input(type="checkbox", name="user_publish");
-        tr.course
-          th Course
-          td
-            -if(typeof(permits) != 'undefined' && permits.course_read) 
-              input(type="checkbox", name="course_read", checked);
-            -else  
-              input(type="checkbox", name="course_read");
-          td
-            -if(typeof(permits) != 'undefined' && permits.course_edit) 
-              input(type="checkbox", name="course_edit", checked);
-            -else  
-              input(type="checkbox", name="course_edit");       
-          td
-            -if(typeof(permits) != 'undefined' && permits.course_insert) 
-              input(type="checkbox", name="course_insert", checked);
-            -else  
-              input(type="checkbox", name="course_insert");       
-          td
-            -if(typeof(permits) != 'undefined' && permits.course_delete) 
-              input(type="checkbox", name="course_delete", checked);
-            -else  
-              input(type="checkbox", name="course_delete");
-          td
-            -if(typeof(permits) != 'undefined' && permits.course_publish) 
-              input(type="checkbox", name="course_publish", checked);
-            -else  
-              input(type="checkbox", name="course_publish");
-        tr.assessment
-          th Assessment
-          td
-            -if(typeof(permits) != 'undefined' && permits.assessment_read) 
-              input(type="checkbox", name="assessment_read", checked);
-            -else  
-              input(type="checkbox", name="assessment_read");
-          td
-            -if(typeof(permits) != 'undefined' && permits.assessment_edit) 
-              input(type="checkbox", name="assessment_edit", checked);
-            -else  
-              input(type="checkbox", name="assessment_edit");				
-          td
-            -if(typeof(permits) != 'undefined' && permits.assessment_insert) 
-              input(type="checkbox", name="assessment_insert", checked);
-            -else  
-              input(type="checkbox", name="assessment_insert");				
-          td
-            -if(typeof(permits) != 'undefined' && permits.assessment_delete) 
-              input(type="checkbox", name="assessment_delete", checked);
-            -else  
-              input(type="checkbox", name="assessment_delete");
-          td
-            -if(typeof(permits) != 'undefined' && permits.assessment_publish) 
-              input(type="checkbox", name="assessment_publish", checked);
-            -else  
-              input(type="checkbox", name="assessment_publish");
+      p
+        label Permissions
 
-    p
-      a#cancel.btn.btn-small(href="/admin/roles") Cancel
-      &nbsp;
-      input#submit.btn.btn-small(type="submit", value="Apply Changes")
+      p
+        table#permissionTable.table.table-bordered
+          tr.permission
+            th Entity\\Permission
+            th Read
+            th Edit
+            th Insert
+            th Delete
+            th Publish
+          tr
+            th Admin
+            td
+              -if(typeof(permits) != 'undefined' && permits.admin_read) 
+                input(type="checkbox", name="admin_read", checked);
+              -else  
+                input(type="checkbox", name="admin_read");
+            td
+              -if(typeof(permits) != 'undefined' && permits.admin_edit) 
+                input(type="checkbox", name="admin_edit", checked);
+              -else  
+                input(type="checkbox", name="admin_edit");				
+            td
+              -if(typeof(permits) != 'undefined' && permits.admin_insert) 
+                input(type="checkbox", name="admin_insert", checked);
+              -else  
+                input(type="checkbox", name="admin_insert");				
+            td
+              -if(typeof(permits) != 'undefined' && permits.admin_delete) 
+                input(type="checkbox", name="admin_delete", checked);
+              -else  
+                input(type="checkbox", name="admin_delete");
+            td
+              -if(typeof(permits) != 'undefined' && permits.admin_publish) 
+                input(type="checkbox", name="admin_publish", checked);
+              -else  
+                input(type="checkbox", name="admin_publish");
+          tr.user
+            th User
+            td
+              -if(typeof(permits) != 'undefined' && permits.user_read) 
+                input(type="checkbox", name="user_read", checked);
+              -else
+                input(type="checkbox", name="user_read");
+            td
+              -if(typeof(permits) != 'undefined' && permits.user_edit) 
+                input(type="checkbox", name="user_edit", checked);
+              -else  
+                input(type="checkbox", name="user_edit");				
+            td
+              -if(typeof(permits) != 'undefined' && permits.user_insert) 
+                input(type="checkbox", name="user_insert", checked);
+              -else  
+                input(type="checkbox", name="user_insert");				
+            td
+              -if(typeof(permits) != 'undefined' && permits.user_delete) 
+                input(type="checkbox", name="user_delete", checked);
+              -else  
+                input(type="checkbox", name="user_delete");
+            td
+              -if(typeof(permits) != 'undefined' && permits.user_publish) 
+                input(type="checkbox", name="user_publish", checked);
+              -else  
+                input(type="checkbox", name="user_publish");
+          tr.course
+            th Course
+            td
+              -if(typeof(permits) != 'undefined' && permits.course_read) 
+                input(type="checkbox", name="course_read", checked);
+              -else  
+                input(type="checkbox", name="course_read");
+            td
+              -if(typeof(permits) != 'undefined' && permits.course_edit) 
+                input(type="checkbox", name="course_edit", checked);
+              -else  
+                input(type="checkbox", name="course_edit");       
+            td
+              -if(typeof(permits) != 'undefined' && permits.course_insert) 
+                input(type="checkbox", name="course_insert", checked);
+              -else  
+                input(type="checkbox", name="course_insert");       
+            td
+              -if(typeof(permits) != 'undefined' && permits.course_delete) 
+                input(type="checkbox", name="course_delete", checked);
+              -else  
+                input(type="checkbox", name="course_delete");
+            td
+              -if(typeof(permits) != 'undefined' && permits.course_publish) 
+                input(type="checkbox", name="course_publish", checked);
+              -else  
+                input(type="checkbox", name="course_publish");
+          tr.assessment
+            th Assessment
+            td
+              -if(typeof(permits) != 'undefined' && permits.assessment_read) 
+                input(type="checkbox", name="assessment_read", checked);
+              -else  
+                input(type="checkbox", name="assessment_read");
+            td
+              -if(typeof(permits) != 'undefined' && permits.assessment_edit) 
+                input(type="checkbox", name="assessment_edit", checked);
+              -else  
+                input(type="checkbox", name="assessment_edit");				
+            td
+              -if(typeof(permits) != 'undefined' && permits.assessment_insert) 
+                input(type="checkbox", name="assessment_insert", checked);
+              -else  
+                input(type="checkbox", name="assessment_insert");				
+            td
+              -if(typeof(permits) != 'undefined' && permits.assessment_delete) 
+                input(type="checkbox", name="assessment_delete", checked);
+              -else  
+                input(type="checkbox", name="assessment_delete");
+            td
+              -if(typeof(permits) != 'undefined' && permits.assessment_publish) 
+                input(type="checkbox", name="assessment_publish", checked);
+              -else  
+                input(type="checkbox", name="assessment_publish");
+
+      p
+        a#cancel.btn.btn-small(href="/admin/roles") Cancel
+        &nbsp;
+        input#submit.btn.btn-small(type="submit", value="Apply Changes")

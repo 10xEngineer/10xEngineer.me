@@ -54,6 +54,7 @@ module.exports = function(config) {
     // Views
     app.set('views', __dirname + '/app/views');
     app.set('view engine', 'jade');
+    app.set('view options', { layout: false });
 
     // CSS Preprocessing with stylus
     function compile(str, path) {

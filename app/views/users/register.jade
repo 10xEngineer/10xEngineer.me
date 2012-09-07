@@ -1,15 +1,18 @@
-.container
-	.span12
-		h2	 #{formHeading}
-		form.form-horizontal(method='POST')
-			p
-				label  Name
-				input.required(id='name', name='name', value='#{user.name}')  
-			p
-				label  Email
-				input.required(id='email', name='email', value='#{user.email}')  
-			p
-				label  Password
-				input.required(id='password', name='password', type="password")  
-			p
-				input.btn-large.btn-primary.regBtn(type='submit', name='submit', value='Register')
+extends ../layout
+
+block layout.body
+  .container
+    .span12
+      h2   #{formHeading}
+      form.form-horizontal(method='POST')
+        p
+          label  Name
+          input.required(id='name', name='name', value='#{user.name}')  
+        p
+          label  Email
+          input.required(id='email', name='email', value='#{user.email}')  
+        p
+          label  Password
+          input.required(id='password', name='password', type="password")  
+        p
+          input.btn-large.btn-primary.regBtn(type='submit', name='submit', value='Register')

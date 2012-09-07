@@ -1,37 +1,40 @@
-script(type="text/javascript")
-  $(window).load(function() {
-    $('.flexslider').flexslider({
-      animation: "slide",
-      directionNav: true,
-      controlsContainer: ".flexslider-container"
+extends ../layout
+
+block layout.body
+  script(type="text/javascript")
+    $(window).load(function() {
+      $('.flexslider').flexslider({
+        animation: "slide",
+        directionNav: true,
+        controlsContainer: ".flexslider-container"
+      });
     });
-  });
-//- Course Admin index?
-- course = {id: 1};
-.container
-  ul.nav.nav-pills.courseMenu
-    li.active
-      a(href="/courses") Featured
-    li
-      a(href="/courses/all") Course Library
-    li
-      a(href="/user/profile") My Library
-    li
-      a(href="/course_editor") Course editor
+  //- Course Admin index?
+  - course = {id: 1};
+  .container
+    ul.nav.nav-pills.courseMenu
+      li.active
+        a(href="/courses") Featured
+      li
+        a(href="/courses/all") Course Library
+      li
+        a(href="/user/profile") My Library
+      li
+        a(href="/course_editor") Course editor
     
-  .row-fluid
-    div.flexslider
-      ul.slides
-        each courseObject,courseIndex in courses
-          -if(courseObject.status == 'published' || isAdmin)
-            li
-              center
-                img.courseImage(src="#{courseObject.wallImage}")
-              div.detailsLink
-                h1.courseTitle #{courseObject.title}
-                p #{courseObject.desc}
-                div.detailsLinkBtn
-                  a.btn.btn-primary.pull-right(href="/course/#{courseObject.id}") Details
-  .row-fluid
-    .span12
-  .carouselWrapper
+    .row-fluid
+      div.flexslider
+        ul.slides
+          each courseObject,courseIndex in courses
+            -if(courseObject.status == 'published' || isAdmin)
+              li
+                center
+                  img.courseImage(src="#{courseObject.wallImage}")
+                div.detailsLink
+                  h1.courseTitle #{courseObject.title}
+                  p #{courseObject.desc}
+                  div.detailsLinkBtn
+                    a.btn.btn-primary.pull-right(href="/course/#{courseObject.id}") Details
+    .row-fluid
+      .span12
+    .carouselWrapper

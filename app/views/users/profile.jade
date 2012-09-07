@@ -1,41 +1,44 @@
-.container
-  h1 #{user.name} 's Profile
-  br
-  form(method='POST', action='', id='profileForm')
+extends ../layout
+
+block layout.body
+  .container
+    h1 #{user.name} 's Profile
+    br
+    form(method='POST', action='', id='profileForm')
     
-    p
-      h5 User Name :
-      label #{user.name}  
-    p 
-      h5 Email :
-      label #{user.email}
-    p
-      h5 Account Type :
-      - if (user.facebook.name)
-          a(href='#{user.facebook.link}')
-            img(src="/images/facebook.png")
-      - else
-          img(src="/images/facebook.png",class="img")
-      - if (user.google.name)
-          - if (user.google.link)
-              a(href='#{user.google.link}')
-                img(src="/images/google.png")
-          - else
-                img(src="/images/google.png")                
-      - else
-          img(src="/images/google.png",class="img")
-      - if (user.twitter.name)
-          a(href='https://twitter.com/#{user.twitter.screen_name}')
-            img(src="/images/twitter.png")
-      - else
-          img(src="/images/twitter.png",class="img")
-    p
-        h5 Attented Courses :
-        each progress in progressObject 
-          -if(progress.course!=null)
-            div.chapterPerogressbox
-              div.courseName #{progress.course.title} 
-              - if (progress.progress != 100)
-                  a.btn.btn-primary.btn-large.chapterContinue.pull-right(href='/course/#{progress.course.id}/start') Continue
-              .courseProgress.pull-right
-                .bar(style="width:#{progress.progress}%;")
+      p
+        h5 User Name :
+        label #{user.name}  
+      p 
+        h5 Email :
+        label #{user.email}
+      p
+        h5 Account Type :
+        - if (user.facebook.name)
+            a(href='#{user.facebook.link}')
+              img(src="/images/facebook.png")
+        - else
+            img(src="/images/facebook.png",class="img")
+        - if (user.google.name)
+            - if (user.google.link)
+                a(href='#{user.google.link}')
+                  img(src="/images/google.png")
+            - else
+                  img(src="/images/google.png")                
+        - else
+            img(src="/images/google.png",class="img")
+        - if (user.twitter.name)
+            a(href='https://twitter.com/#{user.twitter.screen_name}')
+              img(src="/images/twitter.png")
+        - else
+            img(src="/images/twitter.png",class="img")
+      p
+          h5 Attented Courses :
+          each progress in progressObject 
+            -if(progress.course!=null)
+              div.chapterPerogressbox
+                div.courseName #{progress.course.title} 
+                - if (progress.progress != 100)
+                    a.btn.btn-primary.btn-large.chapterContinue.pull-right(href='/course/#{progress.course.id}/start') Continue
+                .courseProgress.pull-right
+                  .bar(style="width:#{progress.progress}%;")
