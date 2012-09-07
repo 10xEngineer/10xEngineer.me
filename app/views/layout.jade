@@ -32,6 +32,8 @@ html(lang="en")
     script(src='http://www.filepicker.io/static/js/filepicker.js')
     script(type='text/javascript', src='/javascripts/select2.min.js')
 
+    block layout.scripts
+    block layout.styles
     != renderScriptTags(scripts)
     != renderCssTags(styles)
     body
@@ -50,7 +52,7 @@ html(lang="en")
               a.close(data-dismiss='alert',href='#') x
               h4.alert-heading Information 
               | #{message}      
-        != body
+        block layout.body
 
       section#footer.row-fluid
         .container

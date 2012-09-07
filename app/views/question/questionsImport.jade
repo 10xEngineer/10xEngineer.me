@@ -1,9 +1,12 @@
-.container
-	h1 Import Questions
-	form(method="post", enctype='multipart/form-data')
-		br
-		p File :
-		input#questions.input-large(name='questions-file', type='file', placeholder='Questions File')
-		
-		p
-			input.btn.btn-primary.btn-large(type='submit') Upload Question
+extends ../layout
+
+block layout.body
+  .container
+    h1 Import Questions
+    form(method="post", enctype='multipart/form-data')
+      br
+      p File :
+      input#questions.input-large(name='questions-file', type='file', placeholder='Questions File')
+    
+      p
+        input.btn.btn-primary.btn-large(type='submit') Upload Question
