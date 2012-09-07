@@ -1,8 +1,8 @@
 .widget_sidebar{height:100%;overflow-x:visible;position:relative;}
 .widget_sidebar .content-block{overflow:auto}
-.widget_sidebar .collapse-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:10px;height:50px;display:none}
-.widget_sidebar .expand-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:10px;height:50px;display:none}
-.widget_sidebar .resize-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:6px;height:100%;cursor:ew-resize;display:none}
+.widget_sidebar .collapse-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:10px;height:50px;z-index:8;display:none}
+.widget_sidebar .expand-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:10px;height:50px;z-index:8;display:none}
+.widget_sidebar .resize-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:6px;height:100%;cursor:ew-resize;z-index:8;display:none}
 .widget_sidebar.collapsible .collapse-handle{display:block}
 .widget_sidebar.expandable .expand-handle{display:block}
 .widget_sidebar.resizable .resize-handle{display:block}

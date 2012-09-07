@@ -9,13 +9,14 @@ resizeHandleSpacing = -(resizeHandleWidth/2 + borderWidth/2)
   position relative
   .content-block
     overflow auto
-  .collapse-handle  
+  .collapse-handle
     user-select none
     background black
     position absolute
     top 0px
     width 10px
     height 50px
+    z-index 8
     display none
   .expand-handle  
     user-select none
@@ -24,6 +25,7 @@ resizeHandleSpacing = -(resizeHandleWidth/2 + borderWidth/2)
     top 0px
     width expandHandleWidth
     height 50px
+    z-index 8
     display none
   .resize-handle  
     user-select none
@@ -33,6 +35,7 @@ resizeHandleSpacing = -(resizeHandleWidth/2 + borderWidth/2)
     width resizeHandleWidth
     height 100%
     cursor ew-resize
+    z-index 8
     display none
   &.collapsible
     .collapse-handle
