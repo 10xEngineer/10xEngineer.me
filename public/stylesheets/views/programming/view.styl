@@ -1,47 +1,55 @@
-ul.fileTree {
-  font-family: Verdana, sans-serif;
-  font-size: 11px;
-  line-height: 18px;
-  padding: 0px;
-  margin: 0px;
-}
+.programming_view
+  height 100%
+  width 100%
+  >.row-fluid
+    height 100%
+  .vsplit
+    overflow hidden
 
-ul.fileTree li {
-  list-style: none;
-  padding: 0px;
-  padding-left: 20px;
-  margin: 0px;
-  white-space: nowrap;
-}
+  ul.fileTree {
+    font-family: Verdana, sans-serif;
+    font-size: 11px;
+    line-height: 18px;
+    padding: 0px;
+    margin: 0px;
+  }
 
-ul.fileTree a {
-  color: #333;
-  text-decoration: none;
-  display: block;
-  padding: 0px 2px;
-}
+  ul.fileTree li {
+    list-style: none;
+    padding: 0px;
+    padding-left: 20px;
+    margin: 0px;
+    white-space: nowrap;
+  }
 
-ul.fileTree a:hover,
-ul.fileTree a.selected {
-  background: #BDF;
-}
+  ul.fileTree a {
+    color: #333;
+    text-decoration: none;
+    display: block;
+    padding: 0px 2px;
+  }
 
-/* Core Styles */
-.fileTree li.directory { background: url(/img/fileTree/directory.png) left top no-repeat; }
-.fileTree li.expanded { background: url(/img/fileTree/folder_open.png) left top no-repeat; }
-.fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
-.fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
+  ul.fileTree a:hover,
+  ul.fileTree a.selected {
+    background: #BDF;
+  }
 
-#tabContainer > li > a > i.closeTab {
-  display : none;
-  z-index: 50;
-}
-#tabContainer > li.active > a {
-  pointer-events: inherit;
-}
-#tabContainer > li.active > a > i.closeTab:hover {
-  cursor: pointer;
-} 
-#tabContainer > li.active > a > i.closeTab {
-  display : inline-block;
-}
+  /* Core Styles */
+  .fileTree li.directory { background: url(/img/fileTree/directory.png) left top no-repeat; }
+  .fileTree li.expanded { background: url(/img/fileTree/folder_open.png) left top no-repeat; }
+  .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
+  .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
+
+  #tabContainer > li > a > i.closeTab {
+    display : none;
+    z-index: 50;
+  }
+  #tabContainer > li.active > a {
+    pointer-events: inherit;
+  }
+  #tabContainer > li.active > a > i.closeTab:hover {
+    cursor: pointer;
+  } 
+  #tabContainer > li.active > a > i.closeTab {
+    display : inline-block;
+  }

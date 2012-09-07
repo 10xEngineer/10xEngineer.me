@@ -1,101 +1,109 @@
-- var docId = 'test';
-- scripts.push("/javascripts/superagent.min.js");
-- scripts.push("/javascripts/ace_2/ace.js");
-- scripts.push("/javascripts/jquery.contextMenu.js");
-- scripts.push("/javascripts/eventemitter2.js");
-- scripts.push("/javascripts/vfs-client.js");
-- scripts.push("/javascripts/filetree.js");
-- scripts.push("/javascripts/editor.js");
-
-// For Share JS
-- scripts.push("/javascripts/share/bcsocket.js");
-- scripts.push("/share/share.js");
-- scripts.push("/share/json.js");
-- scripts.push("/javascripts/share/ace.js");
-- scripts.push("/javascripts/share/chat.js");
-
-- styles.push("/stylesheets/jquery.contextMenu.css");
-- styles.push("/stylesheets/views/programming/view.css")
+extends ../layout
 
 include ../widget/tabbar
+include ../widget/sidebar
 
-.container
-  div#header
-    //- TODO:: Re write header
-  .row-fluid
-    #sidebar.span2
-      button#save(class="btn", type="button") Save
-      button#compile(class="btn", type="button") Compile
+append layout.scripts
+  script(type='text/javascript', src="/javascripts/superagent.min.js")
+  script(type='text/javascript', src="/javascripts/ace_2/ace.js")
+  script(type='text/javascript', src="/javascripts/jquery.contextMenu.js")
+  script(type='text/javascript', src="/javascripts/eventemitter2.js")
+  script(type='text/javascript', src="/javascripts/vfs-client.js")
+  script(type='text/javascript', src="/javascripts/filetree.js")
+  script(type='text/javascript', src="/javascripts/editor.js")
 
-      #tree
+  // For Share JS
+  script(type='text/javascript', src="/javascripts/share/bcsocket.js")
+  script(type='text/javascript', src="/share/share.js")
+  script(type='text/javascript', src="/share/json.js")
+  script(type='text/javascript', src="/javascripts/share/ace.js")
+  script(type='text/javascript', src="/javascripts/share/chat.js")
 
-    .vsplit.span8
-      mixin tabbar
-      //- #tabBar
-      //-   ul#tabContainer.nav.nav-tabs
-      #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
+append layout.styles
+  link(rel='stylesheet', href="/stylesheets/jquery.contextMenu.css")
+  link(rel='stylesheet', href="/stylesheets/views/programming/view.css")
+
+block layout.body
+  .programming_view.container
+    div#header
+      //- TODO:: Re write header
+    .row-fluid
+      //- #sidebar.span2
+      +sidebar-left("collapsible resizable")
+        button#save(class="btn", type="button") Save
+        button#compile(class="btn", type="button") Compile
+
+        #tree
     
-    #sidebar.span2(style="display: inline-block; vertical-align: top;")
-      div#chat
+      +sidebar-right("collapsible resizable")
+      //- #sidebar.span2(style="display: inline-block; vertical-align: top;")
+        div#chat
 
-link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
+      .vsplit
+        mixin tabbar
+        //- #tabBar
+        //-   ul#tabContainer.nav.nav-tabs
+        #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
 
-script(type='text/javascript')
-  $(document).ready(function() {
+  link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
 
-    //dynamically load javascript source file
-    function loadScriptFile(path, callback) {
-      var head = document.getElementsByTagName('head')[0];
-      var s = document.createElement('script');
+  - var docId = 'test';
+  script(type='text/javascript')
+    $(document).ready(function() {
 
-      s.src = path;
-      head.appendChild(s);
+      //dynamically load javascript source file
+      function loadScriptFile(path, callback) {
+        var head = document.getElementsByTagName('head')[0];
+        var s = document.createElement('script');
 
-      s.onload = callback;
-    }
+        s.src = path;
+        head.appendChild(s);
 
-    window.editor = new Editor({
-      vfs: new VFSClient('test'),
-      tree: '#tree',
-      editor: '#editor',
-      tab: '#tabContainer'
-    });
-
-    newCodeSocket.on('codePassed', function(data) {
-      displayMessage('success', 'Congratulations, your code compiled successfully.');
-
-    });
-
-    newCodeSocket.on('codeFailed', function(error) {
-      console.log(error);
-      var error = error || 'Unknown error. Please contact support.';
-      error = '<pre>' + error + '</pre>';
-      displayMessage('error', error);
-
-    });
-
-    $('#compile').click(function() {
-      var sourceCode = editor.getSession().getValue();
-      var languageCode = $('#pageslide #mode').val();
-      if(!languageCode){
-        languageCode = $('#mode').val();
+        s.onload = callback;
       }
-      displayMessage('info', 'Compiling...');
-      newCodeSocket.emit('submitcode', 'test');
-    });
 
-    sharejs.open('#{docId}', 'text', function(error, doc) {
-      if (error) {
-        console.error(error);
-        return;
-      }
-      doc.attach_editor(editor);
-      editor.setReadOnly(false);
-    });
+      window.editor = new Editor({
+        vfs: new VFSClient('test'),
+        tree: '#tree',
+        editor: '#editor',
+        tab: '#tabContainer'
+      });
 
-    $('#save').click(function() {
-      editor.saveFile();
-      return false;
+      newCodeSocket.on('codePassed', function(data) {
+        displayMessage('success', 'Congratulations, your code compiled successfully.');
+
+      });
+
+      newCodeSocket.on('codeFailed', function(error) {
+        console.log(error);
+        var error = error || 'Unknown error. Please contact support.';
+        error = '<pre>' + error + '</pre>';
+        displayMessage('error', error);
+
+      });
+
+      $('#compile').click(function() {
+        var sourceCode = editor.getSession().getValue();
+        var languageCode = $('#pageslide #mode').val();
+        if(!languageCode){
+          languageCode = $('#mode').val();
+        }
+        displayMessage('info', 'Compiling...');
+        newCodeSocket.emit('submitcode', 'test');
+      });
+
+      sharejs.open('#{docId}', 'text', function(error, doc) {
+        if (error) {
+          console.error(error);
+          return;
+        }
+        doc.attach_editor(editor);
+        editor.setReadOnly(false);
+      });
+
+      $('#save').click(function() {
+        editor.saveFile();
+        return false;
+      });
     });
-  });
   
