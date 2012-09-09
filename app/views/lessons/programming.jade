@@ -1,153 +1,156 @@
-- var docId = progressId;
-- scripts.push("/javascripts/superagent.min.js");
-- scripts.push("/javascripts/ace_2/ace.js");
-- scripts.push("/javascripts/jquery.contextMenu.js");
-- scripts.push("/javascripts/eventemitter2.js");
-- scripts.push("/javascripts/vfs-client.js");
-- scripts.push("/javascripts/filetree.js");
-- scripts.push("/javascripts/editor.js");
+extends ../layout
 
-// For Share JS
-- scripts.push("/javascripts/share/bcsocket.js");
-- scripts.push("/share/share.js");
-- scripts.push("/share/json.js");
-- scripts.push("/javascripts/share/ace.js");
-- scripts.push("/javascripts/share/chat.js");
+block layout.body
+  - var docId = progressId;
+  - scripts.push("/javascripts/superagent.min.js");
+  - scripts.push("/javascripts/ace_2/ace.js");
+  - scripts.push("/javascripts/jquery.contextMenu.js");
+  - scripts.push("/javascripts/eventemitter2.js");
+  - scripts.push("/javascripts/vfs-client.js");
+  - scripts.push("/javascripts/filetree.js");
+  - scripts.push("/javascripts/editor.js");
 
-include ../widget/tabbar
+  // For Share JS
+  - scripts.push("/javascripts/share/bcsocket.js");
+  - scripts.push("/share/share.js");
+  - scripts.push("/share/json.js");
+  - scripts.push("/javascripts/share/ace.js");
+  - scripts.push("/javascripts/share/chat.js");
 
-style
-  ul.fileTree {
-    font-family: Verdana, sans-serif;
-    font-size: 11px;
-    line-height: 18px;
-    padding: 0px;
-    margin: 0px;
-  }
+  include ../widget/tabbar
 
-  ul.fileTree li {
-    list-style: none;
-    padding: 0px;
-    padding-left: 20px;
-    margin: 0px;
-    white-space: nowrap;
-  }
-
-  ul.fileTree a {
-    color: #333;
-    text-decoration: none;
-    display: block;
-    padding: 0px 2px;
-  }
-
-  ul.fileTree a:hover,
-  ul.fileTree a.selected {
-    background: #BDF;
-  }
-
-  /* Core Styles */
-  .fileTree li.directory { background: url(/img/fileTree/directory.png) left top no-repeat; }
-  .fileTree li.expanded { background: url(/img/fileTree/folder_open.png) left top no-repeat; }
-  .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
-  .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
-
-  #tabContainer > li > a > i.closeTab {
-    display : none;
-    z-index: 50;
-  }
-  #tabContainer > li.active > a {
-    pointer-events: inherit;
-  }
-  #tabContainer > li.active > a > i.closeTab:hover {
-    cursor: pointer;
-  } 
-  #tabContainer > li.active > a > i.closeTab {
-    display : inline-block;
-  } 
-
-.container
-  include ../_breadcrumb
-
-  div#header
-    //- TODO:: Re write header
-  .row-fluid
-    #sidebar.span2
-      button#save(class="btn", type="button") Save
-      button#compile(class="btn", type="button") Compile
-
-      #tree
-
-    .vsplit.span8
-      mixin tabbar
-      //- #tabBar
-      //-   ul#tabContainer.nav.nav-tabs
-      #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
-      .lessonBar.row-fluid
-        a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-        a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
-    
-    #sidebar.span2(style="display: inline-block; vertical-align: top;")
-      div#chat
-
-link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
-
-script
-  $(document).ready(function() {
-
-    //dynamically load javascript source file
-    function loadScriptFile(path, callback) {
-      var head = document.getElementsByTagName('head')[0];
-      var s = document.createElement('script');
-
-      s.src = path;
-      head.appendChild(s);
-
-      s.onload = callback;
+  style
+    ul.fileTree {
+      font-family: Verdana, sans-serif;
+      font-size: 11px;
+      line-height: 18px;
+      padding: 0px;
+      margin: 0px;
     }
 
-    window.editor = new Editor({
-      vfs: new VFSClient('#{docId}'),
-      tree: '#tree',
-      editor: '#editor',
-      tab: '#tabContainer'
-    });
+    ul.fileTree li {
+      list-style: none;
+      padding: 0px;
+      padding-left: 20px;
+      margin: 0px;
+      white-space: nowrap;
+    }
 
-    new Chat($('#chat'), '#{username}');
+    ul.fileTree a {
+      color: #333;
+      text-decoration: none;
+      display: block;
+      padding: 0px 2px;
+    }
 
-    newCodeSocket.on('codePassed', function(data) {
-      displayMessage('success', 'Congratulations, your code compiled successfully.');
+    ul.fileTree a:hover,
+    ul.fileTree a.selected {
+      background: #BDF;
+    }
 
-    });
+    /* Core Styles */
+    .fileTree li.directory { background: url(/img/fileTree/directory.png) left top no-repeat; }
+    .fileTree li.expanded { background: url(/img/fileTree/folder_open.png) left top no-repeat; }
+    .fileTree li.file { background: url(/img/fileTree/file.png) left top no-repeat; }
+    .fileTree li.wait { background: url(/img/fileTree/spinner.gif) left top no-repeat; }
 
-    newCodeSocket.on('codeFailed', function(error) {
-      console.log(error);
-      var error = error || 'Unknown error. Please contact support.';
-      error = '<pre>' + error + '</pre>';
-      displayMessage('error', error);
+    #tabContainer > li > a > i.closeTab {
+      display : none;
+      z-index: 50;
+    }
+    #tabContainer > li.active > a {
+      pointer-events: inherit;
+    }
+    #tabContainer > li.active > a > i.closeTab:hover {
+      cursor: pointer;
+    } 
+    #tabContainer > li.active > a > i.closeTab {
+      display : inline-block;
+    } 
 
-    });
+  .container
+    include ../_breadcrumb
 
-    $('#compile').click(function() {
-      var sourceCode = editor.getContent();
-      var languageCode = $('#pageslide #mode').val();
-      if(!languageCode){
-        languageCode = $('#mode').val();
+    div#header
+      //- TODO:: Re write header
+    .row-fluid
+      #sidebar.span2
+        button#save(class="btn", type="button") Save
+        button#compile(class="btn", type="button") Compile
+
+        #tree
+
+      .vsplit.span8
+        mixin tabbar
+        //- #tabBar
+        //-   ul#tabContainer.nav.nav-tabs
+        #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
+        .lessonBar.row-fluid
+          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next 
+    
+      #sidebar.span2(style="display: inline-block; vertical-align: top;")
+        div#chat
+
+  link(rel="stylesheet", href="/stylesheets/jquery.contextMenu.css")
+
+  script
+    $(document).ready(function() {
+
+      //dynamically load javascript source file
+      function loadScriptFile(path, callback) {
+        var head = document.getElementsByTagName('head')[0];
+        var s = document.createElement('script');
+
+        s.src = path;
+        head.appendChild(s);
+
+        s.onload = callback;
       }
-      displayMessage('info', 'Compiling...');
-      newCodeSocket.emit('submitcode', 'test');
-    });
 
-    sharejs.open('#{docId}_json', 'json', function(error, doc) {
-      if (error) {
-        console.error(error);
-        return;
-      }
-      //doc.attach_editor(editor);
-    });
+      window.editor = new Editor({
+        vfs: new VFSClient('#{docId}'),
+        tree: '#tree',
+        editor: '#editor',
+        tab: '#tabContainer'
+      });
 
-    $('#save').click(function() {
-      editor.saveFile();
-      return false;
+      new Chat($('#chat'), '#{username}');
+
+      newCodeSocket.on('codePassed', function(data) {
+        displayMessage('success', 'Congratulations, your code compiled successfully.');
+
+      });
+
+      newCodeSocket.on('codeFailed', function(error) {
+        console.log(error);
+        var error = error || 'Unknown error. Please contact support.';
+        error = '<pre>' + error + '</pre>';
+        displayMessage('error', error);
+
+      });
+
+      $('#compile').click(function() {
+        var sourceCode = editor.getContent();
+        var languageCode = $('#pageslide #mode').val();
+        if(!languageCode){
+          languageCode = $('#mode').val();
+        }
+        displayMessage('info', 'Compiling...');
+        newCodeSocket.emit('submitcode', 'test');
+      });
+
+      sharejs.open('#{docId}_json', 'json', function(error, doc) {
+        if (error) {
+          console.error(error);
+          return;
+        }
+        //doc.attach_editor(editor);
+      });
+
+      $('#save').click(function() {
+        editor.saveFile();
+        return false;
+      });
     });
-  });
   

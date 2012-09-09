@@ -1,33 +1,36 @@
-.container
-  include ../../_breadcrumb
-  .container-fluid.course-index.inner-index
+extends ../layout
+
+block layout.body
+  .container
+    include ../../_breadcrumb
+    .container-fluid.course-index.inner-index
     
-    .row-fluid
-      .span9
-        - if(assessed)
-          h1 Congratulations !!!
-          hr
-          h3 Dear #{userName},
-          h4 You successfully completed the quiz and your result is   
-              - var per = Math.round((assessment.score * 100 / quiz.marks)*100)/100;
-              code(style="padding:8px;") #{per}%  (Marks : #{assessment.score}/#{quiz.marks})
-          br
-          hr
-        - else
-          h1 Quiz completed !!!
-          hr
-          h3 Dear #{userName},
-          h4 You successfully completed the quiz and your result will be mail to your mail account after examin.
+      .row-fluid
+        .span9
+          - if(assessed)
+            h1 Congratulations !!!
+            hr
+            h3 Dear #{userName},
+            h4 You successfully completed the quiz and your result is   
+                - var per = Math.round((assessment.score * 100 / quiz.marks)*100)/100;
+                code(style="padding:8px;") #{per}%  (Marks : #{assessment.score}/#{quiz.marks})
+            br
+            hr
+          - else
+            h1 Quiz completed !!!
+            hr
+            h3 Dear #{userName},
+            h4 You successfully completed the quiz and your result will be mail to your mail account after examin.
 
-          br
-          hr
+            br
+            hr
 
-        .lessonBar
-          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+          .lessonBar
+            a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+            a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
 
-      .span3
-        include ../../lessons/_sidebar
+        .span3
+          include ../../lessons/_sidebar
 
-    .row-fluid
-      pre #{assessment}
+      .row-fluid
+        pre #{assessment}

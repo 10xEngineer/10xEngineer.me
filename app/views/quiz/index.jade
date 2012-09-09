@@ -1,27 +1,30 @@
-.container
-  h1= title
-  .row-fluid
-    .spam10
-      a.btn(href="/assessment/quiz/create")
-        i.icon-plus
-        |  Create Quiz
+extends ../layout
 
-  .actions 
-    ul.quizList
-      each quiz in quizs
-        li
-          .innerDiv
-            a(href="/assessment/quiz/#{quiz.id}")
-              label #{quiz.title}
-            .pull-right.actionBtns
-              a.btn.btn-success(href="/assessment/quiz/#{quiz.id}/edit")
-                i.icon-edit.icon-white
-                |  Edit Quiz
-              a.btn.btn-danger(href="/assessment/quiz/#{quiz.id}/remove")
-                i.icon-trash.icon-white 
-                |  Delete Quiz
-              a.btn.btn-primary(href="/assessment/quiz/#{quiz.id}/start")
-                i.icon-hand-right.icon-white
-                |  Start Quiz
-          p
-            #{quiz.desc}
+block layout.body
+  .container
+    h1= title
+    .row-fluid
+      .spam10
+        a.btn(href="/assessment/quiz/create")
+          i.icon-plus
+          |  Create Quiz
+
+    .actions 
+      ul.quizList
+        each quiz in quizs
+          li
+            .innerDiv
+              a(href="/assessment/quiz/#{quiz.id}")
+                label #{quiz.title}
+              .pull-right.actionBtns
+                a.btn.btn-success(href="/assessment/quiz/#{quiz.id}/edit")
+                  i.icon-edit.icon-white
+                  |  Edit Quiz
+                a.btn.btn-danger(href="/assessment/quiz/#{quiz.id}/remove")
+                  i.icon-trash.icon-white 
+                  |  Delete Quiz
+                a.btn.btn-primary(href="/assessment/quiz/#{quiz.id}/start")
+                  i.icon-hand-right.icon-white
+                  |  Start Quiz
+            p
+              #{quiz.desc}

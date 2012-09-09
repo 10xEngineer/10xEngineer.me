@@ -1,0 +1,19 @@
+append layout.styles
+  link(rel='stylesheet', href="/stylesheets/views/widget/sidebar.css")
+append layout.scripts
+  script(type='text/javascript', src="/javascripts/views/widget/sidebar.js");
+
+mixin sidebar-left(classes)
+  .widget_sidebar.left(class = classes)
+    .content-block
+      block
+    .expand-handle
+    .resize-handle
+    .collapse-handle
+mixin sidebar-right(classes)
+  .widget_sidebar.right(class = classes)
+    .content-block
+      block
+    .collapse-handle
+    .resize-handle
+    .expand-handle

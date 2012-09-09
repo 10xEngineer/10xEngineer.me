@@ -1,0 +1,70 @@
+resizeHandleWidth = 6px
+expandHandleWidth = 10px
+borderWidth = 2px
+resizeHandleSpacing = -(resizeHandleWidth/2 + borderWidth/2)
+
+.widget_sidebar
+  height 100%
+  overflow-x visible
+  position relative
+  .content-block
+    overflow auto
+  .collapse-handle
+    user-select none
+    background black
+    position absolute
+    top 0px
+    width 10px
+    height 50px
+    z-index 8
+    display none
+  .expand-handle  
+    user-select none
+    background black
+    position absolute
+    top 0px
+    width expandHandleWidth
+    height 50px
+    z-index 8
+    display none
+  .resize-handle  
+    user-select none
+    background black
+    position absolute
+    top 0px
+    width resizeHandleWidth
+    height 100%
+    cursor ew-resize
+    z-index 8
+    display none
+  &.collapsible
+    .collapse-handle
+      display block
+  &.expandable
+    .expand-handle
+      display block
+  &.resizable
+    .resize-handle
+      display block
+  &.left
+    border-right #CCC borderWidth ridge
+    .collapse-handle
+      cursor w-resize
+      right resizeHandleWidth + resizeHandleSpacing
+    .expand-handle
+      cursor e-resize
+      right resizeHandleSpacing - expandHandleWidth
+    .resize-handle
+      right resizeHandleSpacing
+    float left
+  &.right
+    border-left #CCC borderWidth ridge
+    .collapse-handle
+      cursor e-resize
+      left resizeHandleWidth + resizeHandleSpacing
+    .expand-handle
+      cursor w-resize
+      left resizeHandleSpacing - expandHandleWidth
+    .resize-handle
+      left resizeHandleSpacing
+    float right
