@@ -1,7 +1,6 @@
 var express = require('express');
 var stylus = require('stylus');
 var nib = require('nib');
-var sharejs = require('share');
 var RedisStore = require('connect-redis')(express);
 
 var auth = require('./app/middleware/authentication');
@@ -15,20 +14,6 @@ module.exports = function(config) {
   var authMiddleware = auth.getMiddleware(config);
 
   var app = express.createServer();
-
-  var sharejsOptions = {
-    db: { type: 'redis' },
-    auth: function(client, action) {
-      // Reject readonly requests
-      if (action.name === 'submit op' && action.docName.match(/^readonly/)) {
-        action.reject();
-      } else {
-        action.accept();
-      }
-    },
-    socketio: null,
-    rest: true
-  };
 
   // Custom parser to ignore parsing vfs requests
   var bodyParser = function(req, res, next) {
@@ -129,7 +114,6 @@ module.exports = function(config) {
       }
     });
 
-    sharejs.server.attach(app, sharejsOptions);
     app.use(app.router);
 
     // Static files
