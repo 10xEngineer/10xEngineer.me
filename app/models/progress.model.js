@@ -32,9 +32,15 @@ var statics = {
         progress.course = course;
         progress.save(function(error) {
           if(error) {
+            console.log(error);
             callback(error);
           }
-          callback(null, progress);
+          Progress.findOne({user: user._id, course: course._id}, function(error, progress){
+            if(error){
+              console.log(error);
+            }
+            callback(null, progress);
+          });
         });
       } else {
         callback(null, progress);
@@ -86,9 +92,8 @@ var statics = {
       } else {
         
         var chapters = progress.chapters;
-        var progressChapterLength = chapters.length;
         
-        for (var chapterIndex = 0; chapterIndex < progressChapterLength; chapterIndex++) {
+        for (var chapterIndex in chapters) {
           var chapter = chapters[chapterIndex];
           if(chapter.id.toString() == chapterId){
             for(var lessonIndex in chapter.lessons) {
@@ -139,9 +144,8 @@ var statics = {
       } else {
         
         var chapters = progress.chapters;
-        var progressChapterLength = chapters.length;
         
-        for (var chapterIndex = 0; chapterIndex < progressChapterLength; chapterIndex++) {
+        for (var chapterIndex in chapters) {
           var chapter = chapters[chapterIndex];
           if(chapter._id.toString() == chapterId){
             for(var lessonIndex in chapter.lessons) {
@@ -171,10 +175,16 @@ var methods = {
     var progress = this;
 
     // TODO: Iterate through all the modules and lessons -> Find a lesson, which isn't completed having the least sequence number
-    var chapters = progress.chapters;
+    var chapters = [];
+    for(var indx in progress.chapters){
+      chapters.push(progress.chapters[indx]);
+    }
 
     var combinedChapters = _.reduce(chapters, function(list, chapter) {
-      var lessons = chapter.lessons;
+      var lessons = [];
+      for(var less in chapter.lessons){
+        lessons.push(chapter.lessons[less]);
+      }
 
       var lessonList = (function(chapterSeq) {
         return _.reduce(lessons, function(list, lesson) {
@@ -189,7 +199,7 @@ var methods = {
 
       return list.concat(lessonList);
     }, []);
-
+    console.log(combinedChapters);
     var sortedChapters = _.sortBy(combinedChapters, function(lesson) {
       return lesson.seq;
     });
@@ -207,7 +217,7 @@ var methods = {
     var chapters = progress.chapters;
     var progressChapterLength = chapters.length;
     
-    for (var chapterIndex = 0; chapterIndex < progressChapterLength; chapterIndex++) {
+    for (var chapterIndex in chapters) {
       var chapter = chapters[chapterIndex];
       if(chapter._id.toString() == chapterId.toString()){
         for(var lessonIndex in chapter.lessons) {
@@ -243,7 +253,7 @@ var methods = {
       var attemptedAnswers = lesson.attemptedAnswers;
     }
 
-    for (var chapterIndex = 0; chapterIndex < progressChapterLength; chapterIndex++) {
+    for (var chapterIndex in chapters) {
       var chapter = chapters[chapterIndex];
       if(chapter._id.toString() == chapterId){
         for(var lessonIndex in chapter.lessons) {

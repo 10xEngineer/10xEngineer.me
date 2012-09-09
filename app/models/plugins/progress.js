@@ -16,18 +16,26 @@ module.exports = function(schema, options) {
       .populate('chapters')
       .exec(function(error, course) {
 
-      var chapters;
+      var chapters = [];
 
-      if(progress.chapters && progress.chapters.length > 0) {
-        chapters = progress.chapters;
+      if(progress.chapters && _.size(progress.chapters) > 0) {
+        for(var chapt in progress.chapters){
+          if(progress.chapters.hasOwnProperty(chapt)){
+            chapters.push(progress.chapters[chapt]);
+          }
+        }
 
         var chapterIndex = 0;
         async.forEachSeries(chapters, function(chapter, chapterCallback) {
 
           var lessonProgress = 0;
-          var pLessons = chapter.lessons;
           var lessonIndex = 0;
-
+          var pLessons = [];
+          for(var less in chapter.lessons){
+            if(chapter.lessons.hasOwnProperty(less)){
+              pLessons.push(chapter.lessons[less]);
+            }
+          }
           var lessonProgress = _.reduce(pLessons, function(count, lesson) {
             if(lesson.status == 'completed') {
               return ++count;
@@ -44,15 +52,23 @@ module.exports = function(schema, options) {
           chapterCallback();
         },
         function(error) {
-          var chapterProgress = _.reduce(progress.chapters, function(count, chapter) {
+          var chapArr = [];
+          for(var chapt in progress.chapters){
+            if(progress.chapters.hasOwnProperty(chapt)){
+              chapArr.push(progress.chapters[chapt]);
+            }
+          }
+
+          var chapterProgress = _.reduce(chapArr, function(count, chapter) {
             if(chapter.status == 'completed') {
               return ++count;
             } else {
               return count + (chapter.progress/100);
             }
           }, 0);
-
-          progress.progress = chapterProgress / chapters.length * 100;
+          if(chapArr.length > 0){
+            progress.progress = chapterProgress / chapArr.length * 100;
+          }
           if(progress.progress == 100) {
             progress.status = 'completed';
           }
@@ -62,11 +78,12 @@ module.exports = function(schema, options) {
 
       } else {
         chapters = course.chapters;
+        progress.chapters = {};
 
         var chapterIndex = 0;
         async.forEachSeries(chapters, function(chapter, chapterCallback) {
 
-          var lessons = [];
+          var lessons = {};
           var lessonProgress = 0;
           var pLessons = chapter.lessons;
           var lessonIndex = 0;
@@ -77,16 +94,22 @@ module.exports = function(schema, options) {
                 next(error);
               }
 
-              lessons.push({
-                _id: lesson._id,
-                id: lesson.id,
-                seq: lessonIndex++,
-                status: 'not-started'
-              });
+              lessons[lesson._id] = {
+                _id    : lesson._id,
+                id     : lesson.id,
+                seq    : lessonIndex++,
+                status : 'not-started'
+              };
 
               lessonCallback();
             });
           }, function(error) {
+            pLessons = [];
+            for(var less in lessons){
+              if(lessons.hasOwnProperty(less)){
+                pLessons.push(lessons[less]);
+              }
+            }
             var lessonProgress = _.reduce(pLessons, function(count, lesson) {
               if(lesson.status == 'completed') {
                 return ++count;
@@ -94,34 +117,39 @@ module.exports = function(schema, options) {
                 return count;
               }
             }, 0);
-
             if(pLessons.length > 0) {
               lessonProgress = lessonProgress / pLessons.length * 100;
             }
-            
-            progress.chapters.push({
-              _id: chapter._id,
-              id: chapter.id,
-              seq: chapterIndex++,
-              lessons: lessons,
-              progress: lessonProgress,
-              status: 'not-started'
-            });
-
-            lessons = [];
+            progress.chapters[chapter._id] = {
+              _id       : chapter._id,
+              id        : chapter.id,
+              seq       : chapterIndex++,
+              lessons   : lessons,
+              progress  : lessonProgress,
+              status    : 'not-started'
+            };
 
             chapterCallback(error);
           });
         },
         function(error) {
-          var chapterProgress = _.reduce(progress.chapters, function(count, chapter) {
+          var chapArr = [];
+          for(var chapt in progress.chapters){
+            if(progress.chapters.hasOwnProperty(chapt)){
+              chapArr.push(progress.chapters[chapt]);
+            }
+          }
+          var chapterProgress = _.reduce(chapArr, function(count, chapter) {
             if(chapter.status == 'completed') {
               return ++count;
             } else {
               return count + (chapter.progress/100);
             }
           }, 0);
-
+          if(chapArr.length > 0) {
+            chapterProgress = chapterProgress / chapArr.length * 100;
+          }
+          
           progress.progress = chapterProgress;
           progress.status = 'ongoing';
 

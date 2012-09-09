@@ -8,11 +8,11 @@ var CourseProgressSchema = module.exports = new Schema({
   course: { type: ObjectId, ref: 'Course', index: true },
   status: { type: String, enum: ['ongoing', 'completed'], default: 'ongoing'},
   progress: Number,
-  chapters: [ ChapterProgressSchema ]
+  chapters: {}/*[ ChapterProgressSchema ]*/
 }, {
   collection: 'progress'
 });
-
+/*
 var ChapterProgressSchema = new Schema({
   _id: { type: ObjectId },
   id: Number,
@@ -31,3 +31,4 @@ var LessonProgressSchema = new Schema({
   },
   videoProgress : { type: String}
 });
+*/

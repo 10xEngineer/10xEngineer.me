@@ -5,7 +5,6 @@ var _ = require('lodash');
 var model = require('../models');
 
 var cdn = require('../helpers/cdn');
-var progressHelper = require('../helpers/progress');
 
 
 module.exports = function() {};
@@ -36,13 +35,11 @@ module.exports.showView = function(req, res) {
           log.error(error);
         }
         var chapters = progress.chapters;
-        var chaptersLength = chapters.length;
         
-        for (var index = 0; index < chaptersLength; index++) {
-          if(chapters[index]._id.toString() == lesson.chapter._id.toString()) {
+        for (var index in chapters) {
+          if(chapters.hasOwnProperty(index) && chapters[index]._id.toString() == lesson.chapter._id.toString()) {
             var lessons = chapters[index].lessons;
-            var lessonsLength = lessons.length;
-            for (var lenssonIndex = 0; lenssonIndex < lessonsLength; lenssonIndex++) {
+            for (var lenssonIndex in lessons) {
               if(lessons[lenssonIndex]._id.toString() == lesson._id.toString()) {
                 if(typeof(lessons[lenssonIndex].video) != undefined) {
                   if(! lessons[lenssonIndex].video) {

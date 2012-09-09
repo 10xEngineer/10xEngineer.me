@@ -5,7 +5,6 @@ var Compiler = require('10xCompiler').Compiler;
 var mongofs = require('mongo-vfs');
 
 var model = require('../app/models');
-var progressHelper = require('../app/helpers/progress');
 var util = require('../app/helpers/util');
 
 var wsdlurl = 'http://ideone.com/api/1/service.json';
@@ -52,7 +51,12 @@ module.exports = function(io) {
 
       // Persists current user session in mongodb
       socket.on('persist', function(data){
-        progressHelper.update(data, socket.handshake.session.progress);
+        var Progress = model.Progress;
+        Progress.updateProgress(data, function(error){
+          if(error) {
+            log.error(error);
+          }
+        });
       });
 
     });
