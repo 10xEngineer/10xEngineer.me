@@ -42,7 +42,7 @@ block layout.body
       .row-fluid
         .span6
           #detailsAccordion.accordion#myCollapsible
-            each chapter, chapterIndex in chapters
+            each chapter in chapters
               .accordion-group
                 -var chapterDesc = chapter.desc || "";
                 input.desc(name='desc' ,type='hidden' ,value='#{chapterDesc}')
@@ -51,7 +51,7 @@ block layout.body
                   a(href="##{chapter.id}", data-parent="#detailsAccordion", data-toggle="collapse", class="accordion-toggle") #{chapter.title}
                   - if(progress)
                     .progress
-                      .bar(style="width: #{progress.chapters[chapterIndex].progress}%;")
+                      .bar(style="width: #{progress.chapters[chapter._id].progress}%;")
                 div(class="accordion-body collapse", id="#{chapter.id}", style="height: 0px;", title="#{chapter.title}")
                   .accordion-inner
                     ul.lessonList
@@ -60,7 +60,7 @@ block layout.body
                         li
                           div.lessonType(class="#{icon}")
                           - if(progress)
-                            div.lessonStatus.pull-right(class="#{progress.chapters[chapterIndex].lessons[lessonIndex].status}")
+                            div.lessonStatus.pull-right(class="#{progress.chapters[chapter._id].lessons[lessonIndex].status}")
                           div.lessonTitle
                             - if(progress)
                               a(href="/lesson/#{lesson.id}") #{lesson.title}
