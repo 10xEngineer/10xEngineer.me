@@ -1,56 +1,59 @@
-.container
-  include ../../_breadcrumb
-  .container-fluid.course-index.inner-index
-    h1= title
-    - if(question.answers.length > 1)
-      - var type = "checkbox";
-    - else
-      - var type = "radio";
+extends ../layout
 
-    - var attempted = false;
-    - if(controls.displayedQuestionIndex != controls.currQuestionIndex) attempted = true;
+block layout.body
+  .container
+    include ../../_breadcrumb
+    .container-fluid.course-index.inner-index
+      h1= title
+      - if(question.answers.length > 1)
+        - var type = "checkbox";
+      - else
+        - var type = "radio";
+
+      - var attempted = false;
+      - if(controls.displayedQuestionIndex != controls.currQuestionIndex) attempted = true;
     
-    .row-fluid
-      .span9
-        h3 Q. #{parseInt(controls.displayedQuestionIndex)+1}: #{question.question}
-        form(method="post")
-          .actions 
+      .row-fluid
+        .span9
+          h3 Q. #{parseInt(controls.displayedQuestionIndex)+1}: #{question.question}
+          form(method="post")
+            .actions 
 
-            - if(question.answers.length==1 && question.choices.length==1)
-              br
-              textarea.span8(name="questionOption", rows="10")
-              br
+              - if(question.answers.length==1 && question.choices.length==1)
+                br
+                textarea.span8(name="questionOption", rows="10")
+                br
+              - else
+                .questionBlock
+                  each option, optionIndex in question.choices
+                    div 
+                      - if(attempted)
+                          - if(givenAns.indexOf(option) >= 0)
+                            input(type="#{type}", name="questionOption", value="#{option}", disabled, checked)
+                            |  #{option}
+                          - else
+                            input(type="#{type}", name="questionOption", value="#{option}", disabled)
+                            |  #{option}
+                      - else
+                        input(type="#{type}", name="questionOption", value="#{option}")
+                        |  #{option}
+
+            - if(controls.displayedQuestionIndex>0)
+              a.btn.btn-primary(href="/assessment/quiz/#{controls.lessonId}/#{controls.displayedQuestionIndex}", style="margin-right:5px")
+                i.icon-circle-arrow-left.icon-white 
+                |  Previous
+
+
+            - if(!attempted)
+              - if(controls.finish)
+                button.btn.btn-success(type="submit")
+                  i.icon-ok.icon-white 
+                  |  Finish    
+              - else 
+                button.btn.btn-primary(type="submit") Next 
+                  i.icon-circle-arrow-right.icon-white
             - else
-              .questionBlock
-                each option, optionIndex in question.choices
-                  div 
-                    - if(attempted)
-                        - if(givenAns.indexOf(option) >= 0)
-                          input(type="#{type}", name="questionOption", value="#{option}", disabled, checked)
-                          |  #{option}
-                        - else
-                          input(type="#{type}", name="questionOption", value="#{option}", disabled)
-                          |  #{option}
-                    - else
-                      input(type="#{type}", name="questionOption", value="#{option}")
-                      |  #{option}
-
-          - if(controls.displayedQuestionIndex>0)
-            a.btn.btn-primary(href="/assessment/quiz/#{controls.lessonId}/#{controls.displayedQuestionIndex}", style="margin-right:5px")
-              i.icon-circle-arrow-left.icon-white 
-              |  Previous
-
-
-          - if(!attempted)
-            - if(controls.finish)
-              button.btn.btn-success(type="submit")
-                i.icon-ok.icon-white 
-                |  Finish    
-            - else 
-              button.btn.btn-primary(type="submit") Next 
-                i.icon-circle-arrow-right.icon-white
-          - else
-              a.btn.btn-primary(href="/assessment/quiz/#{controls.lessonId}/#{controls.displayedQuestionIndex+2}", style="margin-right:5px") Next 
-                i.icon-circle-arrow-right.icon-white 
-      .span3
-        include ../../lessons/_sidebar
+                a.btn.btn-primary(href="/assessment/quiz/#{controls.lessonId}/#{controls.displayedQuestionIndex+2}", style="margin-right:5px") Next 
+                  i.icon-circle-arrow-right.icon-white 
+        .span3
+          include ../../lessons/_sidebar

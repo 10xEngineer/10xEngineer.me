@@ -42,7 +42,6 @@
     , "redis": "0.7.x"
     , "reparse": "0.1.x"
     , "request": "2.9.x"
-    , "share": "0.5.x"
     , "socket.io": "0.9.x"
     , "stylus": "0.x"
     , "uglify-js": "1.2.x"

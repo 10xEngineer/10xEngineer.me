@@ -1,12 +1,15 @@
-.container
-  h1 #{title}
-  .actions 
-    ul.admin_view_list_items
-      each user in users
-        li
-          -if(user.name) 
-            label(for='#{user.id}') #{user.name}
-          -else
-            label(for='#{user.id}') #{user.email}
-          .pull-right
-            a.btn(href='/admin/approve/#{user.id}', id='#{user.id}') Approve
+extends ../layout
+
+block layout.body
+  .container
+    h1 #{title}
+    .actions 
+      ul.admin_view_list_items
+        each user in users
+          li
+            -if(user.name) 
+              label(for='#{user.id}') #{user.name}
+            -else
+              label(for='#{user.id}') #{user.email}
+            .pull-right
+              a.btn(href='/admin/approve/#{user.id}', id='#{user.id}') Approve

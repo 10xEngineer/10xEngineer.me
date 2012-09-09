@@ -1,10 +1,13 @@
-.container
-  h1 #{title}
-  .actions 
-    ul.admin_view_list_items
-      each user in users
-        li
-          -if(user.name) 
-            label(for='#{user.id}', style='display:inline') #{user.name}
-          -else
-            label(for='#{user.id}', style='display:inline') #{user.email}
+extends ../layout
+
+block layout.body
+  .container
+    h1 #{title}
+    .actions 
+      ul.admin_view_list_items
+        each user in users
+          li
+            -if(user.name) 
+              label(for='#{user.id}', style='display:inline') #{user.name}
+            -else
+              label(for='#{user.id}', style='display:inline') #{user.email}
