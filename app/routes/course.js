@@ -4,7 +4,6 @@ var path = require('path');
 
 var model = require('../models');
 
-var progressHelper = require('../helpers/progress');
 var importer = require('../helpers/importer');
 var util = require('../helpers/util');
 
@@ -24,8 +23,8 @@ module.exports.allList = function(req, res){
       }
       res.render('courses/allList', { 
         title: 'Courses',
-        courses: courses,
-        progress : formatedProgress
+        courses: courses//,
+        //progress : formatedProgress
       });
     });
   });
@@ -58,13 +57,11 @@ module.exports.featuredList = function(req, res){
 module.exports.start = function(req, res, next){
   // Check if user has already started the course
   var Progress = model.Progress;
-  
   Progress.startOrContinue(req.user, req.course, function(error, progress) {
     if(error) {
       log.error(error);
       next(error);
     }
-
     // Redirect the user to first unfinished lesson
     progress.getNextLesson(function(error, nextLesson) {
       log.info(nextLesson);
@@ -84,10 +81,10 @@ module.exports.show = function(req, res, next){
       log.error(error);
     }
     res.render('courses/courseDetails', {
-      title: req.course.title,
-      chapter: undefined,
-      index :0,
-      progress : progress
+      title     : req.course.title,
+      chapter   : undefined,
+      index     : 0,
+      progress  : progress
     });
   });
 };
