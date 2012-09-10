@@ -11,13 +11,14 @@ append layout.scripts
   script(type='text/javascript', src="/javascripts/vfs-client.js")
   script(type='text/javascript', src="/javascripts/filetree.js")
   script(type='text/javascript', src="/javascripts/editor.js")
+  script(type='text/javascript', src="/javascripts/views/lessons/programming.js")
 
   // For Share JS
-  script(type='text/javascript', src="/javascripts/share/bcsocket.js")
-  script(type='text/javascript', src="/share/share.js")
-  script(type='text/javascript', src="/share/json.js")
-  script(type='text/javascript', src="/javascripts/share/ace.js")
-  script(type='text/javascript', src="/javascripts/share/chat.js")
+  // script(type='text/javascript', src="/javascripts/share/bcsocket.js")
+  // script(type='text/javascript', src="/share/share.js")
+  // script(type='text/javascript', src="/share/json.js")
+  // script(type='text/javascript', src="/javascripts/share/ace.js")
+  // script(type='text/javascript', src="/javascripts/share/chat.js")
 
 append layout.styles
   link(rel='stylesheet', href="/stylesheets/jquery.contextMenu.css")
@@ -47,68 +48,3 @@ block layout.body
         .lessonBar.row-fluid
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
           a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
-        
-      #sidebar.span2(style="display: inline-block; vertical-align: top;")
-        div#chat
-  
-  - var docId = 'test';
-  script
-    $(document).ready(function() {
-
-      //dynamically load javascript source file
-      function loadScriptFile(path, callback) {
-        var head = document.getElementsByTagName('head')[0];
-        var s = document.createElement('script');
-
-        s.src = path;
-        head.appendChild(s);
-
-        s.onload = callback;
-      }
-
-      window.editor = new Editor({
-        vfs: new VFSClient('#{docId}'),
-        tree: '#tree',
-        editor: '#editor',
-        tab: '#tabContainer'
-      });
-
-      new Chat($('#chat'), '#{username}');
-
-      newCodeSocket.on('codePassed', function(data) {
-        displayMessage('success', 'Congratulations, your code compiled successfully.');
-
-      });
-
-      newCodeSocket.on('codeFailed', function(error) {
-        console.log(error);
-        var error = error || 'Unknown error. Please contact support.';
-        error = '<pre>' + error + '</pre>';
-        displayMessage('error', error);
-
-      });
-
-      $('#compile').click(function() {
-        var sourceCode = editor.getContent();
-        var languageCode = $('#pageslide #mode').val();
-        if(!languageCode){
-          languageCode = $('#mode').val();
-        }
-        displayMessage('info', 'Compiling...');
-        newCodeSocket.emit('submitcode', 'test');
-      });
-
-      sharejs.open('#{docId}_json', 'json', function(error, doc) {
-        if (error) {
-          console.error(error);
-          return;
-        }
-        //doc.attach_editor(editor);
-      });
-
-      $('#save').click(function() {
-        editor.saveFile();
-        return false;
-      });
-    });
-  
