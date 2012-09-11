@@ -1,38 +1,41 @@
-.container
-  .container-fluid.course-index.inner-index
-    h1 #{lesson.title}
-    p
-      strong Description:-
-      p #{lesson.desc}
-    .row-fluid
-      .spam10
-        a.btn(href="/assessment/question/create/#{lesson.id}")
-          i.icon-plus
-          |  Add Question
-        a.btn.pull-right(href="/assessment/question/import/#{lesson.id}") 
-          i.icon-download-alt
-          |  Import Questions
+extends ../../layout
 
-    .actions 
-      ul.questionList
-        each question in questions
-          li
-            .innerDiv
-              label #{question.question} 
-                - if(question.weightage == 1)
-                  span.label.label-success Easy
-                - else if(question.weightage == 2)
-                  span.label.label-warning Modrate
-                - else if(question.weightage == 3)
-                  span.label.label-important Hard
-              .pull-right.actionBtns
-                a.btn.btn-success(href="/assessment/question/#{question.id}/edit")
-                  i.icon-edit.icon-white
-                  |  Edit Question
-                a.btn.btn-danger(href="/assessment/question/#{question.id}/remove")
-                  i.icon-trash.icon-white 
-                  |  Delete Question
-            ul
-              each opt in question.choices
-                li #{opt}
-    a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back
+block layout.body
+  .container
+    .container-fluid.course-index.inner-index
+      h1 #{lesson.title}
+      p
+        strong Description:-
+        p #{lesson.desc}
+      .row-fluid
+        .spam10
+          a.btn(href="/assessment/question/create/#{lesson.id}")
+            i.icon-plus
+            |  Add Question
+          a.btn.pull-right(href="/assessment/question/import/#{lesson.id}") 
+            i.icon-download-alt
+            |  Import Questions
+
+      .actions 
+        ul.questionList
+          each question in questions
+            li
+              .innerDiv
+                label #{question.question} 
+                  - if(question.weightage == 1)
+                    span.label.label-success Easy
+                  - else if(question.weightage == 2)
+                    span.label.label-warning Modrate
+                  - else if(question.weightage == 3)
+                    span.label.label-important Hard
+                .pull-right.actionBtns
+                  a.btn.btn-success(href="/assessment/question/#{question.id}/edit")
+                    i.icon-edit.icon-white
+                    |  Edit Question
+                  a.btn.btn-danger(href="/assessment/question/#{question.id}/remove")
+                    i.icon-trash.icon-white 
+                    |  Delete Question
+              ul
+                each opt in question.choices
+                  li #{opt}
+      a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back
