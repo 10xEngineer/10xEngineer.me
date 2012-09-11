@@ -1,7 +1,5 @@
-
-var docId = 'test';
-
 $(document).ready(function() {
+  var docId = $('#docId').val();
 
   //dynamically load javascript source file
   function loadScriptFile(path, callback) {

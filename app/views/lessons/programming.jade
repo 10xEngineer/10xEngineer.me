@@ -44,6 +44,7 @@ block layout.body
         mixin tabbar
         //- #tabBar
         //-   ul#tabContainer.nav.nav-tabs
+        input#docId(type="hidden", value="#{progressId}")
         #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
         .lessonBar.row-fluid
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
