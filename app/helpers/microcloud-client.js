@@ -1,11 +1,13 @@
-var http = require('http');
-
 var KeyManager = require('./mc/keymanager').KeyManager;
 var LabManager = require('./mc/labmanager').LabManager;
 
-function Microcloud(endpoint) {
-  this.endpoint = endpoint;
-  this.keyManager = new KeyManager(endpoint);
-  this.labManager = new LabManager(endpoint);
-}
+module.exports = function Microcloud(endpoint) {
+  // TODO: Hardcoded
+  endpoint = endpoint || 'http://mc.apac.internal.10xlabs.net';
+
+  return {
+    keyManager: new KeyManager(endpoint),
+    labManager: new LabManager(endpoint)
+  };
+};
 
