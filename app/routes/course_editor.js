@@ -806,7 +806,6 @@ module.exports.lessonView = function(req, res) {
     });
   } else if(lesson.type=='quiz') {
     Question.find({ lesson: lesson._id }, function(err, questions) {
-      console.log(questions);
       res.render('course_editor/lesson/' + req.lesson.type, {
         lesson : lesson,
         questions: questions
