@@ -41,7 +41,7 @@ $(document).ready(function() {
       languageCode = $('#mode').val();
     }
     displayMessage('info', 'Compiling...');
-    newCodeSocket.emit('submitcode', 'test');
+    newCodeSocket.emit('submitcode', docId);
   });
 
   //- sharejs.open('#{docId}_json', 'json', function(error, doc) {
