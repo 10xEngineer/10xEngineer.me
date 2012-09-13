@@ -23,6 +23,7 @@
     , "eyes": "0.1.x"
     , "gm" : "1.3.x"
     , "jade": "latest"
+    , "js-yaml": "1.0.x"
     , "lodash": "0.x"
     , "longjohn": "0.x"
     , "mail": "0.2.x"
@@ -42,13 +43,13 @@
     , "redis": "0.7.x"
     , "reparse": "0.1.x"
     , "request": "2.9.x"
+    , "rimraf": "2.0.x"
     , "share": "0.5.x"
     , "socket.io": "0.9.x"
     , "stylus": "0.x"
     , "uglify-js": "1.2.x"
     , "util": "0.4.x"
     , "winston": "0.6.x"
-    , "nib": "0.8.1"
   }
   , "devDependencies": {
       "mocha": "latest"
