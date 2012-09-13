@@ -1,12 +1,14 @@
 var fs = require('fs');
 var spawn = require('child_process').spawn;
-var jsyaml = require('js-yaml');
-var async = require('async');
-var _ = require('lodash');
-var zlib = require('zlib');
-var model = require('../models');
 var path = require('path');
+
+var async = require('async');
+var jsyaml = require('js-yaml');
+var _ = require('lodash');
+var filed = require('filed');
 var rimraf = require("rimraf");
+
+var model = require('../models');
 var importer = require('../helpers/importer');
 var cdn = require('../helpers/cdn');
 var util = require('../helpers/util');
@@ -830,7 +832,7 @@ module.exports.lessonView = function(req, res) {
 **********************************************
 *********************************************/
 
-module.exports.exportCourse = function(req, res) {
+module.exports.exportCourse = function(req, res, next) {
 
   var Lesson    = model.Lesson;
   var course    = req.course;
@@ -839,13 +841,12 @@ module.exports.exportCourse = function(req, res) {
   var data_course = '';
   data_course     = "title: " + course.title + "\n";
   data_course    += "desc: " + course.desc;
-  exp_path        = 'Samples/ExportCourse';
+  exp_path        = 'app/upload';
 
   save_file_for_export(exp_path, course_dir, 'course', data_course, function(error){
     if(error){
       console.log(error);
-      console.log("UnExpected redirect.");  
-      return res.redirect('/course_editor');
+      return next(error);
     } else {
       var chapters = course.chapters;
       var chap_path = exp_path + '/' + course_dir;
@@ -854,16 +855,16 @@ module.exports.exportCourse = function(req, res) {
       load_resorces(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
         if(err){
           console.log("Error...");
+          return next(error);
         }
-        else console.log("Saved.");
       });
 
       wallFile = course.wallImage.substring(5, course.wallImage.length);
       load_resorces(exp_path+'/'+course_dir, 'wall', wallFile, function(err){
         if(err){
           console.log("Error...");
+          return next(error);
         }
-        else console.log("Saved.");
       });
 
       // Loop for course's chapter
@@ -890,30 +891,14 @@ module.exports.exportCourse = function(req, res) {
           });
         });
       }, function(error){
-        console.log("Expected redirect.");
+        if(error) {
+          return next(error);
+        }
 
-        // var gzip = zlib.createGzip();
-        // var gunzip = zlib.createGunzip();
-        // var inp = fs.createReadStream(exp_path+"/course");
-        // var out = fs.createWriteStream(exp_path+"/course.gz");
-        // var in2 = fs.createWriteStream(exp_path+"/courseOUT");
-
-        // inp.pipe(gzip).pipe(out).pipe(gunzip).pipe(in2);
         exp_path = path.resolve(exp_path);
         console.log(exp_path);
-        // spawn("zip",[ "-r", exp_path + "/course.zip", exp_path + "/course"], {
-        //   cwd: exp_path
-        // }, function(error, stdout, stderr){
-        //   console.log(stdout);
-        //   console.log(error);
-        //   console.log(stderr);
-        //   return res.redirect('/course_editor');
-        // });
-        var zip    = spawn("zip",[ "-r", course_dir+".zip", course_dir], { cwd: exp_path });
 
-        zip.stdout.on('data', function (data) {
-          console.log('ZIP stdout: ' + data);
-        });
+        var zip    = spawn("zip",[ "-r", course_dir+".zip", course_dir], { cwd: exp_path });
 
         zip.stderr.on('data', function (data) {
           console.log('ZIP stderr: ' + data);
@@ -921,15 +906,23 @@ module.exports.exportCourse = function(req, res) {
 
         zip.on('exit', function (code) {
           console.log('child process ZIP exited with code ' + code);
-          // var reader = fs.createReadStream(exp_path+"/"+course_dir+".zip", {encoding: 'base64'});
-          var file = fs.readFileSync(exp_path+"/"+course_dir+".zip", 'base64');
-          // res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
-          // res.setHeader('Accept-Ranges', 'bytes');
-          // res.setHeader('Content-Type', 'application/zip');
-          res.setHeader('Content-Length', file.length);
-          res.write(file, 'binary');
-          res.end();
-          // return res.redirect('/course_editor');
+          res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
+          res.setHeader('Content-Type', 'application/zip');
+          //res.setHeader('Content-Length', file.length);
+          res.on('end', function() {
+            console.log('Response Stream Ended.');
+          });
+          var reader = filed(exp_path+"/"+course_dir+".zip");
+          reader.pipe(res);
+          reader.on('end', function() {
+            console.log('File Stream Ended.');
+            rimraf(exp_path+'/'+course_dir, function(error){
+              if(error) {
+                console.log(error);
+                return next(error);
+              }
+            });
+          });
         });
       });
     }
@@ -955,7 +948,6 @@ var save_file_for_export = function(path, dir_name, file_name, data, callback){
       if (err) {
         return callback(err);
       } 
-      console.log('It\'s saved!');
       callback();
     });
   });
@@ -970,7 +962,6 @@ var save_file_for_export = function(path, dir_name, file_name, data, callback){
 var load_resorces = function(path, file_name, file, callback) {
   fs.mkdir(path + "/resorces", 0777, function(error){
     cdn.copyToDisk(file, path + "/resorces", file_name, function (){
-      console.log("Done...", file_name);
       callback();
     });
   });
@@ -1037,7 +1028,7 @@ module.exports.importCourse = function(req, res) {
   // UnZip imported file
   var file = req.files['course-file'];
   var random_dir = util.string.random(15);
-  var imp_path = path.resolve("Samples/ImportCourse");
+  var imp_path = path.resolve("app/upload");
   fs.mkdir(imp_path+'/'+random_dir, function(){
     imp_path = path.resolve(imp_path+'/'+random_dir);
     var unzip    = spawn("unzip",[ file.path ], { cwd: imp_path });
