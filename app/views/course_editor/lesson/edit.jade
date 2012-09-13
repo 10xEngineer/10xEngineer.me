@@ -1,5 +1,8 @@
-.container
-	h1= title
-	h3 Edit a Lesson
-	p Chapter: #{chapter.title}
-	!= partial('lesson')
+extends ../../layout
+
+block layout.body
+  .container
+    h1= title
+    h3 Edit a Lesson
+    p Chapter: #{chapter.title}
+    != partial('lesson')

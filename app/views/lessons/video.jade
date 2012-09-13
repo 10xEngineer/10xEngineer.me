@@ -1,134 +1,137 @@
-.container
-  include ../_breadcrumb
-  .container-fluid.lesson.inner-index
-    h1 #{lesson.title}
-    .row-fluid
-      .span9#playerSpan
-        video#player(preload="none")
-          - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
-            source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
-          - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
-            source(type='video/mp4', src='#{lesson.video.content}')
-        .lessonBar
-          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
-      .span3
-        include _sidebar
-    .row-fluid
-      p
-    - if(false)
+extends ../layout
+
+block layout.body
+  .container
+    include ../_breadcrumb
+    .container-fluid.lesson.inner-index
+      h1 #{lesson.title}
       .row-fluid
-        .span9
-          include _footer
-  script
-    var currentVideoTime = 0, LastUpdatedTime = 0;
-    var videoH = 475;
-    var videoW = 840;
-    var flag =0;
+        .span9#playerSpan
+          video#player(preload="none")
+            - if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'youtube')
+              source(type='video/youtube', src='http://www.youtube.com/watch?v=#{lesson.video.content}')
+            - else if(typeof(lesson.video.content) != 'undefined' && typeof(lesson.video.type) != 'undefined' && lesson.video.type == 'upload')
+              source(type='video/mp4', src='#{lesson.video.content}')
+          .lessonBar
+            a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+            a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+        .span3
+          include _sidebar
+      .row-fluid
+        p
+      - if(false)
+        .row-fluid
+          .span9
+            include _footer
+    script
+      var currentVideoTime = 0, LastUpdatedTime = 0;
+      var videoH = 475;
+      var videoW = 840;
+      var flag =0;
 
-    var videoResumeTime = '#{videoStartTime}';
-    if(typeof(videoResumeTime) != 'number') {
-      videoResumeTime = parseInt(videoResumeTime);
-    }
-    
-    $(document).ready(function(){
-      var rowWidth = $('.row-fluid').width();
-      if(rowWidth < 900) {
-        videoW = rowWidth;
-        videoH = parseInt(rowWidth / 840 * 475);
+      var videoResumeTime = '#{videoStartTime}';
+      if(typeof(videoResumeTime) != 'number') {
+        videoResumeTime = parseInt(videoResumeTime);
       }
-      $('video').attr("width", videoW);
-      $('video').attr("height", videoH);
+    
+      $(document).ready(function(){
+        var rowWidth = $('.row-fluid').width();
+        if(rowWidth < 900) {
+          videoW = rowWidth;
+          videoH = parseInt(rowWidth / 840 * 475);
+        }
+        $('video').attr("width", videoW);
+        $('video').attr("height", videoH);
 
-      $('video').mediaelementplayer({
-        enablePluginDebug : false,
-        defaultVideoWidth : videoW,
-        startTime : videoResumeTime,
-        defaultVideoHeight : videoH,
-        features : ['playpause','progress','current','duration','tracks','volume','fullscreen'],
-        alwaysShowControls : true,
-        pluginPath : '/javascripts/mediaelement/',
-        success : function(mediaElement, domObject) {
+        $('video').mediaelementplayer({
+          enablePluginDebug : false,
+          defaultVideoWidth : videoW,
+          startTime : videoResumeTime,
+          defaultVideoHeight : videoH,
+          features : ['playpause','progress','current','duration','tracks','volume','fullscreen'],
+          alwaysShowControls : true,
+          pluginPath : '/javascripts/mediaelement/',
+          success : function(mediaElement, domObject) {
 
-          // At Video Start
-          mediaElement.addEventListener('playing', function(e) {
-            if(flag == 0) {
-              flag = 1;
-              mediaElement.setCurrentTime(videoResumeTime);
-            }
-          }, false);
+            // At Video Start
+            mediaElement.addEventListener('playing', function(e) {
+              if(flag == 0) {
+                flag = 1;
+                mediaElement.setCurrentTime(videoResumeTime);
+              }
+            }, false);
 
 
-          // Find Current Time and Update it in Progress
-          mediaElement.addEventListener('timeupdate', function(e) {
-            currentVideoTime = mediaElement.currentTime;
-          }, false);
+            // Find Current Time and Update it in Progress
+            mediaElement.addEventListener('timeupdate', function(e) {
+              currentVideoTime = mediaElement.currentTime;
+            }, false);
 
-          // Change the Status at end of Video
-          mediaElement.addEventListener('ended', function(e) {
-            if(#{progressFlag}) {  
-              // Send Complete Status of Video to Server Using Socket.
-              var courseId =  '#{lesson.chapter.course}';
-              var chapterId =  '#{lesson.chapter._id}';
-              var lessonId =  '#{lesson._id}';
-              var userId = '#{userId}';
-              progressSocket.emit('status', { type: 'video', status: 'completed', userId: userId, courseId: courseId, chapterId: chapterId, lessonId: lessonId});
-            }
-          }, false);
+            // Change the Status at end of Video
+            mediaElement.addEventListener('ended', function(e) {
+              if(#{progressFlag}) {  
+                // Send Complete Status of Video to Server Using Socket.
+                var courseId =  '#{lesson.chapter.course}';
+                var chapterId =  '#{lesson.chapter._id}';
+                var lessonId =  '#{lesson._id}';
+                var userId = '#{userId}';
+                progressSocket.emit('status', { type: 'video', status: 'completed', userId: userId, courseId: courseId, chapterId: chapterId, lessonId: lessonId});
+              }
+            }, false);
 
-          $('#mep_0').css("margin-left", "auto");
-          $('#mep_0').css("margin-right", "auto");
+            $('#mep_0').css("margin-left", "auto");
+            $('#mep_0').css("margin-right", "auto");
 
-        },
-        error: function(err) {
-          console.log(err);
+          },
+          error: function(err) {
+            console.log(err);
+          }
+        });
+      });
+
+      if(#{progressFlag}) {
+        var updateProgress = setInterval(function() {
+          if((currentVideoTime - LastUpdatedTime) >= 5) {
+
+            LastUpdatedTime = currentVideoTime ;
+
+            // For Sending Current Updated Time to Server Using Socket.
+            var courseId =  '#{lesson.chapter.course}';
+            var chapterId =  '#{lesson.chapter.id}';
+            var lessonId =  '#{lesson.id}';
+            var userId = '#{userId}';
+            progressSocket.emit('change', { type: 'video', userId: userId, data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
+          
+          }
+        }, 5000);
+      }
+
+      // Script for hide sidebar
+      $(window).resize(function(){
+        if($('.row-fluid').width() <= 250+parseInt($('video').attr("width"))) {
+          removeSideBar();
+        }
+        else {
+          addSideBar();
         }
       });
-    });
-
-    if(#{progressFlag}) {
-      var updateProgress = setInterval(function() {
-        if((currentVideoTime - LastUpdatedTime) >= 5) {
-
-          LastUpdatedTime = currentVideoTime ;
-
-          // For Sending Current Updated Time to Server Using Socket.
-          var courseId =  '#{lesson.chapter.course}';
-          var chapterId =  '#{lesson.chapter.id}';
-          var lessonId =  '#{lesson.id}';
-          var userId = '#{userId}';
-          progressSocket.emit('change', { type: 'video', userId: userId, data: currentVideoTime, courseId: courseId, chapterId: chapterId, lessonId: lessonId });
-          
+      $(document).ready(function(){
+        if($('.row-fluid').width() <= 900) {
+          removeSideBar();
         }
-      }, 5000);
-    }
+        else {
+          addSideBar();
+        }
+      })
 
-    // Script for hide sidebar
-    $(window).resize(function(){
-      if($('.row-fluid').width() <= 250+parseInt($('video').attr("width"))) {
-        removeSideBar();
+      var addSideBar = function() {
+        $('.sidebar').css("display", "block");
+        $('#playerSpan').removeClass('span12');
+        $('#playerSpan').addClass('span9');
       }
-      else {
-        addSideBar();
-      }
-    });
-    $(document).ready(function(){
-      if($('.row-fluid').width() <= 900) {
-        removeSideBar();
-      }
-      else {
-        addSideBar();
-      }
-    })
 
-    var addSideBar = function() {
-      $('.sidebar').css("display", "block");
-      $('#playerSpan').removeClass('span12');
-      $('#playerSpan').addClass('span9');
-    }
-
-    var removeSideBar = function() {
-      $('.sidebar').css("display", "none");
-      $('#playerSpan').removeClass('span9');
-      $('#playerSpan').addClass('span12');
-    }
+      var removeSideBar = function() {
+        $('.sidebar').css("display", "none");
+        $('#playerSpan').removeClass('span9');
+        $('#playerSpan').addClass('span12');
+      }

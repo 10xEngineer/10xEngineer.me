@@ -1,4 +1,7 @@
-.container
-	h1= title
-	h3 Add a Question
-	!= partial('form');
+extends ../layout
+
+block layout.body
+  .container
+    h1= title
+    h3 Add a Question
+    != partial('form');

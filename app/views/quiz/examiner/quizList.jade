@@ -1,14 +1,17 @@
-.container
-  .container-fluid.course-index.inner-index
-    h1 Remaning assessment of quiz
-    .actions 
-      ul.quizList
-        each assessment in assessments
-          li
-            .innerDiv
-              label #{assessment.lesson.title} ( #{assessment.user.name} )
-              .pull-right.actionBtns
-                a.btn.btn-primary(href="/assessment/quiz/examin/#{assessment.id}/start")
-                  i.icon-ok.icon-white 
-                  |  Start Examin
-    a.btn(href='#') Back
+extends ../../layout
+
+block layout.body
+  .container
+    .container-fluid.course-index.inner-index
+      h1 Remaning assessment of quiz
+      .actions 
+        ul.quizList
+          each assessment in assessments
+            li
+              .innerDiv
+                label #{assessment.lesson.title} ( #{assessment.user.name} )
+                .pull-right.actionBtns
+                  a.btn.btn-primary(href="/assessment/quiz/examin/#{assessment.id}/start")
+                    i.icon-ok.icon-white 
+                    |  Start Examin
+      a.btn(href='#') Back

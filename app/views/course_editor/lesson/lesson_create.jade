@@ -1,6 +1,9 @@
-.container
-	h1= title
-	h3 Create a Lesson
-	// TODO: Display the chapter "properly"
-	p Chapter: #{chapter.title}
-	!= partial('lesson');
+extends ../../layout
+
+block layout.body
+  .container
+    h1= title
+    h3 Create a Lesson
+    // TODO: Display the chapter "properly"
+    p Chapter: #{chapter.title}
+    != partial('lesson');

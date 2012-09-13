@@ -1,37 +1,40 @@
-.container
-  //- Chapter index (Lesson list)
-  .container-fluid.chapter-index.inner-index
-    .row-fluid
-      .chapter-header
-        .chapter-content
-          h2 #{chapter.title}
-          p #{chapter.desc}
-          -if(isLoggedIn)
-            .btn-strip
-              a.btn.btn-success(href="/course_editor/lesson/create/#{chapter.id}") Add Lesson
-              a.btn(href='/course_editor/chapter/#{chapter.id}/edit') Edit Chapter Info
-              a.btn.btn-danger(href='/course_editor/chapter/#{chapter.id}/remove') Delete Chapter
+extends ../../layout
 
-    .row-fluid
-      ul.lessons
-        - if(typeof(chapter.lessons) != 'undefined')
-          each lesson in chapter.lessons
-            li.lesson
-              a(href='/course_editor/lesson/#{lesson.id}')
-                h3 #{lesson.title}
-              - if(isLoggedIn)
-                - if(lesson.status != 'published')
-                  | (Draft)
-                a.btn.btn-danger.pull-right(href='/course_editor/lesson/#{lesson.id}/remove') Delete
-                - if(lesson.status != 'published')
-                  a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/publish') Publish
-                - else
-                  a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/unpublish') Unpublish
-                a.btn.pull-right(href='/course_editor/lesson/#{lesson.id}/edit') Edit
-              div.moveBox
-                  a.upArrow(href="/course_editor/lesson/#{lesson.id}/up")
-                    i.icon-chevron-up
-                  a.downArrow(href="/course_editor/lesson/#{lesson.id}/down")
-                    i.icon-chevron-down
+block layout.body
+  .container
+    //- Chapter index (Lesson list)
+    .container-fluid.chapter-index.inner-index
+      .row-fluid
+        .chapter-header
+          .chapter-content
+            h2 #{chapter.title}
+            p #{chapter.desc}
+            -if(isLoggedIn)
+              .btn-strip
+                a.btn.btn-success(href="/course_editor/lesson/create/#{chapter.id}") Add Lesson
+                a.btn(href='/course_editor/chapter/#{chapter.id}/edit') Edit Chapter Info
+                a.btn.btn-danger(href='/course_editor/chapter/#{chapter.id}/remove') Delete Chapter
 
-    a.btn(href='/course_editor/course/#{chapter.course.id}') Back
+      .row-fluid
+        ul.lessons
+          - if(typeof(chapter.lessons) != 'undefined')
+            each lesson in chapter.lessons
+              li.lesson
+                a(href='/course_editor/lesson/#{lesson.id}')
+                  h3 #{lesson.title}
+                - if(isLoggedIn)
+                  - if(lesson.status != 'published')
+                    | (Draft)
+                  a.btn.btn-danger.pull-right(href='/course_editor/lesson/#{lesson.id}/remove') Delete
+                  - if(lesson.status != 'published')
+                    a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/publish') Publish
+                  - else
+                    a.btn.btn-success.pull-right(href='/course_editor/lesson/#{lesson.id}/unpublish') Unpublish
+                  a.btn.pull-right(href='/course_editor/lesson/#{lesson.id}/edit') Edit
+                div.moveBox
+                    a.upArrow(href="/course_editor/lesson/#{lesson.id}/up")
+                      i.icon-chevron-up
+                    a.downArrow(href="/course_editor/lesson/#{lesson.id}/down")
+                      i.icon-chevron-down
+
+      a.btn(href='/course_editor/course/#{chapter.course.id}') Back

@@ -1,41 +1,44 @@
-.container
-  //- Course index (Chapter list)
-  .container-fluid.course-index.inner-index
-    .row-fluid
-      .course-header
-        - if(typeof(course.iconImage) != 'undefined')
-          .course-img
-            img(src='#{course.iconImage}')
-        .course-content
-          h2 #{course.title}
-          p #{course.desc}
-          -if(isLoggedIn)
-            .btn-strip
-              a.btn.btn-success(href="/course_editor/chapter/create/#{course.id}") Add Chapter
-              a.btn(href='/course_editor/course/#{course.id}/edit') Edit Course Info
-              a.btn.btn-danger(href='/course_editor/course/#{course.id}/remove') Delete Course
-         
-    .row-fluid
-      ul.chapters
-        - if(typeof(course.chapters) != 'undefined')
-          each chapter in course.chapters
-            li.chapter
-              a(href='/course_editor/chapter/#{chapter.id}/')
-                h3	#{chapter.title}
-              - if(user != undefined)
-                - if(chapter.status != 'published')
-                  | (Draft)
-                a.btn.btn-danger.pull-right(href='/course_editor/chapter/#{chapter.id}/remove') Delete
-                - if(chapter.status != 'published')
-                  a.btn.btn-success.pull-right(href='/course_editor/chapter/#{chapter.id}/publish') Publish
-                - else
-                  a.btn.btn-success.pull-right(href='/course_editor/chapter/#{chapter.id}/unpublish') Unpublish
-                a.btn.pull-right(href='/course_editor/chapter/#{chapter.id}/edit') Edit
-              div.moveBox
-                a.upArrow(href="/course_editor/chapter/#{chapter.id}/up")
-                  i.icon-chevron-up
-                a.downArrow(href="/course_editor/chapter/#{chapter.id}/down")
-                  i.icon-chevron-down
+extends ../../layout
 
-    div
-      a.btn(href='/course_editor') Back
+block layout.body
+  .container
+    //- Course index (Chapter list)
+    .container-fluid.course-index.inner-index
+      .row-fluid
+        .course-header
+          - if(typeof(course.iconImage) != 'undefined')
+            .course-img
+              img(src='#{course.iconImage}')
+          .course-content
+            h2 #{course.title}
+            p #{course.desc}
+            -if(isLoggedIn)
+              .btn-strip
+                a.btn.btn-success(href="/course_editor/chapter/create/#{course.id}") Add Chapter
+                a.btn(href='/course_editor/course/#{course.id}/edit') Edit Course Info
+                a.btn.btn-danger(href='/course_editor/course/#{course.id}/remove') Delete Course
+         
+      .row-fluid
+        ul.chapters
+          - if(typeof(course.chapters) != 'undefined')
+            each chapter in course.chapters
+              li.chapter
+                a(href='/course_editor/chapter/#{chapter.id}/')
+                  h3	#{chapter.title}
+                - if(user != undefined)
+                  - if(chapter.status != 'published')
+                    | (Draft)
+                  a.btn.btn-danger.pull-right(href='/course_editor/chapter/#{chapter.id}/remove') Delete
+                  - if(chapter.status != 'published')
+                    a.btn.btn-success.pull-right(href='/course_editor/chapter/#{chapter.id}/publish') Publish
+                  - else
+                    a.btn.btn-success.pull-right(href='/course_editor/chapter/#{chapter.id}/unpublish') Unpublish
+                  a.btn.pull-right(href='/course_editor/chapter/#{chapter.id}/edit') Edit
+                div.moveBox
+                  a.upArrow(href="/course_editor/chapter/#{chapter.id}/up")
+                    i.icon-chevron-up
+                  a.downArrow(href="/course_editor/chapter/#{chapter.id}/down")
+                    i.icon-chevron-down
+
+      div
+        a.btn(href='/course_editor') Back

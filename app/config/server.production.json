@@ -1,7 +1,7 @@
 {
   "site": {
     "hostname": "dev.10xengineer.me",
-    "port": 3000,
+    "port": 80,
     "email": "10xengineer@gmail.com"
   },
   "auth": {

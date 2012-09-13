@@ -1,9 +1,12 @@
-.container
-	h1 Import Users Email
-	form(method="post", enctype='multipart/form-data')
-		br
-		p File :
-		input#course.input-large(name='users-file', type='file', placeholder='Users File')
-		
-		p
-			input.btn.btn-primary.btn-large(type='submit') Upload Users Email
+extends ../layout
+
+block layout.body
+  .container
+    h1 Import Users Email
+    form(method="post", enctype='multipart/form-data')
+      br
+      p File :
+      input#course.input-large(name='users-file', type='file', placeholder='Users File')
+    
+      p
+        input.btn.btn-primary.btn-large(type='submit') Upload Users Email

@@ -1,25 +1,28 @@
-- questionNo = parseInt(currQuestion, 10)+1;
-.container
-  h3 Q. #{questionNo}: #{question.question}
-  .row-fluid
-    .span6
-      label Given Answer
-      pre #{assessment.attemptedDetails[currQuestion].givenAns[0]}
-    .span6
-      label Right Answer
-      pre #{question.answers[0]}
-  .row-fluid
-    form.form-inline(method="POST")
-      - if(parseInt(currQuestion)>0)
-        a.btn(href='/assessment/quiz/examin/#{assessment.id}/#{currQuestion}') Previous
-      label(style="margin-left: 5px") Marks :
-      - var marks = assessment.attemptedDetails[currQuestion].gotMarks;
-      select(style="margin-left: 5px", name="marks", value='#{assessment.attemptedDetails[currQuestion].gotMarks}')
-        - var fullMarks = parseInt(question.weightage);
-        - for(var i = 0; i <= fullMarks; i++)
-            - if(marks == i)
-              option(value='#{i}', selected) #{i}
-            - else 
-              option(value='#{i}') #{i}
+extends ../../layout
 
-      input.btn(style="margin-left: 5px", type="submit", value="Submit & Next")
+block layout.body
+  - questionNo = parseInt(currQuestion, 10)+1;
+  .container
+    h3 Q. #{questionNo}: #{question.question}
+    .row-fluid
+      .span6
+        label Given Answer
+        pre #{assessment.attemptedDetails[currQuestion].givenAns[0]}
+      .span6
+        label Right Answer
+        pre #{question.answers[0]}
+    .row-fluid
+      form.form-inline(method="POST")
+        - if(parseInt(currQuestion)>0)
+          a.btn(href='/assessment/quiz/examin/#{assessment.id}/#{currQuestion}') Previous
+        label(style="margin-left: 5px") Marks :
+        - var marks = assessment.attemptedDetails[currQuestion].gotMarks;
+        select(style="margin-left: 5px", name="marks", value='#{assessment.attemptedDetails[currQuestion].gotMarks}')
+          - var fullMarks = parseInt(question.weightage);
+          - for(var i = 0; i <= fullMarks; i++)
+              - if(marks == i)
+                option(value='#{i}', selected) #{i}
+              - else 
+                option(value='#{i}') #{i}
+
+        input.btn(style="margin-left: 5px", type="submit", value="Submit & Next")
