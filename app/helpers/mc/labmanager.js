@@ -1,9 +1,10 @@
-var http = require('http');
+var request = require('request');
 var url = require('url');
 
 var async = require('async');
 
 function LabManager(endpoint) {
+  this.origEndpoint = endpoint;
   this.endpoint = endpoint + '/labs';
 }
 
@@ -17,46 +18,36 @@ function LabManager(endpoint) {
  */
 LabManager.prototype.create = function(options, callback) {
   var self = this;
-  var reqOptions = url.parse(this.endpoint);
-  reqOptions.method = 'POST';
-  
-  var req = http.request(reqOptions, function(res) {
-    var resString = '';
-
-    if(res.statusCode !== 200) {
-      return callback(new Error('Error creating lab.'));
-    }
-
-    res.setEncoding('utf8');
-    res.on('data', function(chunk) {
-      resString += chunk;
-    });
-
-    res.on('end', function() {
-      var resObject;
-      try {
-        resObject = JSON.parse(resString);
-      } catch(e) {
-        return callback(e);
-      }
-
-      callback(null, new Lab(self.endpoint, resObject.name));
-    });
-  });
-
-  var body = {
+  var reqBody = {
     name: options.name,
     repo: options.definition,
     pools: {
-      'pool-name': 'eng_pool_1', // TODO: Hardcoded.
+      'compute': 'eng_pool_1', // TODO: Hardcoded.
     },
     attr: {
       'default-key': options.keypair
     }
   };
-  req.end(JSON.stringify(body));
-  req.on('error', function(error) {
-    callback(error);
+
+  log.info("Creating the lab: ", reqBody);
+  request.post({
+    url: this.endpoint,
+    json: reqBody
+  }, function(error, res, body) {
+    if(error) {
+      return callback(error);
+    }
+    if(res.statusCode !== 201) {
+      log.error("Res:", res);
+      return callback(new Error('Error creating lab.'));
+    }
+
+    // TODO: Add name
+    if(!body.name) {
+      body.name = reqBody.name;
+    }
+    log.info('Lab Created - ', body.name);
+    callback(null, new Lab(self.origEndpoint, body.name));
   });
 };
 
@@ -67,70 +58,61 @@ module.exports.LabManager = LabManager;
  */
 function Lab(endpoint, name) {
   var self = this;
+  this.name = name;
   this.origEndpoint = endpoint;
-  this.endpoint = endpoint + '/' + name;
+  this.endpoint = endpoint + '/labs/' + name;
 
-  http.get(this.endpoint, function(res) {
-    var resString = '';
-
+  log.info("Fetching lab metadata for " + name);
+  request.get({
+    url: this.endpoint
+  }, function(error, res, body) {
+    if(error) {
+      throw error;
+    }
     if(res.statusCode !== 200) {
+      log.error('Res', res);
       throw new Error('Error getting lab info.');
     }
 
-    res.setEncoding('utf8');
-    res.on('data', function(chunk) {
-      resString += chunk;
-    });
-
-    res.on('end', function() {
-      var resObject;
-      try {
-        resObject = JSON.parse(resString);
-      } catch(e) {
-        throw e;
-      }
-
-      self.name = resObject.name;
-      self.version = resObject.current_definition.version;
-      self.repo = resObject.repo;
-      self.token = resObject.token;
-      self.state = resObject.state;
-      self.meta = resObject.meta;
-    });
-  }).on('error', function(e) {
-    console.log('Error getting lab info.');
+    log.info("Lab metadata received.")
+    self.name = body.name;
+    self.repo = body.repo;
+    self.token = body.token;
+    self.state = body.state;
+    self.meta = body.meta;
   });
 }
 
 Lab.prototype.refreshVm = function(uuid, callback) {
   var self = this;
 
-  http.get(this.origEndpoint + '/vms/' + uuid, function(res) {
-    var resString = '';
-
+  log.info("Refreshing vm - ", uuid);
+  request.get({
+    url: this.origEndpoint + '/vms/' + uuid
+  }, function(error, res, body) {
+    if(error) {
+      return callback(error);
+    }
     if(res.statusCode !== 200) {
-      throw new Error('Error getting lab info.');
+      log.info("Res", res);
+      return callback(new Error('Error getting lab info.'));
     }
 
-    res.setEncoding('utf8');
-    res.on('data', function(chunk) {
-      resString += chunk;
-    });
+    log.info("Refreshed - ", uuid);
 
-    res.on('end', function() {
-      var resObject;
+    if(typeof(body) == 'string') {
       try {
-        resObject = JSON.parse(resString);
+        body = JSON.parse(body);
       } catch(e) {
-        throw e;
-      }
+        return callback(new Error("Error parsing vm"));
+      }      
+    }
 
-      self.vms[uuid] = resObject;
-      callback();
-    });
-  }).on('error', function(e) {
-    console.log('Error getting lab info.');
-    callback(e);
+    self.vms[uuid] = body;
+
+    // TODO: hardcode single vm for now
+    self.currentVm = body;
+    callback();
   });
 };
 
@@ -138,59 +120,85 @@ Lab.prototype.refresh = function(callback) {
   var self = this;
   // TODO: Refresh lab state
 
-  // Fetch vms
-  http.get(this.endpoint + '/vms', function(res) {
-    var resString = '';
-
+  log.info("Getting a list of available vms...");
+  request.get({
+    url: this.endpoint + '/vms'
+  }, function(error, res, body) {
+    if(error) {
+      return callback(error);
+    }
     if(res.statusCode !== 200) {
-      throw new Error('Error getting lab info.');
+      return callback(new Error('Error getting lab info.'));
     }
 
-    res.setEncoding('utf8');
-    res.on('data', function(chunk) {
-      resString += chunk;
-    });
+    var respArray;
+    try {
+      respArray = JSON.parse(body);
+    } catch(e) {
+      return callback(new Error("Error parsing list"));
+    }
 
-    res.on('end', function() {
-      var resObject;
-      try {
-        resObject = JSON.parse(resString);
-      } catch(e) {
-        throw e;
-      }
-
-      self.vms = {};
-      async.forEach(resObject, function(vm, callback) {
-        self.refreshVm(vm.uuid, callback);
-      }, function(error) {
-        callback(error);
-      });
+    log.info(respArray.length + ' vm received.');
+    self.vms = {};
+    async.forEach(respArray, function(vm, callback) {
+      self.refreshVm(vm.uuid, callback);
+    }, function(error) {
+      callback(error);
     });
-  }).on('error', function(e) {
-    console.log('Error getting lab info.');
   });
 };
 
-Lab.prototype.release = function(callback) {
+Lab.prototype.release = function(version, callback) {
   var self = this;
-  var reqOptions = url.parse(this.endpoint + '/versions/' + this.version + '/release');
-  reqOptions.method = 'POST';
   
-  var req = http.request(reqOptions, function(res) {
+  log.info('Releasing the lab ' + this.name + ' with version ' + version);
+  request.post({
+    url: this.endpoint + '/versions/' + version + '/release'
+  }, function(error, res, body) {
+    if(error) {
+      return callback(error);
+    }
     if(res.statusCode !== 202) {
+      log.info("Res", res);
       return callback(new Error('Error releasing definition.'));
     }
 
-    res.on('end', function() {
-      self.refresh(function(error) {
-        callback(error);
-      });
+    log.info('Lab successfully released.');
+    self.refresh(function(error) {
+      callback(error);
     });
   });
+};
 
-  req.end();
-  req.on('error', function(error) {
-    callback(error);
+Lab.prototype.getVm = function(uuid) {
+  // TODO: Return current vm for now
+  return this.currentVm;
+};
+
+Lab.prototype.createTTYSession = function(vm, key, callback) {
+  var reqBody = {
+    lab: vm.lab.name,
+    user: 'ubuntu', // TODO: Hardcoded
+    vm_name: vm.vm_name,
+    private_key: key.identity
+  };
+
+  log.info('Creating a tty session.');
+  log.info('Body: ', reqBody);
+  request.post({
+    url: 'http://' + vm.term_server.host + ':' + vm.term_server.client_port + '/sessions',
+    json: reqBody
+  }, function(error, res, body) {
+    if(error) {
+      return callback(error);
+    }
+    if(res.statusCode !== 202) {
+      log.info("Res", res);
+      return callback(new Error('Error releasing definition.'));
+    }
+
+    log.info('TTY session created.');
+    callback(body);
   });
 };
 

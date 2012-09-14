@@ -1,5 +1,6 @@
 var model = require('../app/models');
-var mcClient = require('../app/helpers/microcloud-client')();
+var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
+var Lab = mcClient.Lab;
 
 module.exports = function(io) {
 
@@ -17,18 +18,34 @@ module.exports = function(io) {
       
     socket.on('lab_init', function(lessonId, progressId){
       // TODO: Hardcoded for testing
-      return socket.emit('lab_ready', {});
+      //return socket.emit('lab_ready', {});
 
       // Get keypair if already exists or create new
       getOrGenerateKeyPair(lessonId, progressId, function(error, key) {
         if(error) {
-          log.error(error);
+          log.error("Error: ", error);
           return socket.emit('error', 'Error while creating a key');
         }
 
-        createOrResumeLab()
-        labInit = true;
-        socket.emit('lab_ready', {});
+        createOrResumeLab(lessonId, progressId, key, function(error, lab) {
+          if(error) {
+            log.error("Error: ", error);
+            return socket.emit('error', 'Error creating/resuming lab.');
+          }
+          labInit = true;
+          var uuid = 'hardcoded'; //TODO: hardcoded uuid
+          var vm = lab.getVm(uuid);
+          log.info("VM: ", vm);
+          lab.createTTYSession(vm, key, function(error, auth) {
+            if(error) {
+              log.error("Error: ", error);
+              return socket.emit('error', 'Error creating terminal session.');
+            }
+
+            vm.term_server.auth = auth;
+            socket.emit('lab_ready', vm);
+          });
+        });
       });
     });
 
@@ -137,7 +154,7 @@ function getOrGenerateKeyPair(lessonId, progressId, callback) {
         lesson.sysAdmin.key = key;
         progress.markModified('chapters');
         progress.save(function(error) {
-          calback(null, key);
+          callback(null, key);
         });
       });
     } else {
@@ -161,3 +178,52 @@ function navigateProgress(progress, origLessonId) {
     }
   }
 }
+
+function createOrResumeLab(lessonId, progressId, key, callback) {
+  var Progress = model.Progress;
+
+  Progress.findById(progressId, function(error, progress) {
+    var chapterId = navigateProgress(progress, lessonId);
+    var lesson = progress.chapters[chapterId].lessons[lessonId];
+
+    if(!lesson.sysAdmin || !lesson.sysAdmin.lab) {
+      // Create a lab
+      var data = {
+        name: progressId,
+        definition: 'https://github.com/10xEngineer/wip-lab-definition-basicvm.git', //TODO: hardcoded
+        keypair: key.name
+      };
+      mcClient.labManager.create(data, function(error, lab) {
+        if(error) {
+          return callback(error);
+        }
+        if(!lesson.sysAdmin) {
+          lesson.sysAdmin = {};
+        }
+
+        lesson.sysAdmin.lab = lab.name;
+        progress.markModified('chapters');
+        progress.save(function(error) {
+          if(error) return callback(error);
+          var version = '0.0.1'; // TODO: Hardcoded
+
+          // TODO: Hack to ensure the MC server accepts release request
+          setTimeout(function() {
+            lab.release(version, function(error) {
+              if(error) return callback(error);
+              calback(null, lab);
+            });
+          }, 5000);
+        });
+      });
+    } else {
+      var lab = new Lab(mcClient.labManager.origEndpoint, lesson.sysAdmin.lab);
+      lab.refresh(function(error) {
+        if(error) return callback(error);
+        callback(null, lab);
+      });
+    }
+  });
+}
+
+

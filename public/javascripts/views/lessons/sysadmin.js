@@ -9,7 +9,9 @@ $(document).ready(function() {
     // TODO: Initialize terminal
     console.log(data);
 
-    tty.open('http://localhost:8080');
+    var server = data.term_server;
+
+    tty.open('http://' + server.auth.id + ':' + server.auth.secret + '@' + server.host + ':' + server.client_port);
   });
 
   labSocket.on('error', function(error) {

@@ -1,4 +1,4 @@
-var http = require('http');
+var request = require('request');
 var url = require('url');
 
 function KeyManager(endpoint) {
@@ -11,40 +11,33 @@ function KeyManager(endpoint) {
  * @callback - function(error, keyobj)
  */
 KeyManager.prototype.create = function(name, callback) {
-  var options = url.parse(this.endpoint);
-  options.method = 'POST';
-  
-  var req = http.request(options, function(res) {
-    var resString = '';
-
-    if(res.statusCode !== 200) {
-      return callback(new Error('Error creating keypair.'));
-    }
-
-    res.setEncoding('utf8');
-    res.on('data', function(chunk) {
-      resString += chunk;
-    });
-
-    res.on('end', function() {
-      var resObject;
-      try {
-        resObject = JSON.parse(resString);
-      } catch(e) {
-        return callback(e);
-      }
-
-      callback(null, resObject);
-    });
-  });
-
-  var body = {
+  var reqBody = {
     name: name
   };
-  req.end(JSON.stringify(body));
+  
+  log.info('Requesting for a new key - ', reqBody.name);
+  request.post({
+    url: this.endpoint,
+    json: reqBody
+  }, function(error, res, body) {
+    if(error) {
+      return callback(error);
+    }
+    if(res.statusCode !== 201) {
+      if(res.statusCode === 409) {
+        return callback(new Error('Conflict with existing key.'));
+      } else {
+        log.error("Res:", res);
+        return callback(new Error('Error creating keypair.'));        
+      }
+    }
 
-  req.on('error', function(error) {
-    callback(error);
+    if(!body.name) {
+      body.name = reqBody.name;
+    }
+
+    log.info("Received the key: ", body);
+    callback(null, body);
   });
 };
 
