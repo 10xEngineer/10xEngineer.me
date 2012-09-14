@@ -226,7 +226,7 @@ function Editor(options) {
   this.tree.on('create', function(name, path, type) {
     if((type=='file')){
       self.vfs.newFile(name, path, function(err){
-        cosole.log("Get Call back of file creation at VFS.");
+        console.log("Get Call back of file creation at VFS.");
         if(err){
           console.log("Error in "+type+" creation.");
         } else {

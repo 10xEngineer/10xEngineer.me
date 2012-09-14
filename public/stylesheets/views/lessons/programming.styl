@@ -1,10 +1,27 @@
-.programming_view
+.lessons_programming
   height 100%
   width 100%
+  position relative
   >.row-fluid
-    height 100%
+    position absolute
+    top 0px
+    bottom 52px
   .vsplit
+    position relative
     overflow hidden
+    height 100%
+    >.editor-container
+      position absolute
+      width 100%
+      top 28px
+      bottom 58px
+      overflow scroll
+    >.lessonBar
+      position absolute
+      bottom 0px
+  ._breadcrumb
+    position absolute
+    bottom 0px
 
   ul.fileTree {
     font-family: Verdana, sans-serif;

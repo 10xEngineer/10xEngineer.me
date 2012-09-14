@@ -25,8 +25,7 @@ append layout.styles
   link(rel='stylesheet', href="/stylesheets/views/lessons/programming.css")
 
 block layout.body
-  .programming_view.container
-    include ../_breadcrumb
+  .lessons_programming.container
 
     div#header
       //- TODO:: Re write header
@@ -42,9 +41,10 @@ block layout.body
 
       .vsplit
         mixin tabbar
-        //- #tabBar
-        //-   ul#tabContainer.nav.nav-tabs
-        #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
+        .editor-container
+          #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
         .lessonBar.row-fluid
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
           a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+
+    include ../_breadcrumb
