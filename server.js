@@ -6,6 +6,10 @@ var redis = require("redis");
 // Initialize long stack-traces
 require('longjohn');
 
+process.on('uncaughtException', function(err) {
+  console.log(err);
+});
+
 // Configure logs
 var consoleTransport = new (winston.transports.Console)({ colorize: true, timestamp: true });
 var logger = new (winston.Logger)({ transports: [ consoleTransport ] });
