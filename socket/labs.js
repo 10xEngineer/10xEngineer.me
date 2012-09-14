@@ -13,18 +13,29 @@ module.exports = function(io) {
   io
     .of('/labs')
     .on('connection', function (socket) {
+    var labInit = false;
       
     socket.on('lab_init', function(lessonId, progressId){
+      // TODO: Hardcoded for testing
+      return socket.emit('lab_ready', {});
+
       // Get keypair if already exists or create new
       getOrGenerateKeyPair(lessonId, progressId, function(error, key) {
+        if(error) {
+          log.error(error);
+          return socket.emit('error', 'Error while creating a key');
+        }
 
         createOrResumeLab()
+        labInit = true;
         socket.emit('lab_ready', {});
       });
     });
 
     socket.on('disconnect', function() {
-      console.log('Lab connection closed. Should teardown any available lab.')
+      if(labInit) {
+        console.log('Lab connection closed. Should teardown any available lab.');
+      }
     });
   });
 
@@ -115,8 +126,11 @@ function getOrGenerateKeyPair(lessonId, progressId, callback) {
 
     if(!lesson.sysAdmin || !lesson.sysAdmin.key) {
       // Create a new pair
-      log.info(mcClient);
       mcClient.keyManager.create(progressId, function(error, key) {
+        if(error) {
+          return callback(error);
+        }
+
         if(!lesson.sysAdmin) {
           lesson.sysAdmin = {};
         }

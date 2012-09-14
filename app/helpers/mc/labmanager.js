@@ -55,6 +55,9 @@ LabManager.prototype.create = function(options, callback) {
     }
   };
   req.end(JSON.stringify(body));
+  req.on('error', function(error) {
+    callback(error);
+  });
 };
 
 module.exports.LabManager = LabManager;
@@ -186,6 +189,9 @@ Lab.prototype.release = function(callback) {
   });
 
   req.end();
+  req.on('error', function(error) {
+    callback(error);
+  });
 };
 
 module.exports.Lab = Lab;

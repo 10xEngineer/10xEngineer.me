@@ -42,6 +42,10 @@ KeyManager.prototype.create = function(name, callback) {
     name: name
   };
   req.end(JSON.stringify(body));
+
+  req.on('error', function(error) {
+    callback(error);
+  });
 };
 
 module.exports.KeyManager = KeyManager;
