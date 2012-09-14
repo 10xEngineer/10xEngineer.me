@@ -914,7 +914,6 @@ module.exports.exportCourse = function(req, res, next) {
             }
             var args = [ "-r", course.title+".zip"];
             args = args.concat(files);
-            console.log(args);
             var zip    = spawn("zip", args, { cwd: exp_path+'/'+course_dir });
             zip.stderr.on('data', function (data) {
               console.log('ZIP stderr: ' + data);
@@ -927,12 +926,6 @@ module.exports.exportCourse = function(req, res, next) {
                 console.log('Response Stream Ended.');
               });
               var reader = filed(exp_path+"/"+course_dir+"/"+course.title+".zip");
-              reader.on('pipe', function() {
-                console.log('piped');
-              });
-              reader.on('data', function(data) {
-                console.log('data');
-              });
               reader.on('end', function() {
                 console.log('File Stream Ended.');
                 console.log(exp_path+'/'+course_dir);
@@ -1070,7 +1063,6 @@ module.exports.importCourse = function(req, res) {
       fs.readdir(imp_path, function(err, files){
         extract_course_from_imported_dir(imp_path, req.user, function(){
           rimraf(imp_path, function(err){
-            console.log(err);
             res.redirect('/course_editor'); 
           });
         });
