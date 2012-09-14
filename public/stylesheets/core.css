@@ -181,3 +181,5 @@ div.questionBlock{margin:5px 0;background:#fff;padding:20px;border:solid 1px #ee
 .maxSizeImgDiv{max-width:800px}
 .whiteBg{background-color:#fff}
 .makeItMiddle{margin:20px auto}
+.courseListBtnGroup{margin-right:20px}
+.courseText{margin-left:20px;display:inline-block}
