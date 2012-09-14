@@ -252,9 +252,6 @@ var getQuestions = function(lesson_id, noOfQuestions, difficulty, callback) {
 var getSingleSideQuestions = function (data, callback) {
   var Question = model.Question;
 
-  console.log("DATA ::: ");
-  console.log(JSON.stringify(data.random));
-
   Question.find({difficulty : data.difficulty, random: data.random, lesson: data.lesson }, { _id : 1})
     .sort('random', data.order )
     .limit(data.limit)
@@ -268,7 +265,6 @@ var getSingleSideQuestions = function (data, callback) {
         sampleQuestion['question'] = questions[index]._id.toString();
         questionList.push(sampleQuestion);
       }
-      console.log(">> Collected Questions :: "+questionList.length);
       callback(null, questionList);
     });
 };
@@ -404,7 +400,6 @@ module.exports.quizResult = function(req, res) {
         break;
       };
     };
-    console.log(assessed)
     if(assessed) {
       assessment.status = 'assessed';
       assessment.save(function(err){
@@ -473,7 +468,6 @@ module.exports.showQuestionToExaminer = function(req, res) {
   var currQuestion      = req.questionIndex;
   var attemptedDetails  = assessment.attemptedDetails;
   var length            = attemptedDetails.length;
-  console.log(currQuestion);
   var question          = req.session.essayQuestionList[currQuestion];
 
   res.render('quiz/examiner/question', {

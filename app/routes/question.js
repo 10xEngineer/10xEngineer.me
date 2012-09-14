@@ -85,7 +85,6 @@ module.exports.removeQuestion = function(req, res) {
 module.exports.editView = function(req, res) {
   var Quiz = model.Quiz;
   var question = req.question;
-  console.log(req.lesson);
   res.render("question/edit",{
     title: "Question",
     question: question,
