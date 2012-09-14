@@ -1,7 +1,5 @@
-
-var docId = 'test';
-
 $(document).ready(function() {
+  var docId = $('#docId').val();
 
   //dynamically load javascript source file
   function loadScriptFile(path, callback) {
@@ -43,7 +41,7 @@ $(document).ready(function() {
       languageCode = $('#mode').val();
     }
     displayMessage('info', 'Compiling...');
-    newCodeSocket.emit('submitcode', 'test');
+    newCodeSocket.emit('submitcode', docId);
   });
 
   //- sharejs.open('#{docId}_json', 'json', function(error, doc) {
