@@ -1,4 +1,5 @@
-var mcClient = require('../app/helpers/microcloud-client');
+var model = require('../app/models');
+var mcClient = require('../app/helpers/microcloud-client')();
 
 module.exports = function(io) {
 
@@ -106,12 +107,15 @@ module.exports = function(io) {
 
 // TODO: Get key from progress->lesson. Maybe write a util lib to navigate progress?
 function getOrGenerateKeyPair(lessonId, progressId, callback) {
+  var Progress = model.Progress;
+
   Progress.findById(progressId, function(error, progress) {
     var chapterId = navigateProgress(progress, lessonId);
     var lesson = progress.chapters[chapterId].lessons[lessonId];
 
     if(!lesson.sysAdmin || !lesson.sysAdmin.key) {
       // Create a new pair
+      log.info(mcClient);
       mcClient.keyManager.create(progressId, function(error, key) {
         if(!lesson.sysAdmin) {
           lesson.sysAdmin = {};

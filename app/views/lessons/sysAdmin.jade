@@ -1,13 +1,9 @@
 extends ../layout
 
-include ../widget/tabbar
-include ../widget/sidebar
+include ../widget/terminal
 
 append layout.scripts
   script(type='text/javascript', src="/javascripts/views/lessons/sysadmin.js")
-
-append layout.styles
-  link(rel='stylesheet', href="/stylesheets/views/lessons/sysadmin.css")
 
 block layout.body
   .container
@@ -18,7 +14,8 @@ block layout.body
     .row-fluid
       .vsplit
         input#progressId(type="hidden", value="#{progressId}")
-        #terminal(style='position:relative;width:100%;min-height:500px;display:inline-block;background-color:#333333;text-align:center;padding-top:100px;')
+        input#lessonId(type="hidden", value="#{lesson._id}")
+        mixin terminal
           span(style="color:white;font-size:2em;") Terminal Placeholder
         .lessonBar.row-fluid
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous

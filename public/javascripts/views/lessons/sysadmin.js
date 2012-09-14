@@ -1,8 +1,9 @@
 $(document).ready(function() {
   var progressId = $('#progressId').val();
+  var lessonId = $('#lessonId').val();
 
   // Send signal to initialize the lab instance
-  labSocket.emit('lab_init', progressId);
+  labSocket.emit('lab_init', lessonId, progressId);
 
   labSocket.on('lab_ready', function(data) {
     // TODO: Initialize terminal
