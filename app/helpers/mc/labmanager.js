@@ -186,19 +186,20 @@ Lab.prototype.createTTYSession = function(vm, key, callback) {
   log.info('Creating a tty session.');
   log.info('Body: ', reqBody);
   request.post({
-    url: 'http://' + vm.term_server.host + ':' + vm.term_server.client_port + '/sessions',
+    url: 'http://' + vm.term_server.host + ':' + vm.term_server.manage_port + '/sessions',
     json: reqBody
   }, function(error, res, body) {
     if(error) {
       return callback(error);
     }
-    if(res.statusCode !== 202) {
+    console.log(res.statusCode);
+    if(res.statusCode !== 200) {
       log.info("Res", res);
-      return callback(new Error('Error releasing definition.'));
+      return callback(new Error('Error creating tty session.'));
     }
 
     log.info('TTY session created.');
-    callback(body);
+    callback(null, body);
   });
 };
 

@@ -211,7 +211,7 @@ function createOrResumeLab(lessonId, progressId, key, callback) {
           setTimeout(function() {
             lab.release(version, function(error) {
               if(error) return callback(error);
-              calback(null, lab);
+              callback(null, lab);
             });
           }, 5000);
         });
