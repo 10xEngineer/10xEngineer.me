@@ -38,7 +38,8 @@
       //-         i.icon-star-empty.icon-white
       //-         |  Sign Out
 
-- styles.push("/stylesheets/header.css");
+append layout.styles
+  link(rel='stylesheet', href="/stylesheets/header.css");
 
 mixin header
   .header
