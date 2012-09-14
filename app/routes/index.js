@@ -95,6 +95,7 @@ module.exports = function(app) {
   // Miscellaneous
   app.get('/', main.home);
   app.get('/about', main.about);
+  app.get('/tarball/:bucketId', main.tarball);
 
   // User
   app.get('/auth', accessPermission, user.login);

@@ -86,6 +86,11 @@ module.exports.register = function(req, res, next) {
   });
 };
 
+// Temporary route to serve source tarballs to the compiler sandbox
+module.exports.tarball = function(req, res, next) {
+
+};
+
 module.exports.testing = function(req, res, next) {
   res.render('testing');
 }
