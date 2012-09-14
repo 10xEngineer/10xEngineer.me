@@ -909,39 +909,48 @@ module.exports.exportCourse = function(req, res, next) {
             return next(error);
           }
           exp_path = path.resolve(exp_path);
-          var zip    = spawn("zip",[ "-r", course_dir+".zip", course_dir], { cwd: exp_path });
-          zip.stderr.on('data', function (data) {
-            console.log('ZIP stderr: ' + data);
-          });
-          zip.on('exit', function (code) {
-            res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
-            res.setHeader('Content-Type', 'application/zip');
-            //res.setHeader('Content-Length', file.length);
-            res.on('end', function() {
-              console.log('Response Stream Ended.');
+          fs.readdir(exp_path+'/'+course_dir, function(error, files){
+            if(error){
+              return next(error);
+            }
+            var args = [ "-r", course.title+".zip"];
+            args = args.concat(files);
+            console.log(args);
+            var zip    = spawn("zip", args, { cwd: exp_path+'/'+course_dir });
+            zip.stderr.on('data', function (data) {
+              console.log('ZIP stderr: ' + data);
             });
-            var reader = filed(exp_path+"/"+course_dir+".zip");
-            reader.on('pipe', function() {
-              console.log('piped');
-            });
-            reader.on('data', function(data) {
-              console.log('data');
-            });
-            reader.on('end', function() {
-              console.log('File Stream Ended.');
-              console.log(exp_path+'/'+course_dir);
-              rimraf(exp_path+'/'+course_dir, function(error){
-                if(error) {
-                  console.log(error);
-                  return next(error);
-                }
-                next();
+            zip.on('exit', function (code) {
+              res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
+              res.setHeader('Content-Type', 'application/zip');
+              //res.setHeader('Content-Length', file.length);
+              res.on('end', function() {
+                console.log('Response Stream Ended.');
               });
+              var reader = filed(exp_path+"/"+course_dir+"/"+course.title+".zip");
+              reader.on('pipe', function() {
+                console.log('piped');
+              });
+              reader.on('data', function(data) {
+                console.log('data');
+              });
+              reader.on('end', function() {
+                console.log('File Stream Ended.');
+                console.log(exp_path+'/'+course_dir);
+                rimraf(exp_path+'/'+course_dir, function(error){
+                  if(error) {
+                    console.log(error);
+                    return next(error);
+                  }
+                  next();
+                });
+              });
+              console.log(reader);
+              reader.pipe(res);
             });
-            console.log(reader);
-            reader.pipe(res);
           });
-      });
+        }
+      );
     }
   });
 
@@ -1060,8 +1069,7 @@ module.exports.importCourse = function(req, res) {
     unzip.on('exit', function (code) {
       // Create course from imported course
       fs.readdir(imp_path, function(err, files){
-        ext_dir = files[0];
-        extract_course_from_imported_dir(imp_path+"/"+ext_dir, req.user, function(){
+        extract_course_from_imported_dir(imp_path, req.user, function(){
           rimraf(imp_path, function(err){
             console.log(err);
             res.redirect('/course_editor'); 
@@ -1076,8 +1084,18 @@ module.exports.importCourse = function(req, res) {
 var extract_course_from_imported_dir = function(course_dir, user, callback){
   var course_doc = require(course_dir+'/course.yml');
   fs.readdir(course_dir + '/resorces/', function(err, files){
-    course_doc.iconImage = course_dir + '/resorces/' + files[0]; 
-    course_doc.wallImage = course_dir + '/resorces/' + files[1]; 
+    var iconImg, wallImg;
+    for (var i = 0; i < files.length ; i++) {
+      var regExIco = new RegExp("^icon");
+      var regExWal = new RegExp("^wall");
+      if(regExIco.test(files[i])){
+        iconImg = files[i];
+      } else if(regExWal.test(files[i])){
+        wallImg = files[i];
+      } else continue;
+     }; 
+    course_doc.iconImage = course_dir + '/resorces/' + iconImg; 
+    course_doc.wallImage = course_dir + '/resorces/' + wallImg; 
     course_doc.created_by = user._id;
     importer.course(course_doc, function(err, doc){
       if(err){
