@@ -852,78 +852,95 @@ module.exports.exportCourse = function(req, res, next) {
       var chap_path = exp_path + '/' + course_dir;
       var chap_count = 0;
       iconfile = course.iconImage.substring(5, course.iconImage.length);
-      load_resorces(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
-        if(err){
-          console.log("Error...");
-          return next(error);
-        }
-      });
+      async.parallel([
+        function(asyncParallelCB){
+          // Icon image load
+          load_resorces(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
+            if(err){
+              console.log("Error...");
+              return asyncParallelCB(error);
+            }
+            asyncParallelCB();
+          });          
+        },
+        function(asyncParallelCB){
+          // wall image load
+          wallFile = course.wallImage.substring(5, course.wallImage.length);
+          load_resorces(exp_path+'/'+course_dir, 'wall', wallFile, function(err){
+            if(err){
+              console.log("Error...");
+              return asyncParallelCB(error);
+            }
+            asyncParallelCB();
+          });
+        },
+        function(asyncParallelCB){
+          // Loop for course's chapter
+          async.forEachSeries(chapters, function(chap, callback){
+            var data_chap = '';
+            data_chap     = "title: " + chap.title + "\n";
+            data_chap    += "desc: " + chap.desc;
+            save_file_for_export(chap_path, 'chapter'+chap_count, 'chapter'+chap_count, data_chap, function(error){
+              Lesson.find({_id : { $in : chap.lessons }}, function(error, lessons){
+                var lesson_count = 0;
 
-      wallFile = course.wallImage.substring(5, course.wallImage.length);
-      load_resorces(exp_path+'/'+course_dir, 'wall', wallFile, function(err){
-        if(err){
-          console.log("Error...");
-          return next(error);
-        }
-      });
+                // Loop for chapter's lessons
+                async.forEachSeries(lessons, function(lesson, lessCB){
+                  lesson_file_exp(chap_path, chap_count, lesson_count, lesson, function(error){
+                    lesson_count++;
+                    lessCB();
+                  });
 
-      // Loop for course's chapter
-      async.forEachSeries(chapters, function(chap, callback){
-        var data_chap = '';
-        data_chap     = "title: " + chap.title + "\n";
-        data_chap    += "desc: " + chap.desc;
-        save_file_for_export(chap_path, 'chapter'+chap_count, 'chapter'+chap_count, data_chap, function(error){
-          Lesson.find({_id : { $in : chap.lessons }}, function(error, lessons){
-            var lesson_count = 0;
 
-            // Loop for chapter's lessons
-            async.forEachSeries(lessons, function(lesson, lessCB){
-              lesson_file_exp(chap_path, chap_count, lesson_count, lesson, function(error){
-                lesson_count++;
-                lessCB();
+                }, function(err){
+                  chap_count++;
+                  callback();
+                });
               });
-
-
-            }, function(err){
-              chap_count++;
-              callback();
             });
+          }, function(error){
+            if(error) {
+              return asyncParallelCB(error);
+            }
+            return asyncParallelCB();
           });
-        });
-      }, function(error){
-        if(error) {
-          return next(error);
-        }
-
-        exp_path = path.resolve(exp_path);
-        console.log(exp_path);
-
-        var zip    = spawn("zip",[ "-r", course_dir+".zip", course_dir], { cwd: exp_path });
-
-        zip.stderr.on('data', function (data) {
-          console.log('ZIP stderr: ' + data);
-        });
-
-        zip.on('exit', function (code) {
-          console.log('child process ZIP exited with code ' + code);
-          res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
-          res.setHeader('Content-Type', 'application/zip');
-          //res.setHeader('Content-Length', file.length);
-          res.on('end', function() {
-            console.log('Response Stream Ended.');
+        }], function(error){ // Callback of async parallel
+          if(error){
+            return next(error);
+          }
+          exp_path = path.resolve(exp_path);
+          var zip    = spawn("zip",[ "-r", course_dir+".zip", course_dir], { cwd: exp_path });
+          zip.stderr.on('data', function (data) {
+            console.log('ZIP stderr: ' + data);
           });
-          var reader = filed(exp_path+"/"+course_dir+".zip");
-          reader.pipe(res);
-          reader.on('end', function() {
-            console.log('File Stream Ended.');
-            rimraf(exp_path+'/'+course_dir, function(error){
-              if(error) {
-                console.log(error);
-                return next(error);
-              }
+          zip.on('exit', function (code) {
+            res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
+            res.setHeader('Content-Type', 'application/zip');
+            //res.setHeader('Content-Length', file.length);
+            res.on('end', function() {
+              console.log('Response Stream Ended.');
             });
+            var reader = filed(exp_path+"/"+course_dir+".zip");
+            reader.on('pipe', function() {
+              console.log('piped');
+            });
+            reader.on('data', function(data) {
+              console.log('data');
+            });
+            reader.on('end', function() {
+              console.log('File Stream Ended.');
+              console.log(exp_path+'/'+course_dir);
+              rimraf(exp_path+'/'+course_dir, function(error){
+                if(error) {
+                  console.log(error);
+                  return next(error);
+                }
+                next();
+              });
+            });
+            console.log(reader);
+            reader.pipe(res);
           });
-        });
       });
     }
   });
@@ -1041,13 +1058,14 @@ module.exports.importCourse = function(req, res) {
     });
 
     unzip.on('exit', function (code) {
-      console.log('child process UnZIP exited with code ' + code);
       // Create course from imported course
-      ext_dir = file.name.substring(0, file.name.length - 4);
-      extract_course_from_imported_dir(imp_path+"/"+ext_dir, req.user, function(){
-        rimraf(imp_path, function(err){
-          console.log(err);
-          res.redirect('/course_editor'); 
+      fs.readdir(imp_path, function(err, files){
+        ext_dir = files[0];
+        extract_course_from_imported_dir(imp_path+"/"+ext_dir, req.user, function(){
+          rimraf(imp_path, function(err){
+            console.log(err);
+            res.redirect('/course_editor'); 
+          });
         });
       });
     });
@@ -1061,7 +1079,6 @@ var extract_course_from_imported_dir = function(course_dir, user, callback){
     course_doc.iconImage = course_dir + '/resorces/' + files[0]; 
     course_doc.wallImage = course_dir + '/resorces/' + files[1]; 
     course_doc.created_by = user._id;
-    console.log(course_doc);
     importer.course(course_doc, function(err, doc){
       if(err){
         console.log(err);
@@ -1093,7 +1110,6 @@ var extracts_chapters = function(course_dir, course, callback) {
 var extracts_lessons = function(chap_dir, chap, callback) {
   fs.readdir(chap_dir, function(err, files){
     async.forEach(files, function(lesson, forEachCB){
-      console.log(lesson + ' started');
       var regEx = new RegExp("^lesson");
       if(regEx.test(lesson)){
         lesson_doc = require(chap_dir+'/'+lesson+'/'+lesson+'.yml');
