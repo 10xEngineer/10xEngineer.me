@@ -64,6 +64,7 @@ module.exports = function(app) {
 
   // Initialize socket events
   require('./socket/lesson')(io);
+  require('./socket/labs')(io);
 };
 
 
