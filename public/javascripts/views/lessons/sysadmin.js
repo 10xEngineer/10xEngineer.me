@@ -8,6 +8,8 @@ $(document).ready(function() {
   labSocket.on('lab_ready', function(data) {
     // TODO: Initialize terminal
     console.log(data);
+
+    tty.open('http://localhost:8080');
   });
 
   labSocket.on('error', function(error) {

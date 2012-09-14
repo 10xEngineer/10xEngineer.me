@@ -16,7 +16,6 @@ block layout.body
         input#progressId(type="hidden", value="#{progressId}")
         input#lessonId(type="hidden", value="#{lesson._id}")
         mixin terminal
-          span(style="color:white;font-size:2em;") Terminal Placeholder
-        .lessonBar.row-fluid
-          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+    .lessonBar.row-fluid
+      a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+      a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next

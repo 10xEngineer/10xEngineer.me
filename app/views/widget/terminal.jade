@@ -1,9 +1,9 @@
 append layout.styles
   link(rel='stylesheet', href="/stylesheets/views/widget/terminal.css")
 append layout.scripts
-  script(type='text/javascript', src="/javascripts/ttyjs/tty.js");
   script(type='text/javascript', src="/javascripts/ttyjs/term.js");
+  script(type='text/javascript', src="/javascripts/ttyjs/tty.js");
   script(type='text/javascript', src="/javascripts/ttyjs/terminal.js");
 
 mixin terminal
-  #terminal(style='position:relative;width:100%;min-height:500px;display:inline-block;background-color:#333333;text-align:center;padding-top:100px;')
+  #terminal(style='position:relative;width:100%;display:inline-block;')

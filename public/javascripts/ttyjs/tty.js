@@ -14,14 +14,7 @@ var document = this.document
   , root
   , body
   , h1
-  , open
   , lights;
-
-/**
- * Initial Document Title
- */
-
-var initialTitle = document.title;
 
 /**
  * Helpers
@@ -53,8 +46,8 @@ tty.elements;
  * Open
  */
 
-tty.open = function() {
-  tty.socket = io.connect();
+tty.open = function(url) {
+  tty.socket = io.connect(url);
   tty.windows = [];
   tty.terms = {};
 
@@ -62,21 +55,13 @@ tty.open = function() {
     root: document.documentElement,
     body: document.body,
     h1: document.getElementsByTagName('h1')[0],
-    open: document.getElementById('open'),
     lights: document.getElementById('lights')
   };
 
   root = tty.elements.root;
   body = tty.elements.body;
   h1 = tty.elements.h1;
-  open = tty.elements.open;
   lights = tty.elements.lights;
-
-  if (open) {
-    on(open, 'click', function() {
-      new Window;
-    });
-  }
 
   if (lights) {
     on(lights, 'click', function() {
@@ -87,6 +72,7 @@ tty.open = function() {
   tty.socket.on('connect', function() {
     tty.reset();
     tty.emit('connect');
+    new Window($('#terminal').get(0));
   });
 
   tty.socket.on('data', function(id, data) {
@@ -188,7 +174,7 @@ tty.toggleLights = function() {
  * Window
  */
 
-function Window(socket) {
+function Window(el, socket) {
   var self = this;
 
   EventEmitter.call(this);
@@ -199,7 +185,7 @@ function Window(socket) {
     , button
     , title;
 
-  el = document.createElement('div');
+  //el = document.createElement('div');
   el.className = 'window';
 
   grip = document.createElement('div');
@@ -234,7 +220,7 @@ function Window(socket) {
   el.appendChild(bar);
   bar.appendChild(button);
   bar.appendChild(title);
-  body.appendChild(el);
+  //body.appendChild(el);
 
   tty.windows.push(this);
 
@@ -267,6 +253,8 @@ Window.prototype.bind = function() {
     return cancel(ev);
   });
 
+// Commented drag/drop events
+/*
   on(grip, 'mousedown', function(ev) {
     self.focus();
     self.resizing(ev);
@@ -289,16 +277,19 @@ Window.prototype.bind = function() {
 
     return cancel(ev);
   });
+*/
 };
 
 Window.prototype.focus = function() {
+  /*
   // Restack
   var parent = this.element.parentNode;
   if (parent) {
     parent.removeChild(this.element);
     parent.appendChild(this.element);
   }
-
+  */
+  
   // Focus Foreground Tab
   this.focused.focus();
 
@@ -643,7 +634,6 @@ Tab.prototype.focus = function() {
     win.focused = this;
 
     win.title.innerHTML = this.process;
-    document.title = this.title || initialTitle;
     this.button.style.fontWeight = 'bold';
     this.button.style.color = '';
   }
@@ -690,12 +680,6 @@ Tab.prototype._destroy = function() {
   if (!win.tabs.length) {
     win.destroy();
   }
-
-  // if (!tty.windows.length) {
-  //   document.title = initialTitle;
-  //   if (h1) h1.innerHTML = initialTitle;
-  // }
-
   this.__destroy();
 };
 
@@ -887,23 +871,6 @@ function sanitize(text) {
   if (!text) return '';
   return (text + '').replace(/[&<>]/g, '')
 }
-
-/**
- * Load
- */
-
-function load() {
-  if (load.done) return;
-  load.done = true;
-
-  off(document, 'load', load);
-  off(document, 'DOMContentLoaded', load);
-  tty.open();
-}
-
-on(document, 'load', load);
-on(document, 'DOMContentLoaded', load);
-setTimeout(load, 200);
 
 /**
  * Expose

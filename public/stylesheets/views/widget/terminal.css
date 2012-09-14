@@ -1,4 +1,4 @@
-.window{padding-top:15px;border:1px solid #fafafa solid 1px;background:#272829;position:absolute;top:20px;left:20px;z-index:1000;-webkit-box-shadow:rgba(0,0,0,0.8) 2px 2px 20px;box-shadow:rgba(0,0,0,0.8) 2px 2px 20px}
+.window{padding-top:15px;border:1px solid #fafafa solid 1px;background:#272829;position:absolute;z-index:1000;-webkit-box-shadow:rgba(0,0,0,0.8) 2px 2px 20px;box-shadow:rgba(0,0,0,0.8) 2px 2px 20px;margin-bottom:20px}
 .maximized .window{border:none;-webkit-box-shadow:none;box-shadow:none}
 .dark .window{-webkit-box-shadow:none;box-shadow:none}
 .bar{position:absolute;top:0;left:0;right:0;height:13px;padding:1px 0;font-family:"DejaVu Sans Mono","Liberation Mono",monospace;color:#fafafa}
