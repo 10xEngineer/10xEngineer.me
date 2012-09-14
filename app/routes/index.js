@@ -130,9 +130,10 @@ module.exports = function(app) {
   app.get('/course_editor/create', verifyPermission('course', 'edit'), course_editor.createView);
   app.post('/course_editor/create', verifyPermission('course', 'edit'),  validation.lookUp(validationConfig.course.createCourse), course_editor.create);
   app.get('/course_editor/import',  verifyPermission('course', 'edit'), course_editor.importView);
-  app.post('/course_editor/import',  verifyPermission('course', 'edit'), course_editor.import);
+  app.post('/course_editor/import',  verifyPermission('course', 'edit'), course_editor.importCourse);
   app.get('/course_editor/course/:courseId', verifyPermission('course', 'read'), course_editor.course);
   app.get('/course_editor/course/:courseId/edit', verifyPermission('course', 'edit'), course_editor.updateView);
+  app.get('/course_editor/course/:courseId/export', verifyPermission('course', 'edit'), course_editor.exportCourse);
   app.post('/course_editor/course/:courseId/edit', verifyPermission('course', 'edit'),  validation.lookUp(validationConfig.course.editCourse), course_editor.update);
   app.get('/course_editor/course/:courseId/remove', verifyPermission('course', 'delete'), course_editor.remove);
   app.get('/course_editor/course/:courseId/publish', verifyPermission('course', 'publish'), course_editor.publish);
