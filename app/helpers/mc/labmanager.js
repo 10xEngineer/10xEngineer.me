@@ -198,7 +198,7 @@ Lab.prototype.createTTYSession = function(vm, key, callback) {
       return callback(new Error('Error creating tty session.'));
     }
 
-    log.info('TTY session created.');
+    log.info('TTY session created.', body);
     callback(null, body);
   });
 };
