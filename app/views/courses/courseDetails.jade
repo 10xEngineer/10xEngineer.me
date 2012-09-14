@@ -55,12 +55,12 @@ block layout.body
                 div(class="accordion-body collapse", id="#{chapter.id}", style="height: 0px;", title="#{chapter.title}")
                   .accordion-inner
                     ul.lessonList
-                      each lesson, lessonIndex in chapter.lessons
+                      each lesson in chapter.lessons
                         - var icon = lesson.type + 'Icon';
                         li
                           div.lessonType(class="#{icon}")
                           - if(progress)
-                            div.lessonStatus.pull-right(class="#{progress.chapters[chapter._id].lessons[lessonIndex].status}")
+                            div.lessonStatus.pull-right(class="#{progress.chapters[chapter._id].lessons[lesson._id].status}")
                           div.lessonTitle
                             - if(progress)
                               a(href="/lesson/#{lesson.id}") #{lesson.title}

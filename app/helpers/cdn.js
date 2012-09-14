@@ -1,6 +1,8 @@
 var url = require('url');
 var http = require('http');
 var https = require('https');
+var Stream = require('stream');
+var mime = require('mime');
 
 var fs = require('fs');
 var mongoose = require('mongoose');
@@ -70,7 +72,6 @@ module.exports.saveFileNew = function(fileName, filePath, contentType, callback)
 
   var db = mongoose.connection.db;
   var GridStore = mongoose.mongo.GridStore;
-
   var gs = new GridStore(db, fileName, 'w', {
     'content_type': contentType
   });
@@ -175,6 +176,30 @@ var readFile = function(fd, gs, offset, size, callback) {
       }
     });
 
+  });
+};
+
+module.exports.copyToDisk = function(cdn_file, fs_path, file_name, callback){
+
+  var buffer  = new Buffer(1024);
+  var db = mongoose.connection.db;
+  var GridStore = mongoose.mongo.GridStore;
+  var gs = new GridStore(db, cdn_file, 'r');
+  gs.open(function(err){
+
+    var contentType = gs.contentType;
+    var contentLength = gs.length;
+    var file_extension = (contentType.indexOf('/') != -1)? mime.extension(contentType): contentType;
+    var ins  = gs.stream();
+    var outs = fs.createWriteStream(fs_path+'/'+file_name + '.' + file_extension, { 
+      flags: 'w+',
+      encoding: 'binary',
+      mode: 0666 });
+
+    ins.pipe(outs);
+    ins.on('end', function() {
+      callback();
+    });
   });
 };
 

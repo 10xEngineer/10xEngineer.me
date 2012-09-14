@@ -53,9 +53,9 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000,endCol
 
 /* Direction Nav */
 .flex-direction-nav { height: 0; }
-.flex-direction-nav a {width: 52px; height: 52px; margin: -13px 0 0; display: block; background: url(/stylesheets/theme/bg_direction_nav.png) no-repeat; position: absolute; top: 50%; cursor: pointer; text-indent: -999em;}
-.flex-direction-nav .flex-next {background-position: -52px 0; right: -21px;}
-.flex-direction-nav .flex-prev {left: -20px;}
+.flex-direction-nav a {width: 52px; height: 28px; margin: -13px 0 0; display: block; background: url(/stylesheets/theme/bg_direction_nav.png) no-repeat; position: absolute; top: 40%; cursor: pointer; text-indent: -999em;}
+.flex-direction-nav .flex-next {background-position: -30px 0px; right: 0px; z-index: 1000;}
+.flex-direction-nav .flex-prev {background-position: 22px 0px; left: 0px;}
 .flex-direction-nav .flex-disabled {opacity: .3; filter:alpha(opacity=30); cursor: default;}
 
 /* Control Nav */

@@ -1,0 +1,18 @@
+.lessons_programming{height:100%;width:100%;position:relative;}
+.lessons_programming >.row-fluid{position:absolute;top:0;bottom:52px}
+.lessons_programming .vsplit{position:relative;overflow:hidden;height:100%;}
+.lessons_programming .vsplit >.editor-container{position:absolute;width:100%;top:28px;bottom:58px;overflow:scroll}
+.lessons_programming .vsplit >.lessonBar{position:absolute;bottom:0}
+.lessons_programming ._breadcrumb{position:absolute;bottom:0}
+.lessons_programming ul.fileTree{font-family:Verdana,sans-serif;font-size:11px;line-height:18px;padding:0;margin:0}
+.lessons_programming ul.fileTree li{list-style:none;padding:0;padding-left:20px;margin:0;white-space:nowrap}
+.lessons_programming ul.fileTree a{color:#333;text-decoration:none;display:block;padding:0 2px}
+.lessons_programming ul.fileTree a:hover,.lessons_programming ul.fileTree a.selected{background:#bdf}
+.lessons_programming .fileTree li.directory{background:url("/img/fileTree/directory.png") left top no-repeat}
+.lessons_programming .fileTree li.expanded{background:url("/img/fileTree/folder_open.png") left top no-repeat}
+.lessons_programming .fileTree li.file{background:url("/img/fileTree/file.png") left top no-repeat}
+.lessons_programming .fileTree li.wait{background:url("/img/fileTree/spinner.gif") left top no-repeat}
+.lessons_programming #tabContainer > li > a > i.closeTab{display:none;z-index:50}
+.lessons_programming #tabContainer > li.active > a{pointer-events:inherit}
+.lessons_programming #tabContainer > li.active > a > i.closeTab:hover{cursor:pointer}
+.lessons_programming #tabContainer > li.active > a > i.closeTab{display:inline-block}

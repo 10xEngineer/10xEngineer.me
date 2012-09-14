@@ -199,7 +199,6 @@ var methods = {
 
       return list.concat(lessonList);
     }, []);
-    console.log(combinedChapters);
     var sortedChapters = _.sortBy(combinedChapters, function(lesson) {
       return lesson.seq;
     });
