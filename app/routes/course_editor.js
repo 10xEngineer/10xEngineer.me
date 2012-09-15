@@ -854,6 +854,7 @@ module.exports.exportCourse = function(req, res, next) {
       async.parallel([
         function(asyncParallelCB){
           // Icon image load
+          log.info("Saving course images...");
           load_resorces(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
             if(err){
               console.log("Error...");
@@ -875,6 +876,7 @@ module.exports.exportCourse = function(req, res, next) {
         },
         function(asyncParallelCB){
           // Loop for course's chapter
+          log.info("Saving chapters...");
           async.forEachSeries(chapters, function(chap, callback){
             var data_chap = '';
             data_chap     = "title: " + chap.title + "\n";
@@ -908,17 +910,24 @@ module.exports.exportCourse = function(req, res, next) {
             return next(error);
           }
           exp_path = path.resolve(exp_path);
+          log.info("Course data dumped on disk", exp_path);
           fs.readdir(exp_path+'/'+course_dir, function(error, files){
             if(error){
               return next(error);
             }
             var args = [ "-r", course.title+".zip"];
             args = args.concat(files);
-            var zip    = spawn("zip", args, { cwd: exp_path+'/'+course_dir });
+            log.info("Compressing the exported data.");
+            var zip = spawn("zip", args, { cwd: exp_path+'/'+course_dir });
             zip.stderr.on('data', function (data) {
               console.log('ZIP stderr: ' + data);
             });
             zip.on('exit', function (code) {
+              if(code != 0) {
+                log.error("Error compressing file.");
+              }
+
+              log.info("File saved.");
               res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
               res.setHeader('Content-Type', 'application/zip');
               //res.setHeader('Content-Length', file.length);
@@ -937,7 +946,7 @@ module.exports.exportCourse = function(req, res, next) {
                   next();
                 });
               });
-              console.log(reader);
+              log.info("Streaing file...");
               reader.pipe(res);
             });
           });
@@ -958,6 +967,7 @@ module.exports.exportCourse = function(req, res, next) {
 */
 var save_file_for_export = function(path, dir_name, file_name, data, callback){
 
+  log.info("Dumping course metadata to file.");
   fs.mkdir(path + '/' + dir_name, 0777, function(error){
     if(error){
       return callback(error);
@@ -1049,20 +1059,29 @@ module.exports.importCourse = function(req, res) {
   var imp_path = path.resolve("app/upload");
   fs.mkdir(imp_path+'/'+random_dir, function(){
     imp_path = path.resolve(imp_path+'/'+random_dir);
+    log.info("Extracting course zip.");
     var unzip    = spawn("unzip",[ file.path ], { cwd: imp_path });
 
-    unzip.stdout.on('data', function (data) {
-    });
-
     unzip.stderr.on('data', function (data) {
-      console.log('UnZIP stderr: ' + data);
+      log.error('UnZIP stderr: ', data);
     });
 
     unzip.on('exit', function (code) {
+      if(code != 0) {
+        log.error('Error while extracting file.');
+      }
+      
       // Create course from imported course
       fs.readdir(imp_path, function(err, files){
+        log.info("Importing course.");
         extract_course_from_imported_dir(imp_path, req.user, function(){
+          log.info("Cleaning up.");
           rimraf(imp_path, function(err){
+            if(err) {
+              return next(err);
+            }
+
+            res.session.message = "Course imported successfully.";
             res.redirect('/course_editor'); 
           });
         });
