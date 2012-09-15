@@ -17,7 +17,7 @@ $(document).ready(function() {
   labSocket.on('error', function(error) {
     console.log(error);
     var error = error || 'Unknown error. Please contact support.';
-    error = '<pre>' + error + '</pre>';
+    //error = '<pre>' + error + '</pre>';
     displayMessage('error', error);
   });
 

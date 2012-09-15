@@ -46,8 +46,16 @@ LabManager.prototype.create = function(options, callback) {
     if(!body.name) {
       body.name = reqBody.name;
     }
+    
+    var lab;
+    try {
+      lab = new Lab(self.origEndpoint, body.name);
+    } catch(e) {
+      return callback(e);
+    }
+
     log.info('Lab Created - ', body.name);
-    callback(null, new Lab(self.origEndpoint, body.name));
+    callback(null, lab);
   });
 };
 

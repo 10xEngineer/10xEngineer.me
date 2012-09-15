@@ -47,6 +47,7 @@ tty.elements;
  */
 
 tty.open = function(url) {
+  console.log(url);
   tty.socket = io.connect(url);
   tty.windows = [];
   tty.terms = {};
@@ -70,6 +71,7 @@ tty.open = function(url) {
   }
 
   tty.socket.on('connect', function() {
+    console.log('connected');
     tty.reset();
     tty.emit('connect');
     new Window($('#terminal').get(0));
@@ -81,6 +83,7 @@ tty.open = function(url) {
   });
 
   tty.socket.on('kill', function(id) {
+    console.log('killed');
     if (!tty.terms[id]) return;
     tty.terms[id]._destroy();
   });

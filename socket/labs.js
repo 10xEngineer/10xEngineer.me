@@ -1,6 +1,6 @@
 var model = require('../app/models');
-//var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
-var mcClient = require('../app/helpers/microcloud-client')();
+var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
+//var mcClient = require('../app/helpers/microcloud-client')();
 var Lab = mcClient.Lab;
 
 module.exports = function(io) {
@@ -44,7 +44,9 @@ module.exports = function(io) {
             }
 
             vm.term_server.auth = auth;
-            socket.emit('lab_ready', vm);
+            setTimeout(function() {
+              socket.emit('lab_ready', vm);
+            }, 5000);
           });
         });
       });
