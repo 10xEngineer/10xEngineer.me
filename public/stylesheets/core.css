@@ -34,7 +34,7 @@ div.course-header .course-img img{width:auto;height:200px}
 div.course-header .course-content,div.chapter-header .chapter-content{width:75%;margin:0 0 0 20px}
 div.course-header .course-content .btn-strip .btn,div.chapter-header .chapter-content .btn-strip .btn{margin-right:10px}
 ul.chapters li,ul.lessons li{margin:5px 0;background:#fff;padding:10px;border:solid 1px #eee;-webkit-border-radius:10px 10px;border-radius:10px 10px;list-style:none;margin-left:0;margin-bottom:18px}
-ul.chapters li a,ul.chapters li a h3,ul.lessons li a,ul.lessons li a h3{display:inline}
+ul.chapters li a,ul.chapters li a h4,ul.lessons li a,ul.lessons li a h4{display:inline;margin-right:5px}
 .lesson .lessonBar{margin:5px}
 .lesson .lessonBar .btn{width:50px}
 .img{-webkit-filter:grayscale(1);}

@@ -3,6 +3,7 @@ $(document).ready(function() {
   var lessonId = $('#lessonId').val();
 
   // Send signal to initialize the lab instance
+  displayMessage('info', "Bootstrapping a new lab instance...");
   labSocket.emit('lab_init', lessonId, progressId);
 
   labSocket.on('lab_ready', function(data) {
