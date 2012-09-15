@@ -12,6 +12,11 @@ var logger = new (winston.Logger)({ transports: [ consoleTransport ] });
 
 global.log = logger;
 
+process.on('uncaughtException', function(err) {
+  log.error("Unknown Error: ", err.toString());
+  throw err;
+});
+
 var config = require('./app/config/config');
 
 async.waterfall([

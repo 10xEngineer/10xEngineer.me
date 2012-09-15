@@ -1,4 +1,4 @@
-extends ../layout
+extends ../../layout
 
 block layout.body
   .container
@@ -21,7 +21,7 @@ block layout.body
             each lesson in chapter.lessons
               li.lesson
                 a(href='/course_editor/lesson/#{lesson.id}')
-                  h3 #{lesson.title}
+                  h4 #{lesson.title}
                 - if(isLoggedIn)
                   - if(lesson.status != 'published')
                     | (Draft)

@@ -56,8 +56,6 @@ script(type="text/javascript")
       $(this).addClass("box");
     });
     $(".createFolder").click(function(){
-      console.log($('.box').parents("ol")[0]);
-      alert($('.box').parent("ol"));
       var attClass = $('.box').attr('class').split(' ');
       if(attClass[0] == 'txtFile') {
         $($('.box').parents("ol")[0]).append('<li><label for="folder1" class="folder"> </label><div class="txtFolder">Folder 1</div> <input type="checkbox" checked id="folder1" /></li>');

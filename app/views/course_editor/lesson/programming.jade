@@ -1,18 +1,21 @@
-.container
-  //- @@TODO: Tabs is okay but need other content
-  //- require pageslide ace2
+extends ../../layout
+
+block layout.body
+  .container
+    //- @@TODO: Tabs is okay but need other content
+    //- require pageslide ace2
 
 
-  .container-fluid
-    h1 #{lesson.title}
-    p 
-      strong Description :-
-      p #{lesson.desc}
-    p
-      strong Language :
-      | #{lesson.programming.language}
-    p
-      strong BoilerPlateCode :
-      pre #{lesson.programming.boilerPlateCode}
+    .container-fluid
+      h1 #{lesson.title}
+      p 
+        strong Description :-
+        p #{lesson.desc}
+      p
+        strong Language :
+        | #{lesson.programming.language}
+      p
+        strong BoilerPlateCode :
+        pre #{lesson.programming.boilerPlateCode}
 
-    a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back
+      a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back

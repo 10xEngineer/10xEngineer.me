@@ -1,10 +1,10 @@
 form(method='POST', id='courseForm' ,enctype='multipart/form-data')
   p
     label(for="title") Title:
-    input.required(value='#{course.title}', id='title', name='title')
+    input.required(type='text', value='#{course.title}', id='title', name='title')
   p
     label(for="description") Description:
-    textarea.required(name='description', id='description') #{course.desc}
+    textarea.required(type='text', name='description', id='description') #{course.desc}
   p
     input#cropIconImgInfo(name='cropIconImgInfo', type='hidden')
     input#cropWallImgInfo(name='cropWallImgInfo', type='hidden')

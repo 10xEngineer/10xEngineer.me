@@ -10,7 +10,7 @@ block layout.body
           input#user_id(type='hidden', value='#{usr.id}')
         .row-fluid
           | Name:
-          input#name(value='#{usr.name}')
+          input#name(type='text', value='#{usr.name}')
         .row-fluid
           | Role:
           select#role
@@ -55,8 +55,8 @@ block layout.body
                     -else
                       input(type='checkbox', name='delete')
         .row-fluid
-          input#add_permission.btn.pull-left(value='Add Permission')
-          input#change_permission.btn.pull-right.btn-info(value='Change Permissions')
+          input#add_permission.btn.pull-left(type='button', value='Add Permission')
+          input#change_permission.btn.pull-right.btn-info(type='button', value='Change Permissions')
         #status.row-fluid
           span.label.label-success(style='display:none') Updated
           span.label.label-warning(style='display:none') Update Failed

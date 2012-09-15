@@ -1,4 +1,4 @@
-extends ../layout
+extends ../../layout
 
 block layout.body
   .container
@@ -24,7 +24,7 @@ block layout.body
             each chapter in course.chapters
               li.chapter
                 a(href='/course_editor/chapter/#{chapter.id}/')
-                  h3	#{chapter.title}
+                  h4 #{chapter.title}
                 - if(user != undefined)
                   - if(chapter.status != 'published')
                     | (Draft)
