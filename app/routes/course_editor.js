@@ -1081,7 +1081,7 @@ module.exports.importCourse = function(req, res) {
               return next(err);
             }
 
-            res.session.message = "Course imported successfully.";
+            req.session.message = "Course imported successfully.";
             res.redirect('/course_editor'); 
           });
         });
