@@ -1,5 +1,5 @@
-resizeHandleWidth = 6px
-expandHandleWidth = 10px
+resizeHandleWidth = 2px
+expandHandleWidth = 14px
 borderWidth = 2px
 resizeHandleSpacing = -(resizeHandleWidth/2 + borderWidth/2)
 
@@ -7,36 +7,39 @@ resizeHandleSpacing = -(resizeHandleWidth/2 + borderWidth/2)
   height 100%
   overflow-x visible
   position relative
+  background #eee
   .content-block
     overflow auto
   .collapse-handle
     user-select none
-    background black
     position absolute
-    top 0px
-    width 10px
-    height 50px
+    top 36px
+    width 14px
+    height 14px
     z-index 8
     display none
-  .expand-handle  
+    border-bottom-left-radius 4px
+  .expand-handle
     user-select none
-    background black
     position absolute
-    top 0px
+    top 36px
     width expandHandleWidth
-    height 50px
+    height 14px
     z-index 8
     display none
-  .resize-handle  
+    border-bottom-right-radius 4px
+  .resize-handle
     user-select none
-    background black
+    background rgba(0,0,0,0.3)
     position absolute
-    top 0px
+    top 36px
     width resizeHandleWidth
     height 100%
     cursor ew-resize
     z-index 8
     display none
+  .resize-handle:hover
+    background rgba(0,0,0,0.5)
   &.collapsible
     .collapse-handle
       display block
@@ -47,24 +50,28 @@ resizeHandleSpacing = -(resizeHandleWidth/2 + borderWidth/2)
     .resize-handle
       display block
   &.left
-    border-right #CCC borderWidth ridge
+    //border-right #CCC borderWidth ridge
     .collapse-handle
       cursor w-resize
       right resizeHandleWidth + resizeHandleSpacing
+      background #ddd url('/img/tab-left-button.png') no-repeat center center
     .expand-handle
       cursor e-resize
       right resizeHandleSpacing - expandHandleWidth
+      background #ddd url('/img/tab-right-button.png') no-repeat center center
     .resize-handle
       right resizeHandleSpacing
     float left
   &.right
-    border-left #CCC borderWidth ridge
+    //border-left #CCC borderWidth ridge
     .collapse-handle
       cursor e-resize
       left resizeHandleWidth + resizeHandleSpacing
+      background #ddd url('/img/tab-right-button.png') no-repeat center center
     .expand-handle
       cursor w-resize
       left resizeHandleSpacing - expandHandleWidth
+      background #ddd url('/img/tab-left-button.png') no-repeat center center
     .resize-handle
       left resizeHandleSpacing
     float right

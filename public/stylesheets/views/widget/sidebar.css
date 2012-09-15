@@ -1,16 +1,17 @@
-.widget_sidebar{height:100%;overflow-x:visible;position:relative;}
+.widget_sidebar{height:100%;overflow-x:visible;position:relative;background:#eee;}
 .widget_sidebar .content-block{overflow:auto}
-.widget_sidebar .collapse-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:10px;height:50px;z-index:8;display:none}
-.widget_sidebar .expand-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:10px;height:50px;z-index:8;display:none}
-.widget_sidebar .resize-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:#000;position:absolute;top:0;width:6px;height:100%;cursor:ew-resize;z-index:8;display:none}
+.widget_sidebar .collapse-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;position:absolute;top:36px;width:14px;height:14px;z-index:8;display:none;border-bottom-left-radius:4px}
+.widget_sidebar .expand-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;position:absolute;top:36px;width:14px;height:14px;z-index:8;display:none;border-bottom-right-radius:4px}
+.widget_sidebar .resize-handle{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;background:rgba(0,0,0,0.3);position:absolute;top:36px;width:2px;height:100%;cursor:ew-resize;z-index:8;display:none}
+.widget_sidebar .resize-handle:hover{background:rgba(0,0,0,0.5)}
 .widget_sidebar.collapsible .collapse-handle{display:block}
 .widget_sidebar.expandable .expand-handle{display:block}
 .widget_sidebar.resizable .resize-handle{display:block}
-.widget_sidebar.left{border-right:#ccc 2px ridge;float:left}
-.widget_sidebar.left .collapse-handle{cursor:w-resize;right:2px}
-.widget_sidebar.left .expand-handle{cursor:e-resize;right:-14px}
-.widget_sidebar.left .resize-handle{right:-4px}
-.widget_sidebar.right{border-left:#ccc 2px ridge;float:right}
-.widget_sidebar.right .collapse-handle{cursor:e-resize;left:2px}
-.widget_sidebar.right .expand-handle{cursor:w-resize;left:-14px}
-.widget_sidebar.right .resize-handle{left:-4px}
+.widget_sidebar.left{float:left}
+.widget_sidebar.left .collapse-handle{cursor:w-resize;right:0;background:#ddd url("/img/tab-left-button.png") no-repeat center center}
+.widget_sidebar.left .expand-handle{cursor:e-resize;right:-16px;background:#ddd url("/img/tab-right-button.png") no-repeat center center}
+.widget_sidebar.left .resize-handle{right:-2px}
+.widget_sidebar.right{float:right}
+.widget_sidebar.right .collapse-handle{cursor:e-resize;left:0;background:#ddd url("/img/tab-right-button.png") no-repeat center center}
+.widget_sidebar.right .expand-handle{cursor:w-resize;left:-16px;background:#ddd url("/img/tab-left-button.png") no-repeat center center}
+.widget_sidebar.right .resize-handle{left:-2px}

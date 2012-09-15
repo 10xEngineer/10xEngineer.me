@@ -11,6 +11,7 @@ append layout.scripts
   script(type='text/javascript', src="/javascripts/vfs-client.js")
   script(type='text/javascript', src="/javascripts/filetree.js")
   script(type='text/javascript', src="/javascripts/editor.js")
+  script(type='text/javascript', src="/javascripts/ide.js")
   script(type='text/javascript', src="/javascripts/views/lessons/programming.js")
 
   // For Share JS
@@ -23,28 +24,34 @@ append layout.scripts
 append layout.styles
   link(rel='stylesheet', href="/stylesheets/jquery.contextMenu.css")
   link(rel='stylesheet', href="/stylesheets/views/lessons/programming.css")
+  link(rel='stylesheet', href="/stylesheets/views/programming/ide.css")
+  link(rel='stylesheet', href="/stylesheets/views/programming/tabs.css")
 
 block layout.body
+  include ../_breadcrumb
   .programming_view.container
-    include ../_breadcrumb
 
     div#header
       //- TODO:: Re write header
     .row-fluid
       +sidebar-left("collapsible resizable")
-        button#save(class="btn", type="button") Save
-        button#compile(class="btn", type="button") Compile
+        .buttons-bar
+            button#save(title="Save",class="image-button save-button", type="button") Save
+            button#compile(title="Compile",class="image-button compile-button", type="button") Compile
+            button#newfile(title="New File",class="image-button newfile-button", type="button") New File
+            button#newfolder(title="New Folder",class="image-button newfolder-button", type="button") New Folder
 
         #tree
     
       +sidebar-right("collapsible resizable")
+        .buttons-bar
         div#chat
 
       .vsplit
         mixin tabbar
         //- #tabBar
         //-   ul#tabContainer.nav.nav-tabs
-        #editor(style='position:relative;width:100%;min-height:500px;display:inline-block;')
-        .lessonBar.row-fluid
+        #editor(style='position:relative;width:100%;min-height:100%;margin-bottom:-100px;height:100%;display:inline-block;')
+        .lessonBar
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
           a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
