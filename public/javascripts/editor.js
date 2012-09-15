@@ -145,6 +145,7 @@ function Editor(options) {
     var longestLine = this.$getLongestLine();
     var lastRow = this.session.getLength();
     var height = this.session.getScreenLength() * this.lineHeight;
+    console.log(height*this.lineHeight);
 
     this.scrollTop = 0;
     var config = this.layerConfig;
@@ -226,7 +227,7 @@ function Editor(options) {
   this.tree.on('create', function(name, path, type) {
     if((type=='file')){
       self.vfs.newFile(name, path, function(err){
-        cosole.log("Get Call back of file creation at VFS.");
+        console.log("Get Call back of file creation at VFS.");
         if(err){
           console.log("Error in "+type+" creation.");
         } else {
@@ -391,12 +392,12 @@ Editor.prototype.getContent = function() {
   return this.ace.getSession().getValue();
 };
 
-var consoleHight = 20;
+var consoleHeight = 20;
 Editor.prototype.onResize = function() {
   var left = this.offsetLeft;
   var width = document.documentElement.clientWidth - left;
   container.style.width = width + "px";
-  container.style.height = document.documentElement.clientHeight - consoleHight + "px";
+  container.style.height = document.documentElement.clientHeight - consoleHeight + "px";
   this.resize();
 };
 

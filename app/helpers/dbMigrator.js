@@ -1,5 +1,5 @@
 var model = require('../models'),
-	_ = require('underscore');
+	_ = require('lodash');
 
 
 module.exports = function(config, callback) {

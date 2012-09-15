@@ -34,7 +34,7 @@ div.course-header .course-img img{width:auto;height:200px}
 div.course-header .course-content,div.chapter-header .chapter-content{width:75%;margin:0 0 0 20px}
 div.course-header .course-content .btn-strip .btn,div.chapter-header .chapter-content .btn-strip .btn{margin-right:10px}
 ul.chapters li,ul.lessons li{margin:5px 0;background:#fff;padding:10px;border:solid 1px #eee;-webkit-border-radius:10px 10px;border-radius:10px 10px;list-style:none;margin-left:0;margin-bottom:18px}
-ul.chapters li a,ul.chapters li a h3,ul.lessons li a,ul.lessons li a h3{display:inline}
+ul.chapters li a,ul.chapters li a h4,ul.lessons li a,ul.lessons li a h4{display:inline;margin-right:5px}
 .lesson .lessonBar{margin:5px}
 .lesson .lessonBar .btn{width:50px}
 .img{-webkit-filter:grayscale(1);}
@@ -175,3 +175,11 @@ div.questionBlock{margin:5px 0;background:#fff;padding:20px;border:solid 1px #ee
 .vsplit .lessonBar .btn{margin:15px auto}
 #compile{margin-left:5px}
 .stretch-to-fit{position:absolute;top:0;bottom:0;left:0;right:0}
+.rounded12{-webkit-border-radius:12px;border-radius:12px}
+.rounded6{-webkit-border-radius:6px;border-radius:6px}
+.courseSummery{text-align:left}
+.maxSizeImgDiv{max-width:800px}
+.whiteBg{background-color:#fff}
+.makeItMiddle{margin:20px auto}
+.courseListBtnGroup{margin-right:20px}
+.courseText{margin-left:20px;display:inline-block}

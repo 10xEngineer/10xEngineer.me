@@ -2,31 +2,36 @@ extends ../layout
 
 block layout.body
   .container
-    ul.nav.nav-pills.courseMenu
-      li
-        a(href="/courses") Featured
-      li.active
-        a(href="/courses/all") Course Library
-      li
-        a(href="/user/profile") My Library
-    
     .row-fluid
-      div.flexslider
-        ul.slides
-          each courseObject,courseIndex in courses
-            - if(courseObject.status == 'published' || isAdmin)
-              li
-                center
-                  img.courseImage(src="#{courseObject.wallImage}")
-                div.detailsLink
-                  h1.courseTitle #{courseObject.title}
-                  p #{courseObject.desc}
-                  div.detailsLinkBtn
-                    a.btn.btn-primary.pull-right(href="/course/#{courseObject.id}") Details
-    .row-fluid
-      .span12
-    .carouselWrapper
+      .span2
+        .row-fluid
+          ul.nav.nav-pills.nav-stacked.courseMenu
+            li.rounded6
+              a(href="/courses") Featured
+            li.active.rounded6
+              a(href="/courses/all") Course Library
+            li.rounded6
+              a(href="/user/profile") My Library
+        .row-fluid
+          a.btn.btn-info.btn-large(href="/course_editor") Course editor
 
+      .row-fluid.span10.whiteBg.rounded12
+        div.flexslider
+          ul.slides
+            each courseObject,courseIndex in courses
+              -if(courseObject.status == 'published' || isAdmin)
+                li
+                  center
+                    div.maxSizeImgDiv.makeItMiddle
+                      div.row-fluid
+                        img.courseImage.rounded12(src="#{courseObject.wallImage}")
+                      div.detailsLink.row-fluid.rounded12
+                        div.span10.courseSummery
+                          h1.courseTitle #{courseObject.title}
+                          p #{courseObject.desc}
+                        div.detailsLinkBtn.span2
+                          a.btn.btn-success.btn-large.pull-right(href="/course/#{courseObject.id}") More Details
+                          
   script(type="text/javascript")
     $(window).load(function() {
       $('.flexslider').flexslider({

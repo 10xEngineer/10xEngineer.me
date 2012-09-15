@@ -1,10 +1,10 @@
 form(method='POST', id='lessonForm', enctype='multipart/form-data')
   p
     label(for="title") Title:
-    input.required(value='#{lesson.title}', id='title', name='title')
+    input.required(type='text', value='#{lesson.title}', id='title', name='title')
   p
     label(for="description") Description:
-    textarea.required(name='description', id='description') #{lesson.desc}
+    textarea.required(type='text', name='description', id='description') #{lesson.desc}
   - if(!edit)
 
     input#lessonType(name='type', type='hidden', value='video')
@@ -41,7 +41,7 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
         h3 Quiz
         br
         label(for="marks") Marks:
-        input#marks.required( name='marks')
+        input#marks.required(type='text', name='marks')
 
         //  div#questionBox
 

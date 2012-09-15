@@ -1,6 +1,7 @@
 window.progressSocket = io.connect('/progress');
 window.codeSocket = io.connect('/code');
 window.newCodeSocket = io.connect('/codeNew');
+window.labSocket = io.connect('/labs');
 
 progressSocket.on('connect', function() {
   
@@ -27,3 +28,15 @@ function displayMessage(type, message) {
     html: message
   })).appendTo($alertContainer);
 }
+
+// Initialize header animation
+$(function () {
+    $('.header .left, .header .right')
+        .mouseover(function () {
+            $('.header').stop().animate({top:0});
+        })
+        .mouseout(function () {
+            $('.header').stop().animate({top:-85});
+        });
+    $('#editor').css({height:'800px'});
+});

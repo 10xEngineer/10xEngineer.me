@@ -8,10 +8,10 @@ block layout.body
     form(method='POST', action='', id='profileForm') 
       p
         h5 User Name :
-        input.required(value='#{user.name}', id='name', name='name')   
+        input.required(type='text', value='#{user.name}', id='name', name='name')   
       p 
         h5 Email :
-        input.required(value='#{email}', id='email', name='email')  
+        input.required(type='text', value='#{email}', id='email', name='email')  
       p
         h5 Account Type:
         - if (user.facebook.name)
