@@ -833,6 +833,30 @@ module.exports.lessonView = function(req, res) {
 
 module.exports.exportCourse = function(req, res, next) {
 
+  importer.exportFullCourse(req.course, function(error, path, title){
+      res.setHeader('Content-Disposition', 'attachment; filename=' + title + '.zip');
+      res.setHeader('Content-Type', 'application/zip');
+      //res.setHeader('Content-Length', file.length);
+      res.on('end', function() {
+        console.log('Response Stream Ended.');
+      });
+      var reader = filed(path+"/"+title+".zip");
+      reader.on('end', function() {
+        console.log('File Stream Ended.');
+        console.log(path);
+        rimraf(path, function(error){
+          if(error) {
+            console.log(error);
+            return next(error);
+          }
+          next();
+        });
+      });
+      log.info("Streaing file...");
+      reader.pipe(res);
+  });
+};
+/*
   var Lesson    = model.Lesson;
   var course    = req.course;
 
@@ -956,7 +980,7 @@ module.exports.exportCourse = function(req, res, next) {
   });
 
 };
-
+*/
 
 /*  This save_file_for_export() function will do following
 **  
@@ -1147,7 +1171,9 @@ var extracts_lessons = function(chap_dir, chap, callback) {
         } else if(lesson_doc.type=="programming") {
           lesson_doc.programming['boilerPlateCode'] = chap_dir+'/'+lesson+'/resorces/boilerPlateCode.txt';
           importer.lesson(lesson_doc, chap._id, forEachCB);
-        } else {
+        } else if(lesson_doc.type=="quiz") {
+          // TODO: Code for quiz
+        } else{
           forEachCB();
         }
       } else {
