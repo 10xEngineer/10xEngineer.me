@@ -24,6 +24,12 @@ $(document).ready(function() {
   newCodeSocket.on('codePassed', function(data) {
     displayMessage('success', 'Congratulations, your code compiled successfully.');
 
+/*
+    console.log(data);
+    var data = data;
+    data = '<pre>' + data + '</pre>';
+    displayMessage('info', data);
+*/
   });
 
   newCodeSocket.on('codeFailed', function(error) {
