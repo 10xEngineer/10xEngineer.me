@@ -1081,7 +1081,7 @@ module.exports.importCourse = function(req, res) {
               return next(err);
             }
 
-            res.session.message = "Course imported successfully.";
+            req.session.message = "Course imported successfully.";
             res.redirect('/course_editor'); 
           });
         });
@@ -1110,6 +1110,7 @@ var extract_course_from_imported_dir = function(course_dir, user, callback){
     importer.course(course_doc, function(err, doc){
       if(err){
         console.log(err);
+        callback(err);
       }
       else {
         extracts_chapters(course_dir, doc, callback);
@@ -1130,7 +1131,7 @@ var extracts_chapters = function(course_dir, course, callback) {
       }
       else forEachCB();
     }, function(err){
-      callback();
+      callback(err);
     });
   });
 };
