@@ -77,7 +77,6 @@ async.waterfall([
   // Initialize Express and Socket.io apps
   function(callback) {
     var app = require('./app')(config);
-    var io = require('./socket')(app);
 
     callback(null, app);
   },

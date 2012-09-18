@@ -151,5 +151,8 @@ module.exports = function(config) {
   // Routes
   require('./app/routes')(app);
 
+  // Initialize socket.io
+  require('./socket')(app);
+
   return app;
 };
