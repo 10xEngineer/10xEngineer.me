@@ -84,27 +84,27 @@ var views_tabbar_create;
         'class':'tab'
       })
         .append($('<div/>', {
-        'class':'left-mask'
-      }).append('<span/>'))
+          'class':'left-mask'
+        }).append('<span/>'))
         .append($('<a/>', {
-        'class':'hit-area',
-        text:title
-      }))
+          'class':'hit-area',
+          text:title
+        }))
         .append($('<div/>', {
-        'class':'right-mask'
-      }).append('<span/>'))
+          'class':'right-mask'
+        }).append('<span/>'))
         .append($('<div/>', {
-        'class':'loader'
-      }))
+          'class':'loader'
+        }))
         .append($('<a/>', {
-        'class':'close_button',
-        text:'x'
-      })
-        .click(function (event) {
-          _self.removeTab(id);
-          return event.stopPropagation();
+          'class':'close_button',
+          text:'x'
         })
-      )
+          .click(function (event) {
+            _self.removeTab(id);
+            return event.stopPropagation();
+          })
+        )
         .click(function () {
           _self.setActiveTab(id);
         });
