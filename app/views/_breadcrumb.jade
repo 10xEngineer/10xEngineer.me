@@ -1,20 +1,20 @@
-ul.breadcrumbs
 append layout.styles
   link(rel='stylesheet', href="/stylesheets/breadcrumb.css")
 
+ul.breadcrumb
+  li
+    a(href='/courses') Courses
+    span.divider &#187;
+  - if(typeof (course) != 'undefined')
     li
-        a(href='/courses') Courses
+      a(href='/course/#{course.id}') #{course.title}
+      span.divider &#187;
+    - if(typeof (chapter) != 'undefined')
+      li
+        a(href="#") #{chapter.title}
         span.divider &#187;
-    - if(typeof (course) != 'undefined')
+      - if(typeof (lesson_id) != 'undefined' && typeof(lesson) != 'undefined')
         li
-            a(href='/course/#{course.id}') #{course.title}
-            span.divider &#187;
-        - if(typeof (chapter) != 'undefined')
-            li
-                a(href="#") #{chapter.title}
-                span.divider &#187;
-            - if(typeof (lesson_id) != 'undefined' && typeof(lesson) != 'undefined')
-                li
-                    a(href='/courses/#{course._id}/#{unit_id}/#{lesson_id}') #{lesson.title}
-                    span.divider &#187;
+          a(href='/courses/#{course._id}/#{unit_id}/#{lesson_id}') #{lesson.title}
+          span.divider &#187;
 
