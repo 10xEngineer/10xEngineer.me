@@ -36,24 +36,25 @@ var methods = {
         });
       });
     }
-
-    // Remove images
-    cdn.unlinkFile(course.iconImage, function(error){
-      if (error) {
-        callback(error);
-      }
-      cdn.unlinkFile(course.wallImage, function(error){
+    else {
+      // Remove images
+      cdn.unlinkFile(course.iconImage, function(error){
         if (error) {
           callback(error);
         }
-        course.remove(function(error) {
-          if(error) {
+        cdn.unlinkFile(course.wallImage, function(error){
+          if (error) {
             callback(error);
           }
-          callback();
+          course.remove(function(error) {
+            if(error) {
+              callback(error);
+            }
+            callback();
+          });
         });
       });
-    });
+    }
   },
 
   publish: function(publish, callback) {

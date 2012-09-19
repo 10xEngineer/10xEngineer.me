@@ -72,7 +72,7 @@ var methods = {
                   callback(error);
                 }
       
-                chapter.remove(function(error) {
+                return chapter.remove(function(error) {
                   if(error) {
                     callback(error);
                   }
@@ -80,13 +80,14 @@ var methods = {
                 });
               });      
             }
-
-            chapter.remove(function(error) {
-              if(error) {
-                callback(error);
-              }
-              callback();
-            });
+            else {
+              chapter.remove(function(error) {
+                if(error) {
+                  callback(error);
+                }
+                callback();
+              });
+            }
           });
         });
       });

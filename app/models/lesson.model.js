@@ -28,6 +28,7 @@ var methods = {
         }
 
         if(lesson.type == "video" && lesson.video.type == "upload"){
+          console.log(lesson);
           cdn.unlinkFile(lesson.video.content, function(error){
             if(error){
               callback(error);
@@ -61,26 +62,13 @@ var methods = {
         async.forEach(
           lessons,
           function(lesson, forEachCallback){
-            if(lesson.type == "video" && lesson.video.type == "upload"){
-              cdn.unlinkFile(lesson.video.content, function(error){
-                if(error){
-                  forEachCallback(error);
-                }
-                forEachCallback();
-              });
-            }
-            forEachCallback();
+            lesson.removeLesson(forEachCallback)
           },
           function(error){
             if(error){
-              callback(error);
+              return callback(error);
             }
-            Lesson.remove({chapter: refLesson.chapter}, function(error){
-              if(error){
-                callback(error);
-              }
-              callback();
-            });
+            callback();
           }
         );
       }
