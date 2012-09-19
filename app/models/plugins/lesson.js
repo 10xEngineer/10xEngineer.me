@@ -23,6 +23,10 @@ module.exports = function(schema, options) {
             log.error(error);
           }
 
+          if(!chapter.lessons) {
+            chapter.lessons = [];
+          }
+          
           chapter.lessons.push(lesson._id);
 
           chapter.save(function(error) {

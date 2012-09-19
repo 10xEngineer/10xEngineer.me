@@ -1,6 +1,6 @@
 var model = require('../app/models');
-var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
-//var mcClient = require('../app/helpers/microcloud-client')();
+//var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
+var mcClient = require('../app/helpers/microcloud-client')();
 var Lab = mcClient.Lab;
 
 module.exports = function(io) {

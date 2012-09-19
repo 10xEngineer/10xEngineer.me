@@ -24,6 +24,10 @@ module.exports = function(schema, options) {
             log.error(error);
           }
 
+          if(!course.chapters) {
+            course.chapters = [];
+          }
+          
           course.chapters.push(chapter._id);
 
           course.save(function(error) {
