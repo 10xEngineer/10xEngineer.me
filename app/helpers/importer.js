@@ -5,12 +5,13 @@ var fs = require('fs');
 var async = require('async');
 var path = require('path');
 var spawn = require('child_process').spawn;
+var rimraf = require("rimraf");
 
 var util = require('./util');
 
 module.exports = function() {};
 
-module.exports.course = function(data, callback) {
+var course = function(data, callback) {
   var Course = model.Course;
 
   var course = new Course();
@@ -60,7 +61,7 @@ module.exports.course = function(data, callback) {
   });
 };
 
-module.exports.chapter = function(data, courseId, callback) {
+var chapter = function(data, courseId, callback) {
   var Chapter = model.Chapter;
 
   var chapter = new Chapter();
@@ -85,7 +86,7 @@ module.exports.chapter = function(data, courseId, callback) {
   });
 };
 
-module.exports.lesson = function(data, chapterId, callback) {
+var lesson = function(data, chapterId, callback) {
   var Lesson = model.Lesson;
 
   var lesson = new Lesson();
@@ -117,7 +118,7 @@ module.exports.lesson = function(data, chapterId, callback) {
       if(error) {
         log.error(error);
         console.log("Can't save.");
-        callback(error);
+        return callback(error);
       }
       callback();
     });
@@ -127,7 +128,7 @@ module.exports.lesson = function(data, chapterId, callback) {
         if(error) {
           log.error(error);
           console.log("Can't save first time.");
-          callback(error);
+          return callback(error);
         }
         var id = lesson.id;
         var fileName = 'lessonVideo_' + id;
@@ -136,7 +137,7 @@ module.exports.lesson = function(data, chapterId, callback) {
           if(error) {
             console.log("Can't save at CDN.");
             log.error(error);
-            callback(error);
+            return callback(error);
           }
           Lesson.findOne({ id: id }, function(error, lesson) {
             // Save the CDN URL if available
@@ -145,7 +146,7 @@ module.exports.lesson = function(data, chapterId, callback) {
               if(error) {
                 console.log("Can't save second time.");
                 log.error(error);
-                callback(error);
+                return callback(error);
               }
               callback();
             });
@@ -252,7 +253,7 @@ module.exports.exportFullCourse = function(course, next){
   data_course    += "desc: " + course.desc;
   exp_path        = 'app/upload';
 
-  save_file_for_export(exp_path, course_dir, 'course', data_course, function(error){  // Saving Course Details to respected (.yml) file
+  save_file_for_export(exp_path, course_dir, 'course', data_course, function(error) {
     if(error){
       console.log(error);
       return next(error);
@@ -262,7 +263,7 @@ module.exports.exportFullCourse = function(course, next){
       var chap_count = 0;
       iconfile = course.iconImage.substring(5, course.iconImage.length);
       async.parallel([
-        function(asyncParallelCB){                                                                                     // For Loading Icon Image
+        function(asyncParallelCB){
           // Icon image load
           log.info("Saving course images...");
           load_resorces(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
@@ -273,7 +274,7 @@ module.exports.exportFullCourse = function(course, next){
             asyncParallelCB();
           });          
         },
-        function(asyncParallelCB){                                                                                     // For Loading Wall Image
+        function(asyncParallelCB){
           wallFile = course.wallImage.substring(5, course.wallImage.length);
           load_resorces(exp_path+'/'+course_dir, 'wall', wallFile, function(err){
             if(err){
@@ -283,37 +284,47 @@ module.exports.exportFullCourse = function(course, next){
             asyncParallelCB();
           });
         },
-        function(asyncParallelCB){                                                                                   // For Loading all chapters 
+        function(asyncParallelCB){
           log.info("Saving chapters...");
-          async.forEachSeries(chapters, function(chap, chapForEachCB){                                               // Function for Each Chapter
+          async.forEachSeries(chapters, function(chap, chapForEachCB){
             console.log("Chapter_Count :: "+chap_count);
             var data_chap = '';
             data_chap     = "title: " + chap.title + "\n";
             data_chap    += "desc: " + chap.desc;
-            save_file_for_export(chap_path, 'chapter'+chap_count, 'chapter'+chap_count, data_chap, function(error){  // save chapter details to respected (.yml) file
-              Lesson.find({_id : { $in : chap.lessons }}, function(error, lessons){                                  // Find and queue lessons of each chapter
+            save_file_for_export(chap_path, 'chapter'+chap_count, 'chapter'+chap_count, data_chap, function(error){
+              Lesson.find({_id : { $in : chap.lessons }}, function(error, lessons){
+                if(error){
+                  console.error(error);
+                }
                 var lesson_count = 0;
-                console.log("No of lessons found:: "+lessons.length);
-                async.forEachSeries(lessons, function(lesson, lessCB){                                               // Function For each Lesson
-                  console.log(lesson);
-                  console.log("Process for lesson no. #"+lesson_count);
-                  lesson_file_exp(chap_path, chap_count, lesson_count, lesson, function(error){
-                    lesson_count++;
-                    lessCB();
+                sort_lessons(lessons, chap.lessons, function(error, sorted_lessons){
+                  async.forEachSeries(sorted_lessons, function(lesson, lessCB){
+                    console.log("Process for lesson no. #"+lesson_count);
+                    lesson_file_exp(chap_path, chap_count, lesson_count, lesson, function(error){
+                      if(error){
+                        console.error(error);
+                      }
+                      lesson_count++;
+                      lessCB();
+                    });
+                  }, function(err){ 
+                    if(err){
+                      console.error(error);
+                    }
+                    chap_count++;
+                    chapForEachCB();
                   });
-                }, function(err){                                                                                    // Function that called after complets all lessons of each chapter
-                  chap_count++;
-                  chapForEachCB();
                 });
               });
             });
-          }, function(error){                                                                                        // Function that called after complets all chapter
+          }, function(error){                                                                                     
             if(error) {
               return asyncParallelCB(error);
             }
             return asyncParallelCB();
           });
-        }], function(error){                                                                                         // Function that called after complets all parallel tasks
+        }], 
+        function(error) {                                                                                    
           if(error){
             return next(error);
           }
@@ -323,7 +334,7 @@ module.exports.exportFullCourse = function(course, next){
             if(error){
               return next(error);
             }
-            var args = [ "-r", course.title+".zip"];
+            var args = [ "-r", course.title + ".zip"];
             args = args.concat(files);
             log.info("Compressing the exported data.");
             var zip = spawn("zip", args, { cwd: exp_path+'/'+course_dir });
@@ -331,6 +342,7 @@ module.exports.exportFullCourse = function(course, next){
               console.log('ZIP stderr: ' + data);
             });
             zip.on('exit', function (code) {
+              log.info('Finished compressing course.');
               if(code != 0) {
                 log.error("Error compressing file.");
               }
@@ -343,8 +355,23 @@ module.exports.exportFullCourse = function(course, next){
   });
 };
 
+var sort_lessons = function(lessons, sequence, callback){
+  if(lessons.length!=sequence.length){
+    return callback('No of elements mismatch.');
+  }
+  var len = lessons.length;
+  var sorted_lessons = [];
+  for(var indx = 0; indx < len; indx++) {
+    var lesson = lessons[indx];
+    var _id    = lesson._id;
+    var sorted_indx = sequence.indexOf(_id);
+    sorted_lessons[sorted_indx] = lesson;
+  }
+  return callback(null, sorted_lessons);
+}
 
-/*  This save_file_for_export() function will do following
+/*
+**  This save_file_for_export() function will do following
 **  
 **  - it creates directory with the name as given dir_name at given path
 **  - then it creates file with the name as given file_name
@@ -400,8 +427,10 @@ var lesson_file_exp = function(chap_path, chap_count, lesson_count, lesson, call
       return video_lesson_exp(full_path, lesson, data_lesson, lesson_count, callback);
     case "programming":
       return programming_lesson_exp(full_path, lesson, data_lesson, lesson_count, callback);
+    // case "quiz":
+    //   return quiz_lesson_exp(full_path, lesson, data_lesson, lesson_count, callback);
     default:
-      return callback();
+      return save_file_for_export(full_path, 'lesson'+lesson_count, 'lesson'+lesson_count, data_lesson, callback);
   }
 
 };
@@ -422,8 +451,7 @@ var video_lesson_exp = function(full_path, lesson, data, count, callback) {
   save_file_for_export(full_path, 'lesson' +count, 'lesson'+count, data, function(error){
     full_path += '/lesson'+count;
     if(vtype=="upload"){
-      load_resorces(full_path, 'video', res_file, callback);
-      callback();
+      return load_resorces(full_path, 'video', res_file, callback);
     }
     callback();
   });
@@ -438,8 +466,171 @@ var programming_lesson_exp = function(full_path, lesson, data, count, callback){
     }
     full_path += '/lesson'+count;
     fs.mkdir(full_path + "/resorces", function(err){
-      fs.writeFile(full_path + "/resorces/boilerPlateCode.txt", lesson.programming.boilerPlateCode);
+      if(err){
+        return callback(err);
+      }
+      fs.writeFile(full_path + "/resorces/boilerPlateCode.txt", lesson.programming.boilerPlateCode, function(err){
+        if(err){
+          return callback(err);
+        }
+        return callback();
+      });
+    });
+  });
+};
+
+var quiz_lesson_exp = function(full_path, lesson, data, count, callback) {
+  var Question = model.Question;
+  data += "quiz: \n";
+  data += " marks: " + lesson.quiz.marks + "\n"; 
+  data += " questions: \n";
+
+  // Remaining
+  Question.find({}, function(error, question_list){
+    async.forEach(question_list, function(questions, forEachCB){
+
+    }, function(){}
+    );
+  });
+
+}
+
+module.exports.importFullCourse = function(file, user, callback){
+  console.log("User in globle function ::");
+  console.log(user);
+  var random_dir = util.string.random(15);
+  var imp_path = path.resolve("app/upload");
+
+  fs.mkdir(imp_path+'/'+random_dir, function(){
+    imp_path = path.resolve(imp_path+'/'+random_dir);
+    log.info("Extracting course zip.");
+    var unzip    = spawn("unzip",[ file.path ], { cwd: imp_path });
+
+    unzip.stderr.on('data', function (data) {
+      log.error('UnZIP stderr: ', data);
+    });
+
+    unzip.on('exit', function (code) {
+      if(code != 0) {
+        log.error('Error while extracting file.');
+      }
+      
+      // Create course from imported course
+      fs.readdir(imp_path, function(err, files){
+        log.info("Importing course.");
+        extract_course_from_imported_dir(imp_path, user, function(){
+          log.info("Cleaning up.");
+          rimraf(imp_path, function(err){
+            if(err) {
+              return callback(err);
+            }
+            callback();
+          });
+        });
+      });
+    });
+  });
+
+};
+
+
+var extract_course_from_imported_dir = function(course_dir, user, callback){
+  console.log("User in local function ::");
+  console.log(user);
+  var course_doc = require(course_dir+'/course.yml');
+  fs.readdir(course_dir + '/resorces/', function(err, files){
+    var iconImg, wallImg;
+    for (var i = 0; i < files.length ; i++) {
+      var regExIco = new RegExp("^icon");
+      var regExWal = new RegExp("^wall");
+      if(regExIco.test(files[i])){
+        iconImg = files[i];
+      } else if(regExWal.test(files[i])){
+        wallImg = files[i];
+      } else continue;
+     }; 
+    course_doc.iconImage = course_dir + '/resorces/' + iconImg; 
+    course_doc.wallImage = course_dir + '/resorces/' + wallImg; 
+    course_doc.created_by = user._id;
+    course(course_doc, function(err, saved_course){
+      if(err){
+        console.log(err);
+        return callback(err);
+      }
+      return extracts_chapters(course_dir, saved_course, callback);
+    });
+  });
+};
+
+var extracts_chapters = function(course_dir, course, callback) {
+  fs.readdir(course_dir, function(err, files){
+    async.forEachSeries(files, function(chap, forEachCB){
+      var regEx = new RegExp("^chapter");
+      if(regEx.test(chap)){
+        chap_doc = require(course_dir+'/'+chap+'/'+chap+'.yml');
+        chapter(chap_doc, course._id, function(err, dbChap){
+          extracts_lessons(course_dir+'/'+chap, dbChap, forEachCB);
+        });
+      }
+      else forEachCB();
+    }, function(err){
+      if(err){
+        callback(err);
+      }
       callback();
     });
   });
 };
+
+var extracts_lessons = function(chap_dir, chap, callback) {
+  fs.readdir(chap_dir, function(err, files){
+    async.forEachSeries(files, function(less, forEachCB){
+      var regEx = new RegExp("^lesson");
+      if(regEx.test(less)){
+        lesson_doc = require(chap_dir+'/'+less+'/'+less+'.yml');
+        if(lesson_doc.type=="video"){
+          extract_video_lesson(chap_dir, chap._id, less, lesson_doc, forEachCB);
+        } else if(lesson_doc.type=="programming") {
+          lesson_doc.programming['boilerPlateCode'] = chap_dir+'/'+less+'/resorces/boilerPlateCode.txt';
+          lesson(lesson_doc, chap._id, forEachCB);
+        } else if(lesson_doc.type=="quiz") {
+          // TODO: Code for quiz
+          lesson(lesson_doc, chap._id, forEachCB);
+        } else{
+          forEachCB();
+        }
+      } else {
+        forEachCB();
+      }
+    }, function(err) {
+      if(err){
+        callback(err);
+      }
+      callback();
+    });
+  });
+};
+
+var extract_video_lesson = function(chap_dir, chap_id, less, lesson_data, callback) {
+  var regEx = new RegExp("^video");
+  if(lesson_data.video.type == "upload"){
+    fs.readdir(chap_dir+'/'+less+'/resorces/', function(err, files){
+      async.forEach(files, function(file, innerCB){
+        if(regEx.test(file)){
+          lesson_data.video['path'] = chap_dir+'/'+less+'/resorces/'+file;
+          lesson(lesson_data, chap_id, innerCB);
+        }
+      }, function(err){
+        if(err){
+          console.error(err);
+          return callback(err);
+        }
+        callback();
+      });
+    });
+  } else {
+    return lesson(lesson_data, chap_id, callback);
+  }
+};
+
+

@@ -29,7 +29,9 @@ var util = require('../helpers/util');
 ************************************/
 module.exports.coursesList = function(req, res){
   var Course = model.Course;
-
+  if(typeof(req.user)=='undefined'){
+    res.redirect('/');
+  }
   Course.find({})
     .populate('created_by')
     .exec(function(error, courses) {
@@ -834,9 +836,11 @@ module.exports.lessonView = function(req, res) {
 module.exports.exportCourse = function(req, res, next) {
 
   importer.exportFullCourse(req.course, function(error, path, title){
+      if(error){
+        console.error(error);
+      }
       res.setHeader('Content-Disposition', 'attachment; filename=' + title + '.zip');
       res.setHeader('Content-Type', 'application/zip');
-      //res.setHeader('Content-Length', file.length);
       res.on('end', function() {
         console.log('Response Stream Ended.');
       });
@@ -856,216 +860,6 @@ module.exports.exportCourse = function(req, res, next) {
       reader.pipe(res);
   });
 };
-/*
-  var Lesson    = model.Lesson;
-  var course    = req.course;
-
-  var course_dir = util.string.random(15);
-  var data_course = '';
-  data_course     = "title: " + course.title + "\n";
-  data_course    += "desc: " + course.desc;
-  exp_path        = 'app/upload';
-
-  save_file_for_export(exp_path, course_dir, 'course', data_course, function(error){
-    if(error){
-      console.log(error);
-      return next(error);
-    } else {
-      var chapters = course.chapters;
-      var chap_path = exp_path + '/' + course_dir;
-      var chap_count = 0;
-      iconfile = course.iconImage.substring(5, course.iconImage.length);
-      async.parallel([
-        function(asyncParallelCB){
-          // Icon image load
-          log.info("Saving course images...");
-          load_resorces(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
-            if(err){
-              console.log("Error...");
-              return asyncParallelCB(error);
-            }
-            asyncParallelCB();
-          });          
-        },
-        function(asyncParallelCB){
-          // wall image load
-          wallFile = course.wallImage.substring(5, course.wallImage.length);
-          load_resorces(exp_path+'/'+course_dir, 'wall', wallFile, function(err){
-            if(err){
-              console.log("Error...");
-              return asyncParallelCB(error);
-            }
-            asyncParallelCB();
-          });
-        },
-        function(asyncParallelCB){
-          // Loop for course's chapter
-          log.info("Saving chapters...");
-          async.forEachSeries(chapters, function(chap, callback){
-            var data_chap = '';
-            data_chap     = "title: " + chap.title + "\n";
-            data_chap    += "desc: " + chap.desc;
-            save_file_for_export(chap_path, 'chapter'+chap_count, 'chapter'+chap_count, data_chap, function(error){
-              Lesson.find({_id : { $in : chap.lessons }}, function(error, lessons){
-                var lesson_count = 0;
-
-                // Loop for chapter's lessons
-                async.forEachSeries(lessons, function(lesson, lessCB){
-                  lesson_file_exp(chap_path, chap_count, lesson_count, lesson, function(error){
-                    lesson_count++;
-                    lessCB();
-                  });
-
-
-                }, function(err){
-                  chap_count++;
-                  callback();
-                });
-              });
-            });
-          }, function(error){
-            if(error) {
-              return asyncParallelCB(error);
-            }
-            return asyncParallelCB();
-          });
-        }], function(error){ // Callback of async parallel
-          if(error){
-            return next(error);
-          }
-          exp_path = path.resolve(exp_path);
-          log.info("Course data dumped on disk", exp_path);
-          fs.readdir(exp_path+'/'+course_dir, function(error, files){
-            if(error){
-              return next(error);
-            }
-            var args = [ "-r", course.title+".zip"];
-            args = args.concat(files);
-            log.info("Compressing the exported data.");
-            var zip = spawn("zip", args, { cwd: exp_path+'/'+course_dir });
-            zip.stderr.on('data', function (data) {
-              console.log('ZIP stderr: ' + data);
-            });
-            zip.on('exit', function (code) {
-              if(code != 0) {
-                log.error("Error compressing file.");
-              }
-
-              log.info("File saved.");
-              res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
-              res.setHeader('Content-Type', 'application/zip');
-              //res.setHeader('Content-Length', file.length);
-              res.on('end', function() {
-                console.log('Response Stream Ended.');
-              });
-              var reader = filed(exp_path+"/"+course_dir+"/"+course.title+".zip");
-              reader.on('end', function() {
-                console.log('File Stream Ended.');
-                console.log(exp_path+'/'+course_dir);
-                rimraf(exp_path+'/'+course_dir, function(error){
-                  if(error) {
-                    console.log(error);
-                    return next(error);
-                  }
-                  next();
-                });
-              });
-              log.info("Streaing file...");
-              reader.pipe(res);
-            });
-          });
-        }
-      );
-    }
-  });
-
-};
-*/
-
-/*  This save_file_for_export() function will do following
-**  
-**  - it creates directory with the name as given dir_name at given path
-**  - then it creates file with the name as given file_name
-**  - then write data to the file name
-**  - and finally calls callback (with error if errors are there)
-*/
-var save_file_for_export = function(path, dir_name, file_name, data, callback){
-
-  log.info("Dumping course metadata to file.");
-  fs.mkdir(path + '/' + dir_name, 0777, function(error){
-    if(error){
-      return callback(error);
-    }
-    fs.writeFile(path + '/' + dir_name + '/' + file_name + '.yml', data, function (err) {
-      if (err) {
-        return callback(err);
-      } 
-      callback();
-    });
-  });
-};
-
-/*  This load_resorces function will do following
-**
-**  - create directory namely 'resorces' at given path if it's not exists
-**  - store given file from database to that directory with the given file_name
-**  - then calls callback
-*/
-var load_resorces = function(path, file_name, file, callback) {
-  fs.mkdir(path + "/resorces", 0777, function(error){
-    cdn.copyToDisk(file, path + "/resorces", file_name, function (){
-      callback();
-    });
-  });
-};
-
-var lesson_file_exp = function(chap_path, chap_count, lesson_count, lesson, callback){
-
-  var full_path = chap_path + '/chapter'+ chap_count;
-  var type = lesson.type;
-  var res = false;
-  var res_file = '';
-  var res_file_name = '';
-  var data_lesson = '';
-  data_lesson     = "title: " + lesson.title + "\n";
-  data_lesson    += "desc: " + lesson.desc + "\n";
-  data_lesson    += "type: " + type +"\n";
-
-  switch(type) {
-    case "video":
-      data_lesson += "video: \n";
-      var vtype = lesson.video.type;
-      data_lesson += " type: "+vtype + "\n";
-      if(vtype == "upload"){
-        res = true;
-        res_file = lesson.video.content;
-        res_file = res_file.substring(5, res_file.length);
-        res_file_name = res_file;
-      }
-      data_lesson += " content: "+lesson.video.content;
-      break;
-    case "programming":
-      data_lesson += "programming: \n";
-      data_lesson += " language: " + lesson.programming.language; 
-      break;
-
-  }
-
-  save_file_for_export(full_path, 'lesson' +lesson_count, 'lesson'+lesson_count, data_lesson, function(error){
-    full_path += '/lesson'+lesson_count;
-    if(type == "programming") {
-      fs.mkdir(full_path + "/resorces", function(err){
-        fs.writeFile(full_path + "/resorces/boilerPlateCode.txt", lesson.programming.boilerPlateCode);
-      });
-    }
-    if(res){
-      load_resorces(full_path, res_file_name, res_file, callback);
-    } else {
-      callback();
-    }
-  });
-};
-
 
 /*********************************************
 **********************************************
@@ -1079,121 +873,9 @@ module.exports.importCourse = function(req, res) {
 
   // UnZip imported file
   var file = req.files['course-file'];
-  var random_dir = util.string.random(15);
-  var imp_path = path.resolve("app/upload");
-  fs.mkdir(imp_path+'/'+random_dir, function(){
-    imp_path = path.resolve(imp_path+'/'+random_dir);
-    log.info("Extracting course zip.");
-    var unzip    = spawn("unzip",[ file.path ], { cwd: imp_path });
-
-    unzip.stderr.on('data', function (data) {
-      log.error('UnZIP stderr: ', data);
-    });
-
-    unzip.on('exit', function (code) {
-      if(code != 0) {
-        log.error('Error while extracting file.');
-      }
-      
-      // Create course from imported course
-      fs.readdir(imp_path, function(err, files){
-        log.info("Importing course.");
-        extract_course_from_imported_dir(imp_path, req.user, function(){
-          log.info("Cleaning up.");
-          rimraf(imp_path, function(err){
-            if(err) {
-              return next(err);
-            }
-
-            req.session.message = "Course imported successfully.";
-            res.redirect('/course_editor'); 
-          });
-        });
-      });
-    });
+  importer.importFullCourse(file, req.user, function(){
+    req.session.message = "Course imported successfully.";
+    res.redirect('/course_editor'); 
   });
+
 };
-
-
-var extract_course_from_imported_dir = function(course_dir, user, callback){
-  var course_doc = require(course_dir+'/course.yml');
-  fs.readdir(course_dir + '/resorces/', function(err, files){
-    var iconImg, wallImg;
-    for (var i = 0; i < files.length ; i++) {
-      var regExIco = new RegExp("^icon");
-      var regExWal = new RegExp("^wall");
-      if(regExIco.test(files[i])){
-        iconImg = files[i];
-      } else if(regExWal.test(files[i])){
-        wallImg = files[i];
-      } else continue;
-     }; 
-    course_doc.iconImage = course_dir + '/resorces/' + iconImg; 
-    course_doc.wallImage = course_dir + '/resorces/' + wallImg; 
-    course_doc.created_by = user._id;
-    importer.course(course_doc, function(err, doc){
-      if(err){
-        console.log(err);
-        callback(err);
-      }
-      else {
-        extracts_chapters(course_dir, doc, callback);
-      }
-    });
-  });
-};
-
-var extracts_chapters = function(course_dir, course, callback) {
-  fs.readdir(course_dir, function(err, files){
-    async.forEach(files, function(chapter, forEachCB){
-      var regEx = new RegExp("^chapter");
-      if(regEx.test(chapter)){
-        chap_doc = require(course_dir+'/'+chapter+'/'+chapter+'.yml');
-        importer.chapter(chap_doc, course._id, function(err, dbChap){
-          extracts_lessons(course_dir+'/'+chapter, dbChap, forEachCB);
-        });
-      }
-      else forEachCB();
-    }, function(err){
-      callback(err);
-    });
-  });
-};
-
-var extracts_lessons = function(chap_dir, chap, callback) {
-  fs.readdir(chap_dir, function(err, files){
-    async.forEach(files, function(lesson, forEachCB){
-      var regEx = new RegExp("^lesson");
-      if(regEx.test(lesson)){
-        lesson_doc = require(chap_dir+'/'+lesson+'/'+lesson+'.yml');
-        if(lesson_doc.type=="video"){
-          extract_video_lesson(chap_dir, chap._id, lesson, lesson_doc, forEachCB);
-        } else if(lesson_doc.type=="programming") {
-          lesson_doc.programming['boilerPlateCode'] = chap_dir+'/'+lesson+'/resorces/boilerPlateCode.txt';
-          importer.lesson(lesson_doc, chap._id, forEachCB);
-        } else if(lesson_doc.type=="quiz") {
-          // TODO: Code for quiz
-        } else{
-          forEachCB();
-        }
-      } else {
-        forEachCB();
-      }
-    }, function(err) {
-      callback();
-    });
-  });
-};
-
-var extract_video_lesson = function(chap_dir, chap_id, lesson, lesson_data, callback) {
-  if(lesson_data.video.type == "upload"){
-    fs.readdir(chap_dir+'/'+lesson+'/resorces/', function(err, files){
-      lesson_data.video['path'] = chap_dir+'/'+lesson+'/resorces/'+files[0];
-      return importer.lesson(lesson_data, chap_id, callback);
-    });
-  } else {
-    return importer.lesson(lesson_data, chap_id, callback);
-  }
-};
-
-
