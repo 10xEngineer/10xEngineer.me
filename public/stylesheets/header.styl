@@ -1,27 +1,30 @@
+collapsedHeight = 20px
+expandedHeight = 104px
 .header
   z-index 10
   width 100%
+  height collapsedHeight
   position absolute
-  top -85px
-  height 130px
+  transition        height .2s .2s ease-in-out
+  // transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
   .left
-    height            108px
+    height            collapsedHeight + 4
     background-image  url("/img/header-background.png")
     background-position center bottom
     overflow          hidden
     transition        height .2s .2s ease-in-out
-    transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
+    // transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
   .right
     float             right
     width             198px
-    height            130px
+    height            46px
     background-image  url("/img/header-logo-complete.png")
     background-position center bottom
     transition        height .2s .2s ease-in-out
-    transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
+    // transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
   .navbar
     position          absolute
-    bottom            24px
+    bottom            0
     padding-left      20px
     > ul
       padding-top     3px
@@ -29,12 +32,15 @@
     color             rgb(99,82,82) !important
   a:hover
     color             #999 !important
-/*.header:hover
+.header:hover
+  height expandedHeight
+  transition        height .2s ease-in-out
+  // transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
   .left
-    height            108px
+    height            expandedHeight + 4
     transition        height .2s ease-in-out
-    transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
+    // transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
   .right
     height            130px
     transition        height .2s ease-in-out
-    transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)*/
+    // transition-timing-function cubic-bezier(.75,0.00,1.00,0.25)
