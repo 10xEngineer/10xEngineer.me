@@ -22,11 +22,11 @@ block layout.body
             li
               .innerDiv
                 label #{question.question} 
-                  - if(question.weightage == 1)
+                  - if(question.points == 1)
                     span.label.label-success Easy
-                  - else if(question.weightage == 2)
+                  - else if(question.points == 2)
                     span.label.label-warning Modrate
-                  - else if(question.weightage == 3)
+                  - else if(question.points == 3)
                     span.label.label-important Hard
                 .pull-right.actionBtns
                   a.btn.btn-success(href="/assessment/question/#{question.id}/edit")
@@ -35,7 +35,14 @@ block layout.body
                   a.btn.btn-danger(href="/assessment/question/#{question.id}/remove")
                     i.icon-trash.icon-white 
                     |  Delete Question
-              ul
-                each opt in question.choices
-                  li #{opt}
+              - if(question.type == "mcq")
+                ul
+                  each opt in question.choices
+                    li #{opt}
+              - else if(question.type == "essay")
+                ul
+                  each ansLine in question.answers
+                    li #{ansLine.answer}
+              - else
+                label Undefined Queestion type
       a.btn(href='/course_editor/chapter/#{lesson.chapter.id}') Back
