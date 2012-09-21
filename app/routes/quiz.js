@@ -138,11 +138,15 @@ module.exports.startQuiz = function(req, res) {
     assessment.user.id          = req.user._id;
     assessment.user.name        = req.user.name;
     assessment.score            = 0;
-    assessment.attemptedDetails = questionPaper;
+    if(questionPaper.length>0) {
+      assessment.attemptedDetails = questionPaper;
+    } else {
+      return res.redirect('/lesson/'+lesson.id);
+    }
     assessment.save(function(error){
       if(error){
         log.error(error);
-        res.redirect('/assessment/quiz');
+      return res.redirect('/lesson/'+lesson.id);
       }
       req.session.assessment   = assessment;
       req.session.currQuestion = 0;
@@ -151,6 +155,21 @@ module.exports.startQuiz = function(req, res) {
     });
   });
 };
+
+
+module.exports.continueQuiz = function(req, res) {
+  var Assessment  = model.Assessment;
+  var lesson = req.lesson;
+  Assessment.findOne({ "lesson.id" : lesson._id}, function(error, assessment){
+    var attemptedDetails = assessment.attemptedDetails;
+    var len = attemptedDetails.length;
+    for(var i = 0; i < len; i++){
+      if(attemptedDetails[i].hasOwnProperty('givenAns')) continue;
+      else break;
+    }
+    res.redirect("/assessment/quiz/"+lesson.id+"/"+(i+1));
+  });
+}
 
 // 
 var generateQuestionPaper = function(lesson, callback) {
@@ -214,6 +233,7 @@ var getQuestions = function(lesson_id, noOfQuestions, difficulty, callback) {
   // rand = parseFloat(randStr, 10);
   random[direction] = rand;
   
+  //data['difficulty'] = (difficulty != 3) ? difficulty: { '$gte' : difficulty};
   data['difficulty'] = difficulty;
   data['random'] = random;
   data['lesson'] = lesson_id;
@@ -251,8 +271,7 @@ var getQuestions = function(lesson_id, noOfQuestions, difficulty, callback) {
 
 var getSingleSideQuestions = function (data, callback) {
   var Question = model.Question;
-
-  Question.find({difficulty : data.difficulty, random: data.random, lesson: data.lesson }, { _id : 1})
+  Question.find({points : data.difficulty, random: data.random, lesson: data.lesson }, { _id : 1})
     .sort('random', data.order )
     .limit(data.limit)
     .exec(function(error, questions){

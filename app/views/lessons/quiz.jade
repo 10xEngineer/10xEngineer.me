@@ -16,6 +16,14 @@ block layout.body
               a.btn.btn-primary.btn-large(href="/assessment/quiz/#{lesson.id}/start") Start Quiz
             br
             br
+          - else if(assessment.status == 'inProgress')
+            p #{lesson.desc}
+            h4(style="text-align: center;") It's a Quiz of #{lesson.quiz.marks} Marks
+            br
+            div(style="text-align: center;")
+              a.btn.btn-primary.btn-large(href="/assessment/quiz/#{lesson.id}/continue") Continue Quiz
+            br
+            br
           - else if(assessment.status == 'assessed')
             h1 Congratulations !!!
             hr

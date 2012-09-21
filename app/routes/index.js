@@ -237,6 +237,7 @@ module.exports = function(app) {
   app.post('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
   app.get('/assessment/quiz/:lessonId/remove', verifyPermission('admin', 'delete'), quiz.removeQuiz);
   app.get('/assessment/quiz/:lessonId/start', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.startQuiz);
+  app.get('/assessment/quiz/:lessonId/continue', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.continueQuiz);
   app.get('/assessment/quiz/:lessonId/finish', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.quizResult);
   app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.viewQuestion);
   app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), verifyCourseSubscription, quiz.submitQuestion);
