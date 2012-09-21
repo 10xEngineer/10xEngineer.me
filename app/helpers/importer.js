@@ -103,7 +103,8 @@ var lesson = function(data, chapterId, callback) {
       lesson.video.content = data.video.content;
     }
   } else if(data.type === 'quiz') {
-    lesson.quiz.questions = data.questions;
+    lesson.quiz.marks = data.quiz.marks;
+    res = true;
   } else if(data.type === 'programming') {
     lesson.programming.language = data.programming.language;
     res = true;
@@ -154,12 +155,46 @@ var lesson = function(data, chapterId, callback) {
         });
       });
     } else if(data.type == "quiz"){
-      // Not implemented yet
-      callback();
+      lesson.save(function(error) {
+        if(error) {
+          log.error(error);
+          return callback(error);
+        }
+        fs.readFile(data.quiz.questions, function(error, data){
+          if(error) {
+            log.error(error);
+            return callback(error);
+          }
+          Lesson.findOne({id:lesson.id}, function(err, lesson){
+            if(err){
+              return callback(err);
+            }
+            data = JSON.parse(data);
+            var Question = model.Question;
+            async.forEach(data, function(questionInst, forEachCB){
+              var question = new Question();
+              question.lesson = lesson._id;
+              question.question = questionInst.question;
+              question.random = Math.random();
+              question.points = questionInst.points;
+              question.type = questionInst.type;
+              question.answers = questionInst.answers;
+              question.choices = questionInst.choices;
+              question.save(forEachCB);
+            }, function(err){
+              if(err){
+                console.log(err);
+                return callback(err);
+              }
+              callback();
+            });
+          });
+        });
+      });
     } else if(data.type == "programming"){
       fs.readFile(data.programming.boilerPlateCode, function(err, data){
         if(err){
-          callback(err);
+          return callback(err);
         }
         lesson.programming.boilerPlateCode = data;
         lesson.save(function(error) {
@@ -287,7 +322,6 @@ module.exports.exportFullCourse = function(course, next){
         function(asyncParallelCB){
           log.info("Saving chapters...");
           async.forEachSeries(chapters, function(chap, chapForEachCB){
-            console.log("Chapter_Count :: "+chap_count);
             var data_chap = '';
             data_chap     = "title: " + chap.title + "\n";
             data_chap    += "desc: " + chap.desc;
@@ -299,20 +333,19 @@ module.exports.exportFullCourse = function(course, next){
                 var lesson_count = 0;
                 sort_lessons(lessons, chap.lessons, function(error, sorted_lessons){
                   async.forEachSeries(sorted_lessons, function(lesson, lessCB){
-                    console.log("Process for lesson no. #"+lesson_count);
                     lesson_file_exp(chap_path, chap_count, lesson_count, lesson, function(error){
                       if(error){
                         console.error(error);
                       }
                       lesson_count++;
-                      lessCB();
+                      return lessCB();
                     });
                   }, function(err){ 
                     if(err){
                       console.error(error);
                     }
                     chap_count++;
-                    chapForEachCB();
+                    return chapForEachCB();
                   });
                 });
               });
@@ -346,7 +379,7 @@ module.exports.exportFullCourse = function(course, next){
               if(code != 0) {
                 log.error("Error compressing file.");
               }
-              next(null, exp_path+'/'+course_dir, course.title);
+              return next(null, exp_path+'/'+course_dir, course.title);
             });
           });
         }
@@ -427,8 +460,8 @@ var lesson_file_exp = function(chap_path, chap_count, lesson_count, lesson, call
       return video_lesson_exp(full_path, lesson, data_lesson, lesson_count, callback);
     case "programming":
       return programming_lesson_exp(full_path, lesson, data_lesson, lesson_count, callback);
-    // case "quiz":
-    //   return quiz_lesson_exp(full_path, lesson, data_lesson, lesson_count, callback);
+    case "quiz":
+      return quiz_lesson_exp(full_path, lesson, data_lesson, lesson_count, callback);
     default:
       return save_file_for_export(full_path, 'lesson'+lesson_count, 'lesson'+lesson_count, data_lesson, callback);
   }
@@ -483,21 +516,41 @@ var quiz_lesson_exp = function(full_path, lesson, data, count, callback) {
   var Question = model.Question;
   data += "quiz: \n";
   data += " marks: " + lesson.quiz.marks + "\n"; 
-  data += " questions: \n";
+  data += " questions: questions.json";
 
-  // Remaining
-  Question.find({}, function(error, question_list){
-    async.forEach(question_list, function(questions, forEachCB){
+  save_file_for_export(full_path, 'lesson' +count, 'lesson'+count, data, function(error){
+    if(error){
+      return callback(error);
+    }
+    full_path += '/lesson'+count;
+    fs.mkdir(full_path + "/resorces", function(err){
+      if(err){
+        return callback(err);
+      }
 
-    }, function(){}
-    );
+      // Export questions at resourse file
+      Question.find({"lesson": lesson._id}, function(error, question_list){
+        fs.appendFile(full_path + "/resorces/questions.json", "[", function(){
+          var frist = true;
+          async.forEach(question_list, function(question, forEachCB){
+            var data = "{";
+            data += "\"question\" : \"" + question.question + "\" , ";
+            data += "\"type\" : \"" + question.type + "\" , ";
+            data += "\"points\" : \"" + question.points + "\" , ";
+            data += "\"choices\" : " + JSON.stringify(question.choices) + " , ";
+            data += "\"answers\" : " + JSON.stringify(question.answers) + " }";
+            (!frist) ? data = ", "+data : frist = false;
+            fs.appendFile(full_path + "/resorces/questions.json", data, forEachCB);
+          }, function(error){
+            return fs.appendFile(full_path + "/resorces/questions.json", "]", callback);
+          });
+        });
+      });
+    });
   });
-
 }
 
 module.exports.importFullCourse = function(file, user, callback){
-  console.log("User in globle function ::");
-  console.log(user);
   var random_dir = util.string.random(15);
   var imp_path = path.resolve("app/upload");
 
@@ -535,8 +588,6 @@ module.exports.importFullCourse = function(file, user, callback){
 
 
 var extract_course_from_imported_dir = function(course_dir, user, callback){
-  console.log("User in local function ::");
-  console.log(user);
   var course_doc = require(course_dir+'/course.yml');
   fs.readdir(course_dir + '/resorces/', function(err, files){
     var iconImg, wallImg;
@@ -595,6 +646,7 @@ var extracts_lessons = function(chap_dir, chap, callback) {
           lesson(lesson_doc, chap._id, forEachCB);
         } else if(lesson_doc.type=="quiz") {
           // TODO: Code for quiz
+          lesson_doc.quiz.questions = chap_dir+'/'+less+'/resorces/' + lesson_doc.quiz.questions;
           lesson(lesson_doc, chap._id, forEachCB);
         } else{
           forEachCB();
@@ -632,5 +684,3 @@ var extract_video_lesson = function(chap_dir, chap_id, less, lesson_data, callba
     return lesson(lesson_data, chap_id, callback);
   }
 };
-
-
