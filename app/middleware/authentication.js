@@ -76,9 +76,7 @@ module.exports.getMiddleware = function(config) {
   // deserialize user on logout
   passport.deserializeUser(function(id, callback) {
     var User = model.User;
-    User.findOne({ id: id }, function (error, user) {
-      callback(error, user);
-    });
+    User.findOne({ id: id }, callback);
   });
 
   return passport;
@@ -111,18 +109,14 @@ module.exports.googleCallback = function(req, res, next) {
     failureRedirect: '/auth'
   },
   function(error, profile, info) {
-    if(error) {
-      return next(error);
-    }
+    if(error) return next(error);
 
     var User = model.User;
 
     var email = profile._json.email;
     // Find out if the user is already registered
     User.findOne({ email: email }, function(error, user) {
-      if(error) {
-        return next(error);
-      }
+      if(error) return next(error);
 
       if(!user || !user.hash) {
         // User is not registered, save the profile in session and redirect to registration page
@@ -139,11 +133,11 @@ module.exports.googleCallback = function(req, res, next) {
         user.markModified('google');
 
         user.save(function(error) {
+          if(error) return next(error);
+
           // Establish a session
           req.logIn(user, function(error) {
-            if(error) {
-              return next(error);
-            }
+            if(error) return next(error);
 
             util.redirectBackOrHome(req, res);
           });
@@ -164,18 +158,14 @@ module.exports.facebookCallback = function(req, res, next) {
     failureRedirect: '/auth'
   },
   function(error, profile, info) {
-    if(error) {
-      return next(error);
-    }
+    if(error) return next(error);
 
     var User = model.User;
 
     var email = profile._json.email;
     // Find out if the user is already registered
     User.findOne({ email: email }, function(error, user) {
-      if(error) {
-        return next(error);
-      }
+      if(error) return next(error);
 
       if(!user || !user.hash) {
         // User is not registered, save the profile in session and redirect to registration page
@@ -192,11 +182,11 @@ module.exports.facebookCallback = function(req, res, next) {
         user.markModified('facebook');
 
         user.save(function(error) {
+          if(error) return next(error);
+
           // Establish a session
           req.logIn(user, function(error) {
-            if(error) {
-              return next(error);
-            }
+            if(error) return next(error);
 
             util.redirectBackOrHome(req, res);
           });
@@ -216,18 +206,14 @@ module.exports.twitterCallback = function(req, res, next) {
     failureRedirect: '/auth'
   },
   function(error, profile, info) {
-    if(error) {
-      return next(error);
-    }
+    if(error) return next(error);
 
     var User = model.User;
 
     var username = profile.username;
     // Find out if the user is already registered
     User.findOne({ 'twitter.screen_name': username }, function(error, user) {
-      if(error) {
-        return next(error);
-      }
+      if(error) return next(error);
 
       if(!user || !user.email || !user.hash) {
         // User is not registered, save the profile in session and redirect to registration page
@@ -243,11 +229,11 @@ module.exports.twitterCallback = function(req, res, next) {
         user.markModified('twitter');
 
         user.save(function(error) {
+          if(error) return next(error);
+
           // Establish a session
           req.logIn(user, function(error) {
-            if(error) {
-              return next(error);
-            }
+            if(error) return next(error);
 
             util.redirectBackOrHome(req, res);
           });
