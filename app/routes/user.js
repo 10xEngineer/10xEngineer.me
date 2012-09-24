@@ -3,8 +3,8 @@ var model = require('../models');
 var util = require('../helpers/util');
 
 module.exports = function() {};
-module.exports.login = function(req, res){
-  var error = req.flash('error');
+module.exports.login = function(req, res, next){
+  var error = req.locals.error;
   if(error != "") {
     res.render('users/login', {
       error: error,
@@ -22,7 +22,7 @@ module.exports.login = function(req, res){
 };
 
 // TODO: Implement
-module.exports.signup = function(req, res){
+module.exports.signup = function(req, res, next){
   res.render('users/signup', {
     title: 'Sign Up'
   });
@@ -55,24 +55,17 @@ module.exports.register = function(req, res, next) {
   }
 
   User.createOrUpdate(data, function(error, user) {
-    if(error) {
-      log.error(error);
-      req.session.error = "An error occured while registering.";
-      return next(error);
-    }
+    if(error) return next(error);
 
     req.session.message = "Thank you for registering.";
     next();
   });
 };
 
-module.exports.profile = function(req, res){
+module.exports.profile = function(req, res, next){
   var Progress = model.Progress;
   Progress.userChapterProgress(req.user, function(error, progress) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not fetch a progress report of user.";
-    }
+    if(error) return next(error);
     res.render('users/profile', {
       user: req.user,
       progressObject : progress
@@ -80,22 +73,19 @@ module.exports.profile = function(req, res){
   }); 
 };
 
-module.exports.settingsView = function(req, res){
+module.exports.settingsView = function(req, res, next){
   res.render('users/settings', {
     user: req.user
   });
 };
 
-module.exports.settings = function(req, res){
+module.exports.settings = function(req, res, next){
   
   var user = req.user;
   user.name = req.body.name;
   user.email = req.body.email;
   user.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not save Changes of profile.";
-    }
+    if(error) return next(error);
 
     req.session.message = "Profile updated sucessfully.";
     res.redirect('/user/settings');

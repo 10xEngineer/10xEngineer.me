@@ -14,12 +14,15 @@ var util = require('../helpers/util');
 
 module.exports = function() {};
 
-module.exports.show = function(req, res) {
+module.exports.show = function(req, res, next) {
   var User = model.User;
   var Role = model.Role;
 
   User.find(function(error, users) {
+    if (error) return next(error);
     Role.find(function(error, roles) {
+      if (error) return next(error);
+
       res.render('admin', {
         title: 'Admin',
         users: users,
@@ -29,10 +32,11 @@ module.exports.show = function(req, res) {
   });
 };
 
-module.exports.approveView = function(req, res) {
+module.exports.approveView = function(req, res, next) {
   var User = model.User;
 
   User.find({ roles : { $ne : 'user' } } ,function(error, users) {
+    if (error) return next(error);
     res.render('admin/approve', {
       title: '10xengineer.me Beta Approval',
       users: users
@@ -40,17 +44,13 @@ module.exports.approveView = function(req, res) {
   });
 };
 
-module.exports.approve = function(req, res) {  
+module.exports.approve = function(req, res, next) {  
   var length = req.extUser.roles.length;
   var user = req.extUser;
 
   var templetPath = path.resolve('./Samples/emailTemplet/approvalForBeta.html');
   getHtmlTemplate("approvalForBeta", { "name" : user.name }, function(error, htmlText){
-
-    if(error){
-      log.error(error);
-      res.redirect('/admin/approve');
-    }
+    if (error) return next(error);
 
     var hostMailID    = config.get('mail:username');
     var hostMailPass  = config.get('mail:password');
@@ -73,26 +73,21 @@ module.exports.approve = function(req, res) {
     };
 
     // send mail with defined transport object
-    smtpTransport.sendMail(mailOptions, function(error, response){
-        if(error){
-            console.log(error);
-        }else{
-            console.log("Message sent: " + response.message);
-        }
+    smtpTransport.sendMail(mailOptions, function(error, res){
+      if(error) return next(error);
 
-        // if you don't want to use this transport object anymore, uncomment following line
-        //smtpTransport.close(); // shut down the connection pool, no more messages
-    });
-    
-    req.extUser.roles[length++] = 'user';
-    user.markModified('roles');
-    user.save(function(error){
-      if(error) {
-        log.error(error);
-      }
-      res.redirect('/admin/approve');
-    });
+      console.log("Message sent: " + res.message);
 
+      // if you don't want to use this transport object anymore, uncomment following line
+      //smtpTransport.close(); // shut down the connection pool, no more messages
+
+      req.extUser.roles[length++] = 'user';
+      user.markModified('roles');
+      user.save(function(error){
+        if(error) return next(error);
+        res.redirect('/admin/approve');
+      });
+    });
   });
 };
 
@@ -108,7 +103,7 @@ var getHtmlTemplate = function(templateName, jsonObject, callback){
   callback(null, template);
 };
 
-module.exports.usersImportView = function(req, res) {  
+module.exports.usersImportView = function(req, res, next) {  
   res.render('admin/usersImport');
 };
 
@@ -121,10 +116,7 @@ module.exports.usersImport = function(req, res, next) {
   var fileContentArray = fileContent.split('\n');
   
   async.forEach(fileContentArray, importer.usersFromUnbounce, function(error){
-    if(error) {
-      log.error(error);
-      return next(error);
-    }
+    if(error) return next(error);
 
     req.session.message = "Users imported successfully.";
     res.redirect('/admin');
@@ -136,15 +128,16 @@ module.exports.removeUser = function(req, res, next) {
   user.remove(function(error) {
     if(error) {
       log.error(error);
-      req.session.error = "Can not delete user.";
-      res.redirect('/admin');
+      req.session.error = "Cannot delete user.";
+      return res.redirect('/admin');
     }
+
     req.session.message = "User deleted sucessfully.";
     res.redirect('/admin');
   });
 };
 
-module.exports.labsView = function(req, res) {
+module.exports.labsView = function(req, res, next) {
   var config = req.app.set('config');
 
   res.render('admin/labs', {
@@ -153,7 +146,7 @@ module.exports.labsView = function(req, res) {
   });
 };
 
-module.exports.labEditView = function(req, res) {  
+module.exports.labEditView = function(req, res, next) {  
   var lab = req.labDef;
   var config = req.app.set('config');
 
@@ -173,7 +166,7 @@ module.exports.labEditView = function(req, res) {
   });
 };
 
-module.exports.labEdit = function(req, res) {  
+module.exports.labEdit = function(req, res, next) {  
   var labDef = req.labDef;
   labDef.name = req.body.name;
   labDef.type = req.body.type;
@@ -189,14 +182,12 @@ module.exports.labEdit = function(req, res) {
   };
 */
   labDef.save(function(error){
-    if(error) {
-      log.error(error);
-    }
+    if(error) return next(error);
     res.redirect('/admin/labs');
   });
 };
 
-module.exports.labs = function(req, res) {  
+module.exports.labs = function(req, res, next) {  
   var VMDef = model.VMDef;
 
   var labDef = new VMDef();
@@ -207,213 +198,201 @@ module.exports.labs = function(req, res) {
   labDef.storage = req.body.storage;
   labDef.runList = req.body.runList;
   labDef.save(function(error){
-    if(error) {
-      log.error(error);
-    }
+    if(error) return next(error);
     res.redirect('/admin/labs');
   });
   
 };
 
-module.exports.showLabsView = function(req, res) {  
+module.exports.showLabsView = function(req, res, next) {  
   var VMDef = model.VMDef;
   var config = req.app.set('config');
 
   VMDef.find(function (error, lab) {
+    if(error) return next(error);
 
     var vmList = config.get('vms');
     res.render('admin/showLabs', {
-        labs: lab,
-        itemList: vmList
+      labs: lab,
+      itemList: vmList
     }); 
   });
 };
 
 
 // Remove a LabDef
-module.exports.labRemove = function(req, res) {
+module.exports.labRemove = function(req, res, next) {
 
   var labDef = req.labDef;
   labDef.removeLabDef(function(error) {
     if(error) {
       log.error(error);
-      req.session.error = "Can not delete labDef.";
-      res.redirect('/admin/labs');
+      req.session.error = "Cannot delete labDef.";
+      return res.redirect('/admin/labs');
     }
+
     req.session.message = "Lab deleted sucessfully.";
     res.redirect('/admin/labs');
   });
 };
 
 
-module.exports.rolesView = function(req, res) {
+module.exports.rolesView = function(req, res, next) {
   var Role = model.Role;
 
   Role.find(function (error, roles) {
+    if(error) return next(error);
     res.render('admin/roles', {
       roles: roles
     });    
   });
 };
 
-module.exports.showUserRoles = function(req, res){
+module.exports.showUserRoles = function(req, res. next){
   var Role = model.Role;
 
   Role.find(function (error, roles) {
+    if(error) return next(error);
     res.render('admin/user_roles', {
       roles : roles
     });
   });
 };
 
-module.exports.updateUserRoles = function(req, res) {
+module.exports.updateUserRoles = function(req, res, next) {
   var User = model.User;
   var Role = model.Role;
 
   req.extUser.updateUserRoles(req.body.chngRoles, function(error){
-    if(error){
-      log.error(error);
-    }
-    else{
-      User.find(function(error, users) {
-        Role.find(function(error, roles) {
-          res.render('admin', {
-            title: 'Admin',
-            users: users,
-            roles: roles
-          });
+    if(error) return next(error);
+
+    User.find(function(error, users) {
+      if(error) return next(error);
+      Role.find(function(error, roles) {
+        if(error) return next(error);
+        res.render('admin', {
+          title: 'Admin',
+          users: users,
+          roles: roles
         });
       });
-    }
+    });
   });
 };
 
-module.exports.newRoleView = function(req, res) {
+module.exports.newRoleView = function(req, res, next) {
   res.render('admin/newRole');
 };
 
-module.exports.createRoleView = function(req, res) {
+module.exports.createRoleView = function(req, res, next) {
   res.render('admin/roleViewForm');
 };
 
-module.exports.editRoleView = function(req, res) {
+module.exports.editRoleView = function(req, res, next) {
   var Role = model.Role;
 
   var roleId = parseInt(req.route.params.roleId, 10);
 
   Role.findOne({ id: roleId }, function(error, role){
+    if(error) return next(error);
+
     var roleName = role.name;
-    if(error){
-      log.error(error);
-    }
-    else {
-      var permits = {
-        admin_read : false,
-        admin_edit : false,
-        admin_insert : false,
-        admin_delete : false,
-        admin_publish : false,        
+    var permits = {
+      admin_read : false,
+      admin_edit : false,
+      admin_insert : false,
+      admin_delete : false,
+      admin_publish : false,        
 
-        user_read : false,
-        user_edit : false,
-        user_insert : false,
-        user_delete : false,
-        user_publish : false,        
+      user_read : false,
+      user_edit : false,
+      user_insert : false,
+      user_delete : false,
+      user_publish : false,        
 
-        course_read : false,
-        course_edit : false,
-        course_insert : false,
-        course_delete : false,
-        course_publish : false
+      course_read : false,
+      course_edit : false,
+      course_insert : false,
+      course_delete : false,
+      course_publish : false
 
-      };
-  
-      for (indx = 0; indx < role.permissions.length; indx++){
-        var string = role.permissions[indx];
-        string = string.split('_');
-        var entity = string[0];
-        var allows = string[2];
-        if(allows=="all"){
-          permits[entity+"_read"] = true;
-          permits[entity+"_edit"] = true;
-          permits[entity+"_insert"] = true;
-          permits[entity+"_delete"] = true;
-          permits[entity+"_publish"] = true;
-        }
-        else {
-          permits[entity+"_"+allows] = true;
-        }
+    };
+
+    for (indx = 0; indx < role.permissions.length; indx++){
+      var string = role.permissions[indx];
+      string = string.split('_');
+      var entity = string[0];
+      var allows = string[2];
+      if(allows=="all"){
+        permits[entity+"_read"] = true;
+        permits[entity+"_edit"] = true;
+        permits[entity+"_insert"] = true;
+        permits[entity+"_delete"] = true;
+        permits[entity+"_publish"] = true;
       }
-
-      res.render('admin/roleViewForm', {
-        role : role,
-        permits: permits
-      });
+      else {
+        permits[entity+"_"+allows] = true;
+      }
     }
+
+    res.render('admin/roleViewForm', {
+      role : role,
+      permits: permits
+    });
   });
 };
 
-module.exports.editRole = function(req, res) {
+module.exports.editRole = function(req, res, next) {
   var Role = model.Role;
 
   var modifiedRoleName = req.body.name;
   var roleId = parseInt(req.route.params.roleId, 10);
   getPermissionListForRole(req, function(error, modifiedRolePermits){
-    if(!error){
-      Role.findOne({ id : roleId }, function(error, role){
-        role.modifyRole(modifiedRoleName, modifiedRolePermits, function(error){
-          if(error){
-            log.error(error);
-          }
-          res.redirect('/admin/roles');
-        });
+    if(error) return next(error);
+    Role.findOne({ id : roleId }, function(error, role){
+      if(error) return next(error);
+      role.modifyRole(modifiedRoleName, modifiedRolePermits, function(error){
+        if(error) return next(error);
+        res.redirect('/admin/roles');
       });
-    }
+    });
   });
 };
 
-module.exports.createRole = function(req, res) {
+module.exports.createRole = function(req, res, next) {
   var Role = model.Role;
 
   var newRoleName = req.body.name;
 
   getPermissionListForRole(req, function(error, newRolePermits){
+    if(error) return next(error);
     Role.createRole(newRoleName, newRolePermits, function(error, role){
-      if(error){
-        log.error(error);
-      }
-      else{
-        res.redirect('/admin/roles');
-      }
+      if(error) return next(error);
+      res.redirect('/admin/roles');
     });
   });
 };
 
-module.exports.removeRole = function(req, res) {
+module.exports.removeRole = function(req, res, next) {
   var Role = model.Role;
 
   var roleId = parseInt(req.route.params.roleId, 10);
   Role.findOne({ id : roleId}, function(error, role){
-    if(error){
-      log.error(error);
-    }
-    else {
-      role.removeRole(function(error){
-        if(error){
-          log.error(error);
-        }
-        res.redirect('/admin/roles');
-      });
-    }
+    if(error) return next(error);
+    role.removeRole(function(error){
+      if(error) return next(error);
+      res.redirect('/admin/roles');
+    });
   });
 };
 
-module.exports.usersRoleView = function(req, res) {
+module.exports.usersRoleView = function(req, res, next) {
   
   var roleName = req.route.params.roleName.toString();
   var User = model.User;
 
   User.find({roles : roleName} ,function(error, users) {
+    if(error) return next(error);
     res.render('admin/userRoles', {
       title: roleName+" Roles's User List" ,
       users : users
@@ -421,7 +400,7 @@ module.exports.usersRoleView = function(req, res) {
   });
 };
 
-module.exports.assignRole = function(req, res) {
+module.exports.assignRole = function(req, res, next) {
   
   var Role = model.Role;
   var user = req.extUser;
@@ -430,26 +409,24 @@ module.exports.assignRole = function(req, res) {
   Role.findById(roleId, function(error, role) {
     if(error) {
       log.error(error);
-      res.end('{"success": false}');
+      return res.end('{"success": false}');
     }
 
     user.roles.push(role.name);
     user.save(function(error) {
-      res.end('{"success": true}');
+      if(error) return next(error);
+      return res.end('{"success": true}');
     });
   });
 };
 
-module.exports.userInfo = function(req, res) {
+module.exports.userInfo = function(req, res, next) {
 
   var Progress = model.Progress;
   var Role = model.Role;
 
   Progress.userChapterProgress(req.extUser, function(error, progress) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not fetch a progress report of user.";
-    }
+    if(error) return next(error);
     res.render('admin/userInfo', {
       userObject: req.extUser,
       progressObject : progress

@@ -239,8 +239,4 @@ module.exports = function(app) {
   app.post('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.create);
   app.get('/assessment/programming/:programmingId', verifyPermission('admin', 'read'), programming.appearView);
 
-  // Just for testing
-  // TODO: Remove it and all its related functions and files before commit
-  app.get('/testing', main.testing);
-
 };

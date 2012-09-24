@@ -3,7 +3,7 @@ var cdn = require('../helpers/cdn');
 
 module.exports = function() {};
 
-module.exports.head = function(req, res) {
+module.exports.head = function(req, res, next) {
   var fileName = req.params.fileName;
 
   cdn.head(fileName, function(error, contentType, length) {
@@ -24,7 +24,7 @@ module.exports.head = function(req, res) {
 };
 
 
-module.exports.load = function(req, res) {
+module.exports.load = function(req, res, next) {
   var fileName = req.params.fileName;
 
   var reqRange = req.header('Range');
