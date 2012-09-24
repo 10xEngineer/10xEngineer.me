@@ -1,4 +1,5 @@
 REPORTER = dot
+PID = `cat /tmp/10xengineer.pid`
 
 test:
 	@NODE_ENV=test \
@@ -6,5 +7,11 @@ test:
 		--reporter $(REPORTER) \
 		test/unit/*.js \
 		test/*.js
+
+deploy:
+	@echo "Pulling latest master from github."
+	git pull origin develop
+	npm install
+	kill -s SIGUSR2 $(PID)
 
 .PHONY: test

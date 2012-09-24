@@ -248,7 +248,7 @@ module.exports.rolesView = function(req, res, next) {
   });
 };
 
-module.exports.showUserRoles = function(req, res. next){
+module.exports.showUserRoles = function(req, res, next){
   var Role = model.Role;
 
   Role.find(function (error, roles) {
