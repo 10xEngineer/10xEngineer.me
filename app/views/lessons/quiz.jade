@@ -27,7 +27,7 @@ block layout.body
           - else if(assessment.status == 'assessed')
             h1 Congratulations !!!
             hr
-            h3 Dear #{userName},
+            h3 Dear #{username},
             h4 You successfully completed the quiz and your result is   
                 - var per = Math.round((assessment.score * 100 / quiz.marks)*100)/100;
                 code(style="padding:8px;") #{per}%  (Marks : #{assessment.score}/#{assessment.lesson.marks})
@@ -36,7 +36,7 @@ block layout.body
           - else
             h1 Quiz completed !!!
             hr
-            h3 Dear #{userName},
+            h3 Dear #{username},
             h4 You successfully completed the quiz and your result will be mail to your mail account after examin.
 
             br

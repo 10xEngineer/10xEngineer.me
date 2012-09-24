@@ -8,7 +8,7 @@ block layout.body
 
 
       - var attempted = false;
-      - if(controls.displayedQuestionIndex != controls.currQuestionIndex) attempted = true;
+      - if(controls.displayedQuestionIndex < controls.currQuestionIndex) attempted = true;
     
       .row-fluid
         .span9
@@ -39,7 +39,10 @@ block layout.body
             - else if(question.type == "essay") 
               .actions 
                 br
-                textarea.span8(name="questionOption", rows="10")
+                - if(attempted)
+                  textarea.span8(name="questionOption", rows="10", disabled) #{givenAns}
+                - else
+                  textarea.span8(name="questionOption", rows="10")
               
 
             - if(controls.displayedQuestionIndex>0)
@@ -57,7 +60,7 @@ block layout.body
                 button.btn.btn-primary(type="submit") Next 
                   i.icon-circle-arrow-right.icon-white
             - else
-                a.btn.btn-primary(href="/assessment/quiz/#{controls.lessonId}/#{controls.displayedQuestionIndex+2}", style="margin-right:5px") Next 
+                a.btn.btn-primary(href="/assessment/quiz/#{controls.lessonId}/#{parseInt(controls.displayedQuestionIndex) +2}", style="margin-right:5px") Next 
                   i.icon-circle-arrow-right.icon-white 
         .span3
           include ../../lessons/_sidebar

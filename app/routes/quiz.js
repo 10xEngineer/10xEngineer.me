@@ -167,6 +167,8 @@ module.exports.continueQuiz = function(req, res) {
       if(attemptedDetails[i].hasOwnProperty('givenAns')) continue;
       else break;
     }
+    req.session.assessment = assessment;
+    req.session.currQuestion = i;
     res.redirect("/assessment/quiz/"+lesson.id+"/"+(i+1));
   });
 }
@@ -212,8 +214,6 @@ var generateQuestionPaper = function(lesson, callback) {
       });  
     });
   });
-
-
 }
 
 // 
@@ -369,7 +369,7 @@ module.exports.submitQuestion = function(req, res) {
       log.error(error);
       return res.redirect('/assessment/quiz/'+req.lesson.id+'/'+currQuestion);
     }
-    if(fullQuestion.choices.length>1 && util.compareArray(ans, fullQuestion.answers)){
+    if(fullQuestion.type == 'essay' && util.compareArray(ans, fullQuestion.answers)){
       gotMarks = fullQuestion.weightage.toString();
       status   = 'assessed';
     }
@@ -386,7 +386,7 @@ module.exports.submitQuestion = function(req, res) {
           log.error(error);
           res.redirect('/assessment/quiz/'+req.lesson.id+'/'+(parseInt(currQuestion)+1));
         }
-        currQuestion += 1;
+        currQuestion = parseInt(currQuestion) + 1;
         if(assessment.attemptedDetails.length == currQuestion){
           delete req.session.currQuestion;
           res.redirect('/assessment/quiz/'+req.lesson.id+'/finish');
@@ -427,6 +427,14 @@ module.exports.quizResult = function(req, res) {
         }
         console.log("Seved successfully");
       });
+    } else {
+      assessment.status = 'attempted';
+      assessment.save(function(err){
+        if(err){
+          console.log(err);
+        }
+        console.log("Seved successfully");
+      });
     }
     Progress.getProgress(user, req.course, function(error, progress) {
       if(error) {
@@ -447,7 +455,7 @@ module.exports.quizResult = function(req, res) {
 
 module.exports.examin = function(req, res) {
   var Assessment = model.Assessment;
-  Assessment.find({status: 'inProgress'}, function(err, assessments){
+  Assessment.find({status: 'attempted'}, function(err, assessments){
     res.render('quiz/examiner/quizList', {
       assessments : assessments
     });
@@ -465,16 +473,8 @@ module.exports.startExamin = function(req, res) {
     questionList.push(attemptedDetails[i].question);
   };
 
-  Question.find({ _id: { $in: questionList}}, function(err, fullQuestionList){
+  Question.find({ _id: { $in: questionList}, type: 'essay'}, function(err, fullQuestionList){
     
-    for(var i = 0; i < fullQuestionList.length; i++){
-      if(fullQuestionList[i].choices.length == 1) {
-        continue;
-      } else {
-        fullQuestionList.splice(i,1);
-        i--;
-      }
-    };
     req.session.essayQuestionList = fullQuestionList;
     req.session.currQuestion      = 0;
     res.redirect('/assessment/quiz/examin/'+req.assessment.id+'/1');
@@ -482,11 +482,9 @@ module.exports.startExamin = function(req, res) {
 };
 
 module.exports.showQuestionToExaminer = function(req, res) {
-  var Question          = model.Question;
   var assessment        = req.assessment;
   var currQuestion      = req.questionIndex;
   var attemptedDetails  = assessment.attemptedDetails;
-  var length            = attemptedDetails.length;
   var question          = req.session.essayQuestionList[currQuestion];
 
   res.render('quiz/examiner/question', {
@@ -512,13 +510,14 @@ module.exports.submitAssessmentMarks = function(req, res) {
       }
     };
     assessment.attemptedDetails[assessmentQN]['gotMarks'] = marks;
+    assessment.attemptedDetails[assessmentQN]['status']   = 'assessed';
     assessment.markModified('attemptedDetails');
     assessment.save(function(error) {
       if(error){
         log.error(error);
         res.redirect('/assessment/quiz/'+assessment.id+'/'+(parseInt(currQuestion)+1));
       }
-      var currQuestion = req.session.currQuestion + 1;
+      var currQuestion = parseInt(req.session.currQuestion) + 1;
       if(assessment.attemptedDetails.length == currQuestion){
         delete req.session.currQuestion;
         res.redirect('/assessment/quiz/examin');
