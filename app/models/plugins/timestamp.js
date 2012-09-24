@@ -4,8 +4,8 @@ module.exports = exports = function (schema, options) {
     modified_at: { type: Date, default: Date.now }
   });
 
-  schema.pre('save', function (next) {
+  schema.pre('save', function (callback) {
     this.modified_at = new Date();
-    next();
+    callback();
   });
 };

@@ -6,7 +6,7 @@ module.exports = function(schema, options) {
     next();
   });
 
-  schema.post('save', function() {
+  schema.post('save', function(callback) {
     var self = this;
     var id = parseInt(self.id.toString());
     var Course = model.Course;
@@ -15,26 +15,17 @@ module.exports = function(schema, options) {
     // Add chapter to the course
     if (self._wasNew) {
       Chapter.findOne({ id: id }, function(error, chapter) {
-        if(error) {
-          log.error(error);
-        }
+        if(error) return callback(error);
 
         Course.findById(chapter.course, function(error, course) {
-          if(error) {
-            log.error(error);
-          }
+          if(error) return callback(error);
 
           if(!course.chapters) {
             course.chapters = [];
           }
           
           course.chapters.push(chapter._id);
-
-          course.save(function(error) {
-            if(error) {
-              log.error(error);
-            }
-          });
+          course.save(callback);
         });
       });
     }
