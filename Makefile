@@ -12,6 +12,5 @@ deploy:
 	@echo "Pulling latest master from github."
 	git pull origin develop
 	npm install
-	kill -s SIGUSR2 $(PID)
 
 .PHONY: test
