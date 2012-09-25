@@ -4,7 +4,7 @@ var util = require('../helpers/util');
 
 module.exports = function() {};
 module.exports.login = function(req, res, next){
-  var error = req.locals.error;
+  var error = req.app.locals.error;
   if(error != "") {
     res.render('users/login', {
       error: error,
