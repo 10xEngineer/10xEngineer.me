@@ -11,10 +11,10 @@ module.exports = function() {};
 
 // Display a lesson
 module.exports.showView = function(req, res, next) {
-  
   var Lesson = model.Lesson;
   var Assessment = model.Assessment;
   var Progress = model.Progress;
+  var course = req.course;
   var lesson = req.lesson;
 
   // For Progress
@@ -24,7 +24,7 @@ module.exports.showView = function(req, res, next) {
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
     if(error) return next(error);
-
+    if(!progress) return res.redirect('/course/'+course.id);
     if(progress.status != 'completed') {
 
       // Start the Lesson : Change status of lesson to 'ongoing'

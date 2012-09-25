@@ -156,7 +156,7 @@ FileTree.prototype.create =  function(caller, type) {
   var name = 'NewFile' + self.fileCount++;
   var $item;
   if(type=='file'){
-    $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
+    $item = $('<li/>', { class: 'file itsNew' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
     $item.children('a').bind('dblclick', function(){
       self.openFile(this);
     });
@@ -164,7 +164,7 @@ FileTree.prototype.create =  function(caller, type) {
       self.selectItem(this);
     });
   } else {
-    $item = $('<li/>', { class: 'directory' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
+    $item = $('<li/>', { class: 'directory itsNew' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
     $item.children('a').bind('dblclick', function(){
       self.openDir(this);
     });
@@ -174,7 +174,7 @@ FileTree.prototype.create =  function(caller, type) {
   }
   $parentDir.append($item);
 
-  this.emit('create', name, path, type);
+  // this.emit('create', name, path, type);
 
   this.rename($item);
 };
@@ -289,7 +289,20 @@ FileTree.prototype.renameFinished = function(caller) {
   }
   
   // Event emit for rename done 
-  this.emit('rename', newPath, oldPath);
+  var p = anchor.parent();
+  var pp = p.parent().children('a');
+  console.log(pp);
+  if(p.hasClass('itsNew')){
+    var type = p.hasClass('file') ? 'file': 'directory';
+    var name = anchor.html();
+    var path = pp.attr('rel');
+    console.log("name :: ", name);
+    console.log("path :: ", path);
+    console.log("type :: ", type);
+    this.emit('create', name, path, type);
+  } else {
+    this.emit('rename', newPath, oldPath);
+  }
 
 };
 

@@ -39,11 +39,7 @@ var statics = {
     Progress.findOne({ user: user._id, course: course._id }, function(error, progress) {
       if(error) return callback(error);
 
-      if(!progress) {
-        callback(new Error('Progress unavailable')); 
-      } else {
-        callback(null, progress);
-      }
+      callback(null, progress);
     });
   },
 

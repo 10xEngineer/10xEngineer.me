@@ -1,29 +1,34 @@
 form(method='POST', id='courseForm' ,enctype='multipart/form-data')
-  p
-    label(for="title") Title:
-    input.span6.required(type='text', value='#{course.title}', id='title', name='title')
-  p
-    label(for="description") Description:
-    textarea.span6.required(type='text', name='description', id='description', rows="6") #{course.desc}
-  p
-    input#cropIconImgInfo(name='cropIconImgInfo', type='hidden')
-    input#cropWallImgInfo(name='cropWallImgInfo', type='hidden')
-  p
-    label(for="selectIconImage") Icon Image:
-    button.btn(type='button', name='selectIconImage', id='selectIconImage') Choose
-    .iconPreviewPane
-      - if(course.iconImage)
-        img#cropTargetIcon(src='#{course.iconImage}')
-        input(type='hidden', name='iconImage', value='#{course.iconImage}')
-  p
-    label(for="selectWallImage") Wallpaper Image:
-    button.btn(type='button', name='selectWallImage', id='selectWallImage') Choose
-    .wallPreviewPane
-      - if(course.wallImage)
-        img#cropTargetWall(src='#{course.wallImage}')
-        input(type='hidden', name='wallImage', value='#{course.wallImage}')
-  p
-    input.btn.btn-primary(type='submit', value='Submit')
+  .row-fluid
+    .pull-left
+      p
+        label(for="selectIconImage") Icon Image:
+        .iconPreviewPane
+          - if(course.iconImage)
+            img#cropTargetIcon(src='#{course.iconImage}')
+            input(type='hidden', name='iconImage', value='#{course.iconImage}')
+        button.btn.img-btn(type='button', name='selectIconImage', id='selectIconImage') Change
+    .pull-left.text-info.span6
+      p
+        label(for="title") Title:
+        input.span12.required(type='text', value='#{course.title}', id='title', name='title')
+      p
+        label(for="description") Description:
+        textarea.span12.required(type='text', name='description', id='description', rows="6") #{course.desc}
+      p
+        input#cropIconImgInfo(name='cropIconImgInfo', type='hidden')
+        input#cropWallImgInfo(name='cropWallImgInfo', type='hidden')
+  .row-fluid
+    p
+      label(for="selectWallImage") Wallpaper Image:
+      .wallPreviewPane
+        - if(course.wallImage)
+          img#cropTargetWall(src='#{course.wallImage}')
+          input(type='hidden', name='wallImage', value='#{course.wallImage}')
+      button.btn.img-btn(type='button', name='selectWallImage', id='selectWallImage') Change
+  .row-fluid
+    p
+      input.btn.btn-primary(type='submit', value='Submit')
 
 script
   $(document).ready(function() {
@@ -55,7 +60,6 @@ script
             $('#cropIconImgInfo').val(JSON.stringify(c))
           }
         });
-
       });
     });
     
