@@ -5,7 +5,7 @@ var util = require('../helpers/util');
 module.exports = function() {};
 
 // Miscellaneous routes
-module.exports.home = function(req, res){
+module.exports.home = function(req, res, next){
   res.render('main', {
     title: '10xEngineer.me Home', 
     coursenav: "N",
@@ -14,7 +14,7 @@ module.exports.home = function(req, res){
   });
 };
 
-module.exports.about = function(req, res){
+module.exports.about = function(req, res, next){
   res.render('about', {
     title: '10xEngineer.me About',
     coursenav: "N",
@@ -22,7 +22,7 @@ module.exports.about = function(req, res){
   });
 };
 
-module.exports.registerView = function(req, res) {
+module.exports.registerView = function(req, res, next) {
   if(req.isAuthenticated() && !req.user.email) {
     res.render('users/register', {
       layout: '',
@@ -40,20 +40,14 @@ module.exports.register = function(req, res, next) {
 
   // Check for existing accounts based on current email
   User.findOne({ email: email }, function(error, user) {
-    if(error) {
-      log.error(error);
-      next(error);
-    }
+    if(error) return next(error);
 
     if(!user) {
       // Save email address in current user
       user = req.user;
       user.email = email;
       user.save(function(error) {
-        if(error) {
-          log.error(error);
-          next(error);
-        }
+        if(error) return next(error);
 
         util.redirectBackOrHome(req, res);
       });
@@ -67,17 +61,11 @@ module.exports.register = function(req, res, next) {
 
       currentUser = util.json.merge(currentUser, userObj);
       currentUser.save(function(error) {
-        if(error) {
-          log.error(error);
-          next(error);
-        }
+        if(error) return next(error);
 
         // Delete existing user
         user.remove(function(error) {
-          if(error) {
-            log.error(error);
-            next(error);
-          }
+          if(error) return next(error);
   
           util.redirectBackOrHome(req, res);
         });
@@ -86,11 +74,3 @@ module.exports.register = function(req, res, next) {
   });
 };
 
-// Temporary route to serve source tarballs to the compiler sandbox
-module.exports.tarball = function(req, res, next) {
-
-};
-
-module.exports.testing = function(req, res, next) {
-  res.render('testing');
-}

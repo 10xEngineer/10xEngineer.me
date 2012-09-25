@@ -9,17 +9,15 @@ var statics = {
     var curRole = new Role();
     curRole.name = newName;
     Count.getNext('roles', function(error, newId){
+      if(error) return callback(error);
 
       curRole.id = newId;
       curRole.permissions = newPermissions;
 
       curRole.save(function(error){
-        if(error){
-          callback(error);
-        }
+        if(error) return callback(error);
+        callback(null, curRole);
       });
-
-      callback(null, curRole);
     });
   }
 };
@@ -27,21 +25,14 @@ var statics = {
 var methods = {
   removeRole: function(callback) {
     var role = this;
-    role.remove(function(error){
-      if(error){
-        callback(error);
-      }
-      callback();
-    });
+    role.remove(callback);
   },
 
   modifyRole: function(newName, newPermissions, callback) {
     var role = this;
     role.name = newName;
     role.permissions = newPermissions;
-    role.save(function(error){
-      callback(error);
-    });
+    role.save(callback);
   }
 };
 

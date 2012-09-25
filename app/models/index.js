@@ -4,7 +4,7 @@ var async = require('async');
 var mongoose = require('mongoose');
 var _ = require('lodash');
 
-module.exports = exports = function(callback) {
+module.exports = exports = function(config, callback) {
   exports.models = {};
 
   exports.__proto__ = exports.models;
@@ -12,27 +12,43 @@ module.exports = exports = function(callback) {
   var regExp = new RegExp('.model.js$');
   var files = fs.readdirSync('./app/models');
 
-  // Initialize all the models
-  async.forEach(files, function(modelFile, callback) {
-    if(regExp.test(modelFile)) {
-      var model = require('./' + modelFile);
+  async.waterfall([
+    // Connect to the database
+    function(callback) {
 
-      if(model.name) {
-        exports.init(model.name, model.schema, model.options, callback);
-      } else {
-        log.error(modelFile + ' is not a valid model.');
-        callback('Not a valid model');
-      }
-    } else {
-      callback();
-    }
-  },
-  function(error) {
-    if(error) {
-      return callback(error);
-    }
+      log.info('Connecting to MongoDB.');
+      mongoose.connect(config.get('db:address') + config.get('db:database'));
 
-    callback();
+      mongoose.connection.on('open', function() {
+        log.info('MongoDB connection established.');
+        callback();
+      });
+      mongoose.connection.on('error', function(error) {
+        log.error('Could not establish connection.');
+        callback(error);
+      });
+    },
+
+    // Require and cache the models
+    function(callback) {
+      // Initialize all the models
+      async.forEach(files, function(modelFile, callback) {
+        if(regExp.test(modelFile)) {
+          var model = require('./' + modelFile);
+
+          if(model.name) {
+            exports.init(model.name, model.schema, model.options, callback);
+          } else {
+            callback(new Error(modelFile + ' is not a valid model.'));
+          }
+        } else {
+          callback();
+        }
+      }, callback);
+    }
+  ], function(error) {
+    log.info('Models initialized.');
+    callback(error);
   });
 };
 
@@ -107,7 +123,7 @@ module.exports.init = function(name, schema, options, callback) {
     mongoose.model(name, schema);
 
     // Cache the model in models object
-    module.exports.models[name] = mongoose.model(name);
+    exports.models[name] = mongoose.model(name);
 
     callback();
   });

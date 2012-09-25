@@ -11,8 +11,14 @@ var statics = {
     }
 
     User.findOne({ email: data.email }, function(error, dbUser) {
-      bcrypt.genSalt(10, function(err, salt) {
+      if(error) return callback(error);
+
+      bcrypt.genSalt(10, function(error, salt) {
+        if(error) return callback(error);
+
         bcrypt.hash(data.password, salt, function(error, hash) {
+          if(error) return callback(error);
+
           var newUser;
           if(dbUser) {
             newUser = dbUser;
@@ -60,15 +66,15 @@ var statics = {
   authenticate: function(email, password, callback) {
     var User = this;
     
-    User.findOne({ email: email }, function(err, user) {
-      if (err) { return callback(err); }
+    User.findOne({ email: email }, function(error, user) {
+      if (error) return callback(error);
+
       if (!user) {
         return callback(null, false, { message: 'Unknown user' });
       }
       user.verifyPassword(password, function(error, verified) {
-        if(error) {
-          return callback(error);
-        }
+        if (error) return callback(error);
+
         if(!verified) {
           callback(null, false, { message: 'Invalid password' });          
         } else {
@@ -82,12 +88,7 @@ var statics = {
 var methods = {
   updateUserRoles: function(roles, callback){
     this.roles = roles;
-    this.save(function(error){
-      if(error){
-        log.error(error);
-      }
-    });
-    callback();
+    this.save(callback);
   },
 
   verifyPassword: function(password, callback) {

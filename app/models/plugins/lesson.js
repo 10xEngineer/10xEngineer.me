@@ -1,12 +1,12 @@
 var model = require('../index');
 
 module.exports = function(schema, options) {
-  schema.pre('save', function (next) {
+  schema.pre('save', function (callback) {
     this._wasNew = this.isNew;
-    next();
+    callback();
   });
 
-  schema.post('save', function() {
+  schema.post('save', function(callback) {
     var Chapter = model.Chapter;
     var lesson = this;
     var id = parseInt(lesson.id.toString());
@@ -14,14 +14,10 @@ module.exports = function(schema, options) {
     // Add lesson to the chapter
     if (lesson._wasNew) {
       lesson.collection.findOne({ id: id }, function(error, lesson) {
-        if(error) {
-          log.error(error);
-        }
+        if(error) return callback(error);
 
         Chapter.findById(lesson.chapter, function(error, chapter) {
-          if(error) {
-            log.error(error);
-          }
+          if(error) return callback(error);
 
           if(!chapter.lessons) {
             chapter.lessons = [];
@@ -29,11 +25,7 @@ module.exports = function(schema, options) {
           
           chapter.lessons.push(lesson._id);
 
-          chapter.save(function(error) {
-            if(error) {
-              log.error(error);
-            }
-          });
+          chapter.save(callback);
         });
       });
     }

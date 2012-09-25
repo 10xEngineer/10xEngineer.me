@@ -1,6 +1,8 @@
 $(document).ready(function() {
   var docId = $('#docId').val();
 
+  
+
   //dynamically load javascript source file
   function loadScriptFile(path, callback) {
     var head = document.getElementsByTagName('head')[0];
@@ -19,18 +21,37 @@ $(document).ready(function() {
     tab: '#tabContainer'
   });
 
+  function appendLog(message) {
+    var $logWindow = $('#chat');
+
+    var lines = message.split('\n');
+
+    for (var index in lines) {
+      var line = lines[index];
+      $logWindow.append($('<div/>', { html: line, class: 'log-line' }));      
+    }
+  }
+
   //- new Chat($('#chat'), '#{username}');
 
   newCodeSocket.on('codePassed', function(data) {
-    displayMessage('success', 'Congratulations, your code compiled successfully.');
+    appendLog(data);
+    //displayMessage('success', 'Congratulations, your code compiled successfully.');
 
+/*
+    console.log(data);
+    var data = data;
+    data = '<pre>' + data + '</pre>';
+    displayMessage('info', data);
+*/
   });
 
   newCodeSocket.on('codeFailed', function(error) {
     console.log(error);
     var error = error || 'Unknown error. Please contact support.';
-    error = '<pre>' + error + '</pre>';
-    displayMessage('error', error);
+    appendLog(error);
+    //error = '<pre>' + error + '</pre>';
+    //displayMessage('error', error);
 
   });
 
@@ -40,7 +61,8 @@ $(document).ready(function() {
     if(!languageCode){
       languageCode = $('#mode').val();
     }
-    displayMessage('info', 'Compiling...');
+    //displayMessage('info', 'Compiling...');
+    appendLog('Compiling...');
     newCodeSocket.emit('submitcode', docId);
   });
 

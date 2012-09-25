@@ -10,7 +10,7 @@ var cdn = require('../helpers/cdn');
 module.exports = function() {};
 
 // Display a lesson
-module.exports.showView = function(req, res) {
+module.exports.showView = function(req, res, next) {
   
   var Lesson = model.Lesson;
   var Assessment = model.Assessment;
@@ -23,17 +23,13 @@ module.exports.showView = function(req, res) {
 
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
-    if(error) {
-      log.error(error);
-    }
+    if(error) return next(error);
 
     if(progress.status != 'completed') {
 
       // Start the Lesson : Change status of lesson to 'ongoing'
       progress.startLesson(lesson, function(error) {
-        if(error) {
-          log.error(error);
-        }
+        if(error) return next(error);
         var chapters = progress.chapters;
         
         for (var index in chapters) {
@@ -55,15 +51,10 @@ module.exports.showView = function(req, res) {
         
         progressFlag = true;
         Lesson.find({}, function(error, allLessons) {
+          if(error) return next(error);
           Assessment.findOne({'user.id': req.user._id, 'lesson.id': req.lesson._id}, function(err, assessment){
-            var ass;
-            if(err){
-              console.log(err);
-              ass = {};
-            }
-            else {
-              ass = assessment;
-            }
+            if(error) return next(error);
+            var ass = assessment || {};
             res.render('lessons/' + lesson.type, {
               title           : lesson.title,
               quiz            : lesson.quiz,
@@ -83,6 +74,7 @@ module.exports.showView = function(req, res) {
     } else {
       progressFlag = true;
       Lesson.find({}, function(error, allLessons) {
+        if(error) return next(error);
         res.render('lessons/' + lesson.type, {
           title: lesson.title,
           quiz: lesson.quiz,
@@ -113,41 +105,41 @@ var randomOption =function (options) {
   }
 };
 
-module.exports.show = function(req, res) {
+module.exports.show = function(req, res, next) {
   
   var Lesson   = model.Lesson;
   var Progress = model.Progress;
   var lesson   = req.lesson;
 
-
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
-    if(error) {
-      log.error(error);
-    }
+    if(error) return next(error);
+
+    function renderLesson(){
+      Lesson.find({}, function(error, allLessons){
+        if(error) return next(error);
+        res.render('lessons/' + lesson.type, {
+          title: req.lesson.title,
+          allLessons : allLessons
+        });
+      });    
+    };
+
     if(progress.status != 'completed') {
       // Start the Lesson : Change status of lesson to 'ongoing'
       progress.completeLesson(lesson, function(error) {
-        if(error) {
-          log.error(error);
-        }
+        if(error) return next(error);
+        renderLesson();      
       });
-    } 
-    renderLesson();      
+    } else {
+      renderLesson();      
+    }
   });
 };
 
-var renderLesson = function(){
-  Lesson.find({}, function(error, allLessons){
-    res.render('lessons/' + lesson.type, {
-      title: req.lesson.title,
-      allLessons : allLessons
-    });
-  });    
-};
-
 // Lesson Completes
-module.exports.complete = function(req, res) {
+// TODO: Called using XHR only. Reimplement somewhere else
+module.exports.complete = function(req, res, next) {
   var Progress = model.Progress;
 
   res.contentType('text/plain');
@@ -170,7 +162,8 @@ module.exports.complete = function(req, res) {
 };
 
 // Lesson ServerInfo
-module.exports.serverInfo = function(req, res) {
+// TODO: Called using XHR only. Reimplement somewhere else
+module.exports.serverInfo = function(req, res, next) {
   var VMDef = model.VMDef;
   
   res.contentType('text/plain');
@@ -196,15 +189,12 @@ module.exports.serverInfo = function(req, res) {
 };
 
 // For Next Or Previous Lesson
-module.exports.next = function(req,res){
+module.exports.next = function(req, res, next){
 
   var lesson = req.lesson;
 
-  lesson.getNext(function(error,nextLessonID) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not moved to next lesson.";
-    }  
+  lesson.getNext(function(error, nextLessonID) {
+    if(error) return next(error);
     if(nextLessonID == null) {
       res.redirect('/course/' + req.course.id);
     } else {
@@ -214,15 +204,12 @@ module.exports.next = function(req,res){
   
 };
 
-module.exports.previous = function(req,res){
+module.exports.previous = function(req, res, next){
 
   var lesson = req.lesson;
 
-  lesson.getPrevious(function(error,preLessonID) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not moved to previous lesson.";
-    }
+  lesson.getPrevious(function(error, preLessonID) {
+    if(error) return next(error);
     if(preLessonID == null) {
       res.redirect('/course/' + req.course.id);
     } else {

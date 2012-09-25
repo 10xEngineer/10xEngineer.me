@@ -5,12 +5,7 @@ var methods = {
     // TODO: Remove all child 
     var vmDef = this;
    
-    vmDef.remove(function(error) {
-      if(error) {
-        callback(error);
-      }
-      callback();
-    });
+    vmDef.remove(callback);
   }
 };
 

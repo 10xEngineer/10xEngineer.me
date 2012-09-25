@@ -8,16 +8,15 @@ exports = module.exports = function errorHandler(options) {
   , dumpExceptions = options.dumpExceptions || options.dump
   , formatUrl = options.formatUrl;
 
-  return function errorHandler(err, req, res, next) {
+  return function errorHandler(error, req, res, next) {
     res.statusCode = 500;
     if(dumpExceptions) { 
-      log.error(err);
+      log.error(error.stack);
     }
 
-    req.session.error = err;
     var app = res.app;
 
-    if(err.message && err.message === '404') {
+    if(error.message && error.message === '404') {
       res.render('errors/404', {
         locals: {
           title: '404 - Not Found',
@@ -26,10 +25,11 @@ exports = module.exports = function errorHandler(options) {
         status: 404
       });
     } else {
+      req.session.error = error.message;
       res.render('errors/500', {
         locals: {
           title: 'The Server Encountered an Error',
-          error: showStack ? err : undefined
+          error: showStack ? error : undefined
         },
         status: 500
       });

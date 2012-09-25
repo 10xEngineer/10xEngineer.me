@@ -165,12 +165,25 @@ module.exports = function(io) {
               callback(error);
             });
             compiler.compile();
+          },
+
+          function(callback) {
+            var executed = function(stdout) {
+              compiler.removeAllListeners('executed');
+              callback(null, stdout);
+            };
+
+            compiler.on('executed', executed);
+            compiler.on('error', function(error) {
+              callback(error);
+            });
+            compiler.run();
           }
         ],
-        function(error) {
+        function(error, stdout) {
 
           if(!error) {
-            socket.volatile.emit('codePassed');
+            socket.volatile.emit('codePassed', stdout);
           } else {
             socket.volatile.emit('codeFailed', error);
           }
