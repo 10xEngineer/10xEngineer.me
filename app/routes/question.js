@@ -3,14 +3,14 @@ var fs = require('fs');
 var async = require('async');
 var importer = require('../helpers/importer');
 
-module.exports.createView = function(req, res) {
+module.exports.createView = function(req, res, next) {
   res.render('question/create',{
 		title: "Question",
     edit: false
 	});
 };
 
-module.exports.create = function(req, res) {
+module.exports.create = function(req, res, next) {
   var Question = model.Question;
   var question = new Question();
   question.lesson = req.lesson._id;
@@ -37,52 +37,35 @@ module.exports.create = function(req, res) {
 
   // Saves Created Question
   question.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not create question.";
-      res.redirect('/course_editor/lesson/create');
-    }
+    if(error) return next(error);
 
     req.session.message = "Question created successfully.";
     res.redirect('/course_editor/lesson/' + req.lesson.id);
   });
 };
 
-module.exports.view = function(req, res) {
+module.exports.view = function(req, res, next) {
   res.render('quiz/view', {
     title:  "Question",
     quiz: req.quiz
   });
 };
 
-module.exports.removeQuestion = function(req, res) {
+module.exports.removeQuestion = function(req, res, next) {
   var Lesson = model.Lesson;
   var question = req.question;
   
-  /*
-  question.remove(function(error){
-    if(error){
-      log.error(error);
-    }
-    req.session.message = "Question remove successfully.";
-    res.redirect("/course_editor/lesson/" + req.lesson.id);
-  });
-  */
   Lesson.findOne({_id: question.lesson}, function(err, lesson){
-    if(err){
-      log.error(err);
-    }
+    if(error) return next(error);
     question.remove(function(error){
-      if(error){
-        log.error(error);
-      }
+      if(error) return next(error);
       req.session.message = "Question remove successfully.";
       res.redirect("/course_editor/lesson/" + lesson.id);
     });
   });
 };
 
-module.exports.editView = function(req, res) {
+module.exports.editView = function(req, res, next) {
   var Quiz = model.Quiz;
   var question = req.question;
   res.render("question/edit",{
@@ -92,7 +75,7 @@ module.exports.editView = function(req, res) {
   });
 };
 
-module.exports.edit= function(req, res) {
+module.exports.edit= function(req, res, next) {
   var question = req.question;
   question.question = req.body.question;
   question.weightage = req.body.weightage;
@@ -114,18 +97,14 @@ module.exports.edit= function(req, res) {
 
   // Saves Created Question
   question.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not update question.";
-      res.redirect('/course_editor/lesson/'+question.lesson.id);
-    }
+    if(error) return next(error);
 
     req.session.message = "Question saved successfully.";
     res.redirect('/course_editor/lesson/'+question.lesson.id);
   });
 };
 
-module.exports.importQuestionView = function(req, res) {  
+module.exports.importQuestionView = function(req, res, next) {  
   res.render('question/questionsImport');
 };
 

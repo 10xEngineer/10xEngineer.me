@@ -4,9 +4,7 @@ var model = require('./index');
 var statics = {
   getValue: function(key, callback) {
     getDocument(function(error, doc) {
-      if(error) {
-        callback(error);
-      }
+      if(error) return callback(error);
 
       callback(null, doc[key]);
     });
@@ -14,9 +12,7 @@ var statics = {
 
   setValue: function(key, value, callback) {
     getDocument(function(error, doc) {
-      if(error) {
-        log.error(error);
-      }
+      if(error) return callback(error);
 
       doc[key] = value;
       doc.markModified(key);
@@ -29,15 +25,11 @@ var statics = {
 var getDocument = function(callback) {
   var Metadata = model.Metadata;
   Metadata.findOne(function(error, doc) {
-    if(error) {
-      callback(error);
-    }
+    if(error) return callback(error);
 
     if(!doc) {
       doc = new Metadata();
-      doc.save(function(error){
-        callback(null, doc);
-      });
+      doc.save(callback);
     } else {
       callback(null, doc);
     }
