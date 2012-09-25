@@ -178,11 +178,11 @@ var methods = {
   },
 
   startLesson: function(lesson, callback) {
-    changeLessonState(lesson, 'ongoing', callback);
+    changeLessonState(this, lesson, 'ongoing', callback);
   },
 
   completeLesson: function(lesson, callback) {
-    changeLessonState(lesson, 'completed', callback);
+    changeLessonState(this, lesson, 'completed', callback);
   }
 };
 
@@ -196,8 +196,7 @@ module.exports = {
   }
 };
 
-var changeLessonState = function(lesson, state, callback) {
-  var progress = this;
+var changeLessonState = function(progress, lesson, state, callback) {
   var lessonId  = lesson._id.toString();
   var chapterId = lesson.chapter._id.toString();
   var quiz = lesson.quiz;
