@@ -6,6 +6,8 @@ module.exports = function(app) {
   mongofs({
     database: 'mongofs_test'
   }, function(error, vfs) {
+  	if(error) throw error;
+  	
     app.all('/fs/:bucketId/*', function(req, res, next) {
     	var bucketId = req.params.bucketId;
     	adapter('/fs/' + bucketId + '/', vfs)(req, res, next);

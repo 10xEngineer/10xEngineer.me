@@ -2,7 +2,8 @@
   "site": {
     "hostname": "dev.10xengineer.me",
     "port": 80,
-    "email": "10xengineer@gmail.com"
+    "email": "10xengineer@gmail.com",
+    "pidfile": "/tmp/10xengineer.pid"
   },
   "auth": {
     "twitter": {

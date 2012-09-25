@@ -108,6 +108,8 @@
 var FileTree = function(element, json) {
   var self = this;
 
+  this.fileCount = 1;
+
   // Generete tree code
   this.fileTree = json;
 
@@ -151,7 +153,7 @@ FileTree.prototype.create =  function(caller, type) {
   // Procedure to create file
   var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
   var path = $parentDir.children('a').attr('rel');
-  var name = 'untitled';
+  var name = 'NewFile' + self.fileCount++;
   var $item;
   if(type=='file'){
     $item = $('<li/>', { class: 'file' }).append($('<a/>', { html: name, href: '#', rel: path + name }));

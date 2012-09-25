@@ -9,7 +9,7 @@ var util = require('../../helpers/util');
 var cdn = require('../../helpers/cdn');
 
 module.exports = function(schema, options) {
-  schema.pre('save', function(next) {
+  schema.pre('save', function(callback) {
     var course = this;
     var regex = new RegExp('^/cdn/');
     var options = {processIcon: false, processWall: false};
@@ -22,13 +22,7 @@ module.exports = function(schema, options) {
     }
 
     // Save image
-    processImages(course, options, function(error) {
-      if(error) {
-        next(error);
-      }
-
-      next();
-    });
+    processImages(course, options, callback);
   });
 
 };
@@ -80,51 +74,39 @@ var processImages = function (course, options, callback) {
   }
 
   async.parallel(jobs, function(error, results) {
-    if(error){
-      callback(error);
-    }
-    else{
-      if(results.icon) {
-        course.iconImage = results.icon;
-      }
-      if(results.wall) {
-        course.wallImage = results.wall;
-      }
+    if(error) return callback(error);
 
-      callback();
+    if(results.icon) {
+      course.iconImage = results.icon;
     }
+    if(results.wall) {
+      course.wallImage = results.wall;
+    }
+
+    callback();
   });
 };
 
 
 var imageJob = function(imageUrl, fileName, params) {
 
-  return function(asyncCallback){
+  return function(callback){
 
     // Process icon image
     util.saveToDisk(imageUrl, function(error, imagePath){
-      if(error){
-        log.error("Error comes from util - saveToDisk Function", error);
-        asyncCallback(error);
-      }
+      if(error) return callback(error);
 
       util.processImage(imagePath, params, function(error, processedImagePath) {
         var fileType = mime.extension(mime.lookup(processedImagePath));
 
         cdn.saveFileNew(fileName, processedImagePath, fileType, function(error){
-          if (error) {
-            log.error("Error from save file in database", error);
-            asyncCallback(error);
-          }
+          if(error) return callback(error);
 
           fs.unlink(processedImagePath, function (error) {
-            if (error) {
-              log.error("Error from unlink file", error);
-              asyncCallback(error);
-            }
-          });
+            if(error) return callback(error);
 
-          asyncCallback(null, '/cdn/' + fileName);
+            callback(null, '/cdn/' + fileName);
+          });
         });
       });
     });

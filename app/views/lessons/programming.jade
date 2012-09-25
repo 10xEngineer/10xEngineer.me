@@ -19,12 +19,18 @@ append layout.scripts
   // script(type='text/javascript', src="/share/json.js")
   // script(type='text/javascript', src="/javascripts/share/ace.js")
   // script(type='text/javascript', src="/javascripts/share/chat.js")
+  
+  // included
+  script(type='text/javascript', src="/javascripts/views/widget/tabbar.js")
+  script(type='text/javascript', src="/javascripts/views/widget/sidebar.js")
 
 append layout.styles
   link(rel='stylesheet', href="/stylesheets/jquery.contextMenu.css")
   link(rel='stylesheet', href="/stylesheets/views/lessons/programming.css")
-  link(rel='stylesheet', href="/stylesheets/views/programming/ide.css")
-  link(rel='stylesheet', href="/stylesheets/views/programming/tabs.css")
+  // included
+  link(rel='stylesheet', href="/stylesheets/views/widget/tabbar.css");
+  link(rel='stylesheet', href="/stylesheets/views/widget/sidebar.css");
+  link(rel='stylesheet', href="/stylesheets/breadcrumb.css");
 
 block layout.body
   include ../_breadcrumb
@@ -56,4 +62,3 @@ block layout.body
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
           a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
 
-    include ../_breadcrumb

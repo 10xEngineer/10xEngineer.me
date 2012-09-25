@@ -1,11 +1,22 @@
 var express = require('express');
 var stylus = require('stylus');
 var nib = require('nib');
+var winston = require('winston');
 var RedisStore = require('connect-redis')(express);
+var up = require('up');
 
-var auth = require('./app/middleware/authentication');
+// Initialize long stack-traces
+require('longjohn');
 
-module.exports = function(config) {
+// Configure logs
+var consoleTransport = new (winston.transports.Console)({ colorize: true, timestamp: true });
+var logger = new (winston.Logger)({ transports: [ consoleTransport ] });
+
+global.log = logger;
+
+module.exports = (function() {
+  var auth = require('./app/middleware/authentication');
+  var config = require('./app/config/config');
   var appRoot = process.cwd();
   var tmpFileUploadDir = appRoot + '/app/upload';
   var sessionStore = new RedisStore();
@@ -151,5 +162,16 @@ module.exports = function(config) {
   // Routes
   require('./app/routes')(app);
 
+  // Initialize socket.io
+  require('./socket')(app);
+
+  // Initialize models
+  require('./app/models')(config, function(error) {
+    if(error) {
+      throw error;
+    }
+    up.ready();
+  })
+
   return app;
-};
+})();

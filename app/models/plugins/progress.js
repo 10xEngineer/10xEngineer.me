@@ -6,7 +6,7 @@ var model = require('../index');
 module.exports = function(schema, options) {
   // Calculate Progress
   // TODO: Refactor and make it smaller
-  schema.pre('save', function(next) {
+  schema.pre('save', function(callback) {
     var Course = model.Course;
     var Lesson = model.Lesson;
     var progress = this;
@@ -15,6 +15,7 @@ module.exports = function(schema, options) {
     Course.findById(progress.course)
       .populate('chapters')
       .exec(function(error, course) {
+      if(error) return callback(error);
 
       var chapters = [];
 
@@ -52,6 +53,8 @@ module.exports = function(schema, options) {
           chapterCallback();
         },
         function(error) {
+          if(error) return callback(error);
+
           var chapArr = [];
           for(var chapt in progress.chapters){
             if(progress.chapters.hasOwnProperty(chapt)){
@@ -73,7 +76,7 @@ module.exports = function(schema, options) {
             progress.status = 'completed';
           }
 
-          next();
+          callback();
         });
 
       } else {
@@ -90,9 +93,7 @@ module.exports = function(schema, options) {
 
           async.forEachSeries(pLessons, function(lesson, lessonCallback) {
             Lesson.findById(lesson, function(error, lesson) {
-              if(error) {
-                next(error);
-              }
+              if(error) return lessonCallback(error);
 
               lessons[lesson._id] = {
                 _id    : lesson._id,
@@ -153,7 +154,7 @@ module.exports = function(schema, options) {
           progress.progress = chapterProgress;
           progress.status = 'ongoing';
 
-          next();
+          callback(error);
         });
       }
     });

@@ -19,11 +19,10 @@
     , "cookie": "0.0.3"
     , "debug": "latest"
     , "express": "2.5.x"
-    , "express-mongoose": "0.0.x"
     , "eyes": "0.1.x"
     , "filed": "0.x"
     , "gm" : "1.3.x"
-    , "jade": "latest"
+    , "jade": "0.27.x"
     , "js-yaml": "1.0.x"
     , "lodash": "0.x"
     , "longjohn": "0.x"
@@ -48,14 +47,13 @@
     , "socket.io": "0.9.x"
     , "stylus": "0.x"
     , "uglify-js": "1.2.x"
+    , "up": "git://github.com/LearnBoost/up.git"
+    , "up-hook": "0.1.x"
     , "util": "0.4.x"
     , "winston": "0.6.x"
   }
   , "devDependencies": {
       "mocha": "latest"
     , "should": "latest"
-    , "sinon": "1.3.x"
-    , "supertest": "latest"
-    , "zombie": "latest"
   }
 }

@@ -153,7 +153,7 @@ var // currently active contextMenu trigger
             }
         },
         // offset to add to zIndex
-        zIndex: 1,
+        zIndex: 10,
         // show hide animation settings
         animation: {
             duration: 50,

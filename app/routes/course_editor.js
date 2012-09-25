@@ -27,12 +27,15 @@ var util = require('../helpers/util');
 /************************************
 ** Show Main Page of Course Editor **
 ************************************/
-module.exports.coursesList = function(req, res){
+module.exports.coursesList = function(req, res, next){
   var Course = model.Course;
-
+  if(typeof(req.user)=='undefined'){
+    res.redirect('/');
+  }
   Course.find({})
     .populate('created_by')
     .exec(function(error, courses) {
+      if(error) return next(error);
       res.render('course_editor', {
         courses : courses,
         user: req.user
@@ -43,7 +46,7 @@ module.exports.coursesList = function(req, res){
 /************************************
 ** Create course view              **
 ************************************/
-module.exports.createView = function(req, res){
+module.exports.createView = function(req, res, next){
   res.render('course_editor/course/create', {
     title: 'New Course',
     course: {_id:'',title:'',description:''}
@@ -67,14 +70,10 @@ module.exports.create = function(req, res, next){
 
   // Saves Created Course
   course.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not create course.";
-      next(error);
-    }
+    if(error) return next(error);
 
     var id = course.id;
-    log.info("Course saved.");
+
     //Set the course info in the session to let socket.io know about it.
     req.session.newCourse = {title: course.title, _id: course._id};
     req.session.message = "Course created successfully.";
@@ -98,72 +97,9 @@ module.exports.course = function(req, res, next){
 /************************************
 ** Show import course view         **
 ************************************/
-module.exports.importView = function(req, res){
+module.exports.importView = function(req, res, next){
   res.render('course_editor/course/importView');
 };
-
-/************************************
-** Submit imported course          **
-************************************/
-/*     Old Code  ----
-module.exports.import = function(req, res, next) {
-
-  var f = req.files['course-file'];
-
-  // Read the uploaded file and parse it into a course structure
-  var parsedCourse;
-  try {
-    parsedCourse = JSON.parse(fs.readFileSync(f.path, 'utf-8'));
-  } catch (e) {
-    log.error(e);
-    req.session.error = "Can not import course.";
-    //res.redirect('/course/import', {error: e});
-  }
-
-  // Create a new course based on the parsed file
-
-  parsedCourse.created_by = req.user._id;
-  importer.course(parsedCourse, function(error, course) {
-
-    // Add chapters
-    var chapters = parsedCourse.chapters;
-    if(!chapters.length || chapters.length === 0) {
-      res.redirect('/course_editor');
-    }
-
-    async.forEach(
-      chapters,
-      function(chapter, callback){
-        importer.chapter(chapter, course._id, function(error, chapter, lessons) {
-          if(error){
-            callback(error);
-          }
-          async.forEach(
-            lessons, 
-            function(lesson, callbackInner) {
-              importer.lesson(lesson, chapter._id, function(error){
-                if(error){
-                  callbackInner(error);
-                }
-                callbackInner();
-              });
-            },
-            function(error){
-              callback(error);
-            }
-          );
-        });
-      }, 
-      function(error){
-        next(error);
-      }
-    );
-    // Success
-    req.session.message = "Course sucessfully imported.";
-    res.redirect('/course_editor');
-  });
-};
-*/
 
 /**************************************************
 **   Edit / Update Course View                   **
@@ -184,10 +120,7 @@ module.exports.update = function(req, res, next){
   course.image = req.body.image;
 
   course.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not updated course.";
-    }
+    if(error) return next(error);
     req.session.message = "Course updated sucessfully.";
     res.redirect('/course_editor/course/' + course.id);
   });
@@ -201,16 +134,9 @@ module.exports.remove = function(req, res, next){
   var course_id = course._id;
 
   course.removeCourse(function(error){
-    if (error) {
-      log.error(error);
-      req.session.error = "Can not remove course.";
-    }
+    if(error) return next(error);
     Progress.removeCourseProgress(course_id, function(error){
-      if(error) {
-        log.error(error);
-        req.session.error = "Can not remove course progress.";
-        res.redirect('/course_editor/');
-      }
+      if(error) return next(error);
       req.session.message = "Sucessfully course removed.";
       res.redirect('/course_editor');
     });
@@ -218,28 +144,22 @@ module.exports.remove = function(req, res, next){
 };
 
 // Publish a course
-module.exports.publish = function(req, res) {
+module.exports.publish = function(req, res, next) {
   var course = req.course;
 
   course.publish(true, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not published course.";
-    }
+    if(error) return next(error);
     req.session.message = "Course published sucessfully.";
     res.redirect('/course_editor');
   });
 };
 
 // unpublish a course
-module.exports.unpublish = function(req, res) {
+module.exports.unpublish = function(req, res, next) {
   var course = req.course;
   
   course.publish(false, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not unpublished course.";
-    }
+    if(error) return next(error);
     req.session.message = "Course unpublished sucessfully.";
     res.redirect('/course_editor');
   });
@@ -247,27 +167,21 @@ module.exports.unpublish = function(req, res) {
 };
 
 // Featured a course
-module.exports.featured = function(req, res) {
+module.exports.featured = function(req, res, next) {
   var course = req.course;
   course.setFeatured(true, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not featured course.";
-    }
+    if(error) return next(error);
     req.session.message = "Course featured sucessfully.";
     res.redirect('/course_editor');
   });
 };
 
 // Unfeatured a course
-module.exports.unfeatured = function(req, res) {
+module.exports.unfeatured = function(req, res, next) {
   var course = req.course;
   
   course.setFeatured(false, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not unfeatured course.";
-    }
+    if(error) return next(error);
     req.session.message = "Course unfeatured sucessfully.";
     res.redirect('/course_editor');
   });
@@ -280,30 +194,27 @@ module.exports.unfeatured = function(req, res) {
 **                                          **
 *********************************************/
 
-module.exports.chapterView = function (req, res) {
+module.exports.chapterView = function (req, res, next) {
   res.render('course_editor/chapter', {
     title: req.chapter.title
   });
 };
 
-module.exports.chapterEditView = function(req, res) {
+module.exports.chapterEditView = function(req, res, next) {
   res.render('course_editor/chapter/edit', {
     title: req.chapter.title
   });
 };
 
 // Save edited chapter
-module.exports.chapterEdit = function(req, res){
+module.exports.chapterEdit = function(req, res, next){
   var chapter = req.chapter;
 
   chapter.title = req.body.title;
   chapter.desc = req.body.description;
 
   chapter.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not updated chapter.";
-    }
+    if(error) return next(error);
     req.session.message = "Chaper updated sucessfully.";
     res.redirect('/course_editor/chapter/' + chapter.id);
   });
@@ -311,7 +222,7 @@ module.exports.chapterEdit = function(req, res){
 
 
 // Create new chapter form
-module.exports.chapterCreateView = function(req, res){
+module.exports.chapterCreateView = function(req, res, next){
   res.render('course_editor/chapter/create', {
     title: 'New Chapter',
     chapter: {id: '', title: ''}
@@ -319,7 +230,7 @@ module.exports.chapterCreateView = function(req, res){
 };
 
 // Create a new chapter
-module.exports.chapterCreate = function(req, res){
+module.exports.chapterCreate = function(req, res, next){
   var Chapter = model.Chapter;
 
   var chapter = new Chapter();
@@ -329,54 +240,41 @@ module.exports.chapterCreate = function(req, res){
   chapter.created_by = req.user.id;
 
   chapter.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not create chapter.";
-    }
+    if(error) return next(error);
 
     req.session.message = "Chaper created sucessfully.";
     res.redirect('/course_editor/course/' + req.course.id);
   });
 };
 
-module.exports.chapterRemove = function(req, res) {
+module.exports.chapterRemove = function(req, res, next) {
 
   var chapter = req.chapter;
   var courseId =req.chapter.course.id;
 
   chapter.removeChapter(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not delete chapter.";
-      res.redirect('/chapter/:id');
-    }
+    if(error) return next(error);
     req.session.message = "Chaper deleted sucessfully.";
     res.redirect('/course_editor/course/'+ courseId);
   });
 };
 
 // Publish a chapter
-module.exports.chapterPublish = function(req, res) {
+module.exports.chapterPublish = function(req, res, next) {
   var chapter = req.chapter;
 
   chapter.publish(true, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not published chapter.";
-    }
+    if(error) return next(error);
     req.session.message = "Chapter published sucessfully.";
     res.redirect('/course_editor/course/' + chapter.course.id);
   });
 };
 
 // unpublish a chapter
-module.exports.chapterUnpublish = function(req, res) {
+module.exports.chapterUnpublish = function(req, res, next) {
   var chapter = req.chapter;
   chapter.publish(false, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not unpublished chapter.";
-    }
+    if(error) return next(error);
     req.session.message = "Chapter unpublished sucessfully.";
     res.redirect('/course_editor/course/' + chapter.course.id);
   });
@@ -389,10 +287,7 @@ module.exports.chapterUp = function(req, res, next){
   var chapter = req.chapter;
 
   chapter.move(0, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not moved chapter.";
-    }
+    if(error) return next(error);
     req.session.message = "Chaper moved sucessfully.";
     res.redirect('/course_editor/course/' + chapter.course.id);
   });
@@ -402,10 +297,7 @@ module.exports.chapterDown = function(req, res, next){
    var chapter = req.chapter;
 
   chapter.move(1, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not moved chapter.";
-    }
+    if(error) return next(error);
     req.session.message = "Chaper moved sucessfully.";
     res.redirect('/course_editor/course/' + chapter.course.id);
   });
@@ -419,10 +311,11 @@ module.exports.chapterDown = function(req, res, next){
 **                                          **
 **********************************************
 *********************************************/
-module.exports.lessonCreateView = function(req, res) {
+module.exports.lessonCreateView = function(req, res, next) {
   var VMDef = model.VMDef;
 
   VMDef.find(function (error, lab) {
+    if(error) return next(error);
     res.render('course_editor/lesson/lesson_create', {
       title: req.chapter.title,
       lesson: {title: '', desc: ''},
@@ -450,28 +343,20 @@ module.exports.lessonCreate = function(req, res, next) {
     lesson.video.content = req.body.videoContent;
     f = req.files.videofile;
     lesson.save(function(error) {
-      if(error) {
-        log.error(error);
-        req.session.error = "Can not create lesson.";
-      }
+      if(error) return next(error);
       var id = lesson.id;
       if(lesson.video.type == 'upload') {
         var fileName = 'lessonVideo_' + id;
 
         cdn.saveFile(fileName, f, function(error, fileName) {
-          if(error) {
-            log.error(error);
-            next(error);
-          }
+          if(error) return next(error);
 
           Lesson.findOne({ id: id }, function(error, lesson) {
+            if(error) return next(error);
             // Save the CDN URL if available
             lesson.video.content = fileName;
             lesson.save(function(error) {
-              if(error) {
-                log.error(error);
-                next(error);
-              }
+              if(error) return next(error);
 
               req.session.newLesson = {title: lesson.title, _id: lesson._id};
               req.session.message = "Lesson created successfully.";
@@ -496,33 +381,6 @@ module.exports.lessonCreate = function(req, res, next) {
   if(lesson.type == 'quiz') {
 
     lesson.quiz.marks = req.body.marks;
-    /*
-    // Old code
-    var questionLength = req.body.question.length-1;
-    var lessonInstanceQuestion = lesson.quiz.questions;
-    for (var indexQuestion = 0; indexQuestion < questionLength; indexQuestion++) {        
-      
-      var instanceQuestion = {
-        question : '',
-        options  : [],
-        answers  : []
-      };
-
-      instanceQuestion.question = req.body.question[indexQuestion];
-
-      var optionsLength = req.body.questionOption[indexQuestion].length-1;
-      var answerIndex = 0;
-      for (var indexOption = 0; indexOption < optionsLength; indexOption++) {
-        instanceQuestion.options[indexOption] = req.body.questionOption[indexQuestion][indexOption];
-        if(req.body.questionOptionCheckbox[indexQuestion][indexOption]) {
-          instanceQuestion.answers[answerIndex++] = req.body.questionOption[indexQuestion][indexOption];
-        }
-      }
-      lessonInstanceQuestion.push(instanceQuestion);
-    }
-    saveLesson(lesson, req, res);
-    // old code over
-    */
     saveLesson(lesson, req, res);
   }
 
@@ -539,6 +397,7 @@ module.exports.lessonCreate = function(req, res, next) {
     if(typeof(vmHostNameList) == 'string') vmHostNameList = [vmHostNameList];
 
     VMDef.find({_id : { $in : vmTamplateIdList}}, function (error, lab) {
+      if(error) return next(error);
       for(var index = 0; index < vmTamplateIdList.length; index++) {
         var tmpJSON = {};
         tmpJSON.vm_name = vmNameList[index];
@@ -574,19 +433,16 @@ module.exports.lessonCreate = function(req, res, next) {
         function (error, response, body) {
           // TODO : write code for save sysAdmin lesson using responce id and token
           lesson.sysAdmin.vms = response;
-          saveLesson(lesson, req, res);
+          saveLesson(lesson, req, res, next);
 
         });
     });
   }
 };
 
-var saveLesson = function(lesson, req, res){
+var saveLesson = function(lesson, req, res, next){
   lesson.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not create lesson.";
-    }
+    if(error) return next(error);
     var id = lesson.id;
   
     req.session.newLesson = {title: lesson.title, _id: lesson._id};
@@ -596,37 +452,23 @@ var saveLesson = function(lesson, req, res){
 };
 
 var request = function(config, callback) {
-  var actualObj = config.multipart[0].body.vms;
+  var actualObj;
+  try {
+    actualObj = config.multipart[0].body.vms;
+  } catch(e) {
+    return callback(e);
+  }
   callback(null, actualObj, config);
 };
 
 // Lesson Edit
-module.exports.lessonEditView = function(req, res) {
+module.exports.lessonEditView = function(req, res, next) {
   var VMDef = model.VMDef;
 
   var lesson = req.lesson;
   var answersJSON = {};
-  if(lesson.type == 'quiz') {
-    /*
-    var quizQuestions = lesson.quiz.questions;
-    var quizQuestionsLength = lesson.quiz.questions.length;
-
-    for(var index = 0; index < quizQuestionsLength; index++) {
-      if(!answersJSON[index]) {
-        answersJSON[index] = {};
-      }
-      var answers = quizQuestions[index].answers;
-      var options = quizQuestions[index].options;
-      for (var indexOption = 0; indexOption < options.length; indexOption++) {
-       if(_.indexOf(answers, options[indexOption]) !== -1) {
-          answersJSON[index][options[indexOption]] = true;
-        } else {
-          answersJSON[index][options[indexOption]] = false;
-        }
-      }
-    }*/
-  }
   VMDef.find(function (error, lab) {
+    if(error) return next(error);
     res.render('course_editor/lesson/edit', {
       title: req.lesson.title,
       description: req.lesson.desc,
@@ -639,7 +481,7 @@ module.exports.lessonEditView = function(req, res) {
 };
 
 // Save edited chapter
-module.exports.lessonEdit = function(req, res){
+module.exports.lessonEdit = function(req, res, next){
   var Lesson = model.Lesson;
   
   var lesson = req.lesson;
@@ -679,26 +521,18 @@ module.exports.lessonEdit = function(req, res){
 
   // Save edited lesson
   lesson.save(function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not create lesson.";
-    }
+    if(error) return next(error);
     var id = lesson.id;
     if(lesson.type == 'video' && lesson.video.type == 'upload' && req.files.videofile.name !== '') {
       var fileName = 'lessonVideo_' + id;
       cdn.saveFile(fileName, f, function(error, fileName) {
-        if(error) {
-          log.error(error);
-          next(error);
-        }
+        if(error) return next(error);
         Lesson.findOne({ id: id }, function(error, lesson) {
+          if(error) return next(error);
           // Save the CDN URL if available
           lesson.video.content = fileName;
           lesson.save(function(error) {
-            if(error) {
-              log.error(error);
-              next(error);
-            }
+            if(error) return next(error);
 
             req.session.message = "Lesson edited successfully.";
             res.redirect('/course_editor/chapter/' + req.chapter.id);
@@ -719,48 +553,43 @@ module.exports.lessonRemove = function(req, res, next){
   var chapterId =lesson.chapter.id;
   var lesson_id = lesson._id;
 
-  if(lesson.type == "quiz") {
-    Question.remove({lesson: lesson_id}, function(err){
-      if(err){
-        log.error(err);
-      }
+  function removeLesson() {
+    lesson.removeLesson(function(error){
+      if(error) return next(error);
+      req.session.message = "Sucessfully lesson removed.";
+      res.redirect('/course_editor/chapter/'+ chapterId);
     });
   }
-  lesson.removeLesson(function(error){
-    if (error) {
-      log.error(error);
-      req.session.error = "Can not remove lesson.";
-      res.redirect('/course_editor/chapter/:id');
-    }
-    req.session.message = "Sucessfully lesson removed.";
-    res.redirect('/course_editor/chapter/'+ chapterId);
-  });
+
+  if(lesson.type == "quiz") {
+    Question.remove({lesson: lesson_id}, function(err){
+      if(error) return next(error);
+
+      removeLesson();
+    });
+  } else {
+    removeLesson();
+  }
 };
 
-module.exports.lessonPublish = function(req, res) {
+module.exports.lessonPublish = function(req, res, next) {
   
   var lesson = req.lesson;
 
   lesson.publish(true, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not published lesson.";
-    }
+    if(error) return next(error);
     req.session.message = "Lesson published sucessfully.";
     res.redirect('/course_editor/chapter/' + lesson.chapter.id);
   });
 };
 
 // unpublish a lesson
-module.exports.lessonUnpublish = function(req, res) {
+module.exports.lessonUnpublish = function(req, res, next) {
   
   var lesson = req.lesson;
   
   lesson.publish(false, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not unpublished lesson.";
-    }
+    if(error) return next(error);
     req.session.message = "Lesson unpublished sucessfully.";
     res.redirect('/course_editor/chapter/' + lesson.chapter.id);
   });
@@ -771,10 +600,7 @@ module.exports.lessonUp = function(req, res, next){
   var lesson = req.lesson;
 
   lesson.move(0, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not moved lesson.";
-    }
+    if(error) return next(error);
     req.session.message = "Lesson moved sucessfully.";
     res.redirect('/course_editor/chapter/' + lesson.chapter.id);
   });
@@ -786,10 +612,7 @@ module.exports.lessonDown = function(req, res, next){
   var lesson = req.lesson;
 
   lesson.move(1, function(error) {
-    if(error) {
-      log.error(error);
-      req.session.error = "Can not moved lesson.";
-    }
+    if(error) return next(error);
     req.session.message = "Lesson moved sucessfully.";
     res.redirect('/course_editor/chapter/' + lesson.chapter.id);
   });
@@ -797,13 +620,14 @@ module.exports.lessonDown = function(req, res, next){
 
 
 
-module.exports.lessonView = function(req, res) {
+module.exports.lessonView = function(req, res, next) {
   var VMDef = model.VMDef;
   var Question = model.Question;
   //For random the options
   var lesson = req.lesson;
   if(lesson.type=='sysAdmin'){
     VMDef.find({_id: { $in : lesson.sysAdmin.serverInfo}}, function(error, VMDeflist){
+      if(error) return next(error);
       res.render('course_editor/lesson/' + req.lesson.type, {
         lesson: lesson,
         labs : VMDeflist
@@ -811,6 +635,7 @@ module.exports.lessonView = function(req, res) {
     });
   } else if(lesson.type=='quiz') {
     Question.find({ lesson: lesson._id }, function(err, questions) {
+      if(error) return next(error);
       res.render('course_editor/lesson/' + req.lesson.type, {
         lesson : lesson,
         questions: questions
@@ -833,215 +658,23 @@ module.exports.lessonView = function(req, res) {
 
 module.exports.exportCourse = function(req, res, next) {
 
-  var Lesson    = model.Lesson;
-  var course    = req.course;
-
-  var course_dir = util.string.random(15);
-  var data_course = '';
-  data_course     = "title: " + course.title + "\n";
-  data_course    += "desc: " + course.desc;
-  exp_path        = 'app/upload';
-
-  save_file_for_export(exp_path, course_dir, 'course', data_course, function(error){
-    if(error){
-      console.log(error);
-      return next(error);
-    } else {
-      var chapters = course.chapters;
-      var chap_path = exp_path + '/' + course_dir;
-      var chap_count = 0;
-      iconfile = course.iconImage.substring(5, course.iconImage.length);
-      async.parallel([
-        function(asyncParallelCB){
-          // Icon image load
-          log.info("Saving course images...");
-          load_resorces(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
-            if(err){
-              console.log("Error...");
-              return asyncParallelCB(error);
-            }
-            asyncParallelCB();
-          });          
-        },
-        function(asyncParallelCB){
-          // wall image load
-          wallFile = course.wallImage.substring(5, course.wallImage.length);
-          load_resorces(exp_path+'/'+course_dir, 'wall', wallFile, function(err){
-            if(err){
-              console.log("Error...");
-              return asyncParallelCB(error);
-            }
-            asyncParallelCB();
-          });
-        },
-        function(asyncParallelCB){
-          // Loop for course's chapter
-          log.info("Saving chapters...");
-          async.forEachSeries(chapters, function(chap, callback){
-            var data_chap = '';
-            data_chap     = "title: " + chap.title + "\n";
-            data_chap    += "desc: " + chap.desc;
-            save_file_for_export(chap_path, 'chapter'+chap_count, 'chapter'+chap_count, data_chap, function(error){
-              Lesson.find({_id : { $in : chap.lessons }}, function(error, lessons){
-                var lesson_count = 0;
-
-                // Loop for chapter's lessons
-                async.forEachSeries(lessons, function(lesson, lessCB){
-                  lesson_file_exp(chap_path, chap_count, lesson_count, lesson, function(error){
-                    lesson_count++;
-                    lessCB();
-                  });
-
-
-                }, function(err){
-                  chap_count++;
-                  callback();
-                });
-              });
-            });
-          }, function(error){
-            if(error) {
-              return asyncParallelCB(error);
-            }
-            return asyncParallelCB();
-          });
-        }], function(error){ // Callback of async parallel
-          if(error){
-            return next(error);
-          }
-          exp_path = path.resolve(exp_path);
-          log.info("Course data dumped on disk", exp_path);
-          fs.readdir(exp_path+'/'+course_dir, function(error, files){
-            if(error){
-              return next(error);
-            }
-            var args = [ "-r", course.title+".zip"];
-            args = args.concat(files);
-            log.info("Compressing the exported data.");
-            var zip = spawn("zip", args, { cwd: exp_path+'/'+course_dir });
-            zip.stderr.on('data', function (data) {
-              console.log('ZIP stderr: ' + data);
-            });
-            zip.on('exit', function (code) {
-              if(code != 0) {
-                log.error("Error compressing file.");
-              }
-
-              log.info("File saved.");
-              res.setHeader('Content-Disposition', 'attachment; filename=' + course.title + '.zip');
-              res.setHeader('Content-Type', 'application/zip');
-              //res.setHeader('Content-Length', file.length);
-              res.on('end', function() {
-                console.log('Response Stream Ended.');
-              });
-              var reader = filed(exp_path+"/"+course_dir+"/"+course.title+".zip");
-              reader.on('end', function() {
-                console.log('File Stream Ended.');
-                console.log(exp_path+'/'+course_dir);
-                rimraf(exp_path+'/'+course_dir, function(error){
-                  if(error) {
-                    console.log(error);
-                    return next(error);
-                  }
-                  next();
-                });
-              });
-              log.info("Streaing file...");
-              reader.pipe(res);
-            });
-          });
-        }
-      );
-    }
-  });
-
-};
-
-
-/*  This save_file_for_export() function will do following
-**  
-**  - it creates directory with the name as given dir_name at given path
-**  - then it creates file with the name as given file_name
-**  - then write data to the file name
-**  - and finally calls callback (with error if errors are there)
-*/
-var save_file_for_export = function(path, dir_name, file_name, data, callback){
-
-  log.info("Dumping course metadata to file.");
-  fs.mkdir(path + '/' + dir_name, 0777, function(error){
-    if(error){
-      return callback(error);
-    }
-    fs.writeFile(path + '/' + dir_name + '/' + file_name + '.yml', data, function (err) {
-      if (err) {
-        return callback(err);
-      } 
-      callback();
-    });
-  });
-};
-
-/*  This load_resorces function will do following
-**
-**  - create directory namely 'resorces' at given path if it's not exists
-**  - store given file from database to that directory with the given file_name
-**  - then calls callback
-*/
-var load_resorces = function(path, file_name, file, callback) {
-  fs.mkdir(path + "/resorces", 0777, function(error){
-    cdn.copyToDisk(file, path + "/resorces", file_name, function (){
-      callback();
-    });
-  });
-};
-
-var lesson_file_exp = function(chap_path, chap_count, lesson_count, lesson, callback){
-
-  var full_path = chap_path + '/chapter'+ chap_count;
-  var type = lesson.type;
-  var res = false;
-  var res_file = '';
-  var res_file_name = '';
-  var data_lesson = '';
-  data_lesson     = "title: " + lesson.title + "\n";
-  data_lesson    += "desc: " + lesson.desc + "\n";
-  data_lesson    += "type: " + type +"\n";
-
-  switch(type) {
-    case "video":
-      data_lesson += "video: \n";
-      var vtype = lesson.video.type;
-      data_lesson += " type: "+vtype + "\n";
-      if(vtype == "upload"){
-        res = true;
-        res_file = lesson.video.content;
-        res_file = res_file.substring(5, res_file.length);
-        res_file_name = res_file;
-      }
-      data_lesson += " content: "+lesson.video.content;
-      break;
-    case "programming":
-      data_lesson += "programming: \n";
-      data_lesson += " language: " + lesson.programming.language; 
-      break;
-
-  }
-
-  save_file_for_export(full_path, 'lesson' +lesson_count, 'lesson'+lesson_count, data_lesson, function(error){
-    full_path += '/lesson'+lesson_count;
-    if(type == "programming") {
-      fs.mkdir(full_path + "/resorces", function(err){
-        fs.writeFile(full_path + "/resorces/boilerPlateCode.txt", lesson.programming.boilerPlateCode);
+  importer.exportFullCourse(req.course, function(error, path, title){
+      if(error) return next(error);
+      res.setHeader('Content-Disposition', 'attachment; filename=' + title + '.zip');
+      res.setHeader('Content-Type', 'application/zip');
+      res.on('end', function() {
+        console.log('Response Stream Ended.');
       });
-    }
-    if(res){
-      load_resorces(full_path, res_file_name, res_file, callback);
-    } else {
-      callback();
-    }
+      var reader = filed(path+"/"+title+".zip");
+      reader.on('end', function() {
+        console.log('File Stream Ended.');
+        console.log(path);
+        rimraf(path, next);
+      });
+      log.info("Streaing file...");
+      reader.pipe(res);
   });
 };
-
 
 /*********************************************
 **********************************************
@@ -1051,122 +684,14 @@ var lesson_file_exp = function(chap_path, chap_count, lesson_count, lesson, call
 **********************************************
 *********************************************/
 
-module.exports.importCourse = function(req, res) {
+module.exports.importCourse = function(req, res, next) {
 
   // UnZip imported file
   var file = req.files['course-file'];
-  var random_dir = util.string.random(15);
-  var imp_path = path.resolve("app/upload");
-  fs.mkdir(imp_path+'/'+random_dir, function(){
-    imp_path = path.resolve(imp_path+'/'+random_dir);
-    log.info("Extracting course zip.");
-    var unzip    = spawn("unzip",[ file.path ], { cwd: imp_path });
-
-    unzip.stderr.on('data', function (data) {
-      log.error('UnZIP stderr: ', data);
-    });
-
-    unzip.on('exit', function (code) {
-      if(code != 0) {
-        log.error('Error while extracting file.');
-      }
-      
-      // Create course from imported course
-      fs.readdir(imp_path, function(err, files){
-        log.info("Importing course.");
-        extract_course_from_imported_dir(imp_path, req.user, function(){
-          log.info("Cleaning up.");
-          rimraf(imp_path, function(err){
-            if(err) {
-              return next(err);
-            }
-
-            req.session.message = "Course imported successfully.";
-            res.redirect('/course_editor'); 
-          });
-        });
-      });
-    });
+  importer.importFullCourse(file, req.user, function(error){
+    if(error) return next(error);
+    req.session.message = "Course imported successfully.";
+    res.redirect('/course_editor'); 
   });
+
 };
-
-
-var extract_course_from_imported_dir = function(course_dir, user, callback){
-  var course_doc = require(course_dir+'/course.yml');
-  fs.readdir(course_dir + '/resorces/', function(err, files){
-    var iconImg, wallImg;
-    for (var i = 0; i < files.length ; i++) {
-      var regExIco = new RegExp("^icon");
-      var regExWal = new RegExp("^wall");
-      if(regExIco.test(files[i])){
-        iconImg = files[i];
-      } else if(regExWal.test(files[i])){
-        wallImg = files[i];
-      } else continue;
-     }; 
-    course_doc.iconImage = course_dir + '/resorces/' + iconImg; 
-    course_doc.wallImage = course_dir + '/resorces/' + wallImg; 
-    course_doc.created_by = user._id;
-    importer.course(course_doc, function(err, doc){
-      if(err){
-        console.log(err);
-      }
-      else {
-        extracts_chapters(course_dir, doc, callback);
-      }
-    });
-  });
-};
-
-var extracts_chapters = function(course_dir, course, callback) {
-  fs.readdir(course_dir, function(err, files){
-    async.forEach(files, function(chapter, forEachCB){
-      var regEx = new RegExp("^chapter");
-      if(regEx.test(chapter)){
-        chap_doc = require(course_dir+'/'+chapter+'/'+chapter+'.yml');
-        importer.chapter(chap_doc, course._id, function(err, dbChap){
-          extracts_lessons(course_dir+'/'+chapter, dbChap, forEachCB);
-        });
-      }
-      else forEachCB();
-    }, function(err){
-      callback();
-    });
-  });
-};
-
-var extracts_lessons = function(chap_dir, chap, callback) {
-  fs.readdir(chap_dir, function(err, files){
-    async.forEach(files, function(lesson, forEachCB){
-      var regEx = new RegExp("^lesson");
-      if(regEx.test(lesson)){
-        lesson_doc = require(chap_dir+'/'+lesson+'/'+lesson+'.yml');
-        if(lesson_doc.type=="video"){
-          extract_video_lesson(chap_dir, chap._id, lesson, lesson_doc, forEachCB);
-        } else if(lesson_doc.type=="programming") {
-          lesson_doc.programming['boilerPlateCode'] = chap_dir+'/'+lesson+'/resorces/boilerPlateCode.txt';
-          importer.lesson(lesson_doc, chap._id, forEachCB);
-        } else {
-          forEachCB();
-        }
-      } else {
-        forEachCB();
-      }
-    }, function(err) {
-      callback();
-    });
-  });
-};
-
-var extract_video_lesson = function(chap_dir, chap_id, lesson, lesson_data, callback) {
-  if(lesson_data.video.type == "upload"){
-    fs.readdir(chap_dir+'/'+lesson+'/resorces/', function(err, files){
-      lesson_data.video['path'] = chap_dir+'/'+lesson+'/resorces/'+files[0];
-      return importer.lesson(lesson_data, chap_id, callback);
-    });
-  } else {
-    return importer.lesson(lesson_data, chap_id, callback);
-  }
-};
-
-
