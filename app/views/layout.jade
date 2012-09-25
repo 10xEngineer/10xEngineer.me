@@ -44,39 +44,39 @@ html(lang="en")
       script(src='/javascripts/core.init.js')
 
   body
-    section#header
-      mixin header
-    .container
-    section#content.stretch-to-fit
-      .container.alertContainer
-        -if(typeof(error) != 'undefined') 
-          div.alert.alert-block
-            a.close(data-dismiss='alert',href='#') x
-            h4.alert-heading Warning
-            | #{error}
-        -else if(typeof(message) != 'undefined') 
-          div.alert.alert-info
-            a.close(data-dismiss='alert',href='#') x
-            h4.alert-heading Information 
-            | #{message}      
-      block layout.body
-
-    section#footer.row-fluid
-      .container
-        .span6
-          p Copyright &copy; 2012 - 10xEngineer.me
-        .span6.socialmedia
-          a(href="mailto:10xEngineer@gmail.com")
-            img(src="/img/mail.png", width="32", height="32")
-          img(src="/img/g+.png", width="32", height="32")
-          a(href="http://www.linkedin.com/search?search=&company=10xEngineer%2Eme")
-            img(src="/img/linkedin.png", width="32", height="32")
-          a(href="https://www.facebook.com/pages/10xEngineerme/157148537717942")
-            img(src="/img/fb.png", width="32", height="32")
-          a(href="https://github.com/10xEngineer")
-            img(src="/img/github.png", width="32", height="32")
-          a(href="https://twitter.com/10xEngineerMe")
-            img(src="/img/twitter.png", width="32", height="32")
+    .main-content-wrapper
+      section#header
+        mixin header
+      section#content
+        .container.alertContainer
+          -if(typeof(error) != 'undefined')
+            div.alert.alert-block
+              a.close(data-dismiss='alert',href='#') x
+              h4.alert-heading Warning
+              | #{error}
+          -else if(typeof(message) != 'undefined')
+            div.alert.alert-info
+              a.close(data-dismiss='alert',href='#') x
+              h4.alert-heading Information
+              | #{message}
+        block layout.body
+    .footer-wrapper
+      section#footer
+        .container
+          .span6
+            p Copyright &copy; 2012 - 10xEngineer.me
+          .span6.socialmedia
+            a(href="mailto:10xEngineer@gmail.com")
+              img(src="/img/mail.png", width="32", height="32")
+            img(src="/img/g+.png", width="32", height="32")
+            a(href="http://www.linkedin.com/search?search=&company=10xEngineer%2Eme")
+              img(src="/img/linkedin.png", width="32", height="32")
+            a(href="https://www.facebook.com/pages/10xEngineerme/157148537717942")
+              img(src="/img/fb.png", width="32", height="32")
+            a(href="https://github.com/10xEngineer")
+              img(src="/img/github.png", width="32", height="32")
+            a(href="https://twitter.com/10xEngineerMe")
+              img(src="/img/twitter.png", width="32", height="32")
 
     #pageslide(style='display:none')
     
