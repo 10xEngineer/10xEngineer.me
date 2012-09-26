@@ -113,7 +113,7 @@ module.exports.mailLinkForResetPassword = function(req, res, next) {
 
       var client = redis.createClient();
       var randStr = util.string.random(32);
-      client.setex(randStr, 120, user._id);
+      client.setex(randStr, 86400, user._id);   // 24 hourse = 86,400 seconds
       console.log(randStr);
       var host = config.get('site:hostname');
       templet.getHtmlTemplate("forgotPass", { "name" : user.name, "link": "http://"+host+"/passwordRecover?resetId="+randStr }, function(error, htmlText){
