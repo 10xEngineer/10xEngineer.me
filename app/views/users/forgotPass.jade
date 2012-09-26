@@ -1,0 +1,26 @@
+extends ../layout
+
+block layout.body
+  .container
+    .span12
+      header.page-header
+        h1 Forgot Password
+      p
+        ul
+          li
+            strong Step-1:
+            |  Enter your email here
+          li
+            strong Step-2:
+            |  Check your email inbox there is link from our web-site
+          li 
+            strong Step-3:
+            |  Open that link and reset your password
+      .well
+        form.form-horizontal(method='POST')
+          p
+            label  Email
+            input.required(id='email', name='email')  
+
+          p
+            input.btn-large.btn-primary.regBtn(type='submit', name='submit', value='Send Mail')

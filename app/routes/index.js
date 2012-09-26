@@ -115,6 +115,10 @@ module.exports = function(app) {
   // User
   app.get('/auth', accessPermission, user.login);
   app.post('/auth', accessPermission, auth.local);
+  app.get('/auth/forgot_password', user.forgotPassword);
+  app.get('/passwordRecover', user.resetPasswordView);
+  app.post('/passwordRecover', user.resetPassword);
+  app.post('/auth/forgot_password', user.mailLinkForResetPassword);
   app.get('/logout', auth.logout);
 
   app.get('/auth/twitter', auth.twitter);
