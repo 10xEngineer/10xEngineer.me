@@ -132,7 +132,7 @@ function Editor(options) {
   });
 
   // Initialize renderer
-  var renderer = new Renderer(el);
+  var renderer = new Renderer(el, theme);
   renderer.scrollBar.element.style.display = "none";
   renderer.scrollBar.width = 0;
   renderer.content.style.height = "auto";
