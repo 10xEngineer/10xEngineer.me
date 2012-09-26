@@ -91,6 +91,21 @@ var methods = {
     this.save(callback);
   },
 
+  changePassword: function(data, callback){
+    var self = this;
+    bcrypt.genSalt(10, function(error, salt) {
+      if(error) return callback(error);
+      bcrypt.hash(data.password, salt, function(error, hash) {
+        if(error) return callback(error);
+        self.hash = hash;
+        self.save(function(error){
+          if(error) return callback(error);
+          return callback(null, self);
+        });
+      });
+    });
+  },
+
   verifyPassword: function(password, callback) {
     var user = this;
     bcrypt.compare(password, this.hash, callback);
