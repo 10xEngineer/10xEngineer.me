@@ -388,7 +388,8 @@ module.exports.quizResult = function(req, res, next) {
         assessment.status = 'assessed';
         assessment.save(callback);
       } else {
-        callback();
+        assessment.status = 'attempted';
+        assessment.save(callback);
       }
     }
 
@@ -403,18 +404,12 @@ module.exports.quizResult = function(req, res, next) {
           callback();
         }
       });
-    } else {
-      assessment.status = 'attempted';
-      assessment.save(function(err){
-        if(err){
-          console.log(err);
-        }
-        console.log("Seved successfully");
-      });
     }
 
     saveAssessment(function(error) {
+      if(error) return next(error);
       saveProgress(function(error) {
+        if(error) return next(error);
         res.redirect('/lesson/'+lesson.id);
       });
     });
