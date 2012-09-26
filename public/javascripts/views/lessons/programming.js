@@ -1,4 +1,6 @@
-$(document).ready(function() {
+
+define(['vfs-client', 'editor'], function(VFSClient, Editor) {
+
   var docId = $('#docId').val();
 
   
@@ -78,4 +80,5 @@ $(document).ready(function() {
     editor.saveFile();
     return false;
   });
+
 });

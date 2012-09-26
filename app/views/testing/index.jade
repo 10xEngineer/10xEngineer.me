@@ -68,8 +68,7 @@ block layout.body
 
 
   script
-
-    $(document).ready(function(){
+    function init() {
 
       var element = document.getElementById("root");
       var eventMkDir = document.createEvent('Event');
@@ -418,4 +417,4 @@ block layout.body
       element.addEventListener("rename", renameUI, false);   
       element.addEventListener("rename", renameVFS, false);
 
-    });
+    }

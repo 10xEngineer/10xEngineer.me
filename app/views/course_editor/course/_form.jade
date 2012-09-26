@@ -26,7 +26,7 @@ form(method='POST', id='courseForm' ,enctype='multipart/form-data')
     input.btn.btn-primary(type='submit', value='Submit')
 
 script
-  $(document).ready(function() {
+  function init() {
     filepicker.setKey('462_D0Z1RnO8iMRHhSZb');
     
     $("#selectIconImage").click(function(){
@@ -87,7 +87,4 @@ script
         });
       });
     });
-
-
-
-  });
+  }

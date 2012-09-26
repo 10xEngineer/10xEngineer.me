@@ -1,4 +1,4 @@
-;!function(exports, undefined) {
+define(['superagent'], function() {
 
   function VFSClient(bucketId) {
     this.bucket = bucketId;
@@ -62,14 +62,6 @@
       .end(callback);
   };
 
-  if (typeof define === 'function' && define.amd) {
-    define(function() {
-      return VFSClient;
-    });
-  } else {
-    exports.VFSClient = VFSClient; 
-  }
-
   function fixPath(path) {
     if(path.charAt(path.length-1) != '/') {
       return path + '/';
@@ -78,4 +70,5 @@
     }
   }
 
-}(typeof process !== 'undefined' && typeof process.title !== 'undefined' && typeof exports !== 'undefined' ? exports : window);
+  return VFSClient;
+});
