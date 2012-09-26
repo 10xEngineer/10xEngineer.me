@@ -74,16 +74,21 @@ module.exports.showView = function(req, res, next) {
     } else {
       progressFlag = true;
       Lesson.find({}, function(error, allLessons) {
-        if(error) return next(error);
-        res.render('lessons/' + lesson.type, {
-          title: lesson.title,
-          quiz: lesson.quiz,
-          videoStartTime: videoStartTime,
-          allLessons: allLessons,
-          userId: req.user._id,
-          progressFlag : progressFlag,
-          progressId: progress._id,
-          username: req.user.name
+        Assessment.findOne({'user.id': req.user._id, 'lesson.id': req.lesson._id}, function(err, assessment){
+          if(error) return next(error);
+          var ass = assessment || {};
+
+          res.render('lessons/' + lesson.type, {
+            title: lesson.title,
+            quiz: lesson.quiz,
+            videoStartTime  : videoStartTime,
+            allLessons      : allLessons,
+            assessment      : ass,
+            userId          : req.user._id,
+            progressFlag    : progressFlag,
+            progressId      : progress._id,
+            username        : req.user.name
+          });
         });
       });
     }

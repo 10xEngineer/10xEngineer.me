@@ -15,7 +15,7 @@ var AssessmentSchema = module.exports = new Schema({
   },
   score            : { type: Number },
   attemptedDetails : [ AttemptSchema ],
-  status           : { type: String, default: 'inProgress', enum: ['inProgress', 'assessed'], required: true },
+  status           : { type: String, default: 'inProgress', enum: ['inProgress', 'attempted', 'inAssessing', 'assessed'], required: true },
  }, {
   collection: 'assessment'
 });

@@ -124,6 +124,11 @@ module.exports.startQuiz = function(req, res, next) {
     assessment.user.name = req.user.name;
     assessment.score = 0;
     assessment.attemptedDetails = questionPaper;
+    if(questionPaper.length>0) {
+      assessment.attemptedDetails = questionPaper;
+    } else {
+      return res.redirect('/lesson/'+lesson.id);
+    }
     assessment.save(function(error){
       if(error) return next(error);
       req.session.assessment   = assessment;
@@ -133,6 +138,23 @@ module.exports.startQuiz = function(req, res, next) {
     });
   });
 };
+
+
+module.exports.continueQuiz = function(req, res) {
+  var Assessment  = model.Assessment;
+  var lesson = req.lesson;
+  Assessment.findOne({ "lesson.id" : lesson._id}, function(error, assessment){
+    var attemptedDetails = assessment.attemptedDetails;
+    var len = attemptedDetails.length;
+    for(var i = 0; i < len; i++){
+      if(attemptedDetails[i].hasOwnProperty('givenAns')) continue;
+      else break;
+    }
+    req.session.assessment = assessment;
+    req.session.currQuestion = i;
+    res.redirect("/assessment/quiz/"+lesson.id+"/"+(i+1));
+  });
+}
 
 // 
 var generateQuestionPaper = function(lesson, callback) {
@@ -172,8 +194,6 @@ var generateQuestionPaper = function(lesson, callback) {
       });  
     });
   });
-
-
 }
 
 // 
@@ -193,6 +213,7 @@ var getQuestions = function(lesson_id, noOfQuestions, difficulty, callback) {
   // rand = parseFloat(randStr, 10);
   random[direction] = rand;
   
+  //data['difficulty'] = (difficulty != 3) ? difficulty: { '$gte' : difficulty};
   data['difficulty'] = difficulty;
   data['random'] = random;
   data['lesson'] = lesson_id;
@@ -223,8 +244,7 @@ var getQuestions = function(lesson_id, noOfQuestions, difficulty, callback) {
 
 var getSingleSideQuestions = function (data, callback) {
   var Question = model.Question;
-
-  Question.find({difficulty : data.difficulty, random: data.random, lesson: data.lesson }, { _id : 1})
+  Question.find({points : data.difficulty, random: data.random, lesson: data.lesson }, { _id : 1})
     .sort('random', data.order )
     .limit(data.limit)
     .exec(function(error, questions){
@@ -315,7 +335,7 @@ module.exports.submitQuestion = function(req, res, next) {
   var Question = model.Question;
   Question.findOne({ _id: assessment.attemptedDetails[currQuestion].question}, function(error, fullQuestion){
     if(error) return next(error);
-    if(fullQuestion.choices.length>1 && util.compareArray(ans, fullQuestion.answers)){
+    if(fullQuestion.type == 'essay' && util.compareArray(ans, fullQuestion.answers)){
       gotMarks = fullQuestion.weightage.toString();
       status   = 'assessed';
     }
@@ -329,7 +349,7 @@ module.exports.submitQuestion = function(req, res, next) {
       assessment.markModified('attemptedDetails');
       assessment.save(function(error) {
         if(error) return next(error);
-        currQuestion += 1;
+        currQuestion = parseInt(currQuestion) + 1;
         if(assessment.attemptedDetails.length == currQuestion){
           delete req.session.currQuestion;
           res.redirect('/assessment/quiz/'+req.lesson.id+'/finish');
@@ -383,6 +403,14 @@ module.exports.quizResult = function(req, res, next) {
           callback();
         }
       });
+    } else {
+      assessment.status = 'attempted';
+      assessment.save(function(err){
+        if(err){
+          console.log(err);
+        }
+        console.log("Seved successfully");
+      });
     }
 
     saveAssessment(function(error) {
@@ -395,7 +423,7 @@ module.exports.quizResult = function(req, res, next) {
 
 module.exports.examin = function(req, res, next) {
   var Assessment = model.Assessment;
-  Assessment.find({status: 'inProgress'}, function(error, assessments){
+  Assessment.find({status: 'attempted'}, function(error, assessments){
     if(error) return next(error);
 
     res.render('quiz/examiner/quizList', {
@@ -415,17 +443,9 @@ module.exports.startExamin = function(req, res, next) {
     questionList.push(attemptedDetails[i].question);
   };
 
-  Question.find({ _id: { $in: questionList}}, function(err, fullQuestionList){
+  Question.find({ _id: { $in: questionList}, type: 'essay'}, function(error, fullQuestionList){
     if(error) return next(error);
     
-    for(var i = 0; i < fullQuestionList.length; i++){
-      if(fullQuestionList[i].choices.length == 1) {
-        continue;
-      } else {
-        fullQuestionList.splice(i,1);
-        i--;
-      }
-    };
     req.session.essayQuestionList = fullQuestionList;
     req.session.currQuestion = 0;
     res.redirect('/assessment/quiz/examin/'+req.assessment.id+'/1');
@@ -433,11 +453,9 @@ module.exports.startExamin = function(req, res, next) {
 };
 
 module.exports.showQuestionToExaminer = function(req, res, next) {
-  var Question = model.Question;
   var assessment = req.assessment;
   var currQuestion = req.questionIndex;
   var attemptedDetails = assessment.attemptedDetails;
-  var length = attemptedDetails.length;
   var question = req.session.essayQuestionList[currQuestion];
 
   res.render('quiz/examiner/question', {
@@ -464,10 +482,11 @@ module.exports.submitAssessmentMarks = function(req, res, next) {
       }
     };
     assessment.attemptedDetails[assessmentQN]['gotMarks'] = marks;
+    assessment.attemptedDetails[assessmentQN]['status']   = 'assessed';
     assessment.markModified('attemptedDetails');
     assessment.save(function(error) {
       if(error) return next(error);
-      var currQuestion = req.session.currQuestion + 1;
+      var currQuestion = parseInt(req.session.currQuestion) + 1;
       if(assessment.attemptedDetails.length == currQuestion){
         delete req.session.currQuestion;
         res.redirect('/assessment/quiz/examin');
