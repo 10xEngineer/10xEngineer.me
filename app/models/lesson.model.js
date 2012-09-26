@@ -97,12 +97,12 @@ var methods = {
 
   // For getNext Lesson
   getNext: function(callback){
-    getLessonIdByDirection('next', callback);
+    getLessonIdByDirection(this, 'next', callback);
   },
 
   // For getPrevious Lesson
   getPrevious: function(callback){
-    getLessonIdByDirection('previous', callback);
+    getLessonIdByDirection(this, 'previous', callback);
   }
 };
 
@@ -186,11 +186,10 @@ var callbackFunction = function(index, moveChapterId, callback){
   }
 };
 
-var getLessonIdByDirection = function(direction, callback) {
+var getLessonIdByDirection = function(lesson, direction, callback) {
 
   var lessonId  = '';
   var flag         = true;
-  var lesson       = this;
   var chapterId    = lesson.chapter;
   var Chapter      = model.Chapter;
 
