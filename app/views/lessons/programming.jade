@@ -28,9 +28,9 @@ append layout.styles
   link(rel='stylesheet', href="/stylesheets/jquery.contextMenu.css")
   link(rel='stylesheet', href="/stylesheets/views/lessons/programming.css")
   // included
-  link(rel='stylesheet', href="/stylesheets/views/widget/tabbar.css");
-  link(rel='stylesheet', href="/stylesheets/views/widget/sidebar.css");
-  link(rel='stylesheet', href="/stylesheets/breadcrumb.css");
+  link(rel='stylesheet', href="/stylesheets/views/widget/tabbar.css")
+  link(rel='stylesheet', href="/stylesheets/views/widget/sidebar.css")
+  link(rel='stylesheet', href="/stylesheets/breadcrumb.css")
 
 block layout.body
   include ../_breadcrumb
@@ -56,7 +56,7 @@ block layout.body
         mixin tabbar
         //- #tabBar
         //-   ul#tabContainer.nav.nav-tabs
-        #editor(style='position:relative;width:100%;min-height:100%;margin-bottom:-100px;height:100%;display:inline-block;')
+        #editor(style='position:relative;width:100%;min-height:100%;height:100%;display:inline-block;')
         input#docId(type="hidden", value="#{progressId}")
         .lessonBar
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
