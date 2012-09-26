@@ -7,7 +7,6 @@ var quiz = require('./quiz');
 var question = require('./question');
 var lesson = require('./lesson');
 var quiz = require('./quiz');
-var programming = require('./programming');
 var admin = require('./admin');
 var user = require('./user');
 var cdn = require('./cdn');
@@ -89,7 +88,7 @@ module.exports = function(app) {
   });
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','assessmentId','questionId', 'programmingId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','assessmentId','questionId'], function(req, res, next, num, name){ 
     var parsedNum = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('Invalid route: ' + num));
@@ -252,11 +251,5 @@ module.exports = function(app) {
   app.get('/assessment/question/:questionId/remove', verifyPermission('admin', 'edit'), question.removeQuestion);
   app.get('/assessment/question/:questionId/edit', verifyPermission('admin', 'edit'), question.editView);
   app.post('/assessment/question/:questionId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.edit);
-
-  // Programming
-  app.get('/assessment/programming', verifyPermission('admin', 'read'), programming.list);
-  app.get('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.createView);
-  app.post('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.create);
-  app.get('/assessment/programming/:programmingId', verifyPermission('admin', 'read'), programming.appearView);
 
 };
