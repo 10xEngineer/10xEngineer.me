@@ -292,9 +292,14 @@ module.exports.exportFullCourse = function(course, next){
             data_chap     = "title: " + chap.title + "\n";
             data_chap    += "desc: " + chap.desc;
             save_file_for_export(chap_path, 'chapter'+chap_count, 'chapter'+chap_count, data_chap, function(error){
+              if(error) {
+                console.log(error);
+                return next(error);
+              }
               Lesson.find({_id : { $in : chap.lessons }}, function(error, lessons){
                 if(error){
                   console.error(error);
+                  return next(error);
                 }
                 var lesson_count = 0;
                 sort_lessons(lessons, chap.lessons, function(error, sorted_lessons){

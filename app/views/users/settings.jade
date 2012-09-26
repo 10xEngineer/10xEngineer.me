@@ -6,28 +6,40 @@ block layout.body
     - var email = typeof(user.email) != 'undefined' ? user.email : '' ;
     br
     form(method='POST', action='', id='profileForm') 
-      p
-        h5 User Name :
-        input.required(type='text', value='#{user.name}', id='name', name='name')   
-      p 
-        h5 Email :
-        input.required(type='text', value='#{email}', id='email', name='email')  
-      p
-        h5 Account Type:
-        - if (user.facebook.name)
-            img(src="/images/facebook.png")
-        - else
-            a(href='/auth/fb')
-              img(src="/images/facebook.png",class="img")
-        - if (user.google.name)
-            img(src="/images/google.png")
-        - else
-            a(href='/auth/google')
-              img(src="/images/google.png",class="img")
-        - if (user.twitter.name)
-            img(src="/images/twitter.png")
-        - else
-            a(href='/auth/twitter') 
-              img(src="/images/twitter.png",class="img")
+      .row-fluid
+        .span4
+          p
+            h5 User Name :
+            input.required(type='text', value='#{user.name}', id='name', name='name')   
+          p 
+            h5 Email :
+            input.required(type='text', value='#{email}', id='email', name='email')  
+          p
+            h5 Account Type:
+            - if (user.facebook.name)
+                img(src="/images/facebook.png")
+            - else
+                a(href='/auth/fb')
+                  img(src="/images/facebook.png",class="img")
+            - if (user.google.name)
+                img(src="/images/google.png")
+            - else
+                a(href='/auth/google')
+                  img(src="/images/google.png",class="img")
+            - if (user.twitter.name)
+                img(src="/images/twitter.png")
+            - else
+                a(href='/auth/twitter') 
+                  img(src="/images/twitter.png",class="img")
+        .span8
+          p
+            h5 Old Password :
+            input.required(type='password', id='oldPassword', name='oldPassword')   
+          p 
+            h5 New Password :
+            input.required(type='password', id='newPassword', name='newPassword')  
+          p 
+            h5 Confirm Password :
+            input.required(type='password', id='cnfrmPassword', name='cnfrmPassword')  
       br
       input.btn.btn-primary(type='submit' ,name='submit',value='Update')

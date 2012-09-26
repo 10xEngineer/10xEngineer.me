@@ -33,6 +33,7 @@ block layout.body
         - else
             img(src="/images/twitter.png",class="img")
       p
+        - if(progressObject.length > 0)
           h5 Attented Courses :
           each progress in progressObject 
             -if(progress.course!=null)
@@ -42,3 +43,5 @@ block layout.body
                     a.btn.btn-primary.btn-large.chapterContinue.pull-right(href='/course/#{progress.course.id}/start') Continue
                 .courseProgress.pull-right
                   .bar(style="width:#{progress.progress}%;")
+      p
+        a.btn.btn-primary(href="/user/settings") Edit Profile

@@ -51,12 +51,14 @@ html(lang="en")
       .container.alertContainer
         -if(typeof(error) != 'undefined') 
           div.alert.alert-block
-            a.close(data-dismiss='alert',href='#') x
+            a.close(data-dismiss='alert',href='#') 
+              i.icon-remove
             h4.alert-heading Warning
             | #{error}
         -else if(typeof(message) != 'undefined') 
           div.alert.alert-info
-            a.close(data-dismiss='alert',href='#') x
+            a.close(data-dismiss='alert',href='#')
+              i.icon-remove
             h4.alert-heading Information 
             | #{message}      
       block layout.body

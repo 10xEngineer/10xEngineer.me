@@ -83,15 +83,50 @@ module.exports.settingsView = function(req, res, next){
 };
 
 module.exports.settings = function(req, res, next){
-  
   var user = req.user;
-  user.name = req.body.name;
-  user.email = req.body.email;
-  user.save(function(error) {
+  var oldPassword = req.body.oldPassword;
+  var newPassword = req.body.newPassword;
+  var cnfrmPassword = req.body.cnfrmPassword;
+  user.verifyPassword(oldPassword, function(error, verified){
     if(error) return next(error);
-
-    req.session.message = "Profile updated sucessfully.";
-    res.redirect('/user/settings');
+    if(verified){
+      if(newPassword != cnfrmPassword) {
+        req.session.error = "New password and Confirm password are not same.";
+        return res.redirect('/user/settings');
+      } else if(newPassword == ""){
+        req.session.error = "Empty password not allowed.";
+        return res.redirect('/user/settings');
+      } else {
+        var data = {
+          email: user.email,
+          password: newPassword
+        }
+        user.changePassword(data, function(error, user){
+          if(error) return next(error);
+          req.session.message = "Password Changed Successfully.";
+          user.name = req.body.name;
+          user.email = req.body.email;
+          user.save(function(error) {
+            if(error) return next(error);
+            req.session.message = "Profile updated sucessfully.";
+            return res.redirect('/user/profile');
+          });
+        });
+      }
+    } else {
+      if(oldPassword==""){
+        user.name = req.body.name;
+        user.email = req.body.email;
+        user.save(function(error) {
+          if(error) return next(error);
+          req.session.message = "Profile updated sucessfully.";
+          return res.redirect('/user/profile');
+        });
+      } else {
+        req.session.error = "Incorrect old password";
+        res.redirect('/user/settings');
+      }
+    }
   });
 };
 
