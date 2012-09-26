@@ -266,7 +266,7 @@ module.exports.exportFullCourse = function(course, next){
         function(asyncParallelCB){
           // Icon image load
           log.info("Saving course images...");
-          load_resorces(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
+          load_resources(exp_path+'/'+course_dir, 'icon', iconfile, function(err){
             if(err){
               console.log("Error...");
               return asyncParallelCB(error);
@@ -276,7 +276,7 @@ module.exports.exportFullCourse = function(course, next){
         },
         function(asyncParallelCB){
           wallFile = course.wallImage.substring(5, course.wallImage.length);
-          load_resorces(exp_path+'/'+course_dir, 'wall', wallFile, function(err){
+          load_resources(exp_path+'/'+course_dir, 'wall', wallFile, function(err){
             if(err){
               console.log("Error...");
               return asyncParallelCB(error);
@@ -399,15 +399,15 @@ var save_file_for_export = function(path, dir_name, file_name, data, callback){
   });
 };
 
-/*  This load_resorces function will do following
+/*  This load_resources function will do following
 **
-**  - create directory namely 'resorces' at given path if it's not exists
+**  - create directory namely 'resources' at given path if it's not exists
 **  - store given file from database to that directory with the given file_name
 **  - then calls callback
 */
-var load_resorces = function(path, file_name, file, callback) {
-  fs.mkdir(path + "/resorces", 0777, function(error){
-    cdn.copyToDisk(file, path + "/resorces", file_name, function (){
+var load_resources = function(path, file_name, file, callback) {
+  fs.mkdir(path + "/resources", 0777, function(error){
+    cdn.copyToDisk(file, path + "/resources", file_name, function (){
       callback();
     });
   });
@@ -456,7 +456,7 @@ var video_lesson_exp = function(full_path, lesson, data, count, callback) {
   save_file_for_export(full_path, 'lesson' +count, 'lesson'+count, data, function(error){
     full_path += '/lesson'+count;
     if(vtype=="upload"){
-      return load_resorces(full_path, 'video', res_file, callback);
+      return load_resources(full_path, 'video', res_file, callback);
     }
     callback();
   });
@@ -470,11 +470,11 @@ var programming_lesson_exp = function(full_path, lesson, data, count, callback){
       return callback(error);
     }
     full_path += '/lesson'+count;
-    fs.mkdir(full_path + "/resorces", function(err){
+    fs.mkdir(full_path + "/resources", function(err){
       if(err){
         return callback(err);
       }
-      fs.writeFile(full_path + "/resorces/boilerPlateCode.txt", lesson.programming.boilerPlateCode, function(err){
+      fs.writeFile(full_path + "/resources/boilerPlateCode.txt", lesson.programming.boilerPlateCode, function(err){
         if(err){
           return callback(err);
         }
@@ -543,7 +543,7 @@ var extract_course_from_imported_dir = function(course_dir, user, callback){
   console.log("User in local function ::");
   console.log(user);
   var course_doc = require(course_dir+'/course.yml');
-  fs.readdir(course_dir + '/resorces/', function(err, files){
+  fs.readdir(course_dir + '/resources/', function(err, files){
     var iconImg, wallImg;
     for (var i = 0; i < files.length ; i++) {
       var regExIco = new RegExp("^icon");
@@ -554,8 +554,8 @@ var extract_course_from_imported_dir = function(course_dir, user, callback){
         wallImg = files[i];
       } else continue;
      }; 
-    course_doc.iconImage = course_dir + '/resorces/' + iconImg; 
-    course_doc.wallImage = course_dir + '/resorces/' + wallImg; 
+    course_doc.iconImage = course_dir + '/resources/' + iconImg; 
+    course_doc.wallImage = course_dir + '/resources/' + wallImg; 
     course_doc.created_by = user._id;
     course(course_doc, function(err, saved_course){
       if(err){
@@ -596,7 +596,7 @@ var extracts_lessons = function(chap_dir, chap, callback) {
         if(lesson_doc.type=="video"){
           extract_video_lesson(chap_dir, chap._id, less, lesson_doc, forEachCB);
         } else if(lesson_doc.type=="programming") {
-          lesson_doc.programming['boilerPlateCode'] = chap_dir+'/'+less+'/resorces/boilerPlateCode.txt';
+          lesson_doc.programming['boilerPlateCode'] = chap_dir+'/'+less+'/resources/boilerPlateCode.txt';
           lesson(lesson_doc, chap._id, forEachCB);
         } else if(lesson_doc.type=="quiz") {
           // TODO: Code for quiz
@@ -619,10 +619,10 @@ var extracts_lessons = function(chap_dir, chap, callback) {
 var extract_video_lesson = function(chap_dir, chap_id, less, lesson_data, callback) {
   var regEx = new RegExp("^video");
   if(lesson_data.video.type == "upload"){
-    fs.readdir(chap_dir+'/'+less+'/resorces/', function(err, files){
+    fs.readdir(chap_dir+'/'+less+'/resources/', function(err, files){
       async.forEach(files, function(file, innerCB){
         if(regEx.test(file)){
-          lesson_data.video['path'] = chap_dir+'/'+less+'/resorces/'+file;
+          lesson_data.video['path'] = chap_dir+'/'+less+'/resources/'+file;
           lesson(lesson_data, chap_id, innerCB);
         }
       }, function(err){
