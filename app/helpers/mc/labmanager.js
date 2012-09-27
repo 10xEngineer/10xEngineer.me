@@ -141,12 +141,19 @@ Lab.prototype.getVmList = function(callback) {
     }
 
     log.info(respArray.length + ' vm received.');
-    self.vms = {};
-    async.forEach(respArray, function(vm, callback) {
-      self.refreshVm(vm.uuid, callback);
-    }, function(error) {
-      callback(error);
-    });
+
+    if(respArray.length === 0) {
+      setTimeout(function() {
+        self.getVmList(callback);
+      }, 1000);
+    } else {
+      self.vms = {};
+      async.forEach(respArray, function(vm, callback) {
+        self.refreshVm(vm.uuid, callback);
+      }, function(error) {
+        callback(error);
+      });
+    }
   });
 };
 
@@ -219,6 +226,10 @@ Lab.prototype.release = function(callback) {
   var self = this;
   
   self.getVersions(function(error, version) {
+    if(error) {
+      log.error(error);
+      return callback(error);
+    }
 
     log.info('Releasing the lab ' + this.name + ' with version ' + version);
     request.post({
@@ -234,9 +245,7 @@ Lab.prototype.release = function(callback) {
       }
 
       log.info('Lab successfully released.');
-      self.refresh(function(error) {
-        callback(error);
-      });
+      callback();
     });
   });
 
