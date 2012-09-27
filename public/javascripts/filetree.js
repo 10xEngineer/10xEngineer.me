@@ -248,7 +248,7 @@ define(['eventemitter2'], function(EventEmitter2) {
     });
 
     $(caller).append($input);
-    $input.focus();
+    $input.focus().select();
     var self = this;
     $input.bind({
       keypress: function() {
