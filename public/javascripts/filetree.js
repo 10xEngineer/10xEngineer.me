@@ -100,6 +100,11 @@
       'refresh'
       with parameters;
         treeJSON : current tree in form of JSON
+    
+    * getSelected()
+    ---------------
+    Returns:
+      path : full path of selected element
 
 
 *********************************************************************************************************************************/
@@ -192,6 +197,14 @@ FileTree.prototype.remove = function(caller) {
 FileTree.prototype.selectItem = function(element) {
   $('.selected').removeClass('selected');
   $(element).addClass('selected');
+}
+
+FileTree.prototype.getSelected = function() {
+  var selected = $('.selected');
+  if (typeof selected === "undefined" || selected === null) {
+    selected = $('.filetree .root');
+  }
+  var path = selected.attr('rel');
 }
 
 FileTree.prototype.openDir = function(element) {

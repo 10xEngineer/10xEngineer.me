@@ -1,12 +1,10 @@
-#content
-    padding-top 0
-
 .programming_view
-  height 100%
   width 100%
+  margin-top 76px
   >.row-fluid
     height 100%
   .vsplit
+    position relative
     overflow hidden
     height 100%
 
@@ -57,9 +55,6 @@
   #tabContainer > li.active > a > i.closeTab {
     display : inline-block;
   }
-  #editor{
-  height 1000px
-  }
   .buttons-bar
       height 35px
       background: rgb(207, 207, 207); /* Old browsers */
@@ -105,13 +100,25 @@
       background-image url('/img/newfolder-button.png')
 
   .lessonBar
-      padding 0 40px 0 60px
+    position absolute
+    right 0
+    left 0
+    bottom 0
+    padding 0 40px 0 60px
+  #editor
+    position absolute
+    width 100%
+    min
+    display inline-block
+  #tree
+    min-width 300px
+  #chat
+    min-width 300px
+    overflow-y scroll
+    overflow-x auto
+    height 100%
+
+    
 
 .log-line
   white-space pre
-
-#chat
-  min-width 300px
-  overflow-y scroll
-  overflow-x auto
-  height 600px

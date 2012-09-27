@@ -78,4 +78,15 @@ $(document).ready(function() {
     editor.saveFile();
     return false;
   });
+  
+  $('#').click(function() {
+    editor.newFile();
+    return false;
+  });
+  
+  $('#').click(function() {
+    editor.newFolder();
+    return false;
+  });
+  
 });

@@ -25,6 +25,7 @@ append layout.scripts
   script(type='text/javascript', src="/javascripts/views/widget/sidebar.js")
 
 append layout.styles
+  link(type='text/css', href='/stylesheets/core-fullscreen.css', rel='stylesheet')
   link(rel='stylesheet', href="/stylesheets/jquery.contextMenu.css")
   link(rel='stylesheet', href="/stylesheets/views/lessons/programming.css")
   // included
@@ -34,31 +35,26 @@ append layout.styles
 
 block layout.body
   include ../_breadcrumb
-  .programming_view.container
+  .programming_view.container.stretch-to-fit
+    +sidebar-left("collapsible resizable")
+      .buttons-bar
+          button#save(title="Save",class="image-button save-button", type="button") Save
+          button#compile(title="Compile",class="image-button compile-button", type="button") Compile
+          button#newfile(title="New File",class="image-button newfile-button", type="button") New File
+          button#newfolder(title="New Folder",class="image-button newfolder-button", type="button") New Folder
 
-    div#header
-      //- TODO:: Re write header
-    .row-fluid
-      +sidebar-left("collapsible resizable")
-        .buttons-bar
-            button#save(title="Save",class="image-button save-button", type="button") Save
-            button#compile(title="Compile",class="image-button compile-button", type="button") Compile
-            button#newfile(title="New File",class="image-button newfile-button", type="button") New File
-            button#newfolder(title="New Folder",class="image-button newfolder-button", type="button") New Folder
-
-        #tree
+      #tree
     
-      +sidebar-right("collapsible resizable")
-        .buttons-bar
-        div#chat
+    +sidebar-right("collapsible resizable")
+      .buttons-bar
+      div#chat
 
-      .vsplit
-        mixin tabbar
-        //- #tabBar
-        //-   ul#tabContainer.nav.nav-tabs
-        #editor(style='position:relative;width:100%;min-height:100%;margin-bottom:-100px;height:100%;display:inline-block;')
-        input#docId(type="hidden", value="#{progressId}")
-        .lessonBar
-          a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
-          a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
-
+    .vsplit
+      mixin tabbar
+      //- #tabBar
+      //-   ul#tabContainer.nav.nav-tabs
+      #editor
+      input#docId(type="hidden", value="#{progressId}")
+      .lessonBar
+        a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
+        a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
