@@ -95,7 +95,7 @@ Lab.prototype.refresh = function(callback) {
       body = JSON.parse(body);
     }
 
-    log.info("Lab metadata received.", body);
+    log.info("Lab metadata received.");
     self.name = body.name;
     self.repo = body.repo;
     self.token = body.token;
@@ -108,7 +108,7 @@ Lab.prototype.refresh = function(callback) {
         if(error) return callback(error);
         self.refresh(callback);
       });
-    } else if(state == 'ready') {
+    } else if(self.state == 'pending') {
       self.getVmList(callback);
     } else {
       setTimeout(function() {
@@ -182,27 +182,63 @@ Lab.prototype.refreshVm = function(uuid, callback) {
   });
 };
 
-Lab.prototype.release = function(callback) {
+Lab.prototype.getVersions = function(callback) {
   var self = this;
-  var version = self.version;
-  
-  log.info('Releasing the lab ' + this.name + ' with version ' + version);
-  request.post({
-    url: this.endpoint + '/versions/' + version + '/release'
+
+  // Get valid versions
+  request.get({
+    url: this.endpoint + '/versions'
   }, function(error, res, body) {
     if(error) {
       return callback(error);
     }
-    if(res.statusCode !== 202) {
+    if(res.statusCode !== 200) {
       log.info("Res", res);
       return callback(new Error('Error releasing definition.'));
     }
 
-    log.info('Lab successfully released.');
-    self.refresh(function(error) {
-      callback(error);
+    if(typeof(body) == 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch(e) {
+        return callback(new Error("Error parsing vm"));
+      }      
+    }
+
+    if(body.length === 0) {
+      self.getVersions(callback);
+    } else {
+      log.info('Got existing versions for lab.', body[0].version);
+      callback(null, body[0].version);
+    }
+  });
+};
+
+Lab.prototype.release = function(callback) {
+  var self = this;
+  
+  self.getVersions(function(error, version) {
+
+    log.info('Releasing the lab ' + this.name + ' with version ' + version);
+    request.post({
+      url: self.endpoint + '/versions/' + version + '/release'
+    }, function(error, res, body) {
+      if(error) {
+        log.error(error);
+        return callback(error);
+      }
+      if(res.statusCode !== 202) {
+        log.info("Res", res);
+        return callback(new Error('Error releasing definition.'));
+      }
+
+      log.info('Lab successfully released.');
+      self.refresh(function(error) {
+        callback(error);
+      });
     });
   });
+
 };
 
 Lab.prototype.getVm = function(uuid) {
