@@ -106,6 +106,7 @@ Lab.prototype.refresh = function(callback) {
     if(self.state == 'created' && self.localState != 'released') {
       self.release(function(error) {
         if(error) return callback(error);
+        self.localState = 'released';
         self.refresh(callback);
       });
     } else if(self.state == 'pending' || self.localState == 'released') {
