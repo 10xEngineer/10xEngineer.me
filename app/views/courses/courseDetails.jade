@@ -92,10 +92,9 @@ block layout.body
               p text text text
 
   script(type='text/javascript')
-  
-    $(document).ready(function() {
+    function init() {
       $(".contentChapter").mouseover(function(e) {
         $('#chapterTitle').html($(e.target).parents('.accordion-group').find('.title').val());
         $('#chapterDesc').html($(e.target).parents('.accordion-group').find('.desc').val());
       });
-    });  
+    }

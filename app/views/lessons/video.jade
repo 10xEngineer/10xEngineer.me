@@ -23,7 +23,8 @@ block layout.body
         .row-fluid
           .span9
             include _footer
-    script
+  script
+    function init() {
       var currentVideoTime = 0, LastUpdatedTime = 0;
       var videoH = 475;
       var videoW = 840;
@@ -135,3 +136,4 @@ block layout.body
         $('#playerSpan').removeClass('span9');
         $('#playerSpan').addClass('span12');
       }
+    }

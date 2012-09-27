@@ -6,19 +6,8 @@
 
 /*** /Exports ***/
 
+define(['eventemitter2'], function(EventEmitter2) {
 
-(function() {
-
-$(document).ready(function() {
-  $('.widget_sidebar').each(function(index, element) {
-    new Sidebar($(element));
-  });
-});
-
-var Sidebar;
-
-Sidebar = (function() {
-  
   function Sidebar(element) {
     var self = this;
     this.setSidebarElement(element);
@@ -130,9 +119,13 @@ Sidebar = (function() {
     };
   };
   
-  return Sidebar;
-  
-})();
+  // TODO: Move
+  $(document).ready(function() {
+    $('.widget_sidebar').each(function(index, element) {
+      new Sidebar($(element));
+    });
+  });
 
-  
-})();
+  return Sidebar;
+});
+

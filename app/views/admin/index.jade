@@ -39,7 +39,7 @@ block layout.body
                 i.icon-trash.icon-white 
                 |  Delete User
   script(type='text/javascript')
-    $('doucment').ready(function(){
+    function init() {
       var classes = [], colors = [];
       $('p span').each(function(index, item){
         var classInstance = $(item).attr('class');
@@ -53,5 +53,5 @@ block layout.body
         else {
           $(item).css("color", colors[index]);
         }
-      });
-    });
+      });      
+    }
