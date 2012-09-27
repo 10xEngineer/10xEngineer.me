@@ -193,7 +193,7 @@ function createOrResumeLab(lessonId, progressId, key, callback) {
       // Create a lab
       var data = {
         name: progressId,
-        definition: 'https://github.com/10xEngineer/wip-lab-definition-basicvm.git', //TODO: hardcoded
+        definition: 'https://github.com/deltasquare4/wip-lab-definition-basicvm.git', //TODO: hardcoded
         version: '0.0.1', // TODO: Hardcoded
         keypair: key.name
       };
