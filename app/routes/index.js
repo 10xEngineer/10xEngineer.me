@@ -60,6 +60,7 @@ var verifyCourseSubscription = function(req, res, next) {
   } else {
     courseSubscription.verifyUser(course, user, function(err){
       if(err){
+        console.error(err);
         res.redirect('/');
       }
       else {
@@ -238,11 +239,11 @@ module.exports = function(app) {
   app.get('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), quiz.editView);
   app.post('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
   app.get('/assessment/quiz/:lessonId/remove', verifyPermission('admin', 'delete'), quiz.removeQuiz);
-  app.get('/assessment/quiz/:lessonId/start', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.startQuiz);
-  app.get('/assessment/quiz/:lessonId/continue', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.continueQuiz);
-  app.get('/assessment/quiz/:lessonId/finish', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.quizResult);
-  app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.viewQuestion);
-  app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), verifyCourseSubscription, quiz.submitQuestion);
+  app.get('/assessment/quiz/:lessonId/start', verifyPermission('course', 'read'), verifyCourseSubscription, quiz.startQuiz);
+  app.get('/assessment/quiz/:lessonId/continue', verifyPermission('course', 'read'), verifyCourseSubscription, quiz.continueQuiz);
+  app.get('/assessment/quiz/:lessonId/finish', verifyPermission('course', 'read'), verifyCourseSubscription, quiz.quizResult);
+  app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('course', 'read'), verifyCourseSubscription, quiz.viewQuestion);
+  app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('course', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), verifyCourseSubscription, quiz.submitQuestion);
   app.get('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), question.createView);
   app.post('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.create);
   app.get('/assessment/question/import/:lessonId', verifyPermission('admin', 'edit'), question.importQuestionView);

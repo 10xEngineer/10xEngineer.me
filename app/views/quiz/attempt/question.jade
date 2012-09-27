@@ -21,20 +21,20 @@ block layout.body
                   - var type = "checkbox";
                 - else
                   - var type = "radio";
-                  br
-                  .questionBlock
-                    each option, optionIndex in question.choices
-                      div 
-                        - if(attempted)
-                            - if(givenAns.indexOf(option) >= 0)
-                              input(type="#{type}", name="questionOption", value="#{option}", disabled, checked)
-                              |  #{option}
-                            - else
-                              input(type="#{type}", name="questionOption", value="#{option}", disabled)
-                              |  #{option}
-                        - else
-                          input(type="#{type}", name="questionOption", value="#{option}")
-                          |  #{option}
+                br
+                .questionBlock
+                  each option, optionIndex in question.choices
+                    div 
+                      - if(attempted)
+                          - if(givenAns.indexOf(option) >= 0)
+                            input(type="#{type}", name="questionOption", value="#{option}", disabled, checked)
+                            |  #{option}
+                          - else
+                            input(type="#{type}", name="questionOption", value="#{option}", disabled)
+                            |  #{option}
+                      - else
+                        input(type="#{type}", name="questionOption", value="#{option}")
+                        |  #{option}
  
             - else if(question.type == "essay") 
               .actions 
