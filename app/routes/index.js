@@ -113,12 +113,11 @@ module.exports = function(app) {
   app.get('/auth/fb', auth.facebook);
   app.get('/auth/fb/callback', auth.facebookCallback);
 
-  app.get('/signup', accessPermission, user.signup);
   app.get('/register', accessPermission, user.registerView);
   app.post('/register', accessPermission, validation.lookUp(validationConfig.user.profileUpdate), user.register, auth.local);
-  app.get('/user/profile', user.profile);
-  app.get('/user/settings', user.settingsView);
-  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate), user.settings);
+  app.get('/user/profile', verifyPermission('user', 'read'), user.profile);
+  app.get('/user/settings', verifyPermission('user', 'edit'), user.settingsView);
+  app.post('/user/settings', verifyPermission('user', 'edit'), validation.lookUp(validationConfig.user.profileUpdate), user.settings);
   
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.featuredList);
@@ -131,7 +130,7 @@ module.exports = function(app) {
   // Course Editor
 
   // Course oprations
-  app.get('/course_editor', course_editor.coursesList);
+  app.get('/course_editor', verifyPermission('course', 'read'), course_editor.coursesList);
   app.get('/course_editor/create', verifyPermission('course', 'edit'), course_editor.createView);
   app.post('/course_editor/create', verifyPermission('course', 'edit'),  validation.lookUp(validationConfig.course.createCourse), course_editor.create);
   app.get('/course_editor/import',  verifyPermission('course', 'edit'), course_editor.importView);
@@ -184,8 +183,8 @@ module.exports = function(app) {
 
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
-  app.get('/admin/approve', admin.approveView);
-  app.get('/admin/approve/:userId', admin.approve);
+  app.get('/admin/approve', verifyPermission('admin', 'edit'), admin.approveView);
+  app.get('/admin/approve/:userId', verifyPermission('admin', 'edit'), admin.approve);
 
   app.get('/admin/labs', verifyPermission('admin', 'read'), admin.showLabsView);
   app.get('/admin/labs/create', verifyPermission('admin', 'edit'), admin.labsView);
@@ -202,8 +201,8 @@ module.exports = function(app) {
   app.get('/admin/role/:roleId/remove', verifyPermission('admin', 'delete'), admin.removeRole);
   app.get('/admin/role/:roleName', verifyPermission('admin', 'edit'), admin.usersRoleView);
   
-  app.get('/admin/usersImport', admin.usersImportView);
-  app.post('/admin/usersImport', admin.usersImport);
+  app.get('/admin/usersImport', verifyPermission('admin', 'edit'), admin.usersImportView);
+  app.post('/admin/usersImport', verifyPermission('admin', 'edit'), admin.usersImport);
   app.get('/admin/user/:userId/roles', verifyPermission('admin', 'read'), admin.showUserRoles);
   app.post('/admin/user/:userId/roles', verifyPermission('admin', 'edit'), admin.updateUserRoles);
   app.get('/admin/user/:userId/remove', verifyPermission('admin', 'delete'), admin.removeUser);

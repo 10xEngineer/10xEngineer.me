@@ -24,13 +24,6 @@ module.exports.login = function(req, res, next){
   }
 };
 
-// TODO: Implement
-module.exports.signup = function(req, res, next){
-  res.render('users/signup', {
-    title: 'Sign Up'
-  });
-};
-
 module.exports.registerView = function(req, res, next) {
 
   var user = { name: '', email: '' };

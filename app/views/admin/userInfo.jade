@@ -42,9 +42,9 @@ block layout.body
         p(style="display:inline; margin-right: 5px;")  ( 
           each role,roleIndex in userObject.roles
             if(roleIndex != 0) 
-              | ,
-            a(href='/admin/role/#{role}') #{role} 
-          | )
+              |, 
+            a(href='/admin/role/#{role}') #{role}
+          |  )
       p
           each progress,progressIndex in progressObject
             - if(progressIndex == 0)
@@ -52,7 +52,5 @@ block layout.body
             - if(progress.course != null)
               div.chapterPerogressbox(style = "min-height: 75px")
                 div.courseName #{progress.course.title} 
-                - if (progress.progress != 100)
-                    a.btn.btn-primary.btn-large.chapterContinue.pull-right(href='/course/#{progress.course.id}/start') Continue
                 .courseProgress.pull-right
                   .bar(style="width:#{progress.progress}%;")
