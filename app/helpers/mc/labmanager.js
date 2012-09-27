@@ -77,6 +77,7 @@ Lab.prototype = new EventEmitter();
 
 Lab.prototype.refresh = function(callback) {
   var self = this;
+  this.labRefreshCount = 1;
 
   log.info("Fetching lab metadata for " + self.name);
   log.info("URL: " + self.endpoint);
@@ -114,13 +115,14 @@ Lab.prototype.refresh = function(callback) {
     } else {
       setTimeout(function() {
         self.refresh(callback);
-      }, 1000);
+      }, 1000 * self.labRefreshCount++);
     }
   });
 };
 
 Lab.prototype.getVmList = function(callback) {
   var self = this;
+  this.vmRefreshCount = 1;
 
   log.info("Getting a list of available vms...");
   request.get({
@@ -145,7 +147,7 @@ Lab.prototype.getVmList = function(callback) {
     if(respArray.length === 0) {
       setTimeout(function() {
         self.getVmList(callback);
-      }, 1000);
+      }, 1000 * self.vmRefreshCount++);
     } else {
       self.vms = {};
       async.forEach(respArray, function(vm, callback) {
@@ -231,7 +233,7 @@ Lab.prototype.release = function(callback) {
       return callback(error);
     }
 
-    log.info('Releasing the lab ' + this.name + ' with version ' + version);
+    log.info('Releasing the lab ' + self.name + ' with version ' + version);
     request.post({
       url: self.endpoint + '/versions/' + version + '/release'
     }, function(error, res, body) {
