@@ -19,7 +19,9 @@ require.config({
     'eventemitter2': '/javascripts/eventemitter2',
     'tabbar': '/javascripts/views/widget/tabbar',
     'sidebar': '/javascripts/views/widget/sidebar',
-    'ace': '/javascripts/ace'
+    'ace': '/javascripts/ace',
+    'term': '/javascripts/ttyjs/term',
+    'tty': '/javascripts/ttyjs/tty'
   },
   shim: {
     'bootstrap': ['jquery'],
@@ -78,8 +80,7 @@ require(['require',
     }
   });
 
-  // TODO: public
-  function displayMessage(type, message) {
+  window.displayMessage = function(type, message) {
     var $alertContainer = $('.alertContainer');
     var typeClass = 'alert-block';
 
@@ -99,6 +100,6 @@ require(['require',
     })).append($('<p/>', {
       html: message
     })).appendTo($alertContainer);
-  }
+  };
 
 });

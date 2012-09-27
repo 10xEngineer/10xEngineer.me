@@ -2,13 +2,6 @@ extends ../layout
 
 include ../widget/terminal
 
-append layout.scripts
-  script(type='text/javascript', src="/javascripts/views/lessons/sysadmin.js")
-  //included
-  script(type='text/javascript', src="/javascripts/ttyjs/term.js");
-  script(type='text/javascript', src="/javascripts/ttyjs/tty.js");
-  script(type='text/javascript', src="/javascripts/ttyjs/terminal.js");
-
 append layout.styles
   // included
   link(rel='stylesheet', href="/stylesheets/views/widget/terminal.css")
@@ -27,3 +20,10 @@ block layout.body
     .lessonBar.row-fluid
       a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
       a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
+
+  script(type="text/javascript")
+    function init() {
+      require(['views/lessons/sysadmin'], function() {
+        console.log('All OK');
+      });
+    }
