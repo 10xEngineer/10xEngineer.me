@@ -58,7 +58,7 @@ module.exports.showView = function(req, res, next) {
             res.render('lessons/' + lesson.type, {
               title           : lesson.title,
               quiz            : lesson.quiz,
-              assessment      : ass,
+              assessment      : assessment,
               videoStartTime  : videoStartTime,
               userName        : req.user.name,
               allLessons      : allLessons,
@@ -83,7 +83,7 @@ module.exports.showView = function(req, res, next) {
             quiz: lesson.quiz,
             videoStartTime  : videoStartTime,
             allLessons      : allLessons,
-            assessment      : ass,
+            assessment      : assessment,
             userId          : req.user._id,
             progressFlag    : progressFlag,
             progressId      : progress._id,
@@ -132,7 +132,7 @@ module.exports.show = function(req, res, next) {
 
     if(progress.status != 'completed') {
       // Start the Lesson : Change status of lesson to 'ongoing'
-      progress.completeLesson(lesson, function(error) {
+      progress.startLesson(lesson, function(error) {
         if(error) return next(error);
         renderLesson();      
       });
