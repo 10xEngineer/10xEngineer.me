@@ -4,14 +4,6 @@ include ../widget/tabbar
 include ../widget/sidebar
 
 append layout.scripts
-  script(type='text/javascript', src="/javascripts/superagent.min.js")
-  script(type='text/javascript', src="/javascripts/ace_2/ace.js")
-  script(type='text/javascript', src="/javascripts/jquery.contextMenu.js")
-  script(type='text/javascript', src="/javascripts/eventemitter2.js")
-  script(type='text/javascript', src="/javascripts/vfs-client.js")
-  script(type='text/javascript', src="/javascripts/filetree.js")
-  script(type='text/javascript', src="/javascripts/editor.js")
-  script(type='text/javascript', src="/javascripts/views/lessons/programming.js")
 
   // For Share JS
   // script(type='text/javascript', src="/javascripts/share/bcsocket.js")
@@ -20,17 +12,13 @@ append layout.scripts
   // script(type='text/javascript', src="/javascripts/share/ace.js")
   // script(type='text/javascript', src="/javascripts/share/chat.js")
   
-  // included
-  script(type='text/javascript', src="/javascripts/views/widget/tabbar.js")
-  script(type='text/javascript', src="/javascripts/views/widget/sidebar.js")
-
 append layout.styles
   link(rel='stylesheet', href="/stylesheets/jquery.contextMenu.css")
   link(rel='stylesheet', href="/stylesheets/views/lessons/programming.css")
   // included
-  link(rel='stylesheet', href="/stylesheets/views/widget/tabbar.css");
-  link(rel='stylesheet', href="/stylesheets/views/widget/sidebar.css");
-  link(rel='stylesheet', href="/stylesheets/breadcrumb.css");
+  link(rel='stylesheet', href="/stylesheets/views/widget/tabbar.css")
+  link(rel='stylesheet', href="/stylesheets/views/widget/sidebar.css")
+  link(rel='stylesheet', href="/stylesheets/breadcrumb.css")
 
 block layout.body
   include ../_breadcrumb
@@ -56,9 +44,16 @@ block layout.body
         mixin tabbar
         //- #tabBar
         //-   ul#tabContainer.nav.nav-tabs
-        #editor(style='position:relative;width:100%;min-height:100%;margin-bottom:-100px;height:100%;display:inline-block;')
+        #editor(style='position:relative;width:100%;min-height:100%;height:100%;display:inline-block;')
         input#docId(type="hidden", value="#{progressId}")
         .lessonBar
           a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
           a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
 
+  script(type="text/javascript")
+    function init() {
+      require(['sidebar', 'views/lessons/programming'],
+        function() {
+        console.log('All OK');
+      });
+    }

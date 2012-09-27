@@ -1,17 +1,17 @@
 section
-	ul.nav.nav-tabs#info-tab
-		li.active
-			a(href="#comment",data-toggle="tab") 
-				| INSTRUCTOR COMMENTS
-		li
-			a(href="#description", data-toggle="tab") 
-				| COURSE DESCRIPTION
+  ul.nav.nav-tabs#info-tab
+    li.active
+      a(href="#comment",data-toggle="tab") 
+        | INSTRUCTOR COMMENTS
+    li
+      a(href="#description", data-toggle="tab") 
+        | COURSE DESCRIPTION
 
-	.tab-content#info-tab-content
-		.tab-pane.fade.in.active#comment	#{lesson.desc}
-		.tab-pane.fade#description 		#{course.desc}
+  .tab-content#info-tab-content
+    .tab-pane.fade.in.active#comment  #{lesson.desc}
+    .tab-pane.fade#description    #{course.desc}
 
 script
-	$(function () {
-		$('#info-tab a:first').tab('show')
-	})
+  function init() {
+    $('#info-tab a:first').tab('show');
+  }

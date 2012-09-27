@@ -168,24 +168,6 @@ module.exports = function(app) {
     });
   });
 
-  // Programming
-  app.param('ProgrammingId', function(req, res, next, id){
-    var Programming = model.Programming;
-
-    Programming.findOne({ id: id }, function(error, Programming) {
-      if(error) return next(error);
-
-      if(Programming) {
-        req.Programming = Programming;
-        req.app.helpers({
-          Programming: Programming
-        });
-      }
-     
-      next();
-    });
-  });
-
   // LabDef
   app.param('labDefId', function(req, res, next, id){
     var VMDef = model.VMDef;

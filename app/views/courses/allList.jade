@@ -33,10 +33,13 @@ block layout.body
                           a.btn.btn-success.btn-large.pull-right(href="/course/#{courseObject.id}") More Details
                           
   script(type="text/javascript")
-    $(window).load(function() {
+    function init() {
       $('.flexslider').flexslider({
         animation: "slide",
         directionNav: true,
+        controlNav: true,
+        prevText: "Previous",
+        nextText: "Next",
         controlsContainer: ".flexslider-container"
       });
-    });
+    }

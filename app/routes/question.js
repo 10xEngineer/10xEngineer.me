@@ -15,25 +15,45 @@ module.exports.create = function(req, res, next) {
   var question = new Question();
   question.lesson = req.lesson._id;
   question.question = req.body.question;
-  question.weightage = req.body.weightage;
   question.random = Math.random();
-  question.difficulty = req.body.difficulty;
-  question.choices = [];
-  question.answers = [];
-
-
-  var optCount = req.body.questionOption.length - 1;
-  if(optCount==1){
-    question.answers.push(req.body.questionOption[0]);
-    question.choices.push(req.body.questionOption[0]);
-  } else {
-    for (var index = 0; index < optCount; index++) {
-      question.choices.push(req.body.questionOption[index]);
-      if(req.body.questionOptionCheckbox[index]) {
-        question.answers.push(req.body.questionOption[index]);
+  question.points = req.body.points;
+  var type = question.type = req.body.type;
+  if(type == "essay") {
+    console.log("Essay type question.");
+    var optCount = req.body.optBlock.length - 1;
+    if(optCount==1){
+      var tmpAns = {
+        answer : req.body.optBlock[0],
+        points : req.body.pointOfBlock[0]
       }
-    };
+      question.answers.push(tmpAns);
+    } else {
+      for (var index = 0; index < optCount; index++) {
+        var tmpAns = {
+          answer : req.body.optBlock[index],
+          points : req.body.pointOfBlock[index]
+        }
+        question.answers.push(tmpAns);
+      };
+    }
+  } else if(type == "mcq") {
+    console.log("MCQ type question.");
+    var optCount = req.body.questionOption.length - 1;
+    if(optCount==1){
+      question.answers.push(req.body.questionOption[0]);
+      question.choices.push(req.body.questionOption[0]);
+    } else {
+      for (var index = 0; index < optCount; index++) {
+        question.choices.push(req.body.questionOption[index]);
+        if(req.body.questionOptionCheckbox[index]) {
+          question.answers.push(req.body.questionOption[index]);
+        }
+      };
+    }
+  } else {
+    console.log("Unexpected Execution.");
   }
+  console.log(question);
 
   // Saves Created Question
   question.save(function(error) {
@@ -78,21 +98,61 @@ module.exports.editView = function(req, res, next) {
 module.exports.edit= function(req, res, next) {
   var question = req.question;
   question.question = req.body.question;
-  question.weightage = req.body.weightage;
-  question.difficulty = req.body.difficulty;
+  question.points = req.body.points;
   choices = [];
   answers = [];
 
-  var optCount = req.body.questionOption.length - 1;
-  for (var index = 0; index < optCount; index++) {
-    choices.push(req.body.questionOption[index]);
-    if(req.body.questionOptionCheckbox[index]) {
-      answers.push(req.body.questionOption[index]);
+  console.log(req.body.optBlock);
+  var type = question.type = req.body.type;
+  if(type == "essay") {
+    console.log("Essay type question.");
+    var optCount = req.body.optBlock.length - 1;
+    if(optCount==1){
+      var tmpAns = {
+        answer : req.body.optBlock[0],
+        points : req.body.pointOfBlock[0]
+      }
+      answers.push(tmpAns);
+    } else {
+      for (var index = 0; index < optCount; index++) {
+        var tmpAns = {
+          answer : req.body.optBlock[index],
+          points : req.body.pointOfBlock[index]
+        }
+        answers.push(tmpAns);
+      };
     }
-  };
+  } else if(type == "mcq") {
+    console.log("MCQ type question.");
+    var optCount = req.body.questionOption.length - 1;
+    if(optCount==1){
+      answers.push(req.body.questionOption[0]);
+      choices.push(req.body.questionOption[0]);
+    } else {
+      for (var index = 0; index < optCount; index++) {
+        choices.push(req.body.questionOption[index]);
+        if(req.body.questionOptionCheckbox[index]) {
+          answers.push(req.body.questionOption[index]);
+        }
+      };
+    }
+  } else {
+    console.log("Unexpected Execution.");
+  }
+
+
+  // var optCount = req.body.questionOption.length - 1;
+  // for (var index = 0; index < optCount; index++) {
+  //   choices.push(req.body.questionOption[index]);
+  //   if(req.body.questionOptionCheckbox[index]) {
+  //     answers.push(req.body.questionOption[index]);
+  //   }
+  // };
+  console.log(answers);
   question.choices = choices;
-  question.markModified('choices');
   question.answers = answers;
+
+  question.markModified('choices');
   question.markModified('answers');
 
   // Saves Created Question

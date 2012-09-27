@@ -1,6 +1,6 @@
 var model = require('../app/models');
-//var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
-var mcClient = require('../app/helpers/microcloud-client')();
+var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
+//var mcClient = require('../app/helpers/microcloud-client')();
 var Lab = mcClient.Lab;
 
 module.exports = function(io) {
@@ -194,6 +194,7 @@ function createOrResumeLab(lessonId, progressId, key, callback) {
       var data = {
         name: progressId,
         definition: 'https://github.com/10xEngineer/wip-lab-definition-basicvm.git', //TODO: hardcoded
+        version: '0.0.1', // TODO: Hardcoded
         keypair: key.name
       };
       mcClient.labManager.create(data, function(error, lab) {
@@ -208,15 +209,11 @@ function createOrResumeLab(lessonId, progressId, key, callback) {
         progress.markModified('chapters');
         progress.save(function(error) {
           if(error) return callback(error);
-          var version = '0.0.1'; // TODO: Hardcoded
 
-          // TODO: Hack to ensure the MC server accepts release request
-          setTimeout(function() {
-            lab.release(version, function(error) {
-              if(error) return callback(error);
-              callback(null, lab);
-            });
-          }, 5000);
+          lab.refresh(function(error) {
+            if(error) return callback(error);
+            callback(null, lab);
+          });
         });
       });
     } else {

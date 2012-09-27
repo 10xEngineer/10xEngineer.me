@@ -15,7 +15,7 @@
  * other features.
 */
 
-;(function() {
+define(function() {
 
 /**
  * Terminal Emulation References:
@@ -29,13 +29,6 @@
  */
 
 'use strict';
-
-/**
- * Shared
- */
-
-var window = this
-  , document = this.document;
 
 /**
  * EventEmitter
@@ -4151,10 +4144,6 @@ function isBoldBroken() {
   return w1 !== w2;
 }
 
-var String = this.String;
-var setTimeout = this.setTimeout;
-var setInterval = this.setInterval;
-
 /**
  * Expose
  */
@@ -4166,12 +4155,6 @@ Terminal.on = on;
 Terminal.off = off;
 Terminal.cancel = cancel;
 
-if (typeof module !== 'undefined') {
-  module.exports = Terminal;
-} else {
-  this.Terminal = Terminal;
-}
+return Terminal;
 
-}).call(function() {
-  return this || (typeof window !== 'undefined' ? window : global);
-}());
+});

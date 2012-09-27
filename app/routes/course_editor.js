@@ -30,7 +30,7 @@ var util = require('../helpers/util');
 module.exports.coursesList = function(req, res, next){
   var Course = model.Course;
   if(typeof(req.user)=='undefined'){
-    res.redirect('/');
+    return res.redirect('/');
   }
   Course.find({})
     .populate('created_by')

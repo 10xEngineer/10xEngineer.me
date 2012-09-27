@@ -1,4 +1,4 @@
-$(document).ready(function() {
+define(['tty'], function() {
   var progressId = $('#progressId').val();
   var lessonId = $('#lessonId').val();
 

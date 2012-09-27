@@ -97,8 +97,8 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
       $('#editLanguage').val('#{lesson.programming.language}');
 
 script(type='text/javascript')
-  
-  $(document).ready(function() {
+
+  function init() {
 
     //----------------------------------------------------- //
     //  On Form Submit                                      //
@@ -345,5 +345,5 @@ script(type='text/javascript')
         console.log(err);
       }
     });
-  });
+  }
 
