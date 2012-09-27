@@ -60,8 +60,8 @@ var verifyCourseSubscription = function(req, res, next) {
   } else {
     courseSubscription.verifyUser(course, user, function(err){
       if(err){
-        console.error(err);
-        res.redirect('/');
+        if(typeof(course) == 'undefined') res.redirect('/');
+        else res.redirect('/course/'+req.course.id);
       }
       else {
         next();
