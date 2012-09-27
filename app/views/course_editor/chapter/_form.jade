@@ -1,9 +1,9 @@
 form(method='POST', id='chapterForm')
   p
     label(for="title") Title:
-    input.required(type='text', value='#{chapter.title}', id='title', name='title')
+    input.span6.required(type='text', value='#{chapter.title}', id='title', name='title')
   p
     label(for="description") Description:
-    textarea.required(type='text', name='description', id='description') #{chapter.desc}
+    textarea.span6.required(type='text', name='description', id='description', rows="6") #{chapter.desc}
   p
     input.btn.btn-primary(type='submit', value='Submit')

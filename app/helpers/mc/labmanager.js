@@ -1,5 +1,6 @@
 var request = require('request');
 var url = require('url');
+var EventEmitter = require('events').EventEmitter;
 
 var async = require('async');
 
@@ -49,7 +50,7 @@ LabManager.prototype.create = function(options, callback) {
     
     var lab;
     try {
-      lab = new Lab(self.origEndpoint, body.name);
+      lab = new Lab(self.origEndpoint, body.name, options.version);
     } catch(e) {
       return callback(e);
     }
@@ -64,13 +65,21 @@ module.exports.LabManager = LabManager;
 /*
  * Lab instance
  */
-function Lab(endpoint, name) {
+function Lab(endpoint, name, version) {
   var self = this;
   this.name = name;
   this.origEndpoint = endpoint;
   this.endpoint = endpoint + '/labs/' + name;
+  this.version = version || '0.0.1';
+}
 
-  log.info("Fetching lab metadata for " + name);
+Lab.prototype = new EventEmitter();
+
+Lab.prototype.refresh = function(callback) {
+  var self = this;
+
+  log.info("Fetching lab metadata for " + self.name);
+  log.info("URL: " + self.endpoint);
   request.get({
     url: this.endpoint
   }, function(error, res, body) {
@@ -82,14 +91,63 @@ function Lab(endpoint, name) {
       throw new Error('Error getting lab info.');
     }
 
-    log.info("Lab metadata received.")
+    if(typeof(body) === 'string') {
+      body = JSON.parse(body);
+    }
+
+    log.info("Lab metadata received.");
     self.name = body.name;
     self.repo = body.repo;
     self.token = body.token;
     self.state = body.state;
     self.meta = body.meta;
+
+    log.info('State: ', self.state);
+    if(self.state == 'created') {
+      self.release(function(error) {
+        if(error) return callback(error);
+        self.refresh(callback);
+      });
+    } else if(self.state == 'pending') {
+      self.getVmList(callback);
+    } else {
+      setTimeout(function() {
+        self.refresh(callback);
+      }, 1000);
+    }
   });
-}
+};
+
+Lab.prototype.getVmList = function(callback) {
+  var self = this;
+
+  log.info("Getting a list of available vms...");
+  request.get({
+    url: this.endpoint + '/vms'
+  }, function(error, res, body) {
+    if(error) {
+      return callback(error);
+    }
+    if(res.statusCode !== 200) {
+      return callback(new Error('Error getting lab info.'));
+    }
+
+    var respArray;
+    try {
+      respArray = JSON.parse(body);
+    } catch(e) {
+      return callback(new Error("Error parsing list"));
+    }
+
+    log.info(respArray.length + ' vm received.');
+    self.vms = {};
+    async.forEach(respArray, function(vm, callback) {
+      self.refreshVm(vm.uuid, callback);
+    }, function(error) {
+      callback(error);
+    });
+  });
+};
 
 Lab.prototype.refreshVm = function(uuid, callback) {
   var self = this;
@@ -124,58 +182,63 @@ Lab.prototype.refreshVm = function(uuid, callback) {
   });
 };
 
-Lab.prototype.refresh = function(callback) {
+Lab.prototype.getVersions = function(callback) {
   var self = this;
-  // TODO: Refresh lab state
 
-  log.info("Getting a list of available vms...");
+  // Get valid versions
   request.get({
-    url: this.endpoint + '/vms'
+    url: this.endpoint + '/versions'
   }, function(error, res, body) {
     if(error) {
       return callback(error);
     }
     if(res.statusCode !== 200) {
-      return callback(new Error('Error getting lab info.'));
-    }
-
-    var respArray;
-    try {
-      respArray = JSON.parse(body);
-    } catch(e) {
-      return callback(new Error("Error parsing list"));
-    }
-
-    log.info(respArray.length + ' vm received.');
-    self.vms = {};
-    async.forEach(respArray, function(vm, callback) {
-      self.refreshVm(vm.uuid, callback);
-    }, function(error) {
-      callback(error);
-    });
-  });
-};
-
-Lab.prototype.release = function(version, callback) {
-  var self = this;
-  
-  log.info('Releasing the lab ' + this.name + ' with version ' + version);
-  request.post({
-    url: this.endpoint + '/versions/' + version + '/release'
-  }, function(error, res, body) {
-    if(error) {
-      return callback(error);
-    }
-    if(res.statusCode !== 202) {
       log.info("Res", res);
       return callback(new Error('Error releasing definition.'));
     }
 
-    log.info('Lab successfully released.');
-    self.refresh(function(error) {
-      callback(error);
+    if(typeof(body) == 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch(e) {
+        return callback(new Error("Error parsing vm"));
+      }      
+    }
+
+    if(body.length === 0) {
+      self.getVersions(callback);
+    } else {
+      log.info('Got existing versions for lab.', body[0].version);
+      callback(null, body[0].version);
+    }
+  });
+};
+
+Lab.prototype.release = function(callback) {
+  var self = this;
+  
+  self.getVersions(function(error, version) {
+
+    log.info('Releasing the lab ' + this.name + ' with version ' + version);
+    request.post({
+      url: self.endpoint + '/versions/' + version + '/release'
+    }, function(error, res, body) {
+      if(error) {
+        log.error(error);
+        return callback(error);
+      }
+      if(res.statusCode !== 202) {
+        log.info("Res", res);
+        return callback(new Error('Error releasing definition.'));
+      }
+
+      log.info('Lab successfully released.');
+      self.refresh(function(error) {
+        callback(error);
+      });
     });
   });
+
 };
 
 Lab.prototype.getVm = function(uuid) {

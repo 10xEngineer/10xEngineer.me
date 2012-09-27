@@ -21,7 +21,8 @@ block layout.body
       .row-fluid
         p
 
-    script
+  script
+    function init() {
       $('video').mediaelementplayer({
         enablePluginDebug: false,
         defaultVideoWidth: 930,
@@ -32,4 +33,5 @@ block layout.body
         error: function(err) {
           console.log(err);
         }
-      });
+      });        
+    }

@@ -11,10 +11,10 @@ module.exports = function() {};
 
 // Display a lesson
 module.exports.showView = function(req, res, next) {
-  
   var Lesson = model.Lesson;
   var Assessment = model.Assessment;
   var Progress = model.Progress;
+  var course = req.course;
   var lesson = req.lesson;
 
   // For Progress
@@ -24,7 +24,7 @@ module.exports.showView = function(req, res, next) {
   // Check if progress has already status completed  
   Progress.getProgress(req.user, req.course, function(error, progress) {
     if(error) return next(error);
-
+    if(!progress) return res.redirect('/course/'+course.id);
     if(progress.status != 'completed') {
 
       // Start the Lesson : Change status of lesson to 'ongoing'
@@ -58,7 +58,7 @@ module.exports.showView = function(req, res, next) {
             res.render('lessons/' + lesson.type, {
               title           : lesson.title,
               quiz            : lesson.quiz,
-              assessment      : ass,
+              assessment      : assessment,
               videoStartTime  : videoStartTime,
               userName        : req.user.name,
               allLessons      : allLessons,
@@ -74,16 +74,21 @@ module.exports.showView = function(req, res, next) {
     } else {
       progressFlag = true;
       Lesson.find({}, function(error, allLessons) {
-        if(error) return next(error);
-        res.render('lessons/' + lesson.type, {
-          title: lesson.title,
-          quiz: lesson.quiz,
-          videoStartTime: videoStartTime,
-          allLessons: allLessons,
-          userId: req.user._id,
-          progressFlag : progressFlag,
-          progressId: progress._id,
-          username: req.user.name
+        Assessment.findOne({'user.id': req.user._id, 'lesson.id': req.lesson._id}, function(err, assessment){
+          if(error) return next(error);
+          var ass = assessment || {};
+
+          res.render('lessons/' + lesson.type, {
+            title: lesson.title,
+            quiz: lesson.quiz,
+            videoStartTime  : videoStartTime,
+            allLessons      : allLessons,
+            assessment      : assessment,
+            userId          : req.user._id,
+            progressFlag    : progressFlag,
+            progressId      : progress._id,
+            username        : req.user.name
+          });
         });
       });
     }
@@ -127,7 +132,7 @@ module.exports.show = function(req, res, next) {
 
     if(progress.status != 'completed') {
       // Start the Lesson : Change status of lesson to 'ongoing'
-      progress.completeLesson(lesson, function(error) {
+      progress.startLesson(lesson, function(error) {
         if(error) return next(error);
         renderLesson();      
       });

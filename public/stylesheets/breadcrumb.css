@@ -1,4 +1,4 @@
-.breadcrumb{margin:0;padding:30px 0 10px 10px;background:#272727;overflow:hidden;border-bottom:1px solid #222;}
+.breadcrumb{position:relative;margin:0;padding:30px 0 10px 10px;background:#272727;overflow:hidden;border-bottom:1px solid #222;}
 .breadcrumb li{list-style-type:none;}
 .breadcrumb li a,.breadcrumb li span.divider{color:#eee;margin:0;padding:5px;float:left;display:block}
 .breadcrumb li span.divider{color:#aaa}

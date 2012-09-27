@@ -49,8 +49,7 @@ link(rel="stylesheet", type="text/css", href="/stylesheets/tree.css", media="scr
             input(type="checkbox", id="subfolder1") 
 
 script(type="text/javascript")
-
-  $(document).ready(function(){
+  function init() {
     $(".txtFile, .txtFolder").click(function(){
       $(".txtFile, .txtFolder").removeClass("box");
       $(this).addClass("box");
@@ -63,4 +62,4 @@ script(type="text/javascript")
         $('ol',$('.box')).append('<ol><li><label for="folder1" class="folder"> </label><div class="txtFolder">Folder 1</div> <input type="checkbox" checked id="folder1" /><ol></ol></li></ol>');
       }
     });
-  });
+  }

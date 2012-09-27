@@ -7,16 +7,15 @@ var quiz = require('./quiz');
 var question = require('./question');
 var lesson = require('./lesson');
 var quiz = require('./quiz');
-var programming = require('./programming');
 var admin = require('./admin');
 var user = require('./user');
 var cdn = require('./cdn');
 
 var auth = require('../middleware/authentication');
 var validation = require('../middleware/validation');
+var courseSubscription = require('../middleware/courseSubscription');
 var ability = require('../helpers/ability');
 var validationConfig = require('../helpers/validationConfig');
-
 
 // ---------------------
 // Middleware
@@ -53,7 +52,22 @@ var accessPermission = function(req, res, next) {
   }
 };
 
-
+var verifyCourseSubscription = function(req, res, next) {
+  var course = req.lesson.chapter.course;
+  var user   = req.user._id;
+  if(typeof(course) == 'undefined' || typeof(user) == 'undefined') {
+    res.redirect('/');
+  } else {
+    courseSubscription.verifyUser(course, user, function(err){
+      if(err){
+        res.redirect('/');
+      }
+      else {
+        next();
+      }
+    })
+  }
+}
 
 module.exports = function(app) {
 
@@ -74,7 +88,7 @@ module.exports = function(app) {
   });
 
   // Convert a parameter to integer
-  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','assessmentId','questionId', 'programmingId'], function(req, res, next, num, name){ 
+  app.param(['courseId', 'chapterId', 'lessonId', 'userId','questionIndex','assessmentId','questionId'], function(req, res, next, num, name){ 
     var parsedNum = parseInt(num, 10);
     if( isNaN(num) ){
       next(new Error('Invalid route: ' + num));
@@ -100,6 +114,10 @@ module.exports = function(app) {
   // User
   app.get('/auth', accessPermission, user.login);
   app.post('/auth', accessPermission, auth.local);
+  app.get('/auth/forgot_password', user.forgotPassword);
+  app.get('/passwordRecover', user.resetPasswordView);
+  app.post('/passwordRecover', user.resetPassword);
+  app.post('/auth/forgot_password', user.mailLinkForResetPassword);
   app.get('/logout', auth.logout);
 
   app.get('/auth/twitter', auth.twitter);
@@ -168,11 +186,11 @@ module.exports = function(app) {
   // TODO: Refactor
   app.get('/lesson/serverInfo', lesson.serverInfo);
 
-  app.get('/lesson/:lessonId', verifyPermission('course', 'read'), lesson.showView);
+  app.get('/lesson/:lessonId', verifyPermission('course', 'read'), verifyCourseSubscription, lesson.showView);
   //app.post('/lesson/:lessonId', verifyPermission('course', 'read'), lesson.show);
-  app.get('/lesson/:lessonId/next', verifyPermission('course', 'read'),lesson.next);
-  app.get('/lesson/:lessonId/previous', verifyPermission('course', 'read'), lesson.previous);
-  app.get('/lesson/:lessonId/complete', verifyPermission('course', 'read'), lesson.complete);
+  app.get('/lesson/:lessonId/next', verifyPermission('course', 'read'), verifyCourseSubscription,lesson.next);
+  app.get('/lesson/:lessonId/previous', verifyPermission('course', 'read'), verifyCourseSubscription, lesson.previous);
+  app.get('/lesson/:lessonId/complete', verifyPermission('course', 'read'), verifyCourseSubscription, lesson.complete);
   app.get('/lesson/:lessonId/updateProgress', lesson.updateProgress);
 
   // CDN
@@ -221,10 +239,11 @@ module.exports = function(app) {
   app.get('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), quiz.editView);
   app.post('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
   app.get('/assessment/quiz/:lessonId/remove', verifyPermission('admin', 'delete'), quiz.removeQuiz);
-  app.get('/assessment/quiz/:lessonId/start', verifyPermission('admin', 'read'), quiz.startQuiz);
-  app.get('/assessment/quiz/:lessonId/finish', verifyPermission('admin', 'read'), quiz.quizResult);
-  app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), quiz.viewQuestion);
-  app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), quiz.submitQuestion);
+  app.get('/assessment/quiz/:lessonId/start', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.startQuiz);
+  app.get('/assessment/quiz/:lessonId/continue', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.continueQuiz);
+  app.get('/assessment/quiz/:lessonId/finish', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.quizResult);
+  app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.viewQuestion);
+  app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), verifyCourseSubscription, quiz.submitQuestion);
   app.get('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), question.createView);
   app.post('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.create);
   app.get('/assessment/question/import/:lessonId', verifyPermission('admin', 'edit'), question.importQuestionView);
@@ -232,11 +251,5 @@ module.exports = function(app) {
   app.get('/assessment/question/:questionId/remove', verifyPermission('admin', 'edit'), question.removeQuestion);
   app.get('/assessment/question/:questionId/edit', verifyPermission('admin', 'edit'), question.editView);
   app.post('/assessment/question/:questionId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.edit);
-
-  // Programming
-  app.get('/assessment/programming', verifyPermission('admin', 'read'), programming.list);
-  app.get('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.createView);
-  app.post('/assessment/programming/create', verifyPermission('admin', 'edit'), programming.create);
-  app.get('/assessment/programming/:programmingId', verifyPermission('admin', 'read'), programming.appearView);
 
 };

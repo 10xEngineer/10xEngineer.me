@@ -1,6 +1,11 @@
 
+define(['eventemitter2', 'filetree', 'ace/ace', 'contextMenu', 'views/widget/tabbar'], function(EventEmitter2, FileTree) {
+
 require("ace/lib/fixoldbrowsers");
-require("ace/config").init();
+var config = require("ace/config")
+config.init();
+config.set('packaged', false);
+
 var env = {};
 
 var dom = require("ace/lib/dom");
@@ -127,7 +132,7 @@ function Editor(options) {
   });
 
   // Initialize renderer
-  var renderer = new Renderer(el);
+  var renderer = new Renderer(el, theme);
   renderer.scrollBar.element.style.display = "none";
   renderer.scrollBar.width = 0;
   renderer.content.style.height = "auto";
@@ -145,7 +150,6 @@ function Editor(options) {
     var longestLine = this.$getLongestLine();
     var lastRow = this.session.getLength();
     var height = this.session.getScreenLength() * this.lineHeight;
-    console.log(height*this.lineHeight);
 
     this.scrollTop = 0;
     var config = this.layerConfig;
@@ -383,6 +387,34 @@ Editor.prototype.saveFile = function() {
   return false;
 };
 
+Editor.prototype.newFile = function() {
+  var self = this,
+    parent = this.tree.getSelected();
+  this.vfs.newFile('untitled file', parent, function(err){
+    console.log("Get Call back of file creation at VFS.");
+    if(err){
+      console.log("Error in file creation.");
+    } else {
+      
+    }
+  });
+  this.tree
+};
+
+Editor.prototype.newFolder = function() {
+  var self = this
+    parent = this.tree.getSelected();
+  this.vfs.newDir('untitled folder', parent, function(err){
+    if(err){
+      console.log("Error in folder creation.");
+    }
+    else{
+      
+    }
+  });
+  
+};
+
 Editor.prototype.loadMode = function(value) {
   this.ace.getSession().setMode(modesByName[value].mode || modesByName.java.mode);
   this.ace.getSession().modeName = value;
@@ -402,7 +434,7 @@ Editor.prototype.onResize = function() {
 };
 
 Editor.prototype.setTabState = function(id, state) {
-  tab = this.tabbar.getTabElementById(id)
+  var tab = this.tabbar.getTabElementById(id)
   switch (state) {
     case 'saving':
       tab.addClass('saving');
@@ -415,3 +447,7 @@ Editor.prototype.setTabState = function(id, state) {
       tab.addClass('dirty');
   }
 }
+
+return Editor;
+
+});

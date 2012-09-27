@@ -1,4 +1,4 @@
-$(document).ready(function() {
+define(['tty'], function(tty) {
   var progressId = $('#progressId').val();
   var lessonId = $('#lessonId').val();
 
@@ -8,8 +8,6 @@ $(document).ready(function() {
 
   labSocket.on('lab_ready', function(data) {
     // TODO: Initialize terminal
-    console.log(data);
-
     var server = data.term_server;
 
     tty.open('http://' + server.auth.id + ':' + server.auth.secret + '@' + server.host + ':' + server.client_port);

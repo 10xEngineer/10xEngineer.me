@@ -1,10 +1,10 @@
 form(method='POST', id='lessonForm', enctype='multipart/form-data')
   p
     label(for="title") Title:
-    input.required(type='text', value='#{lesson.title}', id='title', name='title')
+    input.span6.required(type='text', value='#{lesson.title}', id='title', name='title')
   p
     label(for="description") Description:
-    textarea.required(type='text', name='description', id='description') #{lesson.desc}
+    textarea.span6.required(type='text', name='description', id='description', rows="6") #{lesson.desc}
   - if(!edit)
 
     input#lessonType(name='type', type='hidden', value='video')
@@ -97,8 +97,8 @@ form(method='POST', id='lessonForm', enctype='multipart/form-data')
       $('#editLanguage').val('#{lesson.programming.language}');
 
 script(type='text/javascript')
-  
-  $(document).ready(function() {
+
+  function init() {
 
     //----------------------------------------------------- //
     //  On Form Submit                                      //
@@ -345,5 +345,5 @@ script(type='text/javascript')
         console.log(err);
       }
     });
-  });
+  }
 

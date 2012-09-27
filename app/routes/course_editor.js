@@ -30,7 +30,7 @@ var util = require('../helpers/util');
 module.exports.coursesList = function(req, res, next){
   var Course = model.Course;
   if(typeof(req.user)=='undefined'){
-    res.redirect('/');
+    return res.redirect('/');
   }
   Course.find({})
     .populate('created_by')
@@ -562,7 +562,7 @@ module.exports.lessonRemove = function(req, res, next){
   }
 
   if(lesson.type == "quiz") {
-    Question.remove({lesson: lesson_id}, function(err){
+    Question.remove({lesson: lesson_id}, function(error){
       if(error) return next(error);
 
       removeLesson();
@@ -634,7 +634,7 @@ module.exports.lessonView = function(req, res, next) {
       });
     });
   } else if(lesson.type=='quiz') {
-    Question.find({ lesson: lesson._id }, function(err, questions) {
+    Question.find({ lesson: lesson._id }, function(error, questions) {
       if(error) return next(error);
       res.render('course_editor/lesson/' + req.lesson.type, {
         lesson : lesson,
