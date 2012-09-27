@@ -103,12 +103,12 @@ Lab.prototype.refresh = function(callback) {
     self.meta = body.meta;
 
     log.info('State: ', self.state);
-    if(self.state == 'created') {
+    if(self.state == 'created' && self.localState != 'released') {
       self.release(function(error) {
         if(error) return callback(error);
         self.refresh(callback);
       });
-    } else if(self.state == 'pending') {
+    } else if(self.state == 'pending' || self.localState == 'released') {
       self.getVmList(callback);
     } else {
       setTimeout(function() {
