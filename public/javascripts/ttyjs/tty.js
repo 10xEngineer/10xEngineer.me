@@ -3,15 +3,13 @@
  * Copyright (c) 2012, Christopher Jeffrey (MIT License)
  */
 
-;(function() {
+define(['term'], function(Terminal) {
 
 /**
  * Elements
  */
 
-var document = this.document
-  , window = this
-  , root
+var root
   , body
   , h1
   , lights;
@@ -883,8 +881,6 @@ tty.Window = Window;
 tty.Tab = Tab;
 tty.Terminal = Terminal;
 
-this.tty = tty;
+return tty;
 
-}).call(function() {
-  return this || (typeof window !== 'undefined' ? window : global);
-}());
+});

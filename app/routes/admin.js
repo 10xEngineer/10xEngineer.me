@@ -10,6 +10,7 @@ var config = require('../config/config');
   
 var importer = require('../helpers/importer');
 var util = require('../helpers/util');
+var templet = require('../helpers/templet');
 
 
 module.exports = function() {};
@@ -49,7 +50,7 @@ module.exports.approve = function(req, res, next) {
   var user = req.extUser;
 
   var templetPath = path.resolve('./Samples/emailTemplet/approvalForBeta.html');
-  getHtmlTemplate("approvalForBeta", { "name" : user.name }, function(error, htmlText){
+  templet.getHtmlTemplate("approvalForBeta", { "name" : user.name }, function(error, htmlText){
     if (error) return next(error);
 
     var hostMailID    = config.get('mail:username');
@@ -73,10 +74,10 @@ module.exports.approve = function(req, res, next) {
     };
 
     // send mail with defined transport object
-    smtpTransport.sendMail(mailOptions, function(error, res){
+    smtpTransport.sendMail(mailOptions, function(error, responce){
       if(error) return next(error);
 
-      console.log("Message sent: " + res.message);
+      console.log("Message sent: " + responce.message);
 
       // if you don't want to use this transport object anymore, uncomment following line
       //smtpTransport.close(); // shut down the connection pool, no more messages
@@ -89,18 +90,6 @@ module.exports.approve = function(req, res, next) {
       });
     });
   });
-};
-
-var getHtmlTemplate = function(templateName, jsonObject, callback){
-  var templatePath = path.resolve('./Samples/emailTemplet/' + templateName + '.html');
-  var template = fs.readFileSync(templatePath).toString();
-  for(var key in jsonObject) {
-    if(jsonObject.hasOwnProperty(key)) {
-      var regEx = new RegExp("#{" + key + "}", "g");
-      template = template.replace(regEx, jsonObject[key]);
-    }
-  }
-  callback(null, template);
 };
 
 module.exports.usersImportView = function(req, res, next) {  

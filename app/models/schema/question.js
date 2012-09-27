@@ -5,12 +5,12 @@ var mongoose = require('mongoose')
 var QuestionSchema = module.exports = new Schema({
   _id: { type: ObjectId },
   lesson: { type: ObjectId, ref: 'Lesson' },
-  question: String,
-  choices: [ String ],
-  answers: [ String ],
-  weightage: Number,
-  random: Number,
-  difficulty: Number
+  question: { type: String},
+  type: { type: String, enum: ['mcq', 'essay'], required: true },
+  choices: [ { type: String} ],
+  answers: [ {} ],
+  points: {type: Number},
+  random: {type: Number},
 }, {
   collection: 'question'
 });

@@ -3,78 +3,226 @@ form(method='POST')
     .addedQuestion(style="margin: 15px auto;")
       p Question:
       - if(edit)
-        input.question(type="text", value="#{question.question}", placeholder="Question", name="question")
-        input.span1.questionDiffernce(placeholder="Difficulty", value="#{question.difficulty}", type="text", style="margin : auto 5px auto 10px;", name="difficulty")
-        input.span1.questionWeightage(placeholder="Weightage", value="#{question.weightage}", type='text', style="margin : auto 5px;", name="weightage")
+        .row-fluid
+          input.span6.question(type="text", value="#{question.question}", placeholder="Question", name="question")
+        .row-fluid
+          .span6.offset3
+            select.span3(name="type")
+              - if(question.type == "mcq") 
+                option(value="mcq", selected) MCQ
+              - else 
+                option(value="mcq", selected) MCQ
+              - if(question.type == "essay") 
+                option(value="essay", selected) Assay
+              - else 
+                option(value="essay") Assay
+            input.span2.questionDiffernce(placeholder="Points", value="#{question.points}", type="text", style="margin : auto 5px auto 10px;", name="points", id="points")
       - else
-        input.question(type="text", placeholder="Question", name="question")
-        input.span1.questionDiffernce(placeholder="Difficulty", type="text", style="margin : auto 5px auto 10px;", name="difficulty")
-        input.span1.questionWeightage(placeholder="Weightage", style="margin : auto 5px;", type='text', name="weightage")
+        .row-fluid
+          input.span6.question(type="text", placeholder="Question", name="question")
+        .row-fluid
+          .span6.offset3
+            select.span3(name="type", id="type")
+              option(value="mcq") MCQ
+              option(value="essay") Assay
+            input.span2.questionDiffernce(placeholder="Points", type="text", style="margin : auto 5px auto 10px;", name="points", id="points")
 
       br
       .options
         -if(edit)
-          each option, index in question.choices
-            .addedOption
-              - if(question.answers.indexOf(option)>=0)
-                input.questionOptionCheckbox(type="checkbox", checked, name="questionOptionCheckbox[#{index}]")
-              - else
-                input.questionOptionCheckbox(type="checkbox", name="questionOptionCheckbox[#{index}]")
-              input.questionOption(type="text", placeholder="Option", style="margin: 5px", value="#{option}", name="questionOption[#{index}]")  
+          - if(question.type == "mcq")
+            each option, index in question.choices
+              .addedOption
+                - if(question.answers.indexOf(option)>=0)
+                  input.questionOptionCheckbox(type="checkbox", checked, name="questionOptionCheckbox[#{index}]")
+                - else
+                  input.questionOptionCheckbox(type="checkbox", name="questionOptionCheckbox[#{index}]")
+                input.questionOption(type="text", placeholder="Option", style="margin: 5px", value="#{option}", name="questionOption[#{index}]")  
+          - else if(question.type == "essay")
+            each ansLine, index in question.answers
+              .ansBlock
+                select.span1.pointOfBlock(type="text", style="margin : 10px;", placeholder: "Point", name="pointOfBlock[#{index}]")
+                  - if(ansLine.points == 1)
+                    option(value="1", selected) 1
+                  - else                   
+                    option(value="1") 1
+                  - if(ansLine.points == 2)
+                    option(value="2", selected) 2
+                  - else                   
+                    option(value="2") 2
+                  - if(ansLine.points == 3)
+                    option(value="3", selected) 3
+                  - else                   
+                    option(value="3") 3
+                textarea.span4.optBlock(type="text", style= "margin : 10px;", placeholder="Block", name="optBlock[#{index}]") #{ansLine.answer}
 
   p
     input.btn.btn-primary(type='submit', value=' Save ')
 
 script(type='text/javascript')
   
-  $(document).ready(function() {
 
-    //-------------------------------------------------------//
-    //  For  Quiz : Add & Remove Question and their Options  //
-    //-------------------------------------------------------//
+  function init() {
+    //- ----------------------------------------------------- -//
+    //   For Question type change and according DOM Changes    //
+    //- ----------------------------------------------------- -//
 
-    var optDiv = $('<div/>', {
-      class: "addedOption"
-    })
-    .append($('<input/>', {
-      type: "checkbox",
-      class: "questionOptionCheckbox"
-    }))
-    .append($('<input/>', {
-      type: "text",
-      placeholder: "Option",
-      class: "questionOption",
-      style: "margin : 5px;"
-    }));
-
-    optDiv.clone().appendTo('.options'); 
-
-    $(".questionOption").live("change",function() {    
-      var parQueDiv=$(this).parents("div").eq(1);
-      if(parQueDiv.find(".questionOption:last").val()!="") {
-        var tmpOpt = optDiv.clone();
-        tmpOpt.appendTo(parQueDiv);
-        $($(this).parent().next().children()[0]).focus();
-        $($(tmpOpt).children()[0]).focus();
-        assignNamesForOptions($('.options'));
+    
+    $('#type').change(function(){
+      var type = $('#type').val();
+      switch(type){
+        case "mcq":
+          $('#points').removeAttr('readonly');
+          $('.options').html("");
+          initMCQ();
+          break;
+        case "essay":
+          $('.options').html("");
+          initEssay();
+          break;
+        default:
+          alert("Unknown Question type");
       }
     });
+    
 
-    $(".questionOption").live("blur",function(){
-      if($(this).val()=="" && $(this).parents(".options").find(".questionOption:last")[0] != this) {               
-        $(this).parent().remove();
-        assignNamesForOptions($('.options'));
-      }
-    });
+    //- ------------------------------------------------------ -//
+    //-  For  Quiz : Add & Remove Options of Question          -//
+    //- -----------------------------------------------------  -//
 
-    var assignNamesForOptions = function($container) {
-      $container.find('.questionOption').each(function(i, opt) {
-        $(opt).attr('name', 'questionOption['+i+']');
+    var initMCQ = function() {
+
+      var optDiv = $('<div/>', {
+        class: "addedOption"
+      })
+      .append($('<input/>', {
+        type: "checkbox",
+        class: "questionOptionCheckbox",
+        style: "margin : 10px;"
+      }))
+      .append($('<input/>', {
+        type: "text",
+        placeholder: "Option",
+        class: "questionOption",
+        style: "margin : 10px;"
+      }));
+      $('.options').html("");
+      optDiv.clone().appendTo('.options'); 
+
+      $(".questionOption").live("change",function() {    
+        var parQueDiv=$(this).parents("div").eq(1);
+        if(parQueDiv.find(".questionOption:last").val()!="") {
+          var tmpOpt = optDiv.clone();
+          tmpOpt.appendTo(parQueDiv);
+          $($(this).parent().next().children()[0]).focus();
+          $($(tmpOpt).children()[0]).focus();
+          assignNamesForOptions($('.options'));
+        }
       });
-      $container.find('.questionOptionCheckbox').each(function(i, optChkBox) {
-        $(optChkBox).attr('name', 'questionOptionCheckbox['+i+']');
-      });
-    };
 
-    assignNamesForOptions($('.options'));
-  });
+      $(".questionOption").live("blur",function(){
+        if($(this).val()=="" && $(this).parents(".options").find(".questionOption:last")[0] != this) {               
+          $(this).parent().remove();
+          assignNamesForOptions($('.options'));
+        }
+      });
+
+      var assignNamesForOptions = function($container) {
+        $container.find('.questionOption').each(function(i, opt) {
+          $(opt).attr('name', 'questionOption['+i+']');
+        });
+        $container.find('.questionOptionCheckbox').each(function(i, optChkBox) {
+          $(optChkBox).attr('name', 'questionOptionCheckbox['+i+']');
+        });
+      };
+
+      assignNamesForOptions($('.options'));
+
+    }
+
+    //- ------------------------------------------------------ -//
+    //-  For  Quiz : Add & Remove AnsBlock of Question         -//
+    //- -----------------------------------------------------  -//
+
+    var initEssay = function(){
+
+      var essayOptDiv = $('<div/>', {
+        class: "ansBlock"
+      }).append($('<select/>',{
+        type:"text",
+        style: "margin : 10px;",
+        class: "span1 pointOfBlock",
+        placeholder: "Point"
+      }).append($('<option/>', {'value': 1, 'html': '1'})
+      ).append($('<option/>', {'value': 2, 'html': '2'})
+      ).append($('<option/>', {'value': 3, 'html': '3'})
+      )).append($('<textarea/>',{
+        type:"text",
+        style: "margin : 10px;",
+        class: "span4 optBlock",
+        placeholder: "Block"
+      }));
+
+      $('#points').attr('readonly', 'readonly');
+
+      essayOptDiv.clone().appendTo('.options'); 
+
+      $(".optBlock").live("change",function() {    
+        console.log("Called Changes.");
+        var parQueDiv = $(this).parents("div").eq(1);
+        console.log(parQueDiv);
+        if(parQueDiv.find(".optBlock:last").val()!="") {
+          var tmpOpt = essayOptDiv.clone();
+          tmpOpt.appendTo(parQueDiv);
+          $($(this).parent().next().children()[0]).focus();
+          $($(tmpOpt).children()[0]).focus();
+          assignNamesForAnsBlock($('.options'));
+        }
+      });
+
+      $(".optBlock").live("blur",function(){
+        console.log("Called Blur.");
+        if($(this).val()=="" && $(this).parents(".options").find(".optBlock:last")[0] != this) {               
+          $(this).parent().remove();
+          assignNamesForAnsBlock($('.options'));
+        }
+      });
+
+      $(".pointOfBlock").live("blur", function(){
+        var ttlPoints = 0;
+        $('.options').find('.pointOfBlock').each(function(i, blockPoint) {
+          if($(blockPoint).val() != "") ttlPoints += parseInt($(blockPoint).val());
+        });
+        var lastBlockPoint = $('.options').find(".pointOfBlock:last")[0];
+        if($(lastBlockPoint).val() != "") ttlPoints -= parseInt($(lastBlockPoint).val());
+        $('#points').attr('value', ttlPoints);
+      });;
+
+      var assignNamesForAnsBlock = function($container) {
+        var ttlPoints = 0;
+        $container.find('.optBlock').each(function(i, block) {
+          $(block).attr('name', 'optBlock['+i+']');
+        });
+        $container.find('.pointOfBlock').each(function(i, blockPoint) {
+          $(blockPoint).attr('name', 'pointOfBlock['+i+']');
+          if($(blockPoint).val() != "") ttlPoints += parseInt($(blockPoint).val());
+        });
+        var lastBlockPoint = $('.options').find(".pointOfBlock:last")[0];
+        if($(lastBlockPoint).val() != "") ttlPoints -= parseInt($(lastBlockPoint).val());
+        $('#points').attr('value', ttlPoints);
+      };
+
+      assignNamesForAnsBlock($('.options'));
+
+    }
+
+
+    var tmp = $('#type').val();
+    if(tmp=="mcq"){
+      initMCQ();
+    } else {
+      initEssay();
+    }
+
+
+  }

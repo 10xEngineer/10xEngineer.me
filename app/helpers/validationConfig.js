@@ -67,7 +67,6 @@ module.exports.user = {
 	profileUpdate : {
 		name : {required: true},
 		email : {required: true , email : true},
-		password : {required: true}
 	}
 };
 
@@ -90,10 +89,20 @@ module.exports.question = {
 	
 	createQuestion : {
 		question: { required: 1},
-		questionOption:{ required: 1},
-		questionOptionCheckbox:{ required: 1},
-		difficulty: {required: true, number: true},
-		weightage: {required: true, number: true}
+		points: {required: true, number: true},
+		type : {
+			required: true,
+			checkFor: {
+				essay : {
+					optBlock: {required: 1},
+					pointOfBlock: {required: 1}
+				},
+				mcq : {
+					questionOption:{ required: 1},
+					questionOptionCheckbox:{ required: 1}
+				}
+			}
+		}
 	},
 	attemptQuestion : {
 		questionOption: { required : true}

@@ -54,7 +54,7 @@
     //- option(value="scala") Scala
 
   p Boiler Plate Code :
-  textarea#code(name='boilerPlateCode', rows="5") #{lesson.programming.boilerPlateCode}
+  textarea.span6#code(name='boilerPlateCode', rows="5") #{lesson.programming.boilerPlateCode}
 
 - else if(lesson.type == 'sysAdmin')
     select.serverName#serverName(name='serverName', multiple='multiple', style='display:none')
