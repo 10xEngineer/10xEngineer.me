@@ -7,7 +7,7 @@ form(method='POST')
           input.span6.question(type="text", value="#{question.question}", placeholder="Question", name="question")
         .row-fluid
           .span6.offset3
-            select.span3(name="type")
+            select.span3#type(name="type")
               - if(question.type == "mcq") 
                 option(value="mcq", selected) MCQ
               - else 
@@ -34,10 +34,10 @@ form(method='POST')
             each option, index in question.choices
               .addedOption
                 - if(question.answers.indexOf(option)>=0)
-                  input.questionOptionCheckbox(type="checkbox", checked, name="questionOptionCheckbox[#{index}]")
+                  input.questionOptionCheckbox(type="checkbox", checked, style="margin: 10px", name="questionOptionCheckbox[#{index}]")
                 - else
-                  input.questionOptionCheckbox(type="checkbox", name="questionOptionCheckbox[#{index}]")
-                input.questionOption(type="text", placeholder="Option", style="margin: 5px", value="#{option}", name="questionOption[#{index}]")  
+                  input.questionOptionCheckbox(type="checkbox", style="margin: 10px", name="questionOptionCheckbox[#{index}]")
+                input.questionOption(type="text", placeholder="Option", style="margin: 10px", value="#{option}", name="questionOption[#{index}]")  
           - else if(question.type == "essay")
             each ansLine, index in question.answers
               .ansBlock
@@ -106,7 +106,7 @@ script(type='text/javascript')
         class: "questionOption",
         style: "margin : 10px;"
       }));
-      $('.options').html("");
+
       optDiv.clone().appendTo('.options'); 
 
       $(".questionOption").live("change",function() {    
@@ -218,6 +218,7 @@ script(type='text/javascript')
 
 
     var tmp = $('#type').val();
+    console.log(tmp);
     if(tmp=="mcq"){
       initMCQ();
     } else {
