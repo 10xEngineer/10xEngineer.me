@@ -60,6 +60,7 @@ var verifyCourseSubscription = function(req, res, next) {
   } else {
     courseSubscription.verifyUser(course, user, function(err){
       if(err){
+        console.error(err);
         res.redirect('/');
       }
       else {
@@ -127,12 +128,11 @@ module.exports = function(app) {
   app.get('/auth/fb', auth.facebook);
   app.get('/auth/fb/callback', auth.facebookCallback);
 
-  app.get('/signup', accessPermission, user.signup);
   app.get('/register', accessPermission, user.registerView);
   app.post('/register', accessPermission, validation.lookUp(validationConfig.user.profileUpdate), user.register, auth.local);
-  app.get('/user/profile', user.profile);
-  app.get('/user/settings', user.settingsView);
-  app.post('/user/settings', validation.lookUp(validationConfig.user.profileUpdate), user.settings);
+  app.get('/user/profile', verifyPermission('user', 'read'), user.profile);
+  app.get('/user/settings', verifyPermission('user', 'edit'), user.settingsView);
+  app.post('/user/settings', verifyPermission('user', 'edit'), validation.lookUp(validationConfig.user.profileUpdate), user.settings);
   
   // Course
   app.get('/courses', verifyPermission('course', 'read'), course.featuredList);
@@ -145,7 +145,7 @@ module.exports = function(app) {
   // Course Editor
 
   // Course oprations
-  app.get('/course_editor', course_editor.coursesList);
+  app.get('/course_editor', verifyPermission('course', 'read'), course_editor.coursesList);
   app.get('/course_editor/create', verifyPermission('course', 'edit'), course_editor.createView);
   app.post('/course_editor/create', verifyPermission('course', 'edit'),  validation.lookUp(validationConfig.course.createCourse), course_editor.create);
   app.get('/course_editor/import',  verifyPermission('course', 'edit'), course_editor.importView);
@@ -198,8 +198,8 @@ module.exports = function(app) {
 
   // Admin
   app.get('/admin', verifyPermission('admin', 'read'), admin.show);
-  app.get('/admin/approve', admin.approveView);
-  app.get('/admin/approve/:userId', admin.approve);
+  app.get('/admin/approve', verifyPermission('admin', 'edit'), admin.approveView);
+  app.get('/admin/approve/:userId', verifyPermission('admin', 'edit'), admin.approve);
 
   app.get('/admin/labs', verifyPermission('admin', 'read'), admin.showLabsView);
   app.get('/admin/labs/create', verifyPermission('admin', 'edit'), admin.labsView);
@@ -216,8 +216,8 @@ module.exports = function(app) {
   app.get('/admin/role/:roleId/remove', verifyPermission('admin', 'delete'), admin.removeRole);
   app.get('/admin/role/:roleName', verifyPermission('admin', 'edit'), admin.usersRoleView);
   
-  app.get('/admin/usersImport', admin.usersImportView);
-  app.post('/admin/usersImport', admin.usersImport);
+  app.get('/admin/usersImport', verifyPermission('admin', 'edit'), admin.usersImportView);
+  app.post('/admin/usersImport', verifyPermission('admin', 'edit'), admin.usersImport);
   app.get('/admin/user/:userId/roles', verifyPermission('admin', 'read'), admin.showUserRoles);
   app.post('/admin/user/:userId/roles', verifyPermission('admin', 'edit'), admin.updateUserRoles);
   app.get('/admin/user/:userId/remove', verifyPermission('admin', 'delete'), admin.removeUser);
@@ -239,11 +239,11 @@ module.exports = function(app) {
   app.get('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), quiz.editView);
   app.post('/assessment/quiz/:lessonId/edit', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.quiz.editQuiz), quiz.edit);
   app.get('/assessment/quiz/:lessonId/remove', verifyPermission('admin', 'delete'), quiz.removeQuiz);
-  app.get('/assessment/quiz/:lessonId/start', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.startQuiz);
-  app.get('/assessment/quiz/:lessonId/continue', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.continueQuiz);
-  app.get('/assessment/quiz/:lessonId/finish', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.quizResult);
-  app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), verifyCourseSubscription, quiz.viewQuestion);
-  app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('admin', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), verifyCourseSubscription, quiz.submitQuestion);
+  app.get('/assessment/quiz/:lessonId/start', verifyPermission('course', 'read'), verifyCourseSubscription, quiz.startQuiz);
+  app.get('/assessment/quiz/:lessonId/continue', verifyPermission('course', 'read'), verifyCourseSubscription, quiz.continueQuiz);
+  app.get('/assessment/quiz/:lessonId/finish', verifyPermission('course', 'read'), verifyCourseSubscription, quiz.quizResult);
+  app.get('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('course', 'read'), verifyCourseSubscription, quiz.viewQuestion);
+  app.post('/assessment/quiz/:lessonId/:questionIndex', verifyPermission('course', 'read'), validation.lookUp(validationConfig.question.attemptQuestion), verifyCourseSubscription, quiz.submitQuestion);
   app.get('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), question.createView);
   app.post('/assessment/question/create/:lessonId', verifyPermission('admin', 'edit'), validation.lookUp(validationConfig.question.createQuestion), question.create);
   app.get('/assessment/question/import/:lessonId', verifyPermission('admin', 'edit'), question.importQuestionView);

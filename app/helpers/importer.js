@@ -160,7 +160,7 @@ var lesson = function(data, chapterId, callback) {
           log.error(error);
           return callback(error);
         }
-        fs.readFile(data.quiz.questions, function(error, data){
+        fs.readFile(data.quiz.questions, 'utf8', function(error, data){
           if(error) {
             log.error(error);
             return callback(error);
@@ -539,7 +539,7 @@ var quiz_lesson_exp = function(full_path, lesson, data, count, callback) {
           var frist = true;
           async.forEach(question_list, function(question, forEachCB){
             var data = "{";
-            data += "\"question\" : \"" + question.question + "\" , ";
+            data += "\"question\" : " + JSON.stringify(question.question) + " , ";
             data += "\"type\" : \"" + question.type + "\" , ";
             data += "\"points\" : \"" + question.points + "\" , ";
             data += "\"choices\" : " + JSON.stringify(question.choices) + " , ";
