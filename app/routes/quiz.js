@@ -162,9 +162,9 @@ var generateQuestionPaper = function(lesson, callback) {
   var mark = lesson.quiz.marks;
   // Todo : All logic is remaining  :p
   var questionPaper     = [];
-  var easyWeight        = mark * 0.4;
+  var easyWeight        = mark * 0.3;
   var midWeight         = mark * 0.4;
-  var hardWeight        = mark * 0.2;
+  var hardWeight        = mark * 0.3;
   var noOfHardQuestions = parseInt(hardWeight/3);
   var noOfMidQuestions;
   var noOfEasyQuestions;
