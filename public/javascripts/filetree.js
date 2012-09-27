@@ -241,6 +241,8 @@ define(['eventemitter2'], function(EventEmitter2) {
       };
       $currTab.removeClass('active');
       $(nextActiveTab).addClass('active');
+    }
+  }
 
   FileTree.prototype.selectItem = function(element) {
     $('.selected').removeClass('selected');
