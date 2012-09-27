@@ -10,6 +10,7 @@ define(['tty'], function(tty) {
     // TODO: Initialize terminal
     var server = data.term_server;
 
+    displayMessage('success', "Connected.");
     tty.open('http://' + server.auth.id + ':' + server.auth.secret + '@' + server.host + ':' + server.client_port);
   });
 
