@@ -80,5 +80,15 @@ define(['vfs-client', 'editor'], function(VFSClient, Editor) {
     editor.saveFile();
     return false;
   });
-
+  
+  $('#').click(function() {
+    editor.newFile();
+    return false;
+  });
+  
+  $('#').click(function() {
+    editor.newFolder();
+    return false;
+  });
+  
 });

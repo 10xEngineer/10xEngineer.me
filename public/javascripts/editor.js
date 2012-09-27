@@ -387,6 +387,34 @@ Editor.prototype.saveFile = function() {
   return false;
 };
 
+Editor.prototype.newFile = function() {
+  var self = this,
+    parent = this.tree.getSelected();
+  this.vfs.newFile('untitled file', parent, function(err){
+    console.log("Get Call back of file creation at VFS.");
+    if(err){
+      console.log("Error in file creation.");
+    } else {
+      
+    }
+  });
+  this.tree
+};
+
+Editor.prototype.newFolder = function() {
+  var self = this
+    parent = this.tree.getSelected();
+  this.vfs.newDir('untitled folder', parent, function(err){
+    if(err){
+      console.log("Error in folder creation.");
+    }
+    else{
+      
+    }
+  });
+  
+};
+
 Editor.prototype.loadMode = function(value) {
   this.ace.getSession().setMode(modesByName[value].mode || modesByName.java.mode);
   this.ace.getSession().modeName = value;

@@ -100,6 +100,11 @@
       'refresh'
       with parameters;
         treeJSON : current tree in form of JSON
+    
+    * getSelected()
+    ---------------
+    Returns:
+      path : full path of selected element
 
 
 *********************************************************************************************************************************/
@@ -190,6 +195,54 @@ define(['eventemitter2'], function(EventEmitter2) {
     this.emit('remove', path);
     
   };
+
+  FileTree.prototype.getSelected = function() {
+    var selected = $('.selected');
+    if (typeof selected === "undefined" || selected === null) {
+      selected = $('.filetree .root');
+    }
+    var path = selected.attr('rel');
+  }
+
+  FileTree.prototype.openDir = function(element) {
+    var self = this;
+    var $parent = $(element).parent();
+    var path = $(element).attr('rel');
+    if($parent.hasClass('collapsed')) {
+      this.emit('openDir', path, element);
+    } else {
+      self.collapse(element);
+    }
+  };
+
+
+  FileTree.prototype.openFile = function(element) {
+    var path = $(element).attr('rel');
+    this.emit('openFile', path);
+  }
+
+  FileTree.prototype.open = function(caller){
+  };
+
+  FileTree.prototype.close = function(caller) {
+    var self = this;
+    var $currTab = $(caller).parent()
+    var $tabList = $('#tabContainer li');
+    if($tabList.length > 1){
+      var nextActiveTab;
+      for (var i = 0; i < $tabList.length; i++) {
+        var found = ($($tabList[i]).attr('rel') == $currTab.attr('rel') && $($tabList[i]).html() == $currTab.html());
+        var condition = ( found && !(typeof(nextActiveTab)=='undefined'));
+        if(condition){
+          break;
+        } else {
+          nextActiveTab = $tabList[i];
+        }
+      };
+      $currTab.removeClass('active');
+      $(nextActiveTab).addClass('active');
+    }
+  }
 
   FileTree.prototype.selectItem = function(element) {
     $('.selected').removeClass('selected');
