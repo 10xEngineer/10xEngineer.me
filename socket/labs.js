@@ -205,19 +205,22 @@ function createOrResumeLab(lessonId, progressId, key, callback) {
           lesson.sysAdmin = {};
         }
 
-        lesson.sysAdmin.lab = lab.name;
-        progress.markModified('chapters');
-        progress.save(function(error) {
+        lab.refresh(function(error) {
           if(error) return callback(error);
 
-          lab.refresh(function(error) {
+          lesson.sysAdmin.lab = lab.name;
+          lesson.sysAdmin.localState = 'released';
+          progress.markModified('chapters');
+          progress.save(function(error) {
             if(error) return callback(error);
+
             callback(null, lab);
           });
         });
       });
     } else {
       var lab = new Lab(mcClient.labManager.origEndpoint, lesson.sysAdmin.lab);
+      lab.localState = lesson.sysAdmin.localState;
       lab.refresh(function(error) {
         if(error) return callback(error);
         callback(null, lab);
