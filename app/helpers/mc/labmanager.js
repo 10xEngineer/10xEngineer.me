@@ -77,6 +77,7 @@ Lab.prototype = new EventEmitter();
 
 Lab.prototype.refresh = function(callback) {
   var self = this;
+  self.labRefreshCount = self.labRefreshCount || 1;
 
   log.info("Fetching lab metadata for " + self.name);
   log.info("URL: " + self.endpoint);
@@ -107,14 +108,17 @@ Lab.prototype.refresh = function(callback) {
       self.release(function(error) {
         if(error) return callback(error);
         self.localState = 'released';
-        self.refresh(callback);
+
+        setTimeout(function() {
+          self.refresh(callback);
+        }, 1000 * self.labRefreshCount++);
       });
     } else if(self.state == 'pending' || self.localState == 'released') {
       self.getVmList(callback);
     } else {
       setTimeout(function() {
         self.refresh(callback);
-      }, 1000);
+      }, 1000 * self.labRefreshCount++);
     }
   });
 };
@@ -152,6 +156,7 @@ Lab.prototype.getVmList = function(callback) {
 
 Lab.prototype.refreshVm = function(uuid, callback) {
   var self = this;
+  self.vmRefreshCount = self.vmRefreshCount || 1;
 
   log.info("Refreshing vm - ", uuid);
   request.get({
@@ -165,8 +170,6 @@ Lab.prototype.refreshVm = function(uuid, callback) {
       return callback(new Error('Error getting lab info.'));
     }
 
-    log.info("Refreshed - ", uuid);
-
     if(typeof(body) == 'string') {
       try {
         body = JSON.parse(body);
@@ -175,11 +178,18 @@ Lab.prototype.refreshVm = function(uuid, callback) {
       }      
     }
 
-    self.vms[uuid] = body;
+    log.info("Refreshed - " + uuid + " State: " + body.state);
+    if(body.state !== 'available') {
+      setTimeout(function() {
+        self.refreshVm(uuid, callback);        
+      }, 1000 * self.vmRefreshCount++);
+    } else {
+      self.vms[uuid] = body;
 
-    // TODO: hardcode single vm for now
-    self.currentVm = body;
-    callback();
+      // TODO: hardcode single vm for now
+      self.currentVm = body;
+      callback();
+    }
   });
 };
 
