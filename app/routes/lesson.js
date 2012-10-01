@@ -192,7 +192,11 @@ module.exports.serverInfo = function(req, res, next) {
   
   res.contentType('text/plain');
   var id = req.query.id;
-
+  if(!id) {
+    return res.json({
+      error: "lab ID required."
+    });
+  }
   VMDef.findById(id, function (error, lab) {
     if(error) {
       log.error(error);
