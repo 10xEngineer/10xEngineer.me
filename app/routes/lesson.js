@@ -1,18 +1,16 @@
 var fs = require('fs');
-
 var _ = require('lodash');
+var async = require('async');
 
 var model = require('../models');
-
 var cdn = require('../helpers/cdn');
+var util = require('../helpers/util');
 
 
 module.exports = function() {};
 
 // Display a lesson
 module.exports.showView = function(req, res, next) {
-  var Lesson = model.Lesson;
-  var Assessment = model.Assessment;
   var Progress = model.Progress;
   var course = req.course;
   var lesson = req.lesson;
@@ -48,52 +46,73 @@ module.exports.showView = function(req, res, next) {
             }
           }
         }
-        
-        progressFlag = true;
-        Lesson.find({}, function(error, allLessons) {
-          if(error) return next(error);
-          Assessment.findOne({'user.id': req.user._id, 'lesson.id': req.lesson._id}, function(err, assessment){
-            if(error) return next(error);
-            var ass = assessment || {};
-            res.render('lessons/' + lesson.type, {
-              title           : lesson.title,
-              quiz            : lesson.quiz,
-              assessment      : assessment,
-              videoStartTime  : videoStartTime,
-              userName        : req.user.name,
-              allLessons      : allLessons,
-              userId          : req.user._id,
-              progressFlag    : progressFlag,
-              progressId      : progress._id,
-              username        : req.user.name
-            });
-          });
-        });
-      });
 
-    } else {
-      progressFlag = true;
-      Lesson.find({}, function(error, allLessons) {
-        Assessment.findOne({'user.id': req.user._id, 'lesson.id': req.lesson._id}, function(err, assessment){
-          if(error) return next(error);
-          var ass = assessment || {};
-
-          res.render('lessons/' + lesson.type, {
-            title: lesson.title,
-            quiz: lesson.quiz,
-            videoStartTime  : videoStartTime,
-            allLessons      : allLessons,
-            assessment      : assessment,
-            userId          : req.user._id,
-            progressFlag    : progressFlag,
-            progressId      : progress._id,
-            username        : req.user.name
-          });
-        });
+        return renderLessonView(req, res, videoStartTime, progress, next);
       });
+      } else {
+      return renderLessonView(req, res, videoStartTime, progress, next);
     }
   });
 };
+
+var renderLessonView = function(req, res, vsTime, progress, next) {
+  var Lesson = model.Lesson;
+  var Assessment = model.Assessment;
+  var lesson = req.lesson;
+  var course = req.course;
+
+  var chapterList = [];
+  var courseChapters = course.chapters;
+  var len = courseChapters.length;
+
+  for (var i = 0; i < len; i++) {
+    chapterList.push(courseChapters[i]._id);
+  };
+
+  progressFlag = true;
+  Lesson.find({chapter: { $in: chapterList}}, function(error, allLessons) {
+    // Grouping...
+    groupedLesson = {};
+    noOfLessons = allLessons.length;
+    for (var i = 0; i < noOfLessons; i++) {
+      tmpLesson = allLessons[i];
+      if(!groupedLesson.hasOwnProperty(tmpLesson.chapter)) {
+        groupedLesson[tmpLesson.chapter] = [];
+      }
+      groupedLesson[tmpLesson.chapter].push(tmpLesson);
+    };
+
+    // Sorting...
+    var sortedLessonList = [];
+    async.forEachSeries(courseChapters, function(chapter, innerCallback){
+      util.sortLessonAccordingToChapter(groupedLesson[chapter._id], chapter.lessons, function(error, retLessons){
+        if(error) innerCallback(error);
+        else {
+          sortedLessonList = sortedLessonList.concat(retLessons);
+          innerCallback();
+        }
+      });
+    }, function(error){
+      if(error) return next(error);
+      Assessment.findOne({'user.id': req.user._id, 'lesson.id': req.lesson._id}, function(err, assessment){
+        if(error) return next(error);
+        var ass = assessment || {};
+
+        res.render('lessons/' + lesson.type, {
+          title: lesson.title,
+          quiz: lesson.quiz,
+          videoStartTime  : vsTime, // It's video start time.
+          allLessons      : sortedLessonList,
+          assessment      : assessment,
+          userId          : req.user._id,
+          progressFlag    : progressFlag,
+          progressId      : progress._id,
+          username        : req.user.name
+        });
+      });
+    });
+  });
+}
 
 // For random the options
 var randomOption =function (options) {
