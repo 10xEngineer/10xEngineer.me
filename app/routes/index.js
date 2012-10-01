@@ -45,7 +45,7 @@ var verifyPermission = function(entity, action){
 };
 
 var accessPermission = function(req, res, next) {
-  if(req.isAuthenticated() && ( req.path == '/auth' )) {
+  if(req.isAuthenticated() && ( req.path == '/auth' || req.path == '/auth/forgot_password' || req.path == '/passwordRecover')) {
     res.redirect('/');
   } else {
     next();
@@ -115,11 +115,11 @@ module.exports = function(app) {
   // User
   app.get('/auth', accessPermission, user.login);
   app.post('/auth', accessPermission, auth.local);
-  app.get('/auth/forgot_password', user.forgotPassword);
-  app.get('/passwordRecover', user.resetPasswordView);
-  app.post('/passwordRecover', user.resetPassword);
-  app.post('/auth/forgot_password', user.mailLinkForResetPassword);
-  app.get('/logout', auth.logout);
+  app.get('/auth/forgot_password', accessPermission, user.forgotPassword);
+  app.post('/auth/forgot_password', accessPermission, user.mailLinkForResetPassword);
+  app.get('/passwordRecover', accessPermission, user.resetPasswordView);
+  app.post('/passwordRecover', accessPermission, user.resetPassword);
+  app.get('/logout', accessPermission, auth.logout);
 
   app.get('/auth/twitter', auth.twitter);
   app.get('/auth/twitter/callback', auth.twitterCallback);
