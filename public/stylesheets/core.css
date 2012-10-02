@@ -171,7 +171,6 @@ ul.questionList > li .innerDiv a:hover,ul.quizList > li .innerDiv a:hover{cursor
 ul.questionList > li .innerDiv .actionBtns a,ul.quizList > li .innerDiv .actionBtns a{margin-right:5px}
 div.questionBlock{margin:5px 0;background:#fff;padding:20px;border:solid 1px #eee;-webkit-border-radius:10px 10px;border-radius:10px 10px;list-style:none;margin-left:0;margin-bottom:18px}
 #messages{height:350px;overflow-y:scroll}
-.vsplit .lessonBar .btn{margin:15px auto}
 #compile{margin-left:5px}
 .stretch-to-fit{position:absolute;top:0;bottom:0;left:0;right:0}
 .rounded12{-webkit-border-radius:12px;border-radius:12px}

@@ -23,8 +23,8 @@ append layout.styles
 
 block layout.body
   include ../_breadcrumb
-  .programming_view.container.stretch-to-fit
-    +sidebar-left("collapsible resizable")
+  .lessons_programming.container.stretch-to-fit
+    +sidebar-left("resizable")
       .buttons-bar
           button#save(title="Save",class="image-button save-button", type="button") Save
           button#compile(title="Compile",class="image-button compile-button", type="button") Compile
@@ -33,11 +33,11 @@ block layout.body
 
       #tree
     
-    +sidebar-right("collapsible resizable")
+    +sidebar-right("resizable")
       .buttons-bar
       div#chat
 
-    .vsplit
+    .mainContainer
       mixin tabbar
       //- #tabBar
       //-   ul#tabContainer.nav.nav-tabs

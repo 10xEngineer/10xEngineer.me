@@ -444,13 +444,18 @@ Editor.prototype.getContent = function() {
   return this.ace.getSession().getValue();
 };
 
-var consoleHeight = 20;
-Editor.prototype.onResize = function() {
-  var left = this.offsetLeft;
-  var width = document.documentElement.clientWidth - left;
-  container.style.width = width + "px";
-  container.style.height = document.documentElement.clientHeight - consoleHeight + "px";
-  this.resize();
+// The below seems to be deprecated... most of those references don't even exist. Should be removed? -sah 10/1/12
+// var consoleHeight = 20;
+// Editor.prototype.onResize = function() {
+//   var left = this.offsetLeft;
+//   var width = document.documentElement.clientWidth - left;
+//   container.style.width = width + "px";
+//   container.style.height = document.documentElement.clientHeight - consoleHeight + "px";
+//   this.resize();
+// };
+
+Editor.prototype.resize = function() {
+  this.ace.resize();
 };
 
 Editor.prototype.setTabState = function(id, state) {
