@@ -47,7 +47,7 @@
     , "socket.io": "0.9.x"
     , "stylus": "0.x"
     , "uglify-js": "1.2.x"
-    , "up": "git://github.com/LearnBoost/up.git"
+    , "up": "git://github.com/deltasquare4/up.git"
     , "up-hook": "0.1.x"
     , "util": "0.4.x"
     , "winston": "0.6.x"
