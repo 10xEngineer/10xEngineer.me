@@ -39,7 +39,8 @@ require.config({
       exports: 'EventEmitter2'
     },
     'filetree': ['eventemitter2'],
-  }
+  },
+  waitSeconds: 20
 });
 
 require(['require',
