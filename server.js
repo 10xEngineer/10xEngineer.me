@@ -69,6 +69,7 @@ async.waterfall([
     var master = require('http').Server().listen(config.get('site:port'));
 
     var options = {
+      numWorkers: 1, // TODO: Keep single worker for now to avoid proxy errors
       assumeReady: false,
       keepAlive: true,
       title: '10xEngineer'

@@ -77,6 +77,7 @@ Lab.prototype = new EventEmitter();
 
 Lab.prototype.refresh = function(callback) {
   var self = this;
+  self.labRefreshCount = self.labRefreshCount || 1;
 
   log.info("Fetching lab metadata for " + self.name);
   log.info("URL: " + self.endpoint);
@@ -107,20 +108,24 @@ Lab.prototype.refresh = function(callback) {
       self.release(function(error) {
         if(error) return callback(error);
         self.localState = 'released';
-        self.refresh(callback);
+
+        setTimeout(function() {
+          self.refresh(callback);
+        }, 1000 * self.labRefreshCount++);
       });
     } else if(self.state == 'pending' || self.localState == 'released') {
       self.getVmList(callback);
     } else {
       setTimeout(function() {
         self.refresh(callback);
-      }, 1000);
+      }, 1000 * self.labRefreshCount++);
     }
   });
 };
 
 Lab.prototype.getVmList = function(callback) {
   var self = this;
+  this.vmListRefreshCount = this.vmListRefreshCount || 1;
 
   log.info("Getting a list of available vms...");
   request.get({
@@ -141,17 +146,25 @@ Lab.prototype.getVmList = function(callback) {
     }
 
     log.info(respArray.length + ' vm received.');
-    self.vms = {};
-    async.forEach(respArray, function(vm, callback) {
-      self.refreshVm(vm.uuid, callback);
-    }, function(error) {
-      callback(error);
-    });
+
+    if(respArray.length === 0) {
+      setTimeout(function() {
+        self.getVmList(callback);
+      }, 1000 * self.vmListRefreshCount++);
+    } else {
+      self.vms = {};
+      async.forEach(respArray, function(vm, callback) {
+        self.refreshVm(vm.uuid, callback);
+      }, function(error) {
+        callback(error);
+      });
+    }
   });
 };
 
 Lab.prototype.refreshVm = function(uuid, callback) {
   var self = this;
+  self.vmRefreshCount = self.vmRefreshCount || 1;
 
   log.info("Refreshing vm - ", uuid);
   request.get({
@@ -165,8 +178,6 @@ Lab.prototype.refreshVm = function(uuid, callback) {
       return callback(new Error('Error getting lab info.'));
     }
 
-    log.info("Refreshed - ", uuid);
-
     if(typeof(body) == 'string') {
       try {
         body = JSON.parse(body);
@@ -175,11 +186,18 @@ Lab.prototype.refreshVm = function(uuid, callback) {
       }      
     }
 
-    self.vms[uuid] = body;
+    log.info("Refreshed - " + uuid + " State: " + body.state);
+    if(body.state !== 'available') {
+      setTimeout(function() {
+        self.refreshVm(uuid, callback);        
+      }, 1000 * self.vmRefreshCount++);
+    } else {
+      self.vms[uuid] = body;
 
-    // TODO: hardcode single vm for now
-    self.currentVm = body;
-    callback();
+      // TODO: hardcode single vm for now
+      self.currentVm = body;
+      callback();
+    }
   });
 };
 
@@ -219,8 +237,12 @@ Lab.prototype.release = function(callback) {
   var self = this;
   
   self.getVersions(function(error, version) {
+    if(error) {
+      log.error(error);
+      return callback(error);
+    }
 
-    log.info('Releasing the lab ' + this.name + ' with version ' + version);
+    log.info('Releasing the lab ' + self.name + ' with version ' + version);
     request.post({
       url: self.endpoint + '/versions/' + version + '/release'
     }, function(error, res, body) {
@@ -234,9 +256,7 @@ Lab.prototype.release = function(callback) {
       }
 
       log.info('Lab successfully released.');
-      self.refresh(function(error) {
-        callback(error);
-      });
+      callback();
     });
   });
 

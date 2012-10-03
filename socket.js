@@ -53,13 +53,17 @@ module.exports = function(app) {
     redisClient : client
   }));
   io.set('log level', 1);
+  io.enable('browser client etag');
+  io.enable('browser client gzip');
+  io.enable('match origin protocol');
 
   io.configure('development', function () {
-    io.set('transports', ['websocket']);
+    io.set('transports', ['websocket', 'xhr-polling', 'jsonp-polling', 'htmlfile']);
   });
 
   io.configure('production', function () {
-    io.set('transports', ['websocket', 'htmlfile', 'xhr-polling', 'jsonp-polling', 'flashsocket']);
+    io.set('transports', ['websocket', 'xhr-polling', 'jsonp-polling', 'flashsocket', 'htmlfile']);
+    io.enable('browser client minification');
   });
 
   // Initialize socket events
