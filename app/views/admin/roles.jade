@@ -16,9 +16,37 @@ block layout.body
             div.listItemComponent
               label #{role.name}
             div.listItemComponent.pull-right
-              a.btn.btn-danger(href="/admin/role/#{role.id}/remove") Remove
+              a.confirmDeletion.btn.btn-danger(remove-path="/admin/role/#{role.id}/remove", data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{role.name}' user?") Remove
             div.listItemComponent.pull-right
               a.btn((href="/admin/role/#{role.id}/edit") Edit
     p
       .admin_view_footer
         a.btn(href="/admin") Back to admin Panel.
+    
+  script(type="text/javascript")
+    function init() {
+
+      // code for confirm box - modal
+      var myData;
+      createModal();
+      console.log($('#myModal'));
+      $('#myModal').on('show', function(e){
+        var data = bridge(false);
+        setModalData(data);
+      });
+      var bridge = function(bool, data) {
+        if(bool){
+          myData = data;
+        } else {
+          return myData;
+        }
+      }
+      $('.confirmDeletion').click(function(e){
+        var self = $(this);
+        var tmpData = {
+          path: self.attr('remove-path'),
+          body: self.attr('confirm-msg')
+        }
+        bridge(true, tmpData);
+      });      
+    }

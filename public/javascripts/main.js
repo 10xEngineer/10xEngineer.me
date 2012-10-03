@@ -80,6 +80,57 @@ require(['require',
     }
   });
 
+  window.createModal = function() {
+    var modal  = $('<div/>', {
+      id: 'myModal',
+      class: "modal hide",
+      tabindex: "-1",
+      role:"dialog",
+      'aria-labelledby':"myModalLabel", 
+      'aria-hidden':"true"
+    });
+    // Modal header
+    var modalHeader = $('<div/>',{
+      class: 'modal-header'
+    }).append($('<button/>', {
+      class: "close",
+      type:"button",
+      'data-dismiss':"modal",
+      'aria-hidden':"true"
+    }).append($('<i/>',{
+      class: 'icon-remove'
+    }))).append($('<h3/>', {
+      html: "Confirmation"
+    })).appendTo(modal);
+    // Modal body
+    var modalBody = $('<div/>',{
+      class: 'modal-body'
+    }).append($('<p/>', {
+      html:"This is body"
+    })).appendTo(modal);
+    // Modal footer
+    var modalFooter = $('<div/>',{
+      class: 'modal-footer'
+    }).append($('<a/>', {
+      class: 'btn',
+      'data-dismiss': 'modal',
+      'aria-hidden': "true",
+      html: 'Cancel'
+    })).append($('<a/>', {
+      class: "btn btn-danger",
+      html: 'Confirm'
+    })).appendTo(modal);
+
+    $('body').append(modal);
+  };
+
+  window.setModalData = function(data) {
+    console.log(data.body);
+    console.log($('#myModal .modal-body p'));
+    $('#myModal .modal-body p').html(data.body);
+    $('#myModal .modal-footer a.btn.btn-danger').attr('href', data.path);
+  };
+
   window.displayMessage = function(type, message) {
     var $alertContainer = $('.alertContainer');
     var typeClass = 'alert-block';
