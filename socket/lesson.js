@@ -127,11 +127,11 @@ module.exports = function(io) {
     .on('connection', function (socket) {
     var compiler;
     
-    socket.on('submitcode', function(data){
+    socket.on('submitcode', function(bucketId){
       // Create VFS
       mongofs({
         database: 'mongofs_test',
-        bucketId: 'test'
+        bucketId: bucketId
       }, function(error, vfs) {
 
         compiler = new Compiler({

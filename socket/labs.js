@@ -1,6 +1,6 @@
 var model = require('../app/models');
-var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
-//var mcClient = require('../app/helpers/microcloud-client')();
+//var mcClient = require('../app/helpers/microcloud-client')("http://localhost:8000");
+var mcClient = require('../app/helpers/microcloud-client')();
 var Lab = mcClient.Lab;
 
 module.exports = function(io) {
@@ -193,7 +193,7 @@ function createOrResumeLab(lessonId, progressId, key, callback) {
       // Create a lab
       var data = {
         name: progressId,
-        definition: 'https://github.com/10xEngineer/wip-lab-definition-basicvm.git', //TODO: hardcoded
+        definition: 'https://github.com/deltasquare4/wip-lab-definition-basicvm.git', //TODO: hardcoded
         version: '0.0.1', // TODO: Hardcoded
         keypair: key.name
       };
@@ -205,19 +205,22 @@ function createOrResumeLab(lessonId, progressId, key, callback) {
           lesson.sysAdmin = {};
         }
 
-        lesson.sysAdmin.lab = lab.name;
-        progress.markModified('chapters');
-        progress.save(function(error) {
+        lab.refresh(function(error) {
           if(error) return callback(error);
 
-          lab.refresh(function(error) {
+          lesson.sysAdmin.lab = lab.name;
+          lesson.sysAdmin.localState = 'released';
+          progress.markModified('chapters');
+          progress.save(function(error) {
             if(error) return callback(error);
+
             callback(null, lab);
           });
         });
       });
     } else {
       var lab = new Lab(mcClient.labManager.origEndpoint, lesson.sysAdmin.lab);
+      lab.localState = lesson.sysAdmin.localState;
       lab.refresh(function(error) {
         if(error) return callback(error);
         callback(null, lab);
