@@ -1,4 +1,8 @@
+body
+  background-image url(https://d6ff1xmuve0sx.cloudfront.net/2.0.5-112402a5/static/ext/main/style/images/zenbg.png)
+
 #content
+  background-color transparent
   padding-top 0
   margin-top 20px
   margin-bottom 55px
@@ -9,7 +13,30 @@
   left 0
   right 0
   // /.stretch-to-fit
+  transition-property margin, left, right
+  transition-duration .4s
+  transition-timing-function ease-in-out
 
 #footer
   position fixed
   width 100%
+
+.hidden-in-fullscreen
+  transition-property visibility, opacity
+  transition-duration 0s, .4s
+  transition-delay .4s
+  transition-timing-function ease-in-out
+
+body.fullscreen
+  #content
+    margin-bottom 0px
+    left 15%
+    right 15%
+    transition-delay .4s
+  .hidden-in-fullscreen
+    visibility hidden
+    opacity 0
+    transition-property visibility, opacity
+    transition-duration 0s .4s
+    transition-timing-function ease-in-out
+    transition-delay .4s, 0s

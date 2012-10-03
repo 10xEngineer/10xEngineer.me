@@ -29,7 +29,7 @@ html(lang="en")
     section#header
       mixin header
     section#content
-      .container.alertContainer
+      .container.alertContainer.hidden-in-fullscreen
         -if(typeof(error) != 'undefined') 
           div.alert.alert-block
             a.close(data-dismiss='alert',href='#') x
@@ -41,7 +41,7 @@ html(lang="en")
             h4.alert-heading Information 
             | #{message}      
       block layout.body
-    section#footer
+    section#footer.hidden-in-fullscreen
       .container
         .span6
           p Copyright &copy; 2012 - 10xEngineer.me

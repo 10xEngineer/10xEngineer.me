@@ -91,4 +91,27 @@ define(['vfs-client', 'editor'], function(VFSClient, Editor) {
     return false;
   });
   
+  var resizeInterval;
+  $('#fullscreen').click(function() {
+    if ($('body').hasClass('fullscreen')) {
+      $('body').removeClass('fullscreen');
+    }
+    else {
+      $('.widget_sidebar.left').data().expand();
+      $('body').addClass('fullscreen');
+    }
+    resizeInterval = setInterval(function() {
+      editor.resize();
+    }, 10);
+    setTimeout(function() {
+      clearInterval(resizeInterval);
+    }, 700)
+  });
+  
+  $('.widget_sidebar').on('transitionend webkitTransitionEnd oTransitionEnd', function(event) {
+    editor.resize();
+    clearInterval(resizeInterval);
+    $(event.target).data().updateClassStates();
+  });
+  
 });

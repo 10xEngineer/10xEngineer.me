@@ -38,12 +38,14 @@ block layout.body
       div#chat
 
     .mainContainer
+      .buttons-bar
+        button#fullscreen(title="Fullscreen",class="image-button fullscreen-button", type="button") Fullscreen
       mixin tabbar
       //- #tabBar
       //-   ul#tabContainer.nav.nav-tabs
       #editor
       input#docId(type="hidden", value="#{progressId}")
-      .lessonBar
+      .lessonBar.hidden-in-fullscreen
         a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
         a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
 
