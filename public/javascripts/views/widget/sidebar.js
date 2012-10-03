@@ -27,6 +27,8 @@ define(['eventemitter2'], function(EventEmitter2) {
     dragElement.on('mousedown.drag', function(event) {
       self.startDrag.call(self, dragElement, event);
     })
+    
+    this.previousWidth = element.width()
   }
 
   Sidebar.prototype = new EventEmitter2({
@@ -69,7 +71,7 @@ define(['eventemitter2'], function(EventEmitter2) {
       element.width(width);
     }
     else {
-      element.width('');
+      element.width('auto');
     }
     this.updateClassStates();
   };
@@ -112,6 +114,8 @@ define(['eventemitter2'], function(EventEmitter2) {
   
   Sidebar.prototype.exposeApi = function() {
     return {
+      expand            : this.expand.bind(this),
+      updateClassStates : this.updateClassStates.bind(this)
       // addTab : this.addTab.bind(this),
       // getTab : this.getTabElementById.bind(this),
       // removeTab : this.removeTab.bind(this),

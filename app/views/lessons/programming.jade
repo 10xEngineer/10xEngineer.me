@@ -23,8 +23,8 @@ append layout.styles
 
 block layout.body
   include ../_breadcrumb
-  .programming_view.container.stretch-to-fit
-    +sidebar-left("collapsible resizable")
+  .lessons_programming.container.stretch-to-fit
+    +sidebar-left("resizable")
       .buttons-bar
           button#save(title="Save",class="image-button save-button", type="button") Save
           button#compile(title="Compile",class="image-button compile-button", type="button") Compile
@@ -33,17 +33,19 @@ block layout.body
 
       #tree
     
-    +sidebar-right("collapsible resizable")
+    +sidebar-right("resizable")
       .buttons-bar
       div#chat
 
-    .vsplit
+    .mainContainer
+      .buttons-bar
+        button#fullscreen(title="Fullscreen",class="image-button fullscreen-button", type="button") Fullscreen
       mixin tabbar
       //- #tabBar
       //-   ul#tabContainer.nav.nav-tabs
       #editor
       input#docId(type="hidden", value="#{progressId}")
-      .lessonBar
+      .lessonBar.hidden-in-fullscreen
         a.btn.pull-left(href='/lesson/#{lesson.id}/previous/') Previous
         a.btn.pull-right.btn-success(href="/lesson/#{lesson.id}/next/") Next
 

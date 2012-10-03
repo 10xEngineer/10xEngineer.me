@@ -1,5 +1,5 @@
 
-define(['eventemitter2', 'filetree', 'ace/ace', 'contextMenu', 'views/widget/tabbar'], function(EventEmitter2, FileTree) {
+define(['eventemitter2', 'filetree', 'ace/ace', 'contextMenu', 'views/widget/tabbar'], function(EventEmitter2, FileTree, ace) {
 
 require("ace/lib/fixoldbrowsers");
 var config = require("ace/config")
@@ -132,55 +132,56 @@ function Editor(options) {
   });
 
   // Initialize renderer
-  var renderer = new Renderer(el, theme);
-  renderer.scrollBar.element.style.display = "none";
-  renderer.scrollBar.width = 0;
-  renderer.content.style.height = "auto";
+  // var renderer = new Renderer(el, theme);
+  // renderer.scrollBar.element.style.display = "none";
+  // renderer.scrollBar.width = 0;
+  // renderer.content.style.height = "auto";
+  // 
+  // renderer.screenToTextCoordinates = function(x, y) {
+  //   var pos = this.pixelToScreenCoordinates(x, y);
+  //   return this.session.screenToDocumentPosition(
+  //     Math.min(this.session.getScreenLength() - 1, Math.max(pos.row, 0)),
+  //     Math.max(pos.column, 0)
+  //   );
+  // };
+  // 
+  // // todo size change event
+  // renderer.$computeLayerConfig = function() {
+  //   var longestLine = this.$getLongestLine();
+  //   var lastRow = this.session.getLength();
+  //   var height = this.session.getScreenLength() * this.lineHeight;
+  // 
+  //   this.scrollTop = 0;
+  //   var config = this.layerConfig;
+  //   config.width = longestLine;
+  //   config.padding = this.$padding;
+  //   config.firstRow = 0;
+  //   config.firstRowScreen = 0;
+  //   config.lastRow = lastRow;
+  //   config.lineHeight = this.lineHeight;
+  //   config.characterWidth = this.characterWidth;
+  //   config.minHeight = height;
+  //   config.maxHeight = height;
+  //   config.offset = 0;
+  //   config.height = height;
+  // 
+  //   this.$gutterLayer.element.style.marginTop = 0 + "px";
+  //   this.content.style.marginTop = 0 + "px";
+  //   this.content.style.width = longestLine + 2 * this.$padding + "px";
+  //   this.content.style.height = height + "px";
+  //   this.scroller.style.height = height + "px";
+  //   this.container.style.height = height + "px";
+  // };
 
-  renderer.screenToTextCoordinates = function(x, y) {
-    var pos = this.pixelToScreenCoordinates(x, y);
-    return this.session.screenToDocumentPosition(
-      Math.min(this.session.getScreenLength() - 1, Math.max(pos.row, 0)),
-      Math.max(pos.column, 0)
-    );
-  };
+  var editor = ace.edit(options.editor.slice(1));
+  editor.setTheme('ace/theme/textmate');
+  new MultiSelect(editor);
+  editor.setSession(this.blankSession);
+  editor.setKeyboardHandler(null);
+  editor.setAnimatedScroll(true);
+  editor.setReadOnly(true);
 
-  // todo size change event
-  renderer.$computeLayerConfig = function() {
-    var longestLine = this.$getLongestLine();
-    var lastRow = this.session.getLength();
-    var height = this.session.getScreenLength() * this.lineHeight;
-
-    this.scrollTop = 0;
-    var config = this.layerConfig;
-    config.width = longestLine;
-    config.padding = this.$padding;
-    config.firstRow = 0;
-    config.firstRowScreen = 0;
-    config.lastRow = lastRow;
-    config.lineHeight = this.lineHeight;
-    config.characterWidth = this.characterWidth;
-    config.minHeight = height;
-    config.maxHeight = height;
-    config.offset = 0;
-    config.height = height;
-
-    this.$gutterLayer.element.style.marginTop = 0 + "px";
-    this.content.style.marginTop = 0 + "px";
-    this.content.style.width = longestLine + 2 * this.$padding + "px";
-    this.content.style.height = height + "px";
-    this.scroller.style.height = height + "px";
-    this.container.style.height = height + "px";
-  };
-
-  var ace = new AceEditor(renderer);
-  new MultiSelect(ace);
-  ace.setSession(this.blankSession);
-  ace.setKeyboardHandler(null);
-  ace.setAnimatedScroll(true);
-  ace.setReadOnly(true);
-
-  ace.commands.addCommand({
+  editor.commands.addCommand({
       name: "save",
       bindKey: {win: "Ctrl-S", mac: "Command-S"},
       exec: function(e) {
@@ -189,7 +190,26 @@ function Editor(options) {
   });
 
   // Assign ace editor
-  this.ace = ace;
+  this.ace = editor;
+  
+
+  // var ace = new AceEditor(renderer);
+  // new MultiSelect(ace);
+  // ace.setSession(this.blankSession);
+  // ace.setKeyboardHandler(null);
+  // ace.setAnimatedScroll(true);
+  // ace.setReadOnly(true);
+  // 
+  // ace.commands.addCommand({
+  //     name: "save",
+  //     bindKey: {win: "Ctrl-S", mac: "Command-S"},
+  //     exec: function(e) {
+  //       self.saveFile();
+  //     }
+  // });
+  // 
+  // // Assign ace editor
+  // this.ace = ace;
 
   this.tabbar = views_tabbar_create();
 
@@ -424,13 +444,18 @@ Editor.prototype.getContent = function() {
   return this.ace.getSession().getValue();
 };
 
-var consoleHeight = 20;
-Editor.prototype.onResize = function() {
-  var left = this.offsetLeft;
-  var width = document.documentElement.clientWidth - left;
-  container.style.width = width + "px";
-  container.style.height = document.documentElement.clientHeight - consoleHeight + "px";
-  this.resize();
+// The below seems to be deprecated... most of those references don't even exist. Should be removed? -sah 10/1/12
+// var consoleHeight = 20;
+// Editor.prototype.onResize = function() {
+//   var left = this.offsetLeft;
+//   var width = document.documentElement.clientWidth - left;
+//   container.style.width = width + "px";
+//   container.style.height = document.documentElement.clientHeight - consoleHeight + "px";
+//   this.resize();
+// };
+
+Editor.prototype.resize = function() {
+  this.ace.resize();
 };
 
 Editor.prototype.setTabState = function(id, state) {

@@ -1,9 +1,11 @@
-.programming_view
+.lessons_programming
   width 100%
   margin-top 76px
+  transition margin .4s ease-in-out
+  box-shadow 0px 0px 25px #000
   >.row-fluid
     height 100%
-  .vsplit
+  .mainContainer
     position relative
     overflow hidden
     height 100%
@@ -105,10 +107,20 @@
     left 0
     bottom 0
     padding 0 40px 0 60px
+    .btn
+      margin: 15px auto
+  .mainContainer
+    background-color  whiteSmoke
+    .buttons-bar
+      float right
+  .widget_sidebar
+    width 300px
+    transition width .4s ease-in-out
   #editor
     position absolute
     width 100%
-    display inline-block
+    top 36px
+    bottom 60px
   #tree
     min-width 300px
   #chat
@@ -117,6 +129,15 @@
     overflow-x auto
     height 100%
 
+body.fullscreen
+  .lessons_programming
+    margin-top 0
+    #editor
+      bottom 0px
+    .widget_sidebar
+      width 0px
+      transition-delay .4s
+    transition margin .4s ease-in-out .4s
 
 .log-line
   white-space pre
