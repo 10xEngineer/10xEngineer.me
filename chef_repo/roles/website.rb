@@ -1,2 +1,2 @@
 name "website"
-run_list "recipe[mongo]", "recipe[redis]", "recipe[java]", "recipe[node]"
+run_list "recipe[mongodb]", "recipe[redis]", "recipe[java]", "recipe[node]", "recipe[graphicsmagick]"
