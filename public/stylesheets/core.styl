@@ -8,6 +8,7 @@ body
 
 .main-content-wrapper
    min-height 100%
+   padding-bottom 90px
 
 /* helper */
 img.repsonsive
@@ -156,19 +157,29 @@ ul.carousel-inner li.item
 
 /* Chapters */
 div.course-header
-div.chapter-header 
-  margin-bottom: 220px
+div.chapter-header
+  margin-bottom: 20px
 
-div.course-header .course-img
 div.course-header .course-content
 div.chapter-header .chapter-content 
-  display: inline-block
-  float: left
+  //display: inline-block
+  //float: left
+  background-position center
+  background-repeat no-repeat
+  height 300px
+  width 300px
+  background-color #f8f8f8
+  border 1px solid #ddd
+  border-radius 4px
 
+div.course-header .course-img
+  background-position center
+  background-repeat no-repeat
+  height 260px
+  background-color #f8f8f8
+  border 1px solid #ddd
+  border-radius 4px
 
-div.course-header .course-img img 
-  width: auto
-  height: 200px
 
 div.course-header .course-content
 div.chapter-header .chapter-content 
@@ -416,6 +427,9 @@ ul.course_list li
 ul.course_list li label 
   display: inline
 
+ul.course_list li h2
+  max-width 380px
+
 
 div.course_editor_header 
   margin: 5px 0
@@ -554,6 +568,140 @@ div.course_editor_header
 .flexslider .row-fluid .btn-group
   float:right
   padding-top:5px
+.slides-wrapper
+  background #fff
+  padding 10px
+  box-shadow 0 0 3px rgba(0,0,0,0.1)
+  border 1px solid #E0E0E0
+.slides
+  li
+    display block
+    background green
+    width 100%
+    height 360px
+    .content
+      position absolute
+      width 400px
+      bottom 0
+      margin 0
+      padding 0
+      h3
+        color #333
+        font-weight normal
+        line-height 20px
+        font-size 20px
+        margin 0
+        padding 10px 20px 10px
+        background #fff
+        float left
+        z-index 2000
+        position relative
+      p.description
+        float left
+        line-height 20px
+        font-weight 10px
+        padding 10px 0 10px 20px
+        bottom 10px
+        color #555
+        background #fff
+        z-index 1999
+        position relative
+    a
+      background linear-gradient(top, #0ac, #08c)
+      position absolute
+      line-height 15px
+      font-size 15px
+      right 0
+      bottom 20px
+      padding 10px
+      color #fff
+      transition all
+      transition-duration 0.3s
+    a:hover
+      text-decoration none
+      background linear-gradient(top, #0bc, #08c)
+      padding-right 20px
+
+.slides-navigation
+  margin 0
+  padding 0
+  float left
+  list-style-type none
+  li
+    padding 0
+    position relative
+    a
+      margin 0
+      display block
+      width 200px
+      padding 10px
+      background linear-gradient(top, #fff, #f5f5f5)
+      background-size auto
+      color #555
+      border-bottom 1px solid #ddd
+      border-right 1px solid #ddd
+      border-top 1px solid #fff
+      transition-property width
+      transition-duration 0.2s
+      list-style-type none
+    a:hover
+      text-decoration none
+    h4
+      font-size 15px
+      margin 0 0 5px 0
+      font-weight normal
+    p
+      display none
+      font-size 12px
+  li.activeSlide
+    z-index 2000
+    a
+      border-top 1px solid rgba(255,255,255, 0.1)
+      border-right none
+      box-shadow 1px 1px 2px rgba(0,0,0,0.2)
+      border-bottom 1px solid #08c
+      background linear-gradient(top, #0ac, #08c)
+      color #fff
+      width 210px
+      border-top-right-radius 2px
+      border-bottom-right-radius 2px
+    p
+      display block
+  li:first-child
+    a
+      border-top-right-radius 3px
+  li:last-child
+    a
+      border-bottom 1px solid #e0e0e0
+      border-bottom-right-radius 3px
+  li.activeSlide:last-child
+    a
+      border-bottom 1px solid transparent
+      border-top-right-radius 2px
+      border-bottom-right-radius 2px
+  li.activeSlide:first-child
+    a
+      border-top-right-radius 2px
+      border-bottom-right-radius 2px
+.courses-boxes
+  margin-top 20px
+  .course-box
+    padding-top 10px
+    background #fff
+    box-shadow 0 0 3px rgba(0,0,0,0.2)
+    .course-image
+      background-repeat no-repeat
+      background-position center center
+      background-size 250px 250px
+      height 150px
+    h4
+      padding 10px 0 0 20px
+      font-weight normal
+      color #333
+    p
+      padding 0 20px 20px
+      color #555
+      font-size 14px
 
 .carouselWrapper
   padding-bottom:5px
@@ -584,7 +732,17 @@ div.course_editor_header
   padding:10px
 
 .lessonList
-  list-style:none
+  list-style none
+  margin 0
+  padding 0
+  li
+    display block
+    margin 0
+    padding 7px 0 5px 35px
+    border-bottom 1px solid #eee
+    border-top 1px solid #fff
+  li:hover
+    background-color #f8f8f8
 
 .reviewHeader
   border-bottom: 1px solid #000000
@@ -620,7 +778,10 @@ div.course_editor_header
   font-size:12px
   margin:0
   padding:0 5px
-
+.author-and-time
+  font-style italic
+  color #777
+  font-weight normal
 .backBtn
   float:right
   padding:15px
@@ -646,18 +807,22 @@ ul.auth-service
 .programmingIcon
 .sysAdminIcon
   background-repeat: no-repeat
-  background-position: left top
-  height:25px
-  width:25px
+  background-position 4px center
+  line-height 16px
+  font-size 12px
+  height 20px
 
 .videoIcon
   background-image: url(../img/video.png)
+  background-size 20px 20px
 
 .quizIcon
   background-image: url(../img/quiz.png)
 
 .programmingIcon
   background-image: url(../img/programming.png)
+  background-size 20px 20px
+  background-position 5px center
 
 .sysAdminIcon
   background-image: url(../img/admin.png)
@@ -747,7 +912,8 @@ a
   padding-bottom:10px
 
 .progress
-  margin:0px 15px 10px 15px
+  margin 10px 0
+  height 7px
 
 .progressTotal
   margin: 0 20px 10px
@@ -758,33 +924,33 @@ a
 .detailImage img
   padding-top:25px
 
-.not-started
-.ongoing
-.completed
-  background-repeat: no-repeat
-  background-position: left top
-  height:25px
-  width:25px
-  // margin: -25px 0px 0px 25px
+span.lessonStatus
+  background-position center
+  background-repeat no-repeat
+  height 20px
+  width 20px
+  display block
+  float right
 
-.not-started
-  background-position: center
-  background-image: url(../img/not-started.png)
-  height:25px
+li[data-status=not-started]
+  span
+    background-image url(../img/not-started.png)
 
-.ongoing
-  background-position: center
-  background-image: url(../img/ongoing.png)
-  height:25px
+li[data-status=ongoing]
+  span
+    background-image url(../img/ongoing.png)
+    background-size 15px 15px
 
-.completed
-  background-position: center
-  background-image: url(../img/finished.png)
-  height:25px
+li[data-status=completed]
+  span
+    background-image url(../img/completed.png)
+    background-size 15px 15px
 
 .lessonTitle
   height:25px
-  margin: -20px 0px 0px 25px
+  margin: 0 0px 0px 25px
+  p
+    margin 0
 
 /*
   Inline CSS from jade files

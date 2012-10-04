@@ -59,7 +59,7 @@ define(['vfs-client', 'editor'], function(VFSClient, Editor) {
 
   $('#compile').click(function() {
     var sourceCode = editor.getContent();
-    var languageCode = $('#pageslide #mode').val();
+    var languageCode = $('#pageslide').find('#mode').val();
     if(!languageCode){
       languageCode = $('#mode').val();
     }
@@ -81,12 +81,14 @@ define(['vfs-client', 'editor'], function(VFSClient, Editor) {
     return false;
   });
   
-  $('#').click(function() {
+  $('#newfile').click(function() {
+    console.log('newfile');
     editor.newFile();
     return false;
   });
   
-  $('#').click(function() {
+  $('#newfolder').click(function() {
+      console.log('newfolder');
     editor.newFolder();
     return false;
   });

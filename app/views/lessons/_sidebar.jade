@@ -6,21 +6,16 @@
           i.icon-book
           | Course Content
         - var chapters = course.chapters || []
-        #chaptersCollapseble.accordion
-          each innerChapter in chapters
-            .accordion-group
-              .accordion-heading
-                a.accordion-toggle(data-toggle="collapse", data-parent="#chaptersCollapseble", href="#les#{innerChapter.id}")
-                  li.nav-header #{innerChapter.title}
-              .accordion-body.collapse(id="les#{innerChapter.id}")
-                .accordion-inner
-                  each innerLesson in allLessons
-                    - if (innerLesson.chapter.toString() == innerChapter._id.toString())
-                      - if (innerLesson.id.toString() == lesson.id.toString())
-                          li #{innerLesson.title}
-                      - else
-                          li 
-                            a(href='/lesson/#{innerLesson.id}') #{innerLesson.title}
+        each innerChapter in chapters
+          a.accordion-toggle(data-toggle="collapse", data-parent="#chaptersCollapseble", href="#les#{innerChapter.id}")
+            li.nav-header #{innerChapter.title}
+          each innerLesson in allLessons
+            - if (innerLesson.chapter.toString() == innerChapter._id.toString())
+              - if (innerLesson.id.toString() == lesson.id.toString())
+                  li #{innerLesson.title}
+              - else
+                  li
+                    a(href='/lesson/#{innerLesson.id}') #{innerLesson.title}
 
 script
   function init(){

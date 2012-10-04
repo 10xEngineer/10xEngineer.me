@@ -471,7 +471,7 @@ Editor.prototype.setTabState = function(id, state) {
     case 'dirty':
       tab.addClass('dirty');
   }
-}
+};
 
 return Editor;
 

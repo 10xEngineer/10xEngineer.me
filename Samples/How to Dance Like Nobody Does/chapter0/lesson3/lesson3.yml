@@ -1,0 +1,5 @@
+title: Hello Dragons
+desc: Write a function called 'main' using javascript, which appends ' is awesome' to its first parameter and returns the result.
+type: programming
+programming: 
+ language: javascript
