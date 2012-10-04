@@ -120,7 +120,7 @@ define(['eventemitter2'], function(EventEmitter2) {
     // Generete tree code
     this.fileTree = json;
 
-    $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a><li></ul>');
+    $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a></li></ul>');
 
     fileList = json;
     var $ul = $('<ul/>', { class: 'fileTree' });
@@ -146,7 +146,7 @@ define(['eventemitter2'], function(EventEmitter2) {
       $item.appendTo($ul);
     });
     $ul.appendTo($(element).find('.fileTree.start .root'));
-  };
+  }
 
   FileTree.prototype = new EventEmitter2({
     wildcard: true,
@@ -160,9 +160,10 @@ define(['eventemitter2'], function(EventEmitter2) {
     // Procedure to create file
     var $parentDir = $(caller).hasClass('directory') ? $(caller) : $(caller).closest('.directory');
     var path = $parentDir.children('a').attr('rel');
-    var name = 'NewFile' + self.fileCount++;
     var $item;
+    var name;
     if(type=='file'){
+      name = 'NewFile ' + self.fileCount++;
       $item = $('<li/>', { class: 'file itsNew' }).append($('<a/>', { html: name, href: '#', rel: path + name }));
       $item.children('a').bind('dblclick', function(){
         self.openFile(this);
@@ -171,6 +172,7 @@ define(['eventemitter2'], function(EventEmitter2) {
         self.selectItem(this);
       });
     } else {
+      name = 'NewFolder ' + self.fileCount++;
       $item = $('<li/>', { class: 'directory itsNew' }).append($('<a/>', { html: name, href: '#', rel: path + name + '/' }));
       $item.children('a').bind('dblclick', function(){
         self.openDir(this);
@@ -202,7 +204,7 @@ define(['eventemitter2'], function(EventEmitter2) {
       selected = $('.filetree .root');
     }
     var path = selected.attr('rel');
-  }
+  };
 
   FileTree.prototype.openDir = function(element) {
     var self = this;
@@ -219,15 +221,15 @@ define(['eventemitter2'], function(EventEmitter2) {
   FileTree.prototype.openFile = function(element) {
     var path = $(element).attr('rel');
     this.emit('openFile', path);
-  }
+  };
 
   FileTree.prototype.open = function(caller){
   };
 
   FileTree.prototype.close = function(caller) {
     var self = this;
-    var $currTab = $(caller).parent()
-    var $tabList = $('#tabContainer li');
+    var $currTab = $(caller).parent();
+    var $tabList = $('#tabContainer').find('li');
     if($tabList.length > 1){
       var nextActiveTab;
       for (var i = 0; i < $tabList.length; i++) {
@@ -238,16 +240,16 @@ define(['eventemitter2'], function(EventEmitter2) {
         } else {
           nextActiveTab = $tabList[i];
         }
-      };
+      }
       $currTab.removeClass('active');
       $(nextActiveTab).addClass('active');
     }
-  }
+  };
 
   FileTree.prototype.selectItem = function(element) {
     $('.selected').removeClass('selected');
     $(element).addClass('selected');
-  }
+  };
 
   FileTree.prototype.openDir = function(element) {
     var self = this;
@@ -264,15 +266,15 @@ define(['eventemitter2'], function(EventEmitter2) {
   FileTree.prototype.openFile = function(element) {
     var path = $(element).attr('rel');
     this.emit('openFile', path);
-  }
+  };
 
   FileTree.prototype.open = function(caller){
   };
 
   FileTree.prototype.close = function(caller) {
     var self = this;
-    var $currTab = $(caller).parent()
-    var $tabList = $('#tabContainer li');
+    var $currTab = $(caller).parent();
+    var $tabList = $('#tabContainer').find('li');
     if($tabList.length > 1){
       var nextActiveTab;
       for (var i = 0; i < $tabList.length; i++) {
@@ -434,7 +436,7 @@ define(['eventemitter2'], function(EventEmitter2) {
     }
 
     var element = $('#tree');
-    $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a><li></ul>');
+    $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a></li></ul>');
 
     var currLength = 0;
     var tmp = this.fileTree;

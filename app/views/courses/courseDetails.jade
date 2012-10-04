@@ -5,75 +5,63 @@ block layout.body
   .container
     include ../_breadcrumb
     .container-fluid.course-index.inner-index
+      h3 #{course.title}
       .row-fluid
-        .span4
-          .course-header
-            - if(typeof(course.iconImage) != 'undefined')
-              .course-img
-                img(src='#{course.iconImage}')
         .span8
           .course-content
             .row-fluid
-              h1 #{course.title}
               - var creater = course.created_by ? course.created_by.name : undefined;
               - if(creater)
-                h5 Created By: #{creater}
-              h5 Date: #{course.created_at}
-            .row-fluid.detailsBorder
-              h3 Description
+                p.author-and-time Created by&nbsp
+                  span.name #{creater}&nbsp
+                  time(datetime="#{course.created_at}") #{course.created_at}
+                  .
+            .row-fluid
               p #{course.desc}
-            - if(false)
-              .row-fluid.detailsBorder
-                h3 Rating: 
-                img(src="/img/th_rating.gif")
-            - if(progress) 
-              - if(progress.status != 'completed')
-                .row-fluid.detailsBorder
-                  h3 Overall Course Progress
-                  .progress.progressTotal
-                    .bar(style="width: #{progress.progress}%;")
-                .row-fluid
-                  a.btn.btn-primary.btn-large(href="/course/#{course.id}/continue") Continue
-            - if(!progress)
-                a.btn.btn-primary.btn-large(href="/course/#{course.id}/start") Start
-      .row-fluid
-        .span12
+        .span1
+        .span3
+          .course-header
+            - if(typeof(course.iconImage) != 'undefined')
+              .course-img(style='background-image:url(#{course.iconImage})')
+          - if(false)
+            .row-fluid.detailsBorder
+              h3 Rating:
+              img(src="/img/th_rating.gif")
+          - if(progress)
+            - if(progress.status != 'completed')
+              .row-fluid
+                p Overall Course Progress
+                .progress
+                  .bar(style="width: #{progress.progress}%;")
+              .row-fluid
+                a.btn.btn-primary.btn-large(href="/course/#{course.id}/continue") Continue
+          - if(!progress)
+              a.btn.btn-primary.btn-large(href="/course/#{course.id}/start") Start
 
-      .row-fluid
-        .span6
-          #detailsAccordion.accordion#myCollapsible
-            each chapter in chapters
-              .accordion-group
-                -var chapterDesc = chapter.desc || "";
-                input.desc(name='desc' ,type='hidden' ,value='#{chapterDesc}')
-                input.title(name='title' ,type='hidden' ,value='#{chapter.title}')
-                div.accordion-heading.contentChapter
-                  a(href="##{chapter.id}", data-parent="#detailsAccordion", data-toggle="collapse", class="accordion-toggle") #{chapter.title}
+      .row-fluid(style="margin-top:30px;")
+        .span8
+          each chapter in chapters
+            -var chapterDesc = chapter.desc || "";
+            input.desc(name='desc' ,type='hidden' ,value='#{chapterDesc}')
+            input.title(name='title' ,type='hidden' ,value='#{chapter.title}')
+            h5 #{chapter.title}
+            p#chapterDesc #{chapterDesc}
+
+            - if(progress)
+              .progress
+                .bar(style="width: #{progress.chapters[chapter._id].progress}%;")
+            ul.lessonList
+              each lesson in chapter.lessons
+                - var icon = lesson.type + 'Icon';
+                li.lessonType(class="#{icon}", data-status="#{progress.chapters[chapter._id].lessons[lesson._id].status}") #{lesson.title}
                   - if(progress)
-                    .progress
-                      .bar(style="width: #{progress.chapters[chapter._id].progress}%;")
-                div(class="accordion-body collapse", id="#{chapter.id}", style="height: 0px;", title="#{chapter.title}")
-                  .accordion-inner
-                    ul.lessonList
-                      each lesson in chapter.lessons
-                        - var icon = lesson.type + 'Icon';
-                        li
-                          div.lessonType(class="#{icon}")
-                          - if(progress)
-                            div.lessonStatus.pull-right(class="#{progress.chapters[chapter._id].lessons[lesson._id].status}")
-                          div.lessonTitle
-                            - if(progress)
-                              a(href="/lesson/#{lesson.id}") #{lesson.title}
-                            - else 
-                              p #{lesson.title}
-        .span6
+                    span.lessonStatus
+
           -var title = "", desc = "";
           -if(chapters[0])
             title = chapters[0].title;
             desc = chapters[0].desc;
-          h3#chapterTitle #{title}
-          p#chapterDesc #{desc}
-          .row-fluid
+//          .row-fluid
             .btn-group.backBtn
               a.btn.btn-large(href="javascript:history.go(-1)") back
       - if(false)
@@ -93,8 +81,15 @@ block layout.body
 
   script(type='text/javascript')
     function init() {
-      $(".contentChapter").mouseover(function(e) {
-        $('#chapterTitle').html($(e.target).parents('.accordion-group').find('.title').val());
-        $('#chapterDesc').html($(e.target).parents('.accordion-group').find('.desc').val());
+    $(function(){
+        $(".contentChapter").mouseover(function(e) {
+              $('#chapterTitle').html($(e.target).parents('.accordion-group').find('.title').val());
+              $('#chapterDesc').html($(e.target).parents('.accordion-group').find('.desc').val());
+            });
       });
+      $("time").each(function(){
+        date = new Date($(this).text());
+        $(this).attr('datetime', date.toISOString());
+      });
+      $("time").timeago();
     }
