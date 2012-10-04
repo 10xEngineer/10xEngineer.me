@@ -85,21 +85,22 @@
       border-top 1px solid rgba(0,0,0,0.1)
       border-bottom 1px solid rgba(255,255,255,0.1)
       border-right 1px solid rgba(255,255,255,0.1)
+    .save-button
+        background-image url('/img/save-button.png')
+    .compile-button
+        background-image url('/img/compile-button.png')
+    .newfile-button
+        background-image url('/img/newfile-button.png')
+    .newfolder-button
+        background-image url('/img/newfolder-button.png')
+    .fullscreen-button
+      margin 3px 3px 3px 3px
+      background-image url('/img/full-screen.png')
       border-radius 4px
+      
   .image-button:hover
       background-color rgba(255,255,255,0.05)
-
-  .image-button.save-button
-      background-image url('/img/save-button.png')
-
-  .image-button.compile-button
-      background-image url('/img/compile-button.png')
-
-  .image-button.newfile-button
-      background-image url('/img/newfile-button.png')
-
-  .image-button.newfolder-button
-      background-image url('/img/newfolder-button.png')
+  
 
   .lessonBar
     position absolute
@@ -137,6 +138,8 @@ body.fullscreen
     .widget_sidebar
       width 0px
       transition-delay .4s
+    .image-button.fullscreen-button
+        background-image url('/img/un-full-screen.png')
     transition margin .4s ease-in-out .4s
 
 .log-line
