@@ -81,13 +81,13 @@ define(['vfs-client', 'editor'], function(VFSClient, Editor) {
     return false;
   });
   
-  $('#').click(function() {
-    editor.newFile();
+  $('#newfile').click(function() {
+    editor.tree.create($('.selected'), 'file');
     return false;
   });
   
-  $('#').click(function() {
-    editor.newFolder();
+  $('#newfolder').click(function() {
+    editor.tree.create($('.selected'), 'directory');
     return false;
   });
   

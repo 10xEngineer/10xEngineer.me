@@ -330,6 +330,7 @@ define(['eventemitter2'], function(EventEmitter2) {
     var anchor = $(caller).children('a');
     var newPath = oldPath = anchor.attr('rel');
     var newName = $(caller).children('input').val();
+    caller.children('input').remove();  
     if(newName.trim() != "") {
       anchor.html(newName);
       var path = anchor.attr('rel');
@@ -356,7 +357,6 @@ define(['eventemitter2'], function(EventEmitter2) {
     } else {
       this.emit('rename', newPath, oldPath, function(){
         anchor.html(newName);
-        caller.children('input').remove();
       });
     }
 
