@@ -9,7 +9,7 @@ block layout.body
       .row-fluid.span9
         .slides-wrapper
           ul.slides
-            each courseObject,courseIndex in courses
+            each courseObject,courseIndex in featuredCourses
               -if(courseObject.status == 'published' || isAdmin)
                 li(style="background:url(#{courseObject.wallImage}) no-repeat center center;")
                   .content
@@ -21,73 +21,12 @@ block layout.body
     .row-fluid
       .row-fluid.span12
         .courses-boxes
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_6)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_4)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_6)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_4)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-    .row-fluid
-      .row-fluid.span12
-        .courses-boxes
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_6)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_4)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_6)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_4)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-    .row-fluid
-      .row-fluid.span12
-        .courses-boxes
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_6)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_4)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_6)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-          .row-fluid.span3
-            div.course-box
-              div.course-image(style="background-image:url(/cdn/courseIconImage_4)")
-              h4 How To Train Your Dragon
-              p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
-
+          each regularCourse in regularCourses
+            .row-fluid.span3
+              div.course-box
+                div.course-image(style="background-image:url(#{regularCourse.iconImage})")
+                h4 #{regularCourse.title}
+                p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
 
   script(type="text/javascript")
     /*function init() {

@@ -9,39 +9,41 @@ var util = require('../helpers/util');
 
 module.exports = function() {};
 
-// List existing all courses
-module.exports.allList = function(req, res, next){
-  var Course = model.Course;
-  var Progress = model.Progress;
 
-  Course.find({}, function(error, courses){
-    if(error) return next(error);
-    res.render('courses/allList', { 
-      title: 'Courses',
-      courses: courses
-    });
-  });
-};
-
-// List existing featured courses
-module.exports.featuredList = function(req, res, next){
-  log.profile('course.featuredList');
+// List all courses
+module.exports.list = function(req, res, next){
+  log.profile('course.list');
   var Course = model.Course;
   var Progress = model.Progress;
   
   var formatedProgress = {};
-  Course.find({ featured : true }, function(error, courses){
+  Course.find({}, function(error, courses){
     if(error) return next(error);
+
+    // TODO: Do a map-reduce instead
+    var featuredCourses = [];
+    var regularCourses = [];
+
+    for(var index = courses.length - 1; index >= 0; index--) {
+      var course = courses[index];
+      if(course.featured) {
+        featuredCourses.push(course);
+      } else {
+        regularCourses.push(course);
+      }
+    }
+
     Progress.find({ user: req.user._id }, function(error, progresses){
       if(error) return next(error);
-      for(var index = 0; index < progresses.length; index++){
+      for(var index = progresses.length - 1; index >= 0; index--){
         var progress = progresses[index];
         formatedProgress[progress.course] = progress.status;
       }
-      log.profile('course.featuredList');
+      log.profile('course.list');
       res.render('courses', { 
         title: 'Courses',
-        courses: courses,
+        regularCourses: regularCourses,
+        featuredCourses: featuredCourses,
         progress : formatedProgress
       });
     });

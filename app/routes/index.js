@@ -135,8 +135,7 @@ module.exports = function(app) {
   app.post('/user/settings', verifyPermission('user', 'edit'), validation.lookUp(validationConfig.user.profileUpdate), user.settings);
   
   // Course
-  app.get('/courses', verifyPermission('course', 'read'), course.featuredList);
-  app.get('/courses/all', verifyPermission('course', 'read'), course.allList);
+  app.get('/courses', verifyPermission('course', 'read'), course.list);
 
   app.get('/course/:courseId', verifyPermission('course', 'read'), course.show);
   app.get('/course/:courseId/start', verifyPermission('course', 'read'), course.start);
