@@ -43,7 +43,7 @@ block layout.body
       require(['cycle'], function() {
         $(function(){
           $('ul.slides').cycle({
-            timeout: 0,
+            timeout: 5000,
             pager: '.slides-navigation',
             pagerAnchorBuilder: function(idx, slide) {
               title = $(slide).find('h3.courseTitle').text();
