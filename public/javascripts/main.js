@@ -124,11 +124,12 @@ require(['require',
     $('body').append(modal);
   };
 
-  window.setModalData = function(data) {
-    console.log(data.body);
-    console.log($('#myModal .modal-body p'));
+  window.setModalData = function(data, callback) {
+    if(typeof(callback)=='undefined' || callback == null) callback = function(){};
     $('#myModal .modal-body p').html(data.body);
-    $('#myModal .modal-footer a.btn.btn-danger').attr('href', data.path);
+    if(data.hasOwnProperty('path')) $('#myModal .modal-footer a.btn.btn-danger').attr('href', data.path);
+    else $('#myModal .modal-footer a.btn.btn-danger').attr('data-dismiss', 'modal');
+    callback(null, $('#myModal'));
   };
 
   window.displayMessage = function(type, message) {
