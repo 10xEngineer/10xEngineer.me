@@ -5,10 +5,9 @@ block layout.body
   .container
     include ../_breadcrumb
     .container-fluid.course-index.inner-index
-      h3 #{course.title}
+      h1.courseTitle #{course.title}
       .row-fluid
         .span8
-          .course-content
             .row-fluid
               - var creater = course.created_by ? course.created_by.name : undefined;
               - if(creater)
@@ -16,13 +15,13 @@ block layout.body
                   span.name #{creater}&nbsp
                   time(datetime="#{course.created_at}") #{course.created_at}
                   .
+                - if(typeof(course.iconImage) != 'undefined')
+                    .course-img(style='background-image:url(#{course.wallImage})')
             .row-fluid
               p #{course.desc}
         .span1
         .span3
           .course-header
-            - if(typeof(course.iconImage) != 'undefined')
-              .course-img(style='background-image:url(#{course.iconImage})')
           - if(false)
             .row-fluid.detailsBorder
               h3 Rating:
