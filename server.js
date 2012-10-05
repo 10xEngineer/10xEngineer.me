@@ -65,7 +65,6 @@ async.waterfall([
 
   // Start the application
   function(callback) {
-    var app = require('./app');
     var master = require('http').Server().listen(config.get('site:port'));
 
     var options = {
