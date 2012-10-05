@@ -42,6 +42,8 @@ require.config({
       exports: 'EventEmitter2'
     },
     'filetree': ['eventemitter2'],
+    'timeago': ['jquery'],
+    'cycle': ['jquery']
   },
   waitSeconds: 20
 });
@@ -55,7 +57,6 @@ require(['require',
   'filedrop',
   'fittext',
   'flexslider',
-  'cycle',
   'date',
   'timeago',
   'ipicture',

@@ -40,18 +40,18 @@ block layout.body
       });
     }*/
     function init() {
-    $(function(){
-        $('ul.slides').cycle(
-              {
-                timeout: 0,
-                pager: '.slides-navigation',
-                pagerAnchorBuilder: function(idx, slide) {
-                        title = $(slide).find('h3.courseTitle').text();
-                        description = $(slide).find('p.description').text();
-                        img = $(slide).css('background-image');
-                        return '<li><a href="#"><h4>' + title + '</h4><p>Some more content here</p></a></li>';
-                    }
-              }
-            );
-      })
+      require(['cycle'], function() {
+        $(function(){
+          $('ul.slides').cycle({
+            timeout: 0,
+            pager: '.slides-navigation',
+            pagerAnchorBuilder: function(idx, slide) {
+              title = $(slide).find('h3.courseTitle').text();
+              description = $(slide).find('p.description').text();
+              img = $(slide).css('background-image');
+              return '<li><a href="#"><h4>' + title + '</h4><p>Some more content here</p></a></li>';
+            }
+          });
+        });
+      });
     }
