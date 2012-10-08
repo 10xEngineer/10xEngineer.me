@@ -27,6 +27,9 @@ nbproject
 *.komodoproject
 .komodotools
 
+# vagrant
+.vagrant
+
 # Folders to ignore
 .hg
 .svn
