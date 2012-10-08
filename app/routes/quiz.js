@@ -127,6 +127,7 @@ module.exports.startQuiz = function(req, res, next) {
     if(questionPaper.length>0) {
       assessment.attemptedDetails = questionPaper;
     } else {
+      req.session.error = "Not enougth questions to appeare that quiz";
       return res.redirect('/lesson/'+lesson.id);
     }
     assessment.save(function(error){
