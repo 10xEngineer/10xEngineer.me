@@ -120,7 +120,16 @@ define(['eventemitter2'], function(EventEmitter2) {
     // Generete tree code
     this.fileTree = json;
 
-    $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a></li></ul>');
+    $(element).html('<ul class="fileTree start"><li class="directory expanded root"></li></ul>');
+    item = $('<a/>', {
+      href  : '#',
+      rel   : '/',
+      class : 'selected',
+      html  : '/'
+    }).appendTo($('ul.fileTree.start .root'));
+    $(item).bind('click', function(){
+      self.selectItem(this);
+    });
 
     fileList = json;
     var $ul = $('<ul/>', { class: 'fileTree' });
@@ -436,7 +445,17 @@ define(['eventemitter2'], function(EventEmitter2) {
     }
 
     var element = $('#tree');
-    $(element).html('<ul class="fileTree start"><li class="directory expanded root"><a href="#" rel="/">/</a></li></ul>');
+    $(element).html('<ul class="fileTree start"><li class="directory expanded root"></li></ul>');
+    item = $('<a/>', {
+      href  : '#',
+      rel   : '/',
+      class : 'selected',
+      html  : '/'
+    }).appendTo($('ul.fileTree.start .root'));
+    $(item).bind('click', function(){
+      self.selectItem(this);
+    });
+
 
     var currLength = 0;
     var tmp = this.fileTree;
