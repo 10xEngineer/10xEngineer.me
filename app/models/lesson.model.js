@@ -223,6 +223,7 @@ var getLessonIdByDirection = function(lesson, direction, callback) {
     if(flag === false) {
       getChapterContent(direction, chapter, function(error, preChapterId) {
         if(error) return callback(error);
+        if(preChapterId == null) return callback(null, null);
         callbackFunction(direction, preChapterId, callback);
       });
     } else {
