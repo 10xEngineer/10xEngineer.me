@@ -303,8 +303,13 @@ module.exports.editRoleView = function(req, res, next) {
       course_edit : false,
       course_insert : false,
       course_delete : false,
-      course_publish : false
+      course_publish : false,
 
+      assessment_read : false,
+      assessment_edit : false,
+      assessment_insert : false,
+      assessment_delete : false,
+      assessment_publish : false
     };
 
     for (indx = 0; indx < role.permissions.length; indx++){
@@ -426,7 +431,7 @@ module.exports.userInfo = function(req, res, next) {
 var getPermissionListForRole = function(req, callback) {
   var newRolePermits = [];
 
-  var entities = ['admin', 'user', 'course'];
+  var entities = ['admin', 'user', 'course', 'assessment'];
   var allowes = ['read', 'edit', 'insert', 'delete', 'publish'];
 
   for (eIndx = 0; eIndx < entities.length; eIndx++){

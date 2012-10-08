@@ -198,7 +198,7 @@ module.exports.copyToDisk = function(cdn_file, fs_path, file_name, callback){
 
     ins.pipe(outs);
     ins.on('end', function() {
-      callback();
+      callback(null, file_name+'.'+file_extension);
     });
   });
 };

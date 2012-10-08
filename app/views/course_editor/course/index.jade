@@ -16,7 +16,7 @@ block layout.body
               .btn-strip
                 a.btn.btn-success(href="/course_editor/chapter/create/#{course.id}") Add Chapter
                 a.btn(href='/course_editor/course/#{course.id}/edit') Edit Course Info
-                a.btn.btn-danger(href='/course_editor/course/#{course.id}/remove') Delete Course
+                a.confirmDeletion.btn.btn-danger(remove-path='/course_editor/course/#{course.id}/remove', data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{course.title}' course?") Remove Course
          
       .row-fluid
         ul.chapters
@@ -28,7 +28,7 @@ block layout.body
                 - if(user != undefined)
                   - if(chapter.status != 'published')
                     | (Draft)
-                  a.btn.btn-danger.pull-right(href='/course_editor/chapter/#{chapter.id}/remove') Delete
+                  a.confirmDeletion.btn.btn-danger.pull-right(remove-path='/course_editor/chapter/#{chapter.id}/remove', data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{chapter.title}' chapter?") Remove
                   - if(chapter.status != 'published')
                     a.btn.btn-success.pull-right(href='/course_editor/chapter/#{chapter.id}/publish') Publish
                   - else
@@ -42,3 +42,35 @@ block layout.body
 
       div
         a.btn(href='/course_editor') Back
+
+  script(type="text/javascript")
+
+    function init(){
+      var myData;
+
+      createModal();
+
+      console.log($('#myModal'));
+
+      $('#myModal').on('show', function(e){
+        var data = bridge(false);
+        setModalData(data);
+      });
+
+      var bridge = function(bool, data) {
+        if(bool){
+          myData = data;
+        } else {
+          return myData;
+        }
+      }
+
+      $('.confirmDeletion').click(function(e){
+        var self = $(this);
+        var tmpData = {
+          path: self.attr('remove-path'),
+          body: self.attr('confirm-msg')
+        }
+        bridge(true, tmpData);
+      });      
+    }

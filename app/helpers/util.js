@@ -176,6 +176,19 @@ module.exports.processImage = function(imagePath, options, callback) {
 
 };
 
+module.exports.sortLessonAccordingToChapter = function(lessons, chapter_lessons, callback) {
+  if(chapter_lessons.length != lessons.length) return callback("No of lessons - conflicts.");
+
+  var sortedLessons = [];
+  var length = lessons.length;
+  for (var i = 0; i < length; i++) {
+    var id = lessons[i]._id;
+    var index = chapter_lessons.indexOf(id);
+    sortedLessons[index] = lessons[i];
+  };
+  return callback(null, sortedLessons);
+}
+
 module.exports.compareArray = function(array0, array1) {
   var result = true;
   arr1Length = array1.length;

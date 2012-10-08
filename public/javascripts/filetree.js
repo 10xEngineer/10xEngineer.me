@@ -181,21 +181,38 @@ define(['eventemitter2'], function(EventEmitter2) {
         self.selectItem(this);
       });
     }
-    $parentDir.append($item);
+    if($parentDir.hasClass('collapsed')){
+      self.openDir($parentDir.children('a'), function(){
+        $parentDir.children('ul').append($item);
+        self.rename($item);
+      });
+    }   
+    else {
+      var $ul;
+      if($parentDir.children('ul').length == 0) $('<ul/>', {class: 'fileTree'}).appendTo($parentDir);
+      $ul = $parentDir.children('ul');
+      $ul.append($item);
+      self.rename($item);
+    }
 
     // this.emit('create', name, path, type);
-
-    this.rename($item);
   };
 
   FileTree.prototype.remove = function(caller) {
-
+    var self = this
     var path = $(caller).children('a').attr('rel');
+    createModal();
+    setModalData({
+      body: 'Really want to remove...',
+    }, function(error, $modal){
+      $modal.find('.modal-footer a.btn.btn-danger').click(function(){
+        self.emit('remove', path, caller);
+      });
+      $modal.modal('show');
+    });
 
-    caller.remove();
-   
-    this.emit('remove', path);
-    
+    // caller.remove();
+    // this.emit('remove', path);
   };
 
   FileTree.prototype.getSelected = function() {
@@ -206,12 +223,12 @@ define(['eventemitter2'], function(EventEmitter2) {
     var path = selected.attr('rel');
   };
 
-  FileTree.prototype.openDir = function(element) {
+  FileTree.prototype.openDir = function(element, callback) {
     var self = this;
     var $parent = $(element).parent();
     var path = $(element).attr('rel');
     if($parent.hasClass('collapsed')) {
-      this.emit('openDir', path, element);
+      this.emit('openDir', path, element, callback);
     } else {
       self.collapse(element);
     }
@@ -235,7 +252,7 @@ define(['eventemitter2'], function(EventEmitter2) {
       for (var i = 0; i < $tabList.length; i++) {
         var found = ($($tabList[i]).attr('rel') == $currTab.attr('rel') && $($tabList[i]).html() == $currTab.html());
         var condition = ( found && !(typeof(nextActiveTab)=='undefined'));
-        if(condition){
+        if(condition) {
           break;
         } else {
           nextActiveTab = $tabList[i];
@@ -249,17 +266,6 @@ define(['eventemitter2'], function(EventEmitter2) {
   FileTree.prototype.selectItem = function(element) {
     $('.selected').removeClass('selected');
     $(element).addClass('selected');
-  };
-
-  FileTree.prototype.openDir = function(element) {
-    var self = this;
-    var $parent = $(element).parent();
-    var path = $(element).attr('rel');
-    if($parent.hasClass('collapsed')) {
-      this.emit('openDir', path, element);
-    } else {
-      self.collapse(element);
-    }
   };
 
 
@@ -297,38 +303,39 @@ define(['eventemitter2'], function(EventEmitter2) {
   };
 
   FileTree.prototype.rename = function(caller) {
+    var name = $(caller).children('a').html();
     var $input = $('<input/>', {
       type: 'text',
-      value: $(caller).children('a').html()
+      value: name
     });
 
+    $(caller).children('a').html("");
     $(caller).append($input);
-    $input.focus();
+
+    $input.focus().select();
     var self = this;
     $input.bind({
       keypress: function() {
         if(event.keyCode == 13) {
-          self.renameFinished(caller);
+          self.renameFinished(caller, name);
         }
       },
       blur: function() {
-        self.renameFinished(caller);
+        self.renameFinished(caller, name);
       }
     }); 
 
     //this.emit('rename');
   };
 
-  FileTree.prototype.renameFinished = function(caller) {
-    
+  FileTree.prototype.renameFinished = function(caller, oldName) {
     var anchor = $(caller).children('a');
     var newPath = oldPath = anchor.attr('rel');
-    var oldName = anchor.html();
     var newName = $(caller).children('input').val();
+    caller.children('input').remove();  
     if(newName.trim() != "") {
       anchor.html(newName);
       var path = anchor.attr('rel');
-      
       if(caller.hasClass('file')) {
         var pattern = new RegExp(oldName + "$");
         anchor.attr('rel', path.replace(pattern, newName));
@@ -336,29 +343,23 @@ define(['eventemitter2'], function(EventEmitter2) {
         var pattern = new RegExp(oldName + "\\/$");
         anchor.attr('rel', path.replace(pattern, newName)+"/");
       }
-      
-      caller.children('input').remove();
-      anchor.css('display', 'block');
       newPath = anchor.attr('rel');
-    }
-    else{
-      caller.children('input').remove();
     }
     
     // Event emit for rename done 
-    var p = anchor.parent();
-    var pp = p.parent().children('a');
-    console.log(pp);
+    var p = anchor.parent('li');
+    var parentDir = p.parent().parent()
+    var parentAnchor = parentDir.children('a');
     if(p.hasClass('itsNew')){
       var type = p.hasClass('file') ? 'file': 'directory';
       var name = anchor.html();
-      var path = pp.attr('rel');
-      console.log("name :: ", name);
-      console.log("path :: ", path);
-      console.log("type :: ", type);
-      this.emit('create', name, path, type);
+      var path = parentAnchor.attr('rel');
+      p.removeClass('itsNew');
+      this.emit('create', name, path, type, caller);
     } else {
-      this.emit('rename', newPath, oldPath);
+      this.emit('rename', newPath, oldPath, function(){
+        anchor.html(newName);
+      });
     }
 
   };
@@ -376,7 +377,6 @@ define(['eventemitter2'], function(EventEmitter2) {
       indx ++;
     }
     // Append JSON code completed
-
     $parent.removeClass('collapsed').addClass('expanded');
 
     fileList = json;

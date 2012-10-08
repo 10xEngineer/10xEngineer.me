@@ -35,11 +35,37 @@ block layout.body
               a.btn.btn-success(href="/admin/user/#{user.id}/roles", id='#{user.id}')
                 i.icon-edit.icon-white
                 |  Edit Roles
-              a.btn.btn-danger(href="/admin/user/#{user.id}/remove")
+              a.confirmDeletion.btn.btn-danger(remove-path="/admin/user/#{user.id}/remove", data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{user.name}' user?")
                 i.icon-trash.icon-white 
                 |  Delete User
   script(type='text/javascript')
     function init() {
+
+      // code for confirm box - modal
+      var myData;
+      createModal();
+      console.log($('#myModal'));
+      $('#myModal').on('show', function(e){
+        var data = bridge(false);
+        setModalData(data);
+      });
+      var bridge = function(bool, data) {
+        if(bool){
+          myData = data;
+        } else {
+          return myData;
+        }
+      }
+      $('.confirmDeletion').click(function(e){
+        var self = $(this);
+        var tmpData = {
+          path: self.attr('remove-path'),
+          body: self.attr('confirm-msg')
+        }
+        bridge(true, tmpData);
+      });      
+
+
       var classes = [], colors = [];
       $('p span').each(function(index, item){
         var classInstance = $(item).attr('class');

@@ -43,4 +43,36 @@ block layout.body
                   a.btn(href="/course_editor/course/#{course.id}/export") Export
                   -if(course.status == 'published')
                     a.btn.btn-warning(href="/course_editor/course/#{course.id}/unpublish") Unpublish
-                  a.btn.btn-danger(href="/course_editor/course/#{course.id}/remove") Remove
+                  a.confirmDeletion.btn.btn-danger(remove-path="/course_editor/course/#{course.id}/remove", data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{course.title}' course?") Remove
+  
+  script(type="text/javascript")
+
+    function init(){
+      var myData;
+
+      createModal();
+
+      console.log($('#myModal'));
+
+      $('#myModal').on('show', function(e){
+        var data = bridge(false);
+        setModalData(data);
+      });
+
+      var bridge = function(bool, data) {
+        if(bool){
+          myData = data;
+        } else {
+          return myData;
+        }
+      }
+
+      $('.confirmDeletion').click(function(e){
+        var self = $(this);
+        var tmpData = {
+          path: self.attr('remove-path'),
+          body: self.attr('confirm-msg')
+        }
+        bridge(true, tmpData);
+      });      
+    }

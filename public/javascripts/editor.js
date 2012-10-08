@@ -248,23 +248,17 @@ function Editor(options) {
 
 
   // Bind events to fileTree
-  this.tree.on('create', function(name, path, type) {
+  this.tree.on('create', function(name, path, type, element) {
     if((type=='file')){
-      self.vfs.newFile(name, path, function(err){
-        console.log("Get Call back of file creation at VFS.");
-        if(err){
-          console.log("Error in "+type+" creation.");
-        } else {
-          console.log(type+" has been created successfully.");
+      self.vfs.newFile(name, path, function(responce) {
+        if(responce.status != 200){
+          $(element).remove();
         }
       });
     } else {
-      self.vfs.newDir(name, path, function(err){
-        if(err){
-          console.log("Error in "+type+" creation.");
-        }
-        else{
-          console.log(type+" has been created successfully.");
+      self.vfs.newDir(name, path, function(responce) {
+        if(responce.status != 200){
+          $(element).remove();
         }
       });
     }
@@ -275,15 +269,14 @@ function Editor(options) {
   });
 
   // RENAME EVENT
-  this.tree.on('rename', function(newName, oldName){
-    self.vfs.rename(newName, oldName, function(){
-      console.log("Test Callback");
+  this.tree.on('rename', function(newName, oldName, callback){
+    self.vfs.rename(newName, oldName, function(res){
+      if(res.status==200) callback();
     });
   });
 
   // REMOVE EVENT
-  this.tree.on('remove', function(path){
-    console.log(path);
+  this.tree.on('remove', function(path, caller){
     if(/\/$/.test(path)){
       self.vfs.removeDir(path, function(error) {
         if(!error) {
@@ -303,9 +296,11 @@ function Editor(options) {
     self.openTab(path);
   });
 
-  this.tree.on('openDir', function(path, element) {
-    self.vfs.readDir(path, function(json){
+  this.tree.on('openDir', function(path, element, callback) {
+    callback = callback || function(){};
+    self.vfs.readDir(path, function(json) {
       self.tree.expand(element, json);
+      callback();
     });
   });
 

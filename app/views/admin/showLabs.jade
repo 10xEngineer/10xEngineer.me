@@ -28,4 +28,32 @@ block layout.body
             td #{lab.runList}
             td 
               a.btn.btn-success(href="/admin/labs/#{lab.id}/edit") Edit 
-              a.btn.btn-danger(href="/admin/labs/#{lab.id}/remove") Delete
+              a.confirmDeletion.btn.btn-danger(remove-path="/admin/labs/#{lab.id}/remove", data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{lab.name}' user?") Remove
+
+  script(type="text/javascript")
+    function init() {
+
+      // code for confirm box - modal
+      var myData;
+      createModal();
+      console.log($('#myModal'));
+      $('#myModal').on('show', function(e){
+        var data = bridge(false);
+        setModalData(data);
+      });
+      var bridge = function(bool, data) {
+        if(bool){
+          myData = data;
+        } else {
+          return myData;
+        }
+      }
+      $('.confirmDeletion').click(function(e){
+        var self = $(this);
+        var tmpData = {
+          path: self.attr('remove-path'),
+          body: self.attr('confirm-msg')
+        }
+        bridge(true, tmpData);
+      });      
+    }
