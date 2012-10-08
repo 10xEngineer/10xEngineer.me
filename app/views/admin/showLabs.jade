@@ -28,7 +28,7 @@ block layout.body
             td #{lab.runList}
             td 
               a.btn.btn-success(href="/admin/labs/#{lab.id}/edit") Edit 
-              a.confirmDeletion.btn.btn-danger(remove-path="/admin/labs/#{lab.id}/remove", data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{lab.name}' user?") Remove
+              a.confirmDeletion.btn.btn-danger(remove-path="/admin/labs/#{lab.id}/remove", data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{lab.name}' lab?") Remove
 
   script(type="text/javascript")
     function init() {

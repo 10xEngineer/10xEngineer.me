@@ -16,7 +16,7 @@ block layout.body
             div.listItemComponent
               label #{role.name}
             div.listItemComponent.pull-right
-              a.confirmDeletion.btn.btn-danger(remove-path="/admin/role/#{role.id}/remove", data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{role.name}' user?") Remove
+              a.confirmDeletion.btn.btn-danger(remove-path="/admin/role/#{role.id}/remove", data-toggle="modal", data-target="#myModal", confirm-msg="Are you sure you want to remove '#{role.name}' role?") Remove
             div.listItemComponent.pull-right
               a.btn((href="/admin/role/#{role.id}/edit") Edit
     p
