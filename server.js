@@ -1,7 +1,6 @@
 var fs = require('fs');
 
 var async = require('async');
-var mongoose = require('mongoose');
 var redis = require("redis");
 var winston = require('winston');
 var up = require('up');
@@ -50,18 +49,6 @@ async.waterfall([
       callback();
     });
   },
-
-  // Migrating database schema and import data
-  /*function(callback) {
-    log.info('Migrating database schema/data to the latest version (if required).');
-    require('./app/helpers/dbMigrator')(config, function(error) {
-      if(error) {
-        return callback(error);
-      }
-
-      callback();
-    });
-  },*/
 
   // Start the application
   function(callback) {
