@@ -52,9 +52,13 @@ block layout.body
             ul.lessonList
               each lesson in chapter.lessons
                 - var icon = lesson.type + 'Icon';
-                li.lessonType(class="#{icon}", data-status="#{progress.chapters[chapter._id].lessons[lesson._id].status}") #{lesson.title}
-                  - if(progress)
-                    span.lessonStatus
+                - if(progress)
+                  li.lessonType(class="#{icon}", data-status="#{progress.chapters[chapter._id].lessons[lesson._id].status}") 
+                    a(href="/lesson/#{lesson.id}")
+                      div #{lesson.title}
+                        span.lessonStatus
+                - else 
+                  li.lessonType(class="#{icon}") #{lesson.title}
 
           -var title = "", desc = "";
           -if(chapters[0])
