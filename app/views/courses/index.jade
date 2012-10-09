@@ -23,10 +23,11 @@ block layout.body
         .courses-boxes
           each regularCourse in regularCourses
             .row-fluid.span3
-              div.course-box
-                div.course-image(style="background-image:url(#{regularCourse.iconImage})")
-                h4 #{regularCourse.title}
-                p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
+              a(href="/course/#{regularCourse.id}")
+                div.course-box
+                  div.course-image(style="background-image:url(#{regularCourse.iconImage})")
+                  h4 #{regularCourse.title}
+                  p This course provides a detailed guideline for training your pet dragon. It is perfect for the vikings.
 
   script(type="text/javascript")
     /*function init() {
