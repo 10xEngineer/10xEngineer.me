@@ -77,7 +77,7 @@ module.exports = (function() {
       store: sessionStore,
       secret: 'shhhhhh',
       key: 'my.sid',
-      cookie: {maxAge: 31557600000 }
+      cookie: { maxAge: 86400000 }
     }));
 
     // Auth and routes
