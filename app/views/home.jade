@@ -1,0 +1,49 @@
+extends layout
+
+block layout.body
+  .home-page
+    .top-banner
+      a(href="#") Get started
+    .main-container
+      .container
+        .feature-box
+          .span3
+            img(src="http://dummyimage.com/220x200/ddd/777")
+          .span8
+            h3 Something about training
+            p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla posuere nulla aliquet leo condimentum sit amet pellentesque elit laoreet. Duis porta auctor nibh. Pellentesque id leo ac augue egestas iaculis. Nulla facilisi. Cras eget ipsum mi. Pellentesque neque risus, vestibulum vel posuere sed, tincidunt a quam. Praesent semper purus magna, ac blandit nisl.
+        .feature-box
+          .span3
+            img(src="http://dummyimage.com/220x200/ddd/777")
+          .span8
+            h3 Something about training
+            p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla posuere nulla aliquet leo condimentum sit amet pellentesque elit laoreet. Duis porta auctor nibh. Pellentesque id leo ac augue egestas iaculis. Nulla facilisi. Cras eget ipsum mi. Pellentesque neque risus, vestibulum vel posuere sed, tincidunt a quam. Praesent semper purus magna, ac blandit nisl.
+        .feature-box
+          .span3
+            img(src="http://dummyimage.com/220x200/ddd/777")
+          .span8
+            h3 Something about training
+            p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla posuere nulla aliquet leo condimentum sit amet pellentesque elit laoreet. Duis porta auctor nibh. Pellentesque id leo ac augue egestas iaculis. Nulla facilisi. Cras eget ipsum mi. Pellentesque neque risus, vestibulum vel posuere sed, tincidunt a quam. Praesent semper purus magna, ac blandit nisl.
+        ul.footer-links
+          li
+            a(href="#") Links
+          li
+            a(href="#") Contact
+          li
+            a(href="#") Privacy Policy
+          li
+            a(href="#") Terms
+        p.copyright All Rights Reserved &copy; 2012 10xEngineer
+  .container
+    .row-fluid
+      - if(isLoggedIn && (user.roles.indexOf('user') !== -1 || user.roles.indexOf('admin') !== -1))
+        div.align-center
+          div.mainPageBtnContainer
+            div
+              a.btn.btn-info.courseBtn(href="/courses")
+                div.mainPageBtn
+                  div
+                    img(src="/images/courses.png")
+                  div.courseBtnText
+                    p Courses
+

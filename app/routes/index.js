@@ -109,6 +109,7 @@ module.exports = function(app) {
 
   // Miscellaneous
   app.get('/', main.home);
+  app.get('/landing', main.landing);
   app.get('/about', main.about);
   app.get('/tarball/:bucketId', main.tarball);
 

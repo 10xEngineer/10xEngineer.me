@@ -6,8 +6,17 @@ module.exports = function() {};
 
 // Miscellaneous routes
 module.exports.home = function(req, res, next){
-  res.render('main', {
+  res.render('home', {
     title: '10xEngineer.me Home', 
+    coursenav: "N",
+    Course: '',
+    Unit: ''
+  });
+};
+
+module.exports.landing = function(req, res, next){
+  res.render('landing', {
+    title: '10xEngineer.me Landing Page',
     coursenav: "N",
     Course: '',
     Unit: ''
