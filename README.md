@@ -9,9 +9,10 @@ It focuses on making the next generation of elite engineers and offers tailored 
 Copyright and license
 ---------------------
 
-Copyright 2012 Messina Ltd
+Copyright 2013 10xEngineer Ltd
+steve@10xengineer.me
 
-This work is the sole property of Steve Messina, Messina Ltd and 10xEngineer.me brand
+This work is the sole property of 10xEngineer Ltd brand
 you may not use this work except in compliance with the License.
 
 Unless required by applicable law or agreed to in writing, software
