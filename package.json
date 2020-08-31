@@ -13,7 +13,7 @@
       "async": "latest"
     , "bcrypt": "0.7.x"
     , "10xCompiler": "git+ssh://git@github.com:10xEngineer/10xCompiler.git"
-    , "connect": "1.8.x"
+    , "connect": "3.7.x"
     , "connect-form": "0.2.x"
     , "connect-redis": "1.x"
     , "cookie": "0.0.3"
